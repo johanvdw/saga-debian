@@ -1,0 +1,834 @@
+ORIGINAL	TRANSLATION
+1 byte integer	1 Byte Ganzzahl
+2 byte integer	2 Byte Ganzzahl
+20 seconds	20 Sekunden
+4 byte floating point	4 Byte Fließkommazahl
+4 byte integer	4 Byte Ganzzahl
+8 byte floating point	8 Byte Fließkommazahl
+A3 Landscape	
+A3 Portrait	
+A4 Landscape	
+A4 Portrait	
+About SAGA	Über SAGA
+Acknowledgements	Danksagungen
+Activate Grid File Cache?	Dateipuffer für Raster aktivieren?
+Activate file caching automatically, if memory size exceeds the threshold value.	Dateipuffer für Raster automatisch aktivieren, wenn Speicherbedarf Schwellenwert überschreitet.
+Add Field	Feld hinzufügen
+All Files	Alle Dateien
+All Recognised Files	Alle erkannten Dateitypen
+Area	Fläche
+Attribute	Attribut
+Automatic mode	Automatisch
+Available Choices	Auswahlmöglichkeiten
+Bars	Balken
+Buffer Size [MB]	Puffergröße
+CLASS	KLASSE
+COLOR	FARBE
+COUNT	ANZAHL
+Chart Type	Diagrammtyp
+Choose Attribute	Wähle Attribut
+Class 1	Klasse 1
+Class 2	Klasse 2
+Clear	Löschen
+Colors file could not be exported.	Farbdatei konnte nicht erstellt werden.
+Colors file could not be imported.	Farbdatei konnte nicht geladen werden.
+CompuServe Graphics Interchange	
+Confirm file caching	Dateipufferaktivierung jedesmal bestätigen
+Constraints	Einschränkungen
+Copy	Kopieren
+Create Lookup Table	Nachschlagetabelle erstellen
+Create index	Index erstellen
+Creating module documentation files	Dateien zur Moduldokumentation erstellen
+Currently no help files exist for SAGA.\nIt depends on your support, if you will find any help at this place in future!\nThanks a lot...	Zur Zeit existiert keine Programmhilfe für SAGA\nEs hängt auch von Deiner/Ihrer Unterstützung ab, ob hier in Zukunft eine Hilfe zur Verfügung stehen wird.\nVielen Dank im voraus...
+DBase	
+DESCRIPTION	BESCHREIBUNG
+Data Table	Datentabelle
+Delete Fields	Felder löschen
+Description	Beschreibung
+Descriptive name for the grid system	Anschaulicher Name für das Rastersystem
+Direction	Richtung
+Directory, where temporary cache files shall be saved.	Verzeichnis, in dem temporäre Dateipuffer gespeichert werden sollen.
+ESRI Shape Files	
+Error	Fehler
+Error in Trend Calculation	Fehler in Trendberechnung
+Error in formula	Fehler in Formel
+Exit SAGA	SAGA beenden
+Field	Feld
+Field Colors	Farbe für Attribut
+Field Type	Datentyp
+Fields	Felder
+First Class	Erste Klasse
+Function failed because no attributes are available	Funktion schlug fehl, weil keine Attribute verfügbar sind.
+General	Allgemein
+Grid File Caching	Dateipufferung für Raster
+Grids	Raster
+Height	Höhe
+I1: unrecognizable operator	
+I2: too many parameters	
+I3: corrupted buffer	
+I4: size estimate too small	
+Identifier	Bezeichner
+Image Files	Bilddateien
+Image Resolution	Bildauflösung
+In/Out	Eingabe/Ausgabe
+Input	Eingabe
+Insert Method	Einfügemethode
+Insert Position	Einfügeposition
+JPEG - JFIF Compliant	
+JPG Files	JPG Dateien
+Layers	Schichten
+Left/Right	Links/Rechts
+Legend: Save	Legende: Speichern
+Legend: Zoom	Legende: Vergrößerung
+Length	Länge
+Lines	Linien
+Lines and Points	Linien und Punkte
+Load Colors	Lade Farben
+Load Parameters	Lade Parameter
+Logo	
+MAXIMUM	
+MINIMUM	
+Map	Karte
+Maps	Karten
+Maximum	
+Menu	Menü
+Minimum	
+Module	Modul
+NAME	
+Name	
+Neon	
+Options	Optionen
+Options for Data Thumbnails	Optionen für Daten-Vorschaubilder
+Options for Map Thumbnails	Optionen für Karten-Vorschaubilder
+Output	Ausgabe
+PDF Files	
+PNG Files	
+Parameters	Parameterliste
+Parameters file could not be exported.	Parameterdatei konnte nicht erstellt werden.
+Parameters file could not be imported.	Parameterdatei konnte nicht geladen werden.
+Parts	Teile
+Perimeter	Umfang
+Please stop module execution before exiting SAGA.	Um SAGA zu beenden, muß erst das laufende Modul angehalten werden.
+Points	Punkte
+Portable Network Graphics	
+Position	
+Rainbow	Regenbogen
+Resolution	Auflösung
+Row	Reihe
+SAGA Colors	SAGA Farben
+SAGA Help	SAGA Hilfe
+SAGA Module Libraries	
+SAGA Module Library Descriptions	
+SAGA Parameter Files	
+SAGA Project	
+SAGA Projects	
+SAGA: Print Map	
+SVG - Scalable Vector Graphics Files (*.svg)	
+Save 3D Image Options	
+Save Colors	
+Save Georeference	
+Save Parameters	
+Save all	
+Scale	
+Second Class	
+Selection Color	
+Shall I activate file caching for new grid.	
+Show Categories	
+Show Logo at Start Up	
+Sort Table	
+Sort by	
+South-North	
+Start Project	
+Table	
+Tables	
+Tagged Image File Format	
+Temporary files	
+Text	
+Text Files	
+This is a Test!!!	
+Threshold for automatic mode [MB]	
+Thumbnail Size	
+Thumbnails	
+Total memory size	
+Tree	
+Type	
+Up/Down	
+Value Range	
+Version	
+West-East	
+Width	Breite
+Windows or OS/2 Bitmap	
+X	
+X11 Pixel Map	
+Y	
+Z	
+Zsoft Paintbrush	
+[BTN] Add	Hinzufügen
+[BTN] Apply	Anwenden
+[BTN] Button	
+[BTN] Cancel	Abbrechen
+[BTN] Clear	Alles löschen
+[BTN] Count	Anzahl
+[BTN] Delete	Löschen
+[BTN] Down	Ab
+[BTN] Execute	Ausführen
+[BTN] Insert	Einfügen
+[BTN] Invert	Invertieren
+[BTN] Load	Laden
+[BTN] Mirror	Spiegeln
+[BTN] Okay	
+[BTN] Presets	
+[BTN] Random	Zufall
+[BTN] Restore	Wiederherstellen
+[BTN] Save	Speichern
+[BTN] Up	Auf
+[CAP] 3D-View	3D-Ansicht
+[CAP] 3D-View: Player Sequence	3D-Ansicht: Abspielsequenz
+[CAP] About SAGA	Über SAGA
+[CAP] Anaglyph	
+[CAP] Arithmetic Mean	Mittelwert
+[CAP] Attribute	Attribut
+[CAP] Attribute (Size)	
+[CAP] Attributes	Attribute
+[CAP] Author	Autor
+[CAP] Background Color	Hintergrundfarbe
+[CAP] Beep when finished	
+[CAP] Buffer Size MB	
+[CAP] Cell Size	Zellgröße
+[CAP] Cell size	Zellgröße
+[CAP] Chart	
+[CAP] Chart Properties	
+[CAP] Choose Directory	
+[CAP] Circles	Kreise
+[CAP] Close	
+[CAP] Close and save modified data sets...	
+[CAP] Color	Farbe
+[CAP] Colors	Farben
+[CAP] Create Script Command File	
+[CAP] Data	Daten
+[CAP] Data History	
+[CAP] Decimals	Dezimalstellen
+[CAP] Default Size	
+[CAP] Defaults	
+[CAP] Delete	Löschen
+[CAP] Description	Beschreibung
+[CAP] Diagram	Diagramm
+[CAP] Display	Darstellung
+[CAP] Display Resolution	Auflösung
+[CAP] Display Type	Darstellungsart
+[CAP] Display: Cell Values	
+[CAP] Display: Color Classification	
+[CAP] Display: Label	
+[CAP] Display: Size	
+[CAP] Display: Visibility	
+[CAP] Edit	
+[CAP] Edit Shapes	Vektordaten editieren
+[CAP] Elevation	Höhe
+[CAP] Errors	Fehler
+[CAP] Exaggeration	Überhöhung
+[CAP] Execution	Modulausführung
+[CAP] Exit	Beenden
+[CAP] Eye Distance [Degree]	
+[CAP] Field	Feld
+[CAP] Fields	
+[CAP] Figure	
+[CAP] File	Datei
+[CAP] File cache activated	
+[CAP] Fill Style	Füllstil
+[CAP] Fit Map Scale	Maßstab anpassen
+[CAP] Font	Schriftart
+[CAP] Frame	
+[CAP] General	Allgemein
+[CAP] Graduated Color	Abgestufte Farben
+[CAP] Grid	Raster
+[CAP] Grid System	Raster System
+[CAP] Grid Systems	Raster Systeme
+[CAP] Grids	Raster
+[CAP] Histogram	Histogramm
+[CAP] Html Extra Info	
+[CAP] Index	
+[CAP] Info	
+[CAP] Input	Eingabe
+[CAP] Interpolated	Interpoliert
+[CAP] Interpolation	
+[CAP] Layers	
+[CAP] Legend	
+[CAP] Load	
+[CAP] Load Colors	Lade Farben
+[CAP] Load Grid	Lade Raster
+[CAP] Load Module Library	Lade Modulbibliothek
+[CAP] Load Project	Lade Projekt
+[CAP] Load Settings	
+[CAP] Load Shapes	Lade Vektordaten
+[CAP] Load TIN	
+[CAP] Load Table	Lade Tabelle
+[CAP] Load Text	Lade Text
+[CAP] Logarithmic Stretch Factor	Logarithmische Streckung
+[CAP] Lookup Table	Nachschlagetabelle
+[CAP] Map	Karte
+[CAP] Map Extent	
+[CAP] Map Scale	Maßstab
+[CAP] Map Selection	Kartenauswahl
+[CAP] Map-Layout	
+[CAP] Maps	Karten
+[CAP] Memory	Speicher
+[CAP] Memory Compression	
+[CAP] Memory Handling	Speicherverwaltung
+[CAP] Memory Size	Speicherbedarf
+[CAP] Messages	Nachrichten
+[CAP] Mode	Modus
+[CAP] Modified	Modifiziert
+[CAP] Module Execution	Modulausführung
+[CAP] Module Libraries	Modulbibliotheken
+[CAP] Module Library	Modulbibliothek
+[CAP] Modules	Module
+[CAP] Name	
+[CAP] No Data	Keine Daten
+[CAP] Number Of Cells	Anzahl der Zellen
+[CAP] Number Of Grids	Anzahl der Rasterdatensätze
+[CAP] Number Of Shapes	Anzahl der Vektordatensätze
+[CAP] Number of cells	Anzahl der Zellen
+[CAP] Object Properties	
+[CAP] Open	
+[CAP] Options	Optionen
+[CAP] Outline	Umrandung
+[CAP] Outline Color	
+[CAP] Outline Size	
+[CAP] Parameters	Parameter
+[CAP] Perspectivic Distance	Perspektivischer Abstand
+[CAP] Points	Punkte
+[CAP] Preset Selection	
+[CAP] Print Layout	
+[CAP] Print Preview	Druckvorschau
+[CAP] Project File	
+[CAP] Projection	Projektion
+[CAP] Properties	Eigenschaften
+[CAP] Records	
+[CAP] Regression Details	Regressionsdetails
+[CAP] Regression Formula	Regressionsformel
+[CAP] Rotation	
+[CAP] Save	
+[CAP] Save As Image	Als Bild speichern...
+[CAP] Save As Interactive SVG	
+[CAP] Save Colors	Farben speichern
+[CAP] Save Grid	Raster speichern
+[CAP] Save Grid as Image...	
+[CAP] Save Map as Image...	
+[CAP] Save Project	Projekt speichern
+[CAP] Save Settings	
+[CAP] Save Shapes	Vektordaten speichern
+[CAP] Save TIN	
+[CAP] Save Table	Tabelle speichern
+[CAP] Save Text	Text speichern
+[CAP] Save to PDF	
+[CAP] Scale Dependent	
+[CAP] Scatterplot	
+[CAP] Select File	Datei wählen
+[CAP] Settings	
+[CAP] Shapes	Vektordaten
+[CAP] Shift	
+[CAP] Show	Anzeigen
+[CAP] Show Always	
+[CAP] Show Edges	Kanten anzeigen
+[CAP] Show Filled	
+[CAP] Show Legend	Legende anzeigen
+[CAP] Show Nodes	
+[CAP] Show Regression Curve	Regressionskurve anzeigen
+[CAP] Show Vertices	
+[CAP] Size	
+[CAP] Size Range	Größenspanne
+[CAP] Size relates to...	
+[CAP] Snap Distance	
+[CAP] Snap to...	
+[CAP] South-North	
+[CAP] Standard	
+[CAP] Standard Deviation	Standardabweichung
+[CAP] Symbol Image	
+[CAP] Symbol Type	
+[CAP] TIN	
+[CAP] Table	Tabelle
+[CAP] Table Description	
+[CAP] Tables	Tabellen
+[CAP] This Is Not A Caption!	
+[CAP] Transparency [%]	
+[CAP] Type	Typ
+[CAP] Unique Symbol	Einheitliches Symbol
+[CAP] Unit	Einheit
+[CAP] Value	Wert
+[CAP] Value Range	Wertebereich
+[CAP] Value Type	
+[CAP] Version	
+[CAP] Weight	
+[CAP] West-East	
+[CAP] Width	
+[CAP] Workspace	Arbeitsumgebung
+[CAP] X Axis	
+[CAP] X Label	
+[CAP] Z-Factor	Z-Faktor
+[CAP] Zoom to added layer	
+[CAP] [no items]	[keine Objekte]
+[CAP] [none]	[nicht gesetzt]
+[CMD] About SAGA	Über SAGA
+[CMD] Action	Aktion
+[CMD] Add Field	Feld hinzufügen
+[CMD] Add Part	Segment hinzufügen
+[CMD] Add Position [A]	Position hinzufügen [A]
+[CMD] Add Project	Projekt hinzufügen
+[CMD] Add Record	Datensatz hinzufügen
+[CMD] Add Shape	Objekt hinzufügen
+[CMD] Anaglyph [S]	
+[CMD] Arrange Icons	Ikonen anordnen
+[CMD] Backward	Zurück
+[CMD] Cascade	Überlappend
+[CMD] Central Projection	Zentralprojektion
+[CMD] Clear	Löschen
+[CMD] Close	Schließen
+[CMD] Close All	Alle schliessen
+[CMD] Convert To Table	In Tabelle umwandeln
+[CMD] Copy	Kopieren
+[CMD] Create HTML Documentation	
+[CMD] Create Lookup Table	Nachschlagetabelle erstellen
+[CMD] Create Normalised Classification	Normalisierte Klassifikation erstellen
+[CMD] Create Script Command File	
+[CMD] Cumulative	Kumulativ
+[CMD] Decrease Exaggeration [F1]	Überhöhung verringern [F1]
+[CMD] Decrease Eye Distance	
+[CMD] Decrease Perspectivic Distance [F5]	
+[CMD] Delete All Positions	Alle Positionen löschen
+[CMD] Delete All Records	
+[CMD] Delete Fields	
+[CMD] Delete Last Position [D]	Letzte Position löschen [D]
+[CMD] Delete Record	
+[CMD] Delete Selected Part	Ausgewähltes Segment löschen
+[CMD] Delete Selected Point	Ausgewählten Punkt löschen
+[CMD] Delete Selected Shape(s)	
+[CMD] Down	Ab
+[CMD] Edit Positions	Positionen editieren
+[CMD] Edit Selected Shape	Ausgewähltes Vektorobjekt editieren
+[CMD] Execute	Ausführen
+[CMD] Exit	Beenden
+[CMD] Exit SAGA	SAGA beenden
+[CMD] Fit Column Sizes	
+[CMD] Fit Grid Colors To Map Extent	Rasterfarben an Ausschnitt anpassen
+[CMD] Fit Row Sizes	
+[CMD] Fit Scale...	Maßstab anpassen...
+[CMD] Forward	Vorwärts
+[CMD] Help	Hilfe
+[CMD] Increase Exaggeration [F2]	Überhöhung verstärken [F2]
+[CMD] Increase Eye Distance	
+[CMD] Increase Perspectivic Distance [F6]	
+[CMD] Insert Record	
+[CMD] Interpolated Colors	Interpolierte Farben
+[CMD] Invert Selection	
+[CMD] Left	Links
+[CMD] Left [F3]	
+[CMD] Load	
+[CMD] Load Grid	Lade Raster
+[CMD] Load Module Library	Lade Modulbibliothek
+[CMD] Load Project	Lade Projekt
+[CMD] Load Shapes	Lade Vektordaten
+[CMD] Load TIN	
+[CMD] Load Table	Lade Tabelle
+[CMD] Measure Distance	
+[CMD] Move Down	
+[CMD] Move To Bottom	Ganz nach unten
+[CMD] Move To Top	Ganz nach oben
+[CMD] Move Up	
+[CMD] Next	Nächstes
+[CMD] Page Setup	Seite einrichten
+[CMD] Pan	Verschieben
+[CMD] Play And Save As Images...	Abspielen und als Bilder speichern
+[CMD] Play Loop [L]	Wiederholt abspielen
+[CMD] Play Once [P]	Apspielen
+[CMD] Previous	Voriges
+[CMD] Print	Drucken
+[CMD] Print Preview	Druckvorschau
+[CMD] Print Setup	Drucker einrichten
+[CMD] Properties	Eigenschaften
+[CMD] Right	Rechts
+[CMD] Right [F4]	
+[CMD] Save As Image when changed	
+[CMD] Save As Image...	Als Bild speichern...
+[CMD] Save As PDF	Als PDF speichern...
+[CMD] Save Grid	Raster speichern
+[CMD] Save Grid As Image...	Raster als Bilddatei speichern...
+[CMD] Save Grid As...	Raster speichern unter...
+[CMD] Save Project	Projekt speichern
+[CMD] Save Project As...	Projekt speichern unter
+[CMD] Save Shapes	Vektordaten speichern
+[CMD] Save Shapes As...	Vektordaten speichern unter...
+[CMD] Save TIN	TIN speichern
+[CMD] Save TIN As...	TIN speichern unter...
+[CMD] Save Table	Tabelle speichern
+[CMD] Save Table As...	Tabelle speichern unter...
+[CMD] Save as Interactive SVG	Als interaktive Scalable Vector Graphic Dateien speichern
+[CMD] Show 3D-View	3D-Ansicht anzeigen
+[CMD] Show Diagram	Diagramm anzeigen
+[CMD] Show Grid	Raster anzeigen
+[CMD] Show Histogram	Histogramm anzeigen
+[CMD] Show Horizontal Legend	Legende horizontal anzeigen
+[CMD] Show Layer	Schicht anzeigen
+[CMD] Show Map	Karte anzeigen
+[CMD] Show Message Window	Nachrichten anzeigen
+[CMD] Show Object Properties	Objekteigenschaften anzeigen
+[CMD] Show Print Layout	Kartenlayout anzeigen
+[CMD] Show Scatterplot	Scatterplot anzeigen
+[CMD] Show Shapes	Vektordaten anzeigen
+[CMD] Show TIN	TIN anzeigen
+[CMD] Show Table	Tabelle anzeigen
+[CMD] Show Toolbar	Werkzeugleiste anzeigen
+[CMD] Show Vertical Legend	Legende vertikal anzeigen
+[CMD] Show Workspace	Arbeitsumgebung anzeigen
+[CMD] Sort Fields	Felder sortieren
+[CMD] Synchronise Map Extents	Kartenausschnitte synchronisieren
+[CMD] Tile Horizontally	Horizontal anordnen
+[CMD] Tile Vertically	Vertikal anordnen
+[CMD] Tip of the Day...	Tipp des Tages...
+[CMD] UNRECOGNISED COMMAND ID	
+[CMD] Up	Auf
+[CMD] Update Data	
+[CMD] Zoom	Vergrößerung
+[CMD] Zoom To Active Layer	Auf ausgewählte Schicht zoomen
+[CMD] Zoom To Extent	Auf Erstreckung zoomen
+[CMD] Zoom To Full Extent	Auf volle Erstreckung zoomen
+[CMD] Zoom To Next Extent	Auf nächste Erstreckung zoomen
+[CMD] Zoom To Previous Extent	Auf vorige Erstreckung zoomen
+[CMD] Zoom To Selection	Auf ausgewählte Elemente zoomen
+[DAT] Cell size	Zellgröße
+[DAT] Grid	Raster
+[DAT] Line	Linie
+[DAT] Lower left corner	Linke untere Ecke
+[DAT] Number of cells	Anzahl der Zellen
+[DAT] Point	Punkt
+[DAT] Points	Punkte
+[DAT] Polygon	
+[DAT] Resampling	
+[DAT] Save shapes	Vektordaten speichern
+[DAT] Shapes	Vektordaten
+[DAT] TIN	
+[DAT] Table	Tabelle
+[DAT] Undefined	Undefiniert
+[DAT] [not set]	[nicht gesetzt]
+[DAT] new	neu
+[DLG] Add layer to selected map	Datensatz zu ausgewählter Karte hinzufügen
+[DLG] Delete selected shape(s).	Ausgewählte Vektordatenelemente löschen
+[DLG] Invalid parameters!	Ungültige Parameter
+[DLG] Please enter a numeric value:	Bitte geben Sie einen Zahlenwert ein:
+[DLG] Save changes?	Änderungen speichern?
+[DLG] Scale 1 : 	Maßstab 1 : 
+[DLG] Set selected values to no data.	Auswahl als \'Keine Daten\' markieren.
+[ERR] Access Violation	Speicher-Zugriffsverletzung
+[ERR] Calculation Error	
+[ERR] Can't execute a module while another runs	Modul kann nicht ausgeführt werden, während ein anderes läuft
+[ERR] Corrupted shape file.	
+[ERR] Could not save PDF file.	
+[ERR] DBase file could not be opened or it did not contain any records.	
+[ERR] Error: Continue anyway ?	
+[ERR] Grid file could not be opened.	Rasterdatei konnte nicht geöffnet werden
+[ERR] Grid file could not be saved.	Raster konnte nicht gespeichert werden
+[ERR] Invalid data set!	Ungültiger Datensatz!
+[ERR] Invalid data!	Ungültige Daten!
+[ERR] Invalid display size!	Ungültiger Ausgabebereich!
+[ERR] Invalid library	Ungültige Bibliothek
+[ERR] Library could not be loaded	Bibliothek konnte nicht geöffnet werden
+[ERR] Library does not contain any modules	Bibliothek enthält keine Module
+[ERR] Library has already been loaded	Bibliothek wurde bereits geladen
+[ERR] Shape file could not be opened.	Vektordatei konnte nicht geöffnet werden
+[ERR] Shape file invalid or of unsupported type.	
+[ERR] Shape file is corrupted.	Vektordatei ist korrumpiert
+[ERR] Shape index file could not be opened.	Vektor-Indexdatei konnte nicht geöffnet werden
+[ERR] There was a problem printing.\nPerhaps your current printer is not set correctly?	Es gab ein Druckproblem.\nVielleicht ist Ihr Drucker nicht korrekt eingestellt?
+[ERR] Unknown Error	
+[ERR] You canceled printing	Sie haben den Druckvorgang abgebrochen
+[FLD] Attribute	
+[FLD] Central Projection	Zentralprojektion
+[FLD] Exaggeration	Überhöhung
+[FLD] Grid	Raster
+[FLD] Icon	
+[FLD] Index Layer	Index Schicht
+[FLD] Name	
+[FLD] PDF Document	
+[FLD] Paper Format	
+[FLD] Rotate X	Drehung X
+[FLD] Rotate Y	Drehung Y
+[FLD] Rotate Z	Drehung Z
+[FLD] Round Scale	
+[FLD] SVG File	
+[FLD] Shapes	Vektordaten
+[FLD] Shift X	Verschiebung X
+[FLD] Shift Y	Verschiebung Y
+[FLD] Shift Z	Verschiebung Z
+[FLD] Steps to Next	Anzahl der Schritte
+[FLD] Title	Titel
+[FLD] Value	Wert
+[HLP] Execute Module	Modul ausführen
+[HST] Created from file	Von Datei geladen
+[HST] Created with module	Von Modul erstellt
+[HST] Grid addition	Raster Addition
+[HST] Grid denormalisation	Raster Denormalisierung
+[HST] Grid division	Raster Division
+[HST] Grid multiplication	Raster Multiplikation
+[HST] Grid normalisation	Raster Normalisierung
+[HST] Grid operation	Raster Operation
+[HST] Grid subtraction	Raster Subtraktion
+[HST] Horizontally mirrored	Horizontale Spiegelung
+[HST] Inversion	Invertierung
+[HST] Loaded from file	Von Datei geladen
+[HST] Value addition	Addition eines Wertes
+[HST] Value assigned to grid	Zuweisung eines Wertes
+[HST] Value division	Division durch einen Wert
+[HST] Value multiplication	Multiplikation eines Wertes
+[HST] Value subtraction	Subtraktion eines Wertes
+[HST] Vertically mirrored	Vertikale Spiegelung
+[MNU] ?	
+[MNU] Edit	Editieren
+[MNU] File	Datei
+[MNU] Grid	Rasterdaten
+[MNU] Modules	Module
+[MNU] Project	Projekt
+[MNU] Rotation	
+[MNU] Sequencer	Sequenzer
+[MNU] Shapes	Vektordaten
+[MNU] Shift	Verschiebung
+[MNU] TIN	
+[MNU] Table	Tabelle
+[MNU] Window	Fenster
+[MSG] Build Histogram...	Histogramm erstellen...
+[MSG] Close	Schließe
+[MSG] Close Library	Schließe Bibliothek
+[MSG] Close table	Schließe Tabelle
+[MSG] Could not load project.	Projekt konnte nicht geladen werden
+[MSG] Could not save project.	Projekt konnte nicht gespeichert werden
+[MSG] Create TIN from shapes	TIN aus Vektordatensatz erstellen
+[MSG] Executing module	Modul ausführen
+[MSG] Execution has been stopped by user!	Modulausführung von Benutzer abgebrochen!
+[MSG] Interactive module execution failed	Ausführung des interaktiven Moduls schlug fehl
+[MSG] Interactive module execution has been started	Ausführung des interaktiven Moduls wurde gestartet
+[MSG] Interactive module execution has been stopped	Ausführung des interaktiven Moduls wurde beendet
+[MSG] Load grid	Lade Rasterdaten
+[MSG] Load library	Lade Bibliothek
+[MSG] Load project	Lade Projekt
+[MSG] Load shapes	Lade Vektordaten
+[MSG] Load table	Lade Tabelle
+[MSG] Module execution failed	Modulausführung schlug fehl
+[MSG] Module execution succeeded	Modul wurde erfolgreich ausgeführt
+[MSG] Project has been saved.	Projekt wurde gespeichert
+[MSG] Project has been successfully loaded.	Projekt wurde erfolgreich geladen
+[MSG] Save as Interactive SVG	
+[MSG] Save grid	Rasterdaten speichern
+[MSG] Save shapes	Vektordaten speichern
+[MSG] Save table	Tabelle speichern
+[MSG] Save to PDF	Als PDF speichern
+[MSG] Shall execution be stopped?	Soll die Ausführung abgebrochen werden?
+[MSG] failed	fehlgeschlagen
+[MSG] has already been loaded	bereits geladen
+[MSG] okay	erfolgreich
+[PRM] Boolean	Wahrheitswert
+[PRM] Choice	Auswahl
+[PRM] Color	Farbe
+[PRM] Colors	Farben
+[PRM] Data Object	Datensatz
+[PRM] Data Objects	Datensätze
+[PRM] Degree	Grad
+[PRM] File path	Dateipfad
+[PRM] Floating point	Fließkommazahl
+[PRM] Font	Schrift
+[PRM] Frame Width [Pixels]	Rahmenbreite (Pixel)
+[PRM] Grid	Raster
+[PRM] Grid list	Liste von Rastern
+[PRM] Grid system	Rastersystem
+[PRM] Grids	Raster
+[PRM] Integer	Ganzzahl
+[PRM] Legend	Legende
+[PRM] Long text	Langer Text
+[PRM] Map Height [Pixels]	Kartenhöhen (Pixel)
+[PRM] Map Width [Pixels]	Kartenbreite (Pixel)
+[PRM] Node	Knoten
+[PRM] Options	Optionen
+[PRM] Parameter	
+[PRM] Parameters	Parameterliste
+[PRM] Save	Speichern
+[PRM] Save Georeference (world file)	Georeferenz speichern
+[PRM] Shapes	Vektordaten
+[PRM] Shapes list	Liste von Vektordaten
+[PRM] Static table	Statische Tabelle
+[PRM] TIN	
+[PRM] TIN list	TIN Liste
+[PRM] Table	Tabelle
+[PRM] Table field	Tabellenfeld
+[PRM] Table list	Liste von Tabellen
+[PRM] Tables	Tabellen
+[PRM] Text	
+[PRM] Value range	Wertebereich
+[PRM] Zoom	
+[TXT] Close all data sets	Alle Datensätze schliessen
+[TXT] Do you want to delete the selection?	Wollen Sie die Auswahl entfernen?
+[TXT] Do you want to exit SAGA?	Wollen Sie SAGA beenden?
+[TXT] No data loaded.	Keine Daten geladen.
+[TXT] No description available	Keine Beschreibung verfügbar
+[TXT] No parameters available.	Keine Parameter verfügbar
+[TXT] SAGA\nSystem for Automated Geoscientific Analyses\nVersion 2.0	SAGA\nSystem für Automatisierte Geowissenschaftliche Analysen\nVersion 2.0
+[TXT] This is not a text!	
+[TXT] grid system	Rastersystem
+[TXT] grid systems	Rastersysteme
+[VAL] B-Spline	
+[VAL] Backward Diagonal	Schräg nach links
+[VAL] Bicubic Spline	Bikubischer Spline
+[VAL] Bilinear	
+[VAL] Cross	Gekreuzt
+[VAL] Cross Diagonal	Schräg gekreuzt
+[VAL] Dot And Dash	Punkt und Strich
+[VAL] Dotted	Gepunktet
+[VAL] File Cache	Dateipuffer
+[VAL] Forward Diagonal	Schräg nach rechts
+[VAL] Graduated Color	Abgestufter Farbverlauf
+[VAL] Horizontal	
+[VAL] Inverse Distance	Umgekehrte Distanz
+[VAL] Linear	
+[VAL] Logarithmic (down)	Logarithmisch (nach rechts)
+[VAL] Logarithmic (up)	Logarihmisch (nach links)
+[VAL] Long Dashed	Lange Striche
+[VAL] Lookup Table	Nachschlagetabelle
+[VAL] Map Units	Karteneinheiten
+[VAL] New	Neu
+[VAL] No objects	Keine Objekte
+[VAL] None	Nicht vorhanden
+[VAL] Normal	
+[VAL] Opaque	Undurchsichtig
+[VAL] RGB	
+[VAL] RTL Compression	RTL Komprimierung
+[VAL] Screen	Bildschirm
+[VAL] Shade	Schummerung
+[VAL] Short Dashed	Kurze Striche
+[VAL] Solid	Solide
+[VAL] Transparent	
+[VAL] Unique Symbol	Einheitliches Symbol
+[VAL] Vertical	Vertikal
+[VAL] [all grid systems]	[alle Rastersysteme]
+[VAL] [create]	[erstellen]
+[VAL] [default]	[Standardwert]
+[VAL] [no choice available]	[keine Auswahl verfügbar]
+[VAL] [no fields]	[keine Felder verfügbar]
+[VAL] [none]	[nicht vorhanden]
+[VAL] [not set]	[nicht gesetzt]
+[VAL] no	nein
+[VAL] object	Objekt
+[VAL] objects	Objekte
+[VAL] ready	fertig
+[VAL] yes	ja
+access violation	Fehlerhafter Speicherzugriff
+after	nach
+ascending	aufsteigend
+author      	Autor
+automatically save and load	automatisch speichern und laden
+available module libraries	verfügbare Modulbibliotheken
+available modules	verfügbare Module
+ball	Ball
+bar	Balken
+bar (not outlined)	Balken (nicht umrandet)
+before	vor
+black > blue	schwarz > blau
+black > green	schwarz > grün
+black > red	schwarz > rot
+buffer size	Größe des Puffers
+cannot execute interactive module	interaktives Modul kann nicht ausgeführt werden
+central	zentral
+character string	Zeichenkette
+circle	Kreis
+circle in rhombus	Kreis in Rhombus
+circle in square	Kreis in Quadrat
+circle in triangle (down)	Kreis in Dreieck (Spitze abwärts)
+circle in triangle (up)	Kreis in Dreieck (Spitze aufwärts)
+circle with rhombus	Kreis mit Rhombus
+circle with square	Kreis mit Quadrat
+circle with triangle (down)	Kreis mit Dreieck (Spitze abwärts)
+circle with triangle (up)	Kreis mit Dreieck (Spitze aufwärts)
+color (rgb)	Farbe (RGB)
+colors	Farben
+columns	Spalten
+confirm	Bestätige
+confirm with options	Bestätige mit Optionen
+continue	fortsetzen
+creating batch file example	
+cylinder	Zylinder
+date (dd.mm.yyyy)	Datum (dd.mm.yyyy)
+default	Standard
+default (same brightness)	Standard (gleiche Helligkeit)
+descending	absteigend
+do not confirm	nicht bestätigen
+do not show	nicht anzeigen
+empty	leer
+empty coded function	leere Funktion
+empty input list	
+error	Fehler
+executing module	Modulausführung
+failed	fehlgeschlagen
+function not found	Funktion nicht gefunden
+function table full	
+green > blue	
+green > grey > blue	
+green > red > blue	
+greyscale	Graustufen
+image	Bild
+improper function syntax	
+index out of bounds	
+input	Eingabe
+input file	Eingabedatei
+interactive	interaktiv
+interactive execution	interaktive Ausführung
+invalid module libraries path	
+invalid number of parameters	
+last opened	zuletzt geöffnet
+library name	
+library path	
+missing operand	
+module	Modul
+module library	Modulbibliothek
+module library not found	Modulbibliothek nicht gefunden
+module name 	Modulname
+module not found	Modul nicht gefunden
+no	nein
+no memory	kein Speicher
+no valid module library found in path	
+okay	
+only during start up phase	nur während der Programminitialisierung
+optional	
+optional input	optionale Eingabe
+optional output	optionale Ausgabe
+original functions may not be deleted	
+output	Ausgabe
+panorama	Panorama
+parallel	
+parameters	Parameter
+pie	Torte
+pie (not outlined)	Torte (nicht umrandet)
+plain	
+press any key	
+ready	fertig
+red > blue	
+red > blue > green	
+red > green	
+red > green > blue	
+red > grey > blue	
+red > grey > green	
+rhombus	Rhombus
+rows	Reihen
+square	Quadrat
+syntax error	Syntaxfehler
+too few parameters	Zu wenige Parameter
+too many constants	Zu wenige Konstanten
+too many parameters	Zu viele Parameter
+triangle (down)	Dreieck (Spitze abwärts)
+triangle (up)	Dreieck (Spitze aufwärts)
+type -h or --help for further information	
+undeclared parameter	
+unmatched parentheses	
+unsorted	unsortiert
+until user closes it	bis Mausklick
+white > blue	
+white > green	
+white > red	
+yellow > blue	
+yellow > green	
+yellow > red	
+yes	ja
