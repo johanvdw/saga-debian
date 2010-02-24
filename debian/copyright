@@ -1,0 +1,68 @@
+It was downloaded from http://www.saga-gis.org 
+
+Upstream Author: Olaf Conrad <oconrad@saga-gis.org>
+
+Files:src/saga_core/saga_api/*
+Copyright: 2009 Olaf Conrad
+License: LGPGL-2.1
+
+This library is free software; you can redistribute   
+it and/or modify it under the terms of the GNU Lesser 
+General Public License as published by the Free       
+Software Foundation, version 2.1 of the License.      
+                                                      
+This library is distributed in the hope that it will  
+be useful, but WITHOUT ANY WARRANTY; without even the 
+implied warranty of MERCHANTABILITY or FITNESS FOR A  
+PARTICULAR PURPOSE. See the GNU Lesser General Public 
+License for more details.                             
+                                                      
+You should have received a copy of the GNU Lesser     
+General Public License along with this program; if    
+not, write to the Free Software Foundation, Inc.,     
+51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+
+Files: src/* excluding src/saga_core/saga_api/*
+Copyright:  2009 Olaf Conrad 
+License: GPL-2
+
+This file is part of 'SAGA - System for Automated    
+Geoscientific Analyses'. SAGA is free software; you  
+can redistribute it and/or modify it under the terms 
+of the GNU General Public License as published by the
+Free Software Foundation; version 2 of the License.  
+                                                     
+SAGA is distributed in the hope that it will be      
+useful, but WITHOUT ANY WARRANTY; without even the   
+implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE. See the GNU General Public       
+License for more details.                            
+                                                     
+You should have received a copy of the GNU General   
+Public License along with this program; if not,      
+write to the Free Software Foundation, Inc.,         
+51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+
+Files: debian/*
+Copyright: 2010 Johan Van de Wauw <johan.vandewauw@gmail.com>
+License: GPL-2+
+
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991, or
+(at your option) any later version.
+
+This package is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this package; if not, write to the Free Software 
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, 
+MA 02110-1301, USA.
+
+On Debian systems, the complete text of the GNU General
+Public License can be found in '/usr/share/common-licenses/GPL-2' and
+the complete text of the GNU Library (now Lesser) public
+license can be found in the file '/usr/share/common-licenses/LGPL-2.1'

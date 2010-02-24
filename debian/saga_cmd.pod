@@ -1,0 +1,54 @@
+=head1 NAME
+
+B<saga_cmd> - command-line interface to the System for Automated Geoscientific Analyses
+ 
+=head1 SYNOPSIS
+
+[B<SAGA_MLB>=I<dirname>] B<saga_cmd> I<LIBRARY> [I<MODULE>] [B<-silent>] <module specific options...>
+
+B<saga_cmd> [B<-h, --help>]
+
+=head1 DESCRIPTION
+
+Command line interface to the System for Automated Geoscientific Analyses (SAGA). When run without arguments, the module libraries in the current module library are listed. This can be specified by setting the environment variable I<SAGA_MLB>. If this is not specified, the current working directory is used.
+
+SAGA GIS (System for Automated Geoscientific Analysis) is a free and open source geographic information system used for editing and analysing spatial data. It includes a large number of modules for the analysis of vector, table, grid and image data.
+
+=head1 OPTIONS
+
+=over 8
+
+=item [I<SAGA_MLB>=dirname]
+ 
+Module libraries are expected to be located in the directory that is specified by the environment variable 'SAGA_MLB'. If this is not found the current working directory will be searched for instead.
+
+To use the default modules, the environment variable can be set to I</usr/lib/saga>
+
+=item I<LIBRARY> [I<MODULE>] 
+
+Specify the library (ie ta_morphometry) and the module (number or name). If no module is specified the different modules of a library are listed.
+
+=item B<-h, --help>
+
+Display help and exit
+
+=back
+
+=head1 EXAMPLE
+
+export SAGA_MLB=/usr/lib/saga
+
+B<saga_cmd> ta_morphometry "Local Morphometry" -ELEVATION dem.sgrd -SLOPE slope.sgrd -ASPECT aspect.sgrd -METHOD 1
+
+=head1 BUGS
+
+On the website of I<http://www.saga-gis.org>, a list of known bugs can be found and new bug reports can be submitted.
+
+=head1 AUTHORS
+
+B<SAGA> was written by Olaf Conrad with help from a large number of contributers. This manual page was written by Johan Van de Wauw.
+Both are released under the GNU General Public License v2.
+
+More info  I<http://www.saga-gis.org>
+
+=cut

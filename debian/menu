@@ -1,0 +1,5 @@
+?package(saga):needs="X11" section="Apps/Science/Geoscience"\
+  title="saga" command="/usr/bin/saga_gui" \
+  icon32x32="/usr/share/pixmaps/saga_icon_32.xpm"\
+  icon16x16="/usr/share/pixmaps/saga_icon_16.xpm"
+
