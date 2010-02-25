@@ -1,5 +1,8 @@
-saga (2.0.4-2) unstable; urgency=low
+saga (2.0.4-1) unstable; urgency=low
 
+  * Inital release (closes: )
+
+  [ Johan Van de Wauw ]
   * Initial import debian files
   * Fix tip of the day
   * Add saga_gdi to lib instead of pkglib (fixes errors when running
@@ -8,10 +11,14 @@ saga (2.0.4-2) unstable; urgency=low
   * Update manfile (multiple files example)
   * Remove unneccesary CVS files
 
- -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 25 Feb 2010 11:12:53 +0100
+  [ Francesco Paolo Lovergine ]
+  * Maintainer set to DebianGis team, with git maintainance.
+  * Added Johan and me as uploaders.
+  * Set Vcs-* fields.
+  * Long description revised.
+  * Set libproj-dev build-dep.
+  * Moved to Debhelper level 7.
+  * Minor layout changes to debian/control to respect 80 cols width.
+  * Debian revision reset to 2.0.4-1.
 
-saga (2.0.4-1) unstable; urgency=low
-
-  * New release 2.0.4
-
- -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Wed, 24 Feb 2010 21:20:12 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Feb 2010 13:45:14 +0100
