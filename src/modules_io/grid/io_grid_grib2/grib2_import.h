@@ -8,7 +8,7 @@
 
 #include "MLB_Interface.h"
 extern "C" {
-#include "g2clib-1.0.4/grib2.h"
+#include "grib2.h"
 }
 
 
