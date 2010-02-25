@@ -12,6 +12,8 @@ binary/saga::
 
 build/saga::
 	pod2man --section=1 --release=$(VERSION) --center " " debian/saga_cmd.pod >saga_cmd.1
+	pod2man --section=1 --release=$(VERSION) --center " " debian/saga_gui.pod >saga_gui.1
 
 cleanbuilddir/saga::
 	rm -f saga_cmd.1
+	rm -f saga_gui.1
