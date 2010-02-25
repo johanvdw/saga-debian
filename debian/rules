@@ -6,6 +6,10 @@ DEB_CONFIGURE_EXTRA_FLAGS = --enable-unicode
 
 DEB_INSTALL_MANPAGES_saga = saga_cmd.1
 
+# remove libtool helpers
+binary/saga::
+	find debian/saga/usr/lib ! -type d -a -name "*.la" -delete
+
 build/saga::
 	pod2man --section=1 --release=$(VERSION) --center " " debian/saga_cmd.pod >saga_cmd.1
 

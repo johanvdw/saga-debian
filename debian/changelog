@@ -20,5 +20,7 @@ saga (2.0.4-1) unstable; urgency=low
   * Moved to Debhelper level 7.
   * Minor layout changes to debian/control to respect 80 cols width.
   * Debian revision reset to 2.0.4-1.
+  * Apps -> Applications in debian/menu.
+  * Now libtool helper files .la are not installed.
 
- -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Feb 2010 13:45:14 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Feb 2010 15:13:47 +0100
