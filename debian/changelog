@@ -1,3 +1,15 @@
+saga (2.0.4-2) unstable; urgency=low
+
+  * Initial import debian files
+  * Fix tip of the day
+  * Add saga_gdi to lib instead of pkglib (fixes errors when running
+    saga_cmd)
+  * Fix upstream bug 2896803 Grid to shapefile
+  * Update manfile (multiple files example)
+  * Remove unneccesary CVS files
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 25 Feb 2010 11:12:53 +0100
+
 saga (2.0.4-1) unstable; urgency=low
 
   * New release 2.0.4
