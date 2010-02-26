@@ -1,6 +1,6 @@
 saga (2.0.4-1) unstable; urgency=low
 
-  * Inital release (closes: )
+  * Inital release (closes: #570014).
 
   [ Johan Van de Wauw ]
   * Initial import debian files
