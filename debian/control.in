@@ -13,7 +13,7 @@ Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
 Package: saga
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: saga2.0.4
+Provides: saga@VERSION@
 Description: System for Automatic Geoscientific Analysis
  SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
  information system usable for editing and analysing spatial data. Among
@@ -45,7 +45,7 @@ Package: saga-dev
 Section: devel
 Architecture: any
 Depends: saga (= ${binary:Version})
-Provides: saga2.0.4-dev
+Provides: saga@VERSION@-dev
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
  information system usable for editing and analysing spatial data.
