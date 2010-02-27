@@ -86,6 +86,9 @@ am_libsaga_api_la_OBJECTS = api_callback.lo api_colors.lo api_core.lo \
 	table_dbase.lo table_io.lo table_record.lo table_selection.lo \
 	tin.lo tin_elements.lo tin_triangulation.lo
 libsaga_api_la_OBJECTS = $(am_libsaga_api_la_OBJECTS)
+libsaga_api_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libsaga_api_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -238,8 +241,10 @@ top_srcdir = @top_srcdir@
 SOVERSION = 4:0:0
 @SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
 @SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
-@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` --version-info $(SOVERSION)
-@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` --version-info $(SOVERSION)
+@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs`
+@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs`
+@SAGA_UNICODE_FALSE@libsaga_api_la_LDFLAGS = -version-info $(SOVERSION)
+@SAGA_UNICODE_TRUE@libsaga_api_la_LDFLAGS = -version-info $(SOVERSION)
 lib_LTLIBRARIES = libsaga_api.la
 libsaga_api_la_SOURCES = \
 api_callback.cpp\
@@ -390,7 +395,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libsaga_api.la: $(libsaga_api_la_OBJECTS) $(libsaga_api_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libsaga_api_la_OBJECTS) $(libsaga_api_la_LIBADD) $(LIBS)
+	$(libsaga_api_la_LINK) -rpath $(libdir) $(libsaga_api_la_OBJECTS) $(libsaga_api_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

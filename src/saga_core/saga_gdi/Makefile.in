@@ -72,6 +72,9 @@ libsaga_gdi_la_DEPENDENCIES =  \
 am_libsaga_gdi_la_OBJECTS = sgdi_diagram.lo sgdi_dialog.lo \
 	sgdi_helper.lo saga_gdi.lo
 libsaga_gdi_la_OBJECTS = $(am_libsaga_gdi_la_OBJECTS)
+libsaga_gdi_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libsaga_gdi_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -225,7 +228,8 @@ SOVERSION = 0:0:0
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
-AM_LDFLAGS = $(DEP_LFLG) --version-info $(SOVERSION)
+AM_LDFLAGS = $(DEP_LFLG) 
+libsaga_gdi_la_LDFLAGS = -version-info $(SOVERSION)
 lib_LTLIBRARIES = libsaga_gdi.la
 libsaga_gdi_la_SOURCES = \
 sgdi_diagram.cpp\
@@ -304,7 +308,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libsaga_gdi.la: $(libsaga_gdi_la_OBJECTS) $(libsaga_gdi_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libsaga_gdi_la_OBJECTS) $(libsaga_gdi_la_LIBADD) $(LIBS)
+	$(libsaga_gdi_la_LINK) -rpath $(libdir) $(libsaga_gdi_la_OBJECTS) $(libsaga_gdi_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
