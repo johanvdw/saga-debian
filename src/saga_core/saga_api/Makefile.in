@@ -167,6 +167,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -234,10 +235,11 @@ top_srcdir = @top_srcdir@
 # $Id: Makefile.am,v 1.17 2009/10/01 14:01:19 oconrad Exp $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
+SOVERSION = 4:0:0
 @SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
 @SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
-@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs`
-@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs`
+@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` --version-info $(SOVERSION)
+@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` --version-info $(SOVERSION)
 lib_LTLIBRARIES = libsaga_api.la
 libsaga_api_la_SOURCES = \
 api_callback.cpp\

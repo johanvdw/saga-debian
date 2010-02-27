@@ -4,12 +4,13 @@
 if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
+SOVERSION = 4:0:0
 if SAGA_UNICODE
 AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs`
+AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` --version-info $(SOVERSION)
 else
 AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs`
+AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` --version-info $(SOVERSION)
 endif
 
 lib_LTLIBRARIES = libsaga_api.la

@@ -1,6 +1,7 @@
 if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
+SOVERSION = 0:0:0
 if SAGA_UNICODE
 DEP_DEFS = -fPIC `wx-config --unicode=yes --static=no --cxxflags` -D_SAGA_UNICODE $(DBGFLAGS)
 DEP_LFLG = -fPIC -shared `wx-config --unicode=yes --static=no --libs`
@@ -11,7 +12,7 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = $(DEP_LFLG)
+AM_LDFLAGS         = $(DEP_LFLG) --version-info $(SOVERSION)
 lib_LTLIBRARIES = libsaga_gdi.la
 libsaga_gdi_la_SOURCES =\
 sgdi_diagram.cpp\
