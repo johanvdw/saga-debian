@@ -10,6 +10,11 @@ saga (2.0.4-1) unstable; urgency=low
   * Fix upstream bug 2896803 Grid to shapefile
   * Update manfile (multiple files example)
   * Remove unneccesary CVS files
+  * Add libsaga_gdi.so to /usr/lib instead of /usr/lib/saga
+  * Use grib2 in debian instead of static linked version
+  * Seperate saga-dev package
+  * Fix sonumbers for saga_api.so and saga_gdi
+  * Add Provides: info for libsaga_api and libsaga_gdi
 
   [ Francesco Paolo Lovergine ]
   * Maintainer set to DebianGis team, with git maintainance.
@@ -22,5 +27,6 @@ saga (2.0.4-1) unstable; urgency=low
   * Debian revision reset to 2.0.4-1.
   * Apps -> Applications in debian/menu.
   * Now libtool helper files .la are not installed.
+  * Added ITP bug number.
 
  -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Feb 2010 15:13:47 +0100
