@@ -46,7 +46,6 @@ Package: saga-dev
 Section: devel
 Architecture: any
 Depends: saga (= ${binary:Version})
-Provides: saga@VERSION@-dev
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
  information system usable for editing and analysing spatial data.
