@@ -7,6 +7,8 @@ DEB_INSTALL_MANPAGES_saga = saga_cmd.1
 
 VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | \
    cut -f 2 -d ' ' | cut -f 1 -d '-')
+LIBSAGAAPISO := $(shell grep '^SOVERSION =' src/saga_core/saga_api/Makefile.am | sed 's/SOVERSION = \([0-9]*\):[0-9]*:[0-9]*/\1/g')
+LIBSAGAGDISO := $(shell grep '^SOVERSION =' src/saga_core/saga_gdi/Makefile.am | sed 's/SOVERSION = \([0-9]*\):[0-9]*:[0-9]*/\1/g')
 
 # remove libtool helpers
 binary/saga::
@@ -22,4 +24,5 @@ cleanbuilddir/saga::
 
 debian/% :: debian/%.in
 	sed -e 's/@VERSION@/$(VERSION)/' -e 's/@ABI@/$(ABI)/' $< >$@
+	sed -e 's/@LIBSAGAAPISO@/$(LIBSAGAAPISO)/' -e 's/@LIBSAGAGDISO@/$(LIBSAGAGDISO)/' $< >$@
 
