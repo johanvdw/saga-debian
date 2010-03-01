@@ -5,9 +5,6 @@ include /usr/share/cdbs/1/class/autotools.mk
 DEB_CONFIGURE_EXTRA_FLAGS = --enable-unicode
 DEB_INSTALL_MANPAGES_saga = saga_cmd.1
 
-LIBSAGAAPISO := $(shell grep '^SOVERSION =' src/saga_core/saga_api/Makefile.am | sed 's/SOVERSION = \([0-9]*\):[0-9]*:[0-9]*/\1/g')
-LIBSAGAGDISO := $(shell grep '^SOVERSION =' src/saga_core/saga_gdi/Makefile.am | sed 's/SOVERSION = \([0-9]*\):[0-9]*:[0-9]*/\1/g')
-
 # remove libtool helpers
 binary/saga::
 	find debian/saga/usr/lib ! -type d -a -name "*.la" -delete

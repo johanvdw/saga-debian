@@ -3,4 +3,4 @@ src/saga_core/saga_gui/res/xpm/saga_icon_16.xpm  /usr/share/pixmaps/
 debian/saga_gui.desktop  /usr/share/applications/
 src/saga_core/saga_gui/res/saga_tip.txt /usr/share/saga/
 usr/bin
-usr/lib
+usr/lib/saga/*

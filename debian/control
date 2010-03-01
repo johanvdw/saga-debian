@@ -13,8 +13,6 @@ Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
 Package: saga
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: libsaga_api4
-Provides: libsaga_gdi0
 Description: System for Automatic Geoscientific Analysis
  SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
  information system usable for editing and analysing spatial data. Among
@@ -42,14 +40,25 @@ Description: System for Automatic Geoscientific Analysis
    altitudes.
  * Vector tools: polygon intersection, contour lines from grid.
 
-Package: saga-dev
-Section: devel
+Package: libsaga4-dev
+Section: libdevel
 Architecture: any
-Depends: saga (= ${binary:Version})
-Provides: saga@VERSION@-dev
+Suggests: saga (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
  information system usable for editing and analysing spatial data.
  . 
  This package contains the header files for developing with SAGA.
  Install this package if you wish to develop software that uses the SAGA API.
+
+Package: libsaga4
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: libsaga
+Description: SAGA GIS development files
+ SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
+ information system usable for editing and analysing spatial data.
+ . 
+ This package contains the library files for developing with SAGA.
