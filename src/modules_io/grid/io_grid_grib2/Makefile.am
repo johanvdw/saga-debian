@@ -11,8 +11,8 @@ DEP_LIBS = -lgrib2c
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -DUSE_JPEG2000 -DUSE_PNG
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-#AM_LDFLAGS         = -fPIC -shared -lpq -ljasper
-AM_LDFLAGS         = -fPIC -shared -ljasper $(DEP_LIBS)
+#AM_LDFLAGS         = -fPIC -shared -avoid-version -lpq -ljasper
+AM_LDFLAGS         = -fPIC -shared -avoid-version -ljasper $(DEP_LIBS)
 pkglib_LTLIBRARIES = libio_grid_grib2.la
 libio_grid_grib2_la_SOURCES =\
 grib2_import.cpp\
