@@ -243,8 +243,8 @@ SOVERSION = 4:0:0
 @SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS -D_SAGA_DONOTUSE_HARU $(DBGFLAGS)
 @SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs`
 @SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs`
-@SAGA_UNICODE_FALSE@libsaga_api_la_LDFLAGS = -version-info $(SOVERSION)
-@SAGA_UNICODE_TRUE@libsaga_api_la_LDFLAGS = -version-info $(SOVERSION)
+@SAGA_UNICODE_FALSE@libsaga_api_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(SOVERSION)
+@SAGA_UNICODE_TRUE@libsaga_api_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(SOVERSION)
 lib_LTLIBRARIES = libsaga_api.la
 libsaga_api_la_SOURCES = \
 api_callback.cpp\
