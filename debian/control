@@ -40,7 +40,7 @@ Description: System for Automatic Geoscientific Analysis
    altitudes.
  * Vector tools: polygon intersection, contour lines from grid.
 
-Package: libsaga4-dev
+Package: libsaga-2.0.4-dev
 Section: libdevel
 Architecture: any
 Suggests: saga (= ${binary:Version})
@@ -52,7 +52,7 @@ Description: SAGA GIS development files
  This package contains the header files for developing with SAGA.
  Install this package if you wish to develop software that uses the SAGA API.
 
-Package: libsaga4
+Package: libsaga-2.0.4
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
