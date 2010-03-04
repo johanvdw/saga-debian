@@ -14,7 +14,7 @@ saga (2.0.4+dfsg1) unstable; urgency=low
   * Use grib2 in debian instead of static linked version
   * Separate saga-dev package
   * Fix sonumbers for saga_api.so and saga_gdi
-  * Add Provides: info for libsaga_api and libsaga_gdi
+  * Remove non-free components (in grid_gridding and fire_simulation)
 
   [ Francesco Paolo Lovergine ]
   * Maintainer set to DebianGis team, with git maintenance.

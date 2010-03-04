@@ -71,25 +71,13 @@ libgrid_gridding_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libgrid_gridding_la_OBJECTS = Interpolation.lo \
 	Interpolation_InverseDistance.lo \
-	Interpolation_NaturalNeighbour.lo \
-	Interpolation_NearestNeighbour.lo Interpolation_Shepard.lo \
-	Interpolation_Triangulation.lo MLB_Interface.lo Shapes2Grid.lo \
-	Shepard.lo delaunay.lo hash.lo istack.lo lpi.lo nnai.lo \
-	nncommon.lo nnpi.lo triangle.lo
+	Interpolation_NearestNeighbour.lo \
+	Interpolation_Triangulation.lo MLB_Interface.lo Shapes2Grid.lo
 libgrid_gridding_la_OBJECTS = $(am_libgrid_gridding_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -98,6 +86,15 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libgrid_gridding_la_SOURCES)
 DIST_SOURCES = $(libgrid_gridding_la_SOURCES)
@@ -236,43 +233,22 @@ pkglib_LTLIBRARIES = libgrid_gridding.la
 libgrid_gridding_la_SOURCES = \
 Interpolation.cpp\
 Interpolation_InverseDistance.cpp\
-Interpolation_NaturalNeighbour.cpp\
 Interpolation_NearestNeighbour.cpp\
-Interpolation_Shepard.cpp\
 Interpolation_Triangulation.cpp\
 MLB_Interface.cpp\
 Shapes2Grid.cpp\
-Shepard.cpp\
-./nn/delaunay.c\
-./nn/hash.c\
-./nn/istack.c\
-./nn/lpi.c\
-./nn/nnai.c\
-./nn/nncommon.c\
-./nn/nnpi.c\
-./nn/triangle.c\
 Interpolation.h\
 Interpolation_InverseDistance.h\
-Interpolation_NaturalNeighbour.h\
 Interpolation_NearestNeighbour.h\
-Interpolation_Shepard.h\
 Interpolation_Triangulation.h\
 MLB_Interface.h\
-Shapes2Grid.h\
-Shepard.h\
-./nn/delaunay.h\
-./nn/hash.h\
-./nn/istack.h\
-./nn/nan.h\
-./nn/nn.h\
-./nn/triangle.h\
-./nn/version.h
+Shapes2Grid.h
 
 libgrid_gridding_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -345,98 +321,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation_InverseDistance.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation_NaturalNeighbour.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation_NearestNeighbour.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation_Shepard.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Interpolation_Triangulation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes2Grid.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shepard.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/delaunay.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/istack.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lpi.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nnai.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nncommon.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nnpi.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/triangle.Plo@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-delaunay.lo: ./nn/delaunay.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT delaunay.lo -MD -MP -MF $(DEPDIR)/delaunay.Tpo -c -o delaunay.lo `test -f './nn/delaunay.c' || echo '$(srcdir)/'`./nn/delaunay.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/delaunay.Tpo $(DEPDIR)/delaunay.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/delaunay.c' object='delaunay.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o delaunay.lo `test -f './nn/delaunay.c' || echo '$(srcdir)/'`./nn/delaunay.c
-
-hash.lo: ./nn/hash.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hash.lo -MD -MP -MF $(DEPDIR)/hash.Tpo -c -o hash.lo `test -f './nn/hash.c' || echo '$(srcdir)/'`./nn/hash.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/hash.Tpo $(DEPDIR)/hash.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/hash.c' object='hash.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hash.lo `test -f './nn/hash.c' || echo '$(srcdir)/'`./nn/hash.c
-
-istack.lo: ./nn/istack.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT istack.lo -MD -MP -MF $(DEPDIR)/istack.Tpo -c -o istack.lo `test -f './nn/istack.c' || echo '$(srcdir)/'`./nn/istack.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/istack.Tpo $(DEPDIR)/istack.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/istack.c' object='istack.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o istack.lo `test -f './nn/istack.c' || echo '$(srcdir)/'`./nn/istack.c
-
-lpi.lo: ./nn/lpi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lpi.lo -MD -MP -MF $(DEPDIR)/lpi.Tpo -c -o lpi.lo `test -f './nn/lpi.c' || echo '$(srcdir)/'`./nn/lpi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/lpi.Tpo $(DEPDIR)/lpi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/lpi.c' object='lpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lpi.lo `test -f './nn/lpi.c' || echo '$(srcdir)/'`./nn/lpi.c
-
-nnai.lo: ./nn/nnai.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nnai.lo -MD -MP -MF $(DEPDIR)/nnai.Tpo -c -o nnai.lo `test -f './nn/nnai.c' || echo '$(srcdir)/'`./nn/nnai.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/nnai.Tpo $(DEPDIR)/nnai.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/nnai.c' object='nnai.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nnai.lo `test -f './nn/nnai.c' || echo '$(srcdir)/'`./nn/nnai.c
-
-nncommon.lo: ./nn/nncommon.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nncommon.lo -MD -MP -MF $(DEPDIR)/nncommon.Tpo -c -o nncommon.lo `test -f './nn/nncommon.c' || echo '$(srcdir)/'`./nn/nncommon.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/nncommon.Tpo $(DEPDIR)/nncommon.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/nncommon.c' object='nncommon.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nncommon.lo `test -f './nn/nncommon.c' || echo '$(srcdir)/'`./nn/nncommon.c
-
-nnpi.lo: ./nn/nnpi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nnpi.lo -MD -MP -MF $(DEPDIR)/nnpi.Tpo -c -o nnpi.lo `test -f './nn/nnpi.c' || echo '$(srcdir)/'`./nn/nnpi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/nnpi.Tpo $(DEPDIR)/nnpi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/nnpi.c' object='nnpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nnpi.lo `test -f './nn/nnpi.c' || echo '$(srcdir)/'`./nn/nnpi.c
-
-triangle.lo: ./nn/triangle.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT triangle.lo -MD -MP -MF $(DEPDIR)/triangle.Tpo -c -o triangle.lo `test -f './nn/triangle.c' || echo '$(srcdir)/'`./nn/triangle.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/triangle.Tpo $(DEPDIR)/triangle.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='./nn/triangle.c' object='triangle.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o triangle.lo `test -f './nn/triangle.c' || echo '$(srcdir)/'`./nn/triangle.c
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
