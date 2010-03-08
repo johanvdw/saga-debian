@@ -4,10 +4,8 @@ include /usr/share/cdbs/1/class/autotools.mk
 
 DEB_CONFIGURE_EXTRA_FLAGS = --enable-unicode
 DEB_INSTALL_MANPAGES_saga = saga_cmd.1
-
-VERSION := $(shell dpkg-parsechangelog | egrep '^Version:' | \
-   cut -f 2 -d ' ' | cut -f 1 -d '-')
-
+VERSION := $(shell grep '^AC_INIT' configure.in | \
+	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
 # remove libtool helpers
 install/saga::
 	find debian/tmp/usr/lib ! -type d -a -name "*.la" -delete
@@ -21,5 +19,5 @@ cleanbuilddir/saga::
 	rm -f saga_gui.1
 
 debian/% :: debian/%.in
-	sed -e 's/@VERSION@/$(VERSION)/' -e 's/@LIBSAGAGDISO@/$(LIBSAGAGDISO)/' $< >$@
+	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
 
