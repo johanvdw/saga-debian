@@ -1,6 +1,6 @@
 saga (2.0.4-1) unstable; urgency=low
 
-  * Inital release (closes: #570014).
+  * Initial release (closes: #570014).
 
   [ Johan Van de Wauw ]
   * Initial import debian files
@@ -12,12 +12,12 @@ saga (2.0.4-1) unstable; urgency=low
   * Remove unneccesary CVS files
   * Add libsaga_gdi.so to /usr/lib instead of /usr/lib/saga
   * Use grib2 in debian instead of static linked version
-  * Seperate saga-dev package
+  * Separate saga-dev package
   * Fix sonumbers for saga_api.so and saga_gdi
   * Add Provides: info for libsaga_api and libsaga_gdi
 
   [ Francesco Paolo Lovergine ]
-  * Maintainer set to DebianGis team, with git maintainance.
+  * Maintainer set to DebianGis team, with git maintenance.
   * Added Johan and me as uploaders.
   * Set Vcs-* fields.
   * Long description revised.
