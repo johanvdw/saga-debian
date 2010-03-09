@@ -1,0 +1,25 @@
+.TH saga-depends 1 "2010-03-09" "0.1" "SAGA packages for Debian GNU/Linux"
+.SH "NAME"
+saga\-depends \- calculates SAGA Gis dependencies
+
+.SH "SYNOPSIS"
+\&\fBsaga-depends\fR [\fIbinary-package ...\fR]
+
+.SH "DESCRIPTION"
+saga-depends is a debhelper-like program which is responsible for generating
+the ${saga:Depends} substitution variables and adding them to substvars files.
+You should specify one or more binary packages to consider for adding the 
+per-package substvars definition or none to use default debian/substvars.
+.PP
+If you use this program, your package must build-depend on libsaga-dev.
+
+.SH "SEE ALSO"
+\&\fIdebhelper\fR\|(7),
+\&\fIdh_shlibdeps\fR\|(1),
+\&\fIdpkg-shlibdeps\fR\|(1)
+.PP
+This program is not a part of debhelper.
+
+.SH "AUTHOR"
+Francesco Paolo Lovergine <frankie@debian.org>
+
