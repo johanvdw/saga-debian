@@ -1,0 +1,16 @@
+SAGA Gis for Debian
+-------------------
+
+Libraries provided by SAGA Gis can be used by third-parties modules,
+but currently change at every new release their APIs. Therefore, third-parties 
+source packages should build-depend on libsaga-dev and depend on 
+an additional ${saga:Depends} substvar. This will enforce strict package 
+dependency on the right library version and prevent obscure failure
+due to changes in structures or functions.
+
+Their debian/rules should execute a little debhelper script
+named /usr/bin/saga-depends to append required versioned lib dependencies
+to their control file before executing dh_shlibdeps. That script is
+provided in the libsaga-dev package.
+
+-- Francesco Paolo Lovergine <frankie@debian.org>  Tue Mar  9 11:30:25 CET 2010
