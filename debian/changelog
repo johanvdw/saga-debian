@@ -28,5 +28,7 @@ saga (2.0.4-1) unstable; urgency=low
   * Apps -> Applications in debian/menu.
   * Now libtool helper files .la are not installed.
   * Added ITP bug number.
+  * Added a templated debhelper saga-depends little script to provide required
+    substvars for third-parties packages.
 
- -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Feb 2010 15:13:47 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Tue, 09 Mar 2010 11:17:49 +0100
