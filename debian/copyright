@@ -1,68 +1,170 @@
-It was downloaded from http://www.saga-gis.org 
+The original source was downloaded from http://www.saga-gis.org 
+On two places files were removed to adhere to the DFSG:
+- the module natural neighbour was removed from libgrid_gridding
+  it relied on a non DFSG algorithm (in triangle.c)
+  src/modules/grid/grid_gridding/nn/* (w
+
+- the module fire simulation: src/modules_simulation/fire/*
+  it relies on a non DFSG library: libfire  (www.fire.org)
 
 Upstream Author: Olaf Conrad <oconrad@saga-gis.org>
 
-Files:src/saga_core/saga_api/*
-Copyright: 2009 Olaf Conrad
-License: LGPGL-2.1
+***Saga API and cli/gui - Copyright***
+src/saga_core/*:
+Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2003-2006 Victor Olaya 
+Copyright: 2001-2004 Andre Ringeler 
+Copyright: 2007      Thomas Schorr
+Copyright: 2003-2009 Volker Wichmann
 
-This library is free software; you can redistribute   
-it and/or modify it under the terms of the GNU Lesser 
-General Public License as published by the Free       
-Software Foundation, version 2.1 of the License.      
-                                                      
-This library is distributed in the hope that it will  
-be useful, but WITHOUT ANY WARRANTY; without even the 
-implied warranty of MERCHANTABILITY or FITNESS FOR A  
-PARTICULAR PURPOSE. See the GNU Lesser General Public 
-License for more details.                             
-                                                      
-You should have received a copy of the GNU Lesser     
-General Public License along with this program; if    
-not, write to the Free Software Foundation, Inc.,     
-51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+src/saga_core/saga_gui/wx/propgrid/*
+Copyright: 2004-2007 Jaakko Salli
 
-Files: src/* excluding src/saga_core/saga_api/*
-Copyright:  2009 Olaf Conrad 
-License: GPL-2
+src/saga_core/saga_api/mat_formula.cpp
+contains code base on work by:
+Copyright 1993-1998 Herald Helfgott
 
-This file is part of 'SAGA - System for Automated    
-Geoscientific Analyses'. SAGA is free software; you  
-can redistribute it and/or modify it under the terms 
-of the GNU General Public License as published by the
-Free Software Foundation; version 2 of the License.  
-                                                     
-SAGA is distributed in the hope that it will be      
-useful, but WITHOUT ANY WARRANTY; without even the   
-implied warranty of MERCHANTABILITY or FITNESS FOR A 
-PARTICULAR PURPOSE. See the GNU General Public       
-License for more details.                            
-                                                     
-You should have received a copy of the GNU General   
-Public License along with this program; if not,      
-write to the Free Software Foundation, Inc.,         
-51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+***Saga API and cli/gui - License***
+src/saga_core/saga_api/*
+License: LGPGL-2.1 available on debian at: /usr/share/common-licenses/LGPL-2.1
+
+src/saga_core/saga_gui/*
+src/saga_core/saga_cmd/*
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+src/saga_core/saga_gui/wx/propgrid/*
+License: wxWindows License, GPLv2 with exception that object code may be distributed under own terms.
+<<echo license>>
+
+*** SAGA modules: Copyright ***
+src/modules/*
+src/modules_*
+Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2003-2006 Victor Olaya
+Copyright: 2001-2004 Andre Ringeler
+Copyright: 2007 Thomas Schorr
+Copyright: 2003-2009 Volker Wichmann
+Copyright: 2004 Antonio Boggia
+Copyright: 2004 Gianluca Massei
+Copyright: 2006 Stefan Liersch
+Copyright:      Alessandro Perego
+Copyright: 2007 Johan Van de Wauw
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+Some modules contain (parts of) previously published software:
+src/modules_io/esri_e00/io_esri_e00/e00compr/*
+Copyright 1998-1999 Frank Warmerdam and Daniel Morisette
+MIT license:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+shapes/io_shapes_dxf/dxflib
+Copyright (C) 2001-2003 RibbonSoft. All rights reserved.
+Copyright (C) 2001 Robert J. Campbell Jr
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+src/modules/shapes/shapes_lines_ex/*
+Contains code from Plot Graphic Library
+http://pgl.codeplex.com/
+Author: Jonathan de Halleux, dehalleux@auto.ucl.ac.be
+Copyright (C) 2002 Pelikhan, Inc
+LGPL (no version number mentioned)
+License: LGPGLavailable on debian at: /usr/share/common-licenses/LGPL
+
+[src/modules_io/grid/io_grid_grib2/g2clib-1.0.4/]
+Not used in debian - build in a seperate package - source still in orig.tar.gz:
+http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
+
+From the website:
+"These codes are provided as is for the use of NCEP data users.
+NCEP does not and cannot provide any support for them".
+
+Brent A. Gordon of noaa.gov  clarified that this code is in the public domain,
+and is covered by the disclaimer:
+http://www.weather.gov/disclaimer.php
+
+    The information on government servers are in the public domain, 
+    unless specifically annotated otherwise, and may be used freely by the public 
+    so long as you do not 1) claim it is your own (e.g. by claiming copyright 
+    for NWS information -- see below), 2) use it in a manner that implies an endorsement 
+    or affiliation with NOAA/NWS, or 3) modify it in content and then present it  
+    as official government material. You also cannot present information of your 
+    own in a way that makes it appear to be official government information..
+
+src/modules_projection/pj_georeference/pj_georeference/*
+Contains code from cminpack http://devernay.free.fr/hacks/cminpack.html
+Upstream authors: Jorge More' <more@mcs.anl.gov>, Burt Garbow, and Ken Hillstrom at
+Argonne National Laboratory.
+Copyright:
+Minpack Copyright Notice (1999) University of Chicago.  All rights reserved
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the
+following conditions are met:
+
+1. Redistributions of source code must retain the above
+copyright notice, this list of conditions and the following
+disclaimer.
+
+2. Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials
+provided with the distribution.
+
+3. The end-user documentation included with the
+redistribution, if any, must include the following
+acknowledgment:
+
+   "This product includes software developed by the
+   University of Chicago, as Operator of Argonne National
+   Laboratory.
+
+Alternately, this acknowledgment may appear in the software
+itself, if and wherever such third-party acknowledgments
+normally appear.
+
+4. WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS"
+WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT HOLDER, THE
+UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND
+THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE
+OR NON-INFRINGEMENT, (2) DO NOT ASSUME ANY LEGAL LIABILITY
+OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR
+USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF
+THE SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4)
+DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION
+UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL
+BE CORRECTED.
+
+5. LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT
+HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF
+ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF
+ANY KIND OR NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF
+PROFITS OR LOSS OF DATA, FOR ANY REASON WHATSOEVER, WHETHER
+SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT
+(INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE,
+EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
+POSSIBILITY OF SUCH LOSS OR DAMAGES.
 
 Files: debian/*
 Copyright: 2010 Johan Van de Wauw <johan.vandewauw@gmail.com>
-License: GPL-2+
-
-This package is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 2 dated June, 1991, or
-(at your option) any later version.
-
-This package is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this package; if not, write to the Free Software 
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, 
-MA 02110-1301, USA.
-
-On Debian systems, the complete text of the GNU General
-Public License can be found in '/usr/share/common-licenses/GPL-2' and
+License: LGPLv2.1+ (2.1 or higher)
 the complete text of the GNU Library (now Lesser) public
 license can be found in the file '/usr/share/common-licenses/LGPL-2.1'
