@@ -134,8 +134,6 @@ AC_OUTPUT(Makefile \
 	src/modules_simulation/cellular_automata/sim_cellular_automata/Makefile \
 	src/modules_simulation/ecosystems/Makefile \
 	src/modules_simulation/ecosystems/sim_ecosystems_hugget/Makefile \
-	src/modules_simulation/fire/Makefile \
-	src/modules_simulation/fire/sim_fire_spreading/Makefile \
 	src/modules_terrain_analysis/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/ta_channels/Makefile \
