@@ -6,6 +6,8 @@ DEB_CONFIGURE_EXTRA_FLAGS = --enable-unicode
 DEB_INSTALL_MANPAGES_saga = saga_cmd.1
 VERSION := $(shell grep '^AC_INIT' configure.in | \
 	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
+UPSTREAM_URL ?=$(shell uscan --dehs | sed -n 's/.*<upstream-url>\(.*\)<\/upstream-url>.*/\1/p')
+UPSTREAM_VERSION ?=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\/upstream-version>.*/\1/p')
 # remove libtool helpers
 install/saga::
 	find debian/tmp/usr/lib ! -type d -a -name "*.la" -delete
@@ -21,3 +23,10 @@ cleanbuilddir/saga::
 debian/% :: debian/%.in
 	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
 
+get-orig-source:
+	wget $(UPSTREAM_URL)
+	gunzip *.tar.gz
+	tar --delete -f *.tar saga-2.0/src/modules/grid/grid_gridding/nn
+	tar --delete -f *.tar saga-2.0/src/modules_simulation/fire
+	gzip *.tar
+	mv saga_$(UPSTREAM_VERSION)_src_linux.tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
