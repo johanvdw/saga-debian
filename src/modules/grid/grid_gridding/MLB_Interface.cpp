@@ -93,7 +93,6 @@ const SG_Char * Get_Info(int i)
 
 #include "Interpolation_InverseDistance.h"
 #include "Interpolation_NearestNeighbour.h"
-#include "Interpolation_NaturalNeighbour.h"
 #include "Interpolation_Shepard.h"
 #include "Interpolation_Triangulation.h"
 #include "Shapes2Grid.h"
@@ -109,9 +108,8 @@ CSG_Module *		Create_Module(int i)
 	case 0:	return( new CShapes2Grid );
 	case 1:	return( new CInterpolation_InverseDistance );
 	case 2:	return( new CInterpolation_NearestNeighbour );
-	case 3:	return( new CInterpolation_NaturalNeighbour );
-	case 4:	return( new CInterpolation_Shepard );
-	case 5:	return( new CInterpolation_Triangulation );
+	case 3:	return( new CInterpolation_Shepard );
+	case 4:	return( new CInterpolation_Triangulation );
 	}
 
 	return( NULL );
