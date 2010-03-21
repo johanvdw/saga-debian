@@ -1,13 +1,13 @@
 The original source was downloaded from http://www.saga-gis.org 
+The upstream author is: Olaf Conrad <oconrad@saga-gis.org>
+
 On two places files were removed to adhere to the DFSG:
 - the module natural neighbour was removed from libgrid_gridding
   it relied on a non DFSG algorithm (in triangle.c)
-  src/modules/grid/grid_gridding/nn/* (w
-
+  src/modules/grid/grid_gridding/nn/*
 - the module fire simulation: src/modules_simulation/fire/*
   it relies on a non DFSG library: libfire  (www.fire.org)
 
-Upstream Author: Olaf Conrad <oconrad@saga-gis.org>
 
 ***Saga API and cli/gui - Copyright***
 src/saga_core/*:
@@ -19,6 +19,7 @@ Copyright: 2003-2009 Volker Wichmann
 
 src/saga_core/saga_gui/wx/propgrid/*
 Copyright: 2004-2007 Jaakko Salli
+http://wxpropgrid.sourceforge.net/
 
 src/saga_core/saga_api/mat_formula.cpp
 contains code base on work by:
@@ -33,8 +34,57 @@ src/saga_core/saga_cmd/*
 License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
 
 src/saga_core/saga_gui/wx/propgrid/*
-License: wxWindows License, GPLv2 with exception that object code may be distributed under own terms.
-<<echo license>>
+License: wxWindows Library License, this equals the LPGL with exception that object code may be distributed under own terms. 
+wxWindows library licence:
+Copyright (c) 1998 Julian Smart, Robert Roebling [, ...]
+
+Everyone is permitted to copy and distribute verbatim copies
+of this licence document, but changing it is not allowed.
+
+WXWINDOWS LIBRARY LICENCE
+
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public Licence as published by
+the Free Software Foundation; either version 2 of the Licence, or (at
+your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library
+General Public Licence for more details.
+
+You should have received a copy of the GNU Library General Public Licence
+along with this software, usually in a file named COPYING.LIB. If not,
+write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA.
+
+EXCEPTION NOTICE
+
+1. As a special exception, the copyright holders of this library give
+permission for additional uses of the text contained in this release of
+the library as licenced under the wxWindows Library Licence, applying
+either version 3 of the Licence, or (at your option) any later version of
+the Licence as published by the copyright holders of version 3 of the
+Licence document.
+
+2. The exception is that you may use, copy, link, modify and distribute
+under the user's own terms, binary object code versions of works based
+on the Library.
+
+3. If you copy code from files distributed under the terms of the GNU
+General Public Licence or the GNU Library General Public Licence into a
+copy of this library, as this licence permits, the exception does not
+apply to the code that you add in this way. To avoid misleading anyone as
+to the status of such modified files, you must delete this exception
+notice from such code and/or adjust the licensing conditions notice
+accordingly.
+
+4. If you write modifications of your own for this library, it is your
+choice whether to permit this exception to apply to your modifications.
+If you do not wish that, you must delete the exception notice from such
+code and/or adjust the licensing conditions notice accordingly.
 
 *** SAGA modules: Copyright ***
 src/modules/*
@@ -80,91 +130,16 @@ License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
 
 src/modules/shapes/shapes_lines_ex/*
 Contains code from Plot Graphic Library
+a C++/MFC charting library.
 http://pgl.codeplex.com/
-Author: Jonathan de Halleux, dehalleux@auto.ucl.ac.be
-Copyright (C) 2002 Pelikhan, Inc
-LGPL (no version number mentioned)
-License: LGPGLavailable on debian at: /usr/share/common-licenses/LGPL
+Copyright (C) 2001  de Halleux Jonathan
+LGPLv2.1+ (2.1 or higher)
+the complete text of this license can be found in the file:
+/usr/share/common-licenses/LGPL-2.1
 
-[src/modules_io/grid/io_grid_grib2/g2clib-1.0.4/]
-Not used in debian - build in a seperate package - source still in orig.tar.gz:
-http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
-
-From the website:
-"These codes are provided as is for the use of NCEP data users.
-NCEP does not and cannot provide any support for them".
-
-Brent A. Gordon of noaa.gov  clarified that this code is in the public domain,
-and is covered by the disclaimer:
-http://www.weather.gov/disclaimer.php
-
-    The information on government servers are in the public domain, 
-    unless specifically annotated otherwise, and may be used freely by the public 
-    so long as you do not 1) claim it is your own (e.g. by claiming copyright 
-    for NWS information -- see below), 2) use it in a manner that implies an endorsement 
-    or affiliation with NOAA/NWS, or 3) modify it in content and then present it  
-    as official government material. You also cannot present information of your 
-    own in a way that makes it appear to be official government information..
-
-src/modules_projection/pj_georeference/pj_georeference/*
-Contains code from cminpack http://devernay.free.fr/hacks/cminpack.html
-Upstream authors: Jorge More' <more@mcs.anl.gov>, Burt Garbow, and Ken Hillstrom at
-Argonne National Laboratory.
-Copyright:
-Minpack Copyright Notice (1999) University of Chicago.  All rights reserved
-
-Redistribution and use in source and binary forms, with or
-without modification, are permitted provided that the
-following conditions are met:
-
-1. Redistributions of source code must retain the above
-copyright notice, this list of conditions and the following
-disclaimer.
-
-2. Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following
-disclaimer in the documentation and/or other materials
-provided with the distribution.
-
-3. The end-user documentation included with the
-redistribution, if any, must include the following
-acknowledgment:
-
-   "This product includes software developed by the
-   University of Chicago, as Operator of Argonne National
-   Laboratory.
-
-Alternately, this acknowledgment may appear in the software
-itself, if and wherever such third-party acknowledgments
-normally appear.
-
-4. WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS"
-WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT HOLDER, THE
-UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND
-THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE
-OR NON-INFRINGEMENT, (2) DO NOT ASSUME ANY LEGAL LIABILITY
-OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR
-USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF
-THE SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4)
-DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION
-UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL
-BE CORRECTED.
-
-5. LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT
-HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF
-ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT,
-INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF
-ANY KIND OR NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF
-PROFITS OR LOSS OF DATA, FOR ANY REASON WHATSOEVER, WHETHER
-SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT
-(INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE,
-EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
-POSSIBILITY OF SUCH LOSS OR DAMAGES.
-
+*** Debian packaging ***
 Files: debian/*
 Copyright: 2010 Johan Van de Wauw <johan.vandewauw@gmail.com>
 License: LGPLv2.1+ (2.1 or higher)
-the complete text of the GNU Library (now Lesser) public
-license can be found in the file '/usr/share/common-licenses/LGPL-2.1'
+the complete text of this license can be found in the file:
+/usr/share/common-licenses/LGPL-2.1
