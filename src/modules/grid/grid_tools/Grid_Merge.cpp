@@ -385,8 +385,8 @@ bool CGrid_Merge::On_Execute(void)
                         pMerged->Set_Value(x, y, pMerged->asDouble(x, y) / pCount->asInt(x, y));
                 }
             }
+		delete(pCount);
         }
-        pCount->Destroy();
 		return( true );
 	}
 
