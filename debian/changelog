@@ -1,6 +1,7 @@
 saga (2.0.4+dfsg-1) unstable; urgency=low
 
-  * Initial release (closes: #570014).
+  * Initial release, with copyright fixes and non-free removals.
+    (closes: #570014)
 
   [ Johan Van de Wauw ]
   * Initial import debian files
@@ -31,4 +32,4 @@ saga (2.0.4+dfsg-1) unstable; urgency=low
   * Added a templated debhelper saga-depends little script to provide required
     substvars for third-parties packages.
 
- -- Francesco Paolo Lovergine <frankie@debian.org>  Tue, 09 Mar 2010 11:17:49 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Mar 2010 13:22:43 +0100
