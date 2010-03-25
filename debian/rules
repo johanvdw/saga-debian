@@ -29,5 +29,5 @@ get-orig-source:
 	tar --delete -f saga_$(UPSTREAM_VERSION)_src_linux.tar saga-2.0/src/modules/grid/grid_gridding/nn
 	tar --delete -f saga_$(UPSTREAM_VERSION)_src_linux.tar saga-2.0/src/modules_simulation/fire
 	tar --delete -f saga_$(UPSTREAM_VERSION)_src_linux.tar saga-2.0/src/modules_io/grid/io_grid_grib2/g2clib-1.0.4
-	gzip *.tar
+	gzip -9n saga_$(UPSTREAM_VERSION)_src_linux.tar
 	mv saga_$(UPSTREAM_VERSION)_src_linux.tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
