@@ -137,7 +137,7 @@ public:
 	{
 		if( Value && m_Value.Cmp(Value) )
 		{
-			m_Value.Printf(Value);
+			m_Value = Value;
 
 			return( true );
 		}

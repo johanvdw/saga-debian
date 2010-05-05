@@ -165,7 +165,7 @@ void CSG_Parameters::Set_Identifier(const SG_Char *String)
 {
 	if( String )
 	{
-		m_Identifier.Printf(String);
+		m_Identifier =String;
 	}
 	else
 	{
@@ -183,7 +183,7 @@ void CSG_Parameters::Set_Name(const SG_Char *String)
 {
 	if( String )
 	{
-		m_Name.Printf(String);
+		m_Name = String;
 	}
 	else
 	{
