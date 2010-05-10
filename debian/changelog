@@ -1,3 +1,13 @@
+saga (2.0.4+dfsg-2) unstable; urgency=low
+
+  [ Johan Van de Wauw ]
+  * Fix program description (#578419)
+  * Fix bug: deep map window zoom freezes SAGA
+  * Fix Esri E00 import
+  * Fix bug: printf() crashes
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 10 May 2010 16:00:39 +0200
+
 saga (2.0.4+dfsg-1) unstable; urgency=low
 
   * Initial release, with copyright fixes and non-free removals.
