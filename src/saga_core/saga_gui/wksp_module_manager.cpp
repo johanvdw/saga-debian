@@ -554,6 +554,7 @@ void CWKSP_Module_Manager::_Make_HTML_Docs(void)
 				if( Stream_Libs.is_Open() )
 				{
 					s	= Get_FilePath_Relative(Directory.c_str(), FileName.GetFullPath().c_str()).c_str();	if( s[0] == '\\' )	s	= s.AfterFirst('\\');
+                    if(s[0]=='/') s = s.AfterFirst('/');
 					Stream_Libs.Printf(wxT("<li><a href=\"%s\">%s</a></li>\n"), s.c_str(), Get_Library(i)->Get_Name().c_str());
 				}
 
@@ -567,10 +568,13 @@ void CWKSP_Module_Manager::_Make_HTML_Docs(void)
 			//---------------------------------------------
 			// write the modules
 
-			if( bDirectory )
-				s	= wxT("./../index");
-			else
-				s	= Get_FilePath_Relative(Main.c_str(), FileName.GetFullPath().c_str()).c_str();	if( s[0] == '\\' )	s	= s.AfterFirst('\\');
+			if( bDirectory ){
+				s	= wxT("./../index");}
+			else{
+				s	= Get_FilePath_Relative(Main.c_str(), FileName.GetFullPath().c_str()).c_str();
+                if( s[0] == '\\' )	s	= s.AfterFirst('\\');
+                if(s[0]=='/') s = s.AfterFirst('/');
+            }
 
 			FileName.SetName(wxT("modules"));
 			Stream_List.Open(FileName.GetFullPath().c_str(), SG_FILE_W, false);
