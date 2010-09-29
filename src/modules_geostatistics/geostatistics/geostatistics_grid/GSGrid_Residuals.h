@@ -84,8 +84,6 @@ class CGSGrid_Residuals : public CSG_Module_Grid
 public:
 	CGSGrid_Residuals(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Neighborhoods" ));	}
-
 
 protected:
 
@@ -94,14 +92,12 @@ protected:
 
 private:
 
-	double					*Values;
+	CSG_Grid_Cell_Addressor	m_Cells;
 
-	CSG_Grid_Radius			m_Radius;
-
-	CSG_Grid				*pInput, *pMean, *pDiff, *pStdDev, *pRange, *pMin, *pMax, *pDevMean, *pPercentile;
+	CSG_Grid				*m_pGrid, *m_pMean, *m_pDiff, *m_pStdDev, *m_pRange, *m_pMin, *m_pMax, *m_pDevMean, *m_pPercent;
 
 
-	int						Get_Value		(int x, int y);
+	bool					Get_Statistics	(int x, int y);
 
 };
 

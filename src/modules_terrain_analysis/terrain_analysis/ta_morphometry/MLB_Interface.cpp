@@ -101,6 +101,7 @@ const SG_Char * Get_Info(int i)
 #include "land_surface_temperature.h"
 #include "relative_heights.h"
 #include "wind_effect.h"
+#include "ruggedness.h"
 
 
 //---------------------------------------------------------
@@ -124,6 +125,8 @@ CSG_Module *		Create_Module(int i)
 	case 13:	return( new CLand_Surface_Temperature );
 	case 14:	return( new CRelative_Heights );
 	case 15:	return( new CWind_Effect );
+	case 16:	return( new CRuggedness_TRI );
+	case 17:	return( new CRuggedness_VRM );
 	}
 
 	return( NULL );

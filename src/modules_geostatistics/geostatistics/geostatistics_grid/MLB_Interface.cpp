@@ -74,16 +74,16 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Geostatistics - Grids") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad, Volker Wichmann (c) 2002-5" ));
+		return( _TL("O.Conrad, V.Wichmann (c) 2002-10" ));
 
 	case MLB_INFO_Description:
-		return( _TL("Tools for (geo)statistical analyses of grids.") );
+		return( _TL("Tools for (geo)statistical analyses.") );
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Geostatistics|Grid") );
+		return( _TL("Geostatistics|Grids") );
 	}
 }
 
@@ -91,13 +91,13 @@ const SG_Char * Get_Info(int i)
 //---------------------------------------------------------
 // 3. Include the headers of your modules here...
 
+#include "fast_representativeness.h"
 #include "GSGrid_Residuals.h"
 #include "GSGrid_Variance.h"
 #include "GSGrid_Variance_Radius.h"
-#include "GSGrid_Regression.h"
-#include "GSGrid_Regression_Multiple.h"
 #include "GSGrid_Statistics.h"
 #include "GSGrid_Zonal_Statistics.h"
+#include "GSGrid_Directional_Statistics.h"
 
 
 //---------------------------------------------------------
@@ -105,49 +105,18 @@ const SG_Char * Get_Info(int i)
 
 CSG_Module *		Create_Module(int i)
 {
-	// Don't forget to continuously enumerate the case switches
-	// when adding new modules! Also bear in mind that the
-	// enumeration always has to start with [case 0:] and
-	// that [default:] must return NULL!...
-
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CGSGrid_Residuals;
-		break;
-
-	case 1:
-		pModule	= new CGSGrid_Variance;
-		break;
-
-	case 2:
-		pModule	= new CGSGrid_Variance_Radius;
-		break;
-
-	case 3:
-		pModule	= new CGSGrid_Regression;
-		break;
-
-	case 4:
-		pModule	= new CGSGrid_Regression_Multiple;
-		break;
-
-	case 5:
-		pModule	= new CGSGrid_Statistics;
-		break;
-
-	case 6:
-		pModule	= new CGSGrid_Zonal_Statistics;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	case  0:	return( new CFast_Representativeness );
+	case  1:	return( new CGSGrid_Residuals );
+	case  2:	return( new CGSGrid_Variance );
+	case  3:	return( new CGSGrid_Variance_Radius );
+	case  4:	return( new CGSGrid_Statistics );
+	case  5:	return( new CGSGrid_Zonal_Statistics );
+	case  6:	return( new CGSGrid_Directional_Statistics );
 	}
 
-	return( pModule );
+	return( NULL );
 }
 
 

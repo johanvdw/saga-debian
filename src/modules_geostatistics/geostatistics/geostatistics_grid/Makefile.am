@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.5 2007/02/13 12:49:24 tschorr Exp $
+# $Id: Makefile.am,v 1.11 2010/07/08 14:11:51 johanvdw Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,19 +10,19 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared 
+AM_LDFLAGS         = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgeostatistics_grid.la
 libgeostatistics_grid_la_SOURCES =\
-GSGrid_Regression.cpp\
-GSGrid_Regression_Multiple.cpp\
+fast_representativeness.cpp\
+GSGrid_Directional_Statistics.cpp\
 GSGrid_Residuals.cpp\
 GSGrid_Statistics.cpp\
 GSGrid_Variance.cpp\
 GSGrid_Variance_Radius.cpp\
 GSGrid_Zonal_Statistics.cpp\
 MLB_Interface.cpp\
-GSGrid_Regression.h\
-GSGrid_Regression_Multiple.h\
+fast_representativeness.h\
+GSGrid_Directional_Statistics.h\
 GSGrid_Residuals.h\
 GSGrid_Statistics.h\
 GSGrid_Variance.h\

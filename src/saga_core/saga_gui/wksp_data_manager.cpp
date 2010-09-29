@@ -183,6 +183,24 @@ CWKSP_Data_Manager::CWKSP_Data_Manager(void)
 	);
 
 	//-----------------------------------------------------
+	pNode	= m_Parameters.Add_Node(NULL, "NODE_GRID_DISPLAY", LNG("Grid Display Defaults"), LNG(""));
+
+	if( CONFIG_Read(wxT("/DATA/GRIDS"), wxT("DISPLAY_RANGEFIT")	, lValue) == false )
+	{
+		lValue	= 2;
+	}
+
+	m_Parameters.Add_Choice(
+		pNode	, "GRID_DISPLAY_RANGEFIT"	, LNG("Display Range"),
+		LNG(""),
+		wxString::Format(wxT("%s|%s|%s|"),
+			LNG("Minimum/Maximum"),
+			LNG("1.5 * Standard Deviation"),
+			LNG("2.0 * Standard Deviation")
+		), lValue
+	);
+
+	//-----------------------------------------------------
 	pNode	= m_Parameters.Add_Node(NULL, "NODE_GENERAL", LNG("General"), LNG(""));
 
 	if( CONFIG_Read(wxT("/DATA"), wxT("PROJECT_START")			, lValue) == false )
@@ -238,21 +256,29 @@ bool CWKSP_Data_Manager::Initialise(void)
 bool CWKSP_Data_Manager::Finalise(void)
 {
 	//-----------------------------------------------------
-	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_TMP_DIR")	,		SG_Grid_Cache_Get_Directory());
-	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_AUTO")		,		SG_Grid_Cache_Get_Automatic());
-	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_THRESHOLD"), (long)SG_Grid_Cache_Get_Threshold());
-	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_CONFIRM")	, (long)SG_Grid_Cache_Get_Confirm  ());
-
-	//-----------------------------------------------------
 #ifdef _SAGA_LINUX
 //	wxFileName	fProject(wxString(getenv( "HOME"), wxConvFile ), wxT("saga_gui"), wxT("cfg"));
 	CSG_String	sHome(getenv("HOME"));
 	wxFileName	fProject(sHome.c_str(), wxT("saga_gui"), wxT("cfg"));
 #else
 	wxFileName	fProject(g_pSAGA->Get_App_Path(), wxT("saga_gui"), wxT("cfg"));
+
+	if(	( fProject.FileExists() && (!fProject.IsFileReadable() || !fProject.IsFileWritable()))
+	||	(!fProject.FileExists() && (!fProject.IsDirReadable () || !fProject.IsDirWritable ())) )
+	{
+		fProject.Assign(wxGetHomeDir(), wxT("saga_gui"), wxT("cfg"));
+	}
 #endif
 
-	CONFIG_Write(wxT("/DATA")		, wxT("PROJECT_START")	, (long)m_Parameters("PROJECT_START")	->asInt());
+	//-----------------------------------------------------
+	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_TMP_DIR")		,		SG_Grid_Cache_Get_Directory());
+	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_AUTO")			,		SG_Grid_Cache_Get_Automatic());
+	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_THRESHOLD")	, (long)SG_Grid_Cache_Get_Threshold());
+	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("CACHE_CONFIRM")		, (long)SG_Grid_Cache_Get_Confirm  ());
+
+	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("DISPLAY_RANGEFIT")	, (long)m_Parameters("GRID_DISPLAY_RANGEFIT")->asInt());
+
+	CONFIG_Write(wxT("/DATA")		, wxT("PROJECT_START")		, (long)m_Parameters("PROJECT_START")->asInt());
 
 	if( Get_Count() == 0 )
 	{
@@ -357,8 +383,14 @@ wxMenu * CWKSP_Data_Manager::Get_Menu(void)
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_NEW);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_OPEN);
 //	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_OPEN_ADD);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_SAVE);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_SAVE_AS);
+
+	if( Get_Count() > 0 )
+	{
+		CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_SAVE);
+		CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECT_SAVE_AS);
+		pMenu->AppendSeparator();
+		CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SEARCH);
+	}
 
 	return( pMenu );
 }
@@ -604,6 +636,11 @@ bool CWKSP_Data_Manager::Open(const wxChar *File_Name)
 		return( Open(DATAOBJECT_TYPE_Shapes, File_Name) != NULL );
 	}
 
+	if( SG_File_Cmp_Extension(File_Name, wxT("spc")) )
+	{
+		return( Open(DATAOBJECT_TYPE_PointCloud, File_Name) != NULL );
+	}
+
 	if(	SG_File_Cmp_Extension(File_Name, wxT("sgrd"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("dgm"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("grd")) )
@@ -721,19 +758,22 @@ bool CWKSP_Data_Manager::Exists(CSG_Data_Object *pObject, int Type)
 	switch( Type )
 	{
 	case DATAOBJECT_TYPE_Grid:
-		return( m_pGrids  && m_pGrids ->Exists((CSG_Grid   *)pObject) );
+		return( m_pGrids       && m_pGrids      ->Exists((CSG_Grid       *)pObject) );
 
 	case DATAOBJECT_TYPE_Table:
 		return(
-			(	m_pTables && m_pTables->Exists((CSG_Table  *)pObject)	)
-		||	(	m_pShapes && m_pShapes->Exists((CSG_Shapes *)pObject)	)
+			(	m_pTables      && m_pTables     ->Exists((CSG_Table      *)pObject)	)
+		||	(	m_pShapes      && m_pShapes     ->Exists((CSG_Shapes     *)pObject)	)
 		);
 
 	case DATAOBJECT_TYPE_Shapes:
-		return( m_pShapes && m_pShapes->Exists((CSG_Shapes *)pObject) );
+		return(
+			(	m_pShapes      && m_pShapes     ->Exists((CSG_Shapes     *)pObject) )
+		||	(	m_pPointClouds && m_pPointClouds->Exists((CSG_PointCloud *)pObject) )
+		);
 
 	case DATAOBJECT_TYPE_TIN:
-		return( m_pTINs   && m_pTINs  ->Exists((CSG_TIN    *)pObject) );
+		return( m_pTINs        && m_pTINs       ->Exists((CSG_TIN        *)pObject) );
 
 	case DATAOBJECT_TYPE_PointCloud:
 		return( m_pPointClouds && m_pPointClouds->Exists((CSG_PointCloud *)pObject) );
@@ -1126,32 +1166,31 @@ bool CWKSP_Data_Manager::Get_Parameters(CSG_Data_Object *pObject, CSG_Parameters
 {
 	if( pObject && pParameters )
 	{
-		CWKSP_Base_Item	*pItem;
+		CWKSP_Base_Item	*pItem	= NULL;
 
 		switch( pObject->Get_ObjectType() )
 		{
 		case DATAOBJECT_TYPE_Grid:
-			pItem	= (CWKSP_Base_Item *)m_pGrids ->Get_Grid  ((CSG_Grid   *)pObject);
+			if( m_pGrids )			pItem	= (CWKSP_Base_Item *)m_pGrids      ->Get_Grid      ((CSG_Grid       *)pObject);
 			break;
 
 		case DATAOBJECT_TYPE_Shapes:
-			pItem	= (CWKSP_Base_Item *)m_pShapes->Get_Shapes((CSG_Shapes *)pObject);
+			if( m_pShapes )			pItem	= (CWKSP_Base_Item *)m_pShapes     ->Get_Shapes    ((CSG_Shapes     *)pObject);
 			break;
 
 		case DATAOBJECT_TYPE_TIN:
-			pItem	= (CWKSP_Base_Item *)m_pTINs  ->Get_TIN   ((CSG_TIN    *)pObject);
+			if( m_pTINs )			pItem	= (CWKSP_Base_Item *)m_pTINs       ->Get_TIN       ((CSG_TIN        *)pObject);
 			break;
 
 		case DATAOBJECT_TYPE_PointCloud:
-			pItem	= (CWKSP_Base_Item *)m_pPointClouds->Get_PointCloud((CSG_PointCloud *)pObject);
+			if( m_pPointClouds )	pItem	= (CWKSP_Base_Item *)m_pPointClouds->Get_PointCloud((CSG_PointCloud *)pObject);
 			break;
 
 		case DATAOBJECT_TYPE_Table:
-			pItem	= (CWKSP_Base_Item *)m_pTables->Get_Table ((CSG_Table  *)pObject);
+			if( m_pTables )			pItem	= (CWKSP_Base_Item *)m_pTables     ->Get_Table     ((CSG_Table      *)pObject);
 			break;
 
 		default:
-			pItem	= NULL;
 			break;
 		}
 

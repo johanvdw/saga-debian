@@ -60,8 +60,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <string.h>
-
 #include "table.h"
 #include "table_value.h"
 
@@ -77,7 +75,7 @@ CSG_Table_Record::CSG_Table_Record(CSG_Table *pTable, int Index)
 {
 	m_pTable	= pTable;
 	m_Index		= Index;
-	m_bSelected	= false;
+	m_Flags		= 0;
 
 	if( m_pTable && m_pTable->Get_Field_Count() > 0 )
 	{
@@ -97,7 +95,7 @@ CSG_Table_Record::CSG_Table_Record(CSG_Table *pTable, int Index)
 //---------------------------------------------------------
 CSG_Table_Record::~CSG_Table_Record(void)
 {
-	if( m_bSelected )
+	if( is_Selected() )
 	{
 		m_pTable->Select(m_Index, true);
 	}
@@ -142,6 +140,8 @@ CSG_Table_Value * CSG_Table_Record::_Create_Value(TSG_Data_Type Type)
 
 	case SG_DATATYPE_Float:
 	case SG_DATATYPE_Double:	return( new CSG_Table_Value_Double() );
+
+	case SG_DATATYPE_Binary:	return( new CSG_Table_Value_Binary() );
 	}
 }
 
@@ -216,13 +216,79 @@ int CSG_Table_Record::_Get_Field(const SG_Char *Field) const
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+void CSG_Table_Record::Set_Selected(bool bOn)
+{
+	if( bOn != is_Selected() )
+	{
+		if( bOn )
+		{
+			m_Flags	|=  SG_TABLE_REC_FLAG_Selected;
+		}
+		else
+		{
+			m_Flags	&= ~SG_TABLE_REC_FLAG_Selected;
+		}
+	}
+}
+
+//---------------------------------------------------------
+void CSG_Table_Record::Set_Modified(bool bOn)
+{
+	if( bOn != is_Modified() )
+	{
+		if( bOn )
+		{
+			m_Flags	|=  SG_TABLE_REC_FLAG_Modified;
+
+			m_pTable->Set_Modified();
+		}
+		else
+		{
+			m_Flags	&= ~SG_TABLE_REC_FLAG_Modified;
+		}
+	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Table_Record::Set_Value		(int           iField, const CSG_Bytes &Value)
+{
+	if( iField >= 0 && iField < m_pTable->Get_Field_Count() )
+	{
+		if( m_Values[iField]->Set_Value(Value) )
+		{
+			Set_Modified(true);
+
+			m_pTable->Set_Update_Flag();
+			m_pTable->_Stats_Invalidate(iField);
+
+			return( true );
+		}
+	}
+
+	return( false );
+}
+
+bool CSG_Table_Record::Set_Value		(const SG_Char *Field, const CSG_Bytes &Value)
+{
+	return( Set_Value(_Get_Field(Field), Value) );
+}
+
+//---------------------------------------------------------
 bool CSG_Table_Record::Set_Value(int iField, const SG_Char *Value)
 {
 	if( iField >= 0 && iField < m_pTable->Get_Field_Count() )
 	{
 		if( m_Values[iField]->Set_Value(Value) )
 		{
-			m_pTable->Set_Modified();
+			Set_Modified(true);
+
 			m_pTable->Set_Update_Flag();
 			m_pTable->_Stats_Invalidate(iField);
 
@@ -245,7 +311,8 @@ bool CSG_Table_Record::Set_Value(int iField, double Value)
 	{
 		if( m_Values[iField]->Set_Value(Value) )
 		{
-			m_pTable->Set_Modified();
+			Set_Modified(true);
+
 			m_pTable->Set_Update_Flag();
 			m_pTable->_Stats_Invalidate(iField);
 
@@ -305,14 +372,41 @@ bool CSG_Table_Record::Set_NoData(int iField)
 {
 	if( iField >= 0 && iField < m_pTable->Get_Field_Count() )
 	{
-		if( m_Values[iField]->Set_NoData() )
+		switch( m_pTable->Get_Field_Type(iField) )
 		{
-			m_pTable->Set_Modified();
-			m_pTable->Set_Update_Flag();
-			m_pTable->_Stats_Invalidate(iField);
+		default:
+		case SG_DATATYPE_String:
+			if( !m_Values[iField]->Set_Value(SG_T("")) )
+				return( false );
+			break;
 
-			return( true );
+		case SG_DATATYPE_Date:
+		case SG_DATATYPE_Color:
+		case SG_DATATYPE_Byte:
+		case SG_DATATYPE_Char:
+		case SG_DATATYPE_Word:
+		case SG_DATATYPE_Short:
+		case SG_DATATYPE_DWord:
+		case SG_DATATYPE_Int:
+		case SG_DATATYPE_ULong:
+		case SG_DATATYPE_Long:
+		case SG_DATATYPE_Float:
+		case SG_DATATYPE_Double:
+			if( !m_Values[iField]->Set_Value(m_pTable->Get_NoData_Value()) )
+				return( false );
+			break;
+
+		case SG_DATATYPE_Binary:
+			m_Values[iField]->asBinary().Destroy();
+			break;
 		}
+
+		Set_Modified(true);
+
+		m_pTable->Set_Update_Flag();
+		m_pTable->_Stats_Invalidate(iField);
+
+		return( true );
 	}
 
 	return( false );
@@ -326,7 +420,36 @@ bool CSG_Table_Record::Set_NoData(const SG_Char *Field)
 //---------------------------------------------------------
 bool CSG_Table_Record::is_NoData(int iField) const
 {
-	return( iField >= 0 && iField < m_pTable->Get_Field_Count() ? m_Values[iField]->is_NoData() : true );
+	if( iField >= 0 && iField < m_pTable->Get_Field_Count() )
+	{
+		switch( m_pTable->Get_Field_Type(iField) )
+		{
+		default:
+		case SG_DATATYPE_String:
+			return( m_Values[iField]->asString() == NULL );
+
+		case SG_DATATYPE_Date:
+		case SG_DATATYPE_Color:
+		case SG_DATATYPE_Byte:
+		case SG_DATATYPE_Char:
+		case SG_DATATYPE_Word:
+		case SG_DATATYPE_Short:
+		case SG_DATATYPE_DWord:
+		case SG_DATATYPE_Int:
+		case SG_DATATYPE_ULong:
+		case SG_DATATYPE_Long:
+			return( m_pTable->is_NoData_Value(m_Values[iField]->asInt()) );
+
+		case SG_DATATYPE_Float:
+		case SG_DATATYPE_Double:
+			return( m_pTable->is_NoData_Value(m_Values[iField]->asDouble()) );
+
+		case SG_DATATYPE_Binary:
+			return( m_Values[iField]->asBinary().Get_Count() == 0 );
+		}
+	}
+
+	return( true );
 }
 
 bool CSG_Table_Record::is_NoData(const SG_Char *Field) const
@@ -386,9 +509,12 @@ bool CSG_Table_Record::Assign(CSG_Table_Record *pRecord)
 {
 	if( pRecord )
 	{
-		for(int iField=0; iField<m_pTable->Get_Field_Count(); iField++)
+		int		nFields	= m_pTable->Get_Field_Count() < pRecord->m_pTable->Get_Field_Count()
+						? m_pTable->Get_Field_Count() : pRecord->m_pTable->Get_Field_Count();
+
+		for(int iField=0; iField<nFields; iField++)
 		{
-			Set_Value(iField, pRecord->asString(iField));
+			*(m_Values[iField])	= *(pRecord->m_Values[iField]);
 		}
 
 		return( true );

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.8 2009/04/28 16:31:58 oconrad Exp $
+# $Id: Makefile.am,v 1.10 2010/07/08 14:18:53 johanvdw Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,7 +10,7 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared
+AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libta_morphometry.la
 libta_morphometry_la_SOURCES =\
 Convergence.cpp\
@@ -22,6 +22,7 @@ mass_balance_index.cpp\
 Morphometry.cpp\
 ProtectionIndex.cpp\
 RealArea.cpp\
+ruggedness.cpp\
 SurfaceSpecificPoints.cpp\
 mrvbf.cpp\
 distance_gradient.cpp\
@@ -39,6 +40,7 @@ mass_balance_index.h\
 Morphometry.h\
 ProtectionIndex.h\
 RealArea.h\
+ruggedness.h\
 SurfaceSpecificPoints.h\
 mrvbf.h\
 distance_gradient.h\

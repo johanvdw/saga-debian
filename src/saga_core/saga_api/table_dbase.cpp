@@ -277,6 +277,18 @@ void CSG_Table_DBase::Header_Write(void)
 
 		for(iField=0; iField<nFields; iField++)
 		{
+			if( FieldDesc[iField].Type == DBF_FT_CHARACTER )
+			{
+				if( FieldDesc[iField].Width < 1 )
+				{
+					FieldDesc[iField].Width	= 1;
+				}
+				else if( FieldDesc[iField].Width > 255 )
+				{
+					FieldDesc[iField].Width	= 255;
+				}
+			}
+
 			nRecordBytes	+= FieldDesc[iField].Width;
 		}
 
@@ -314,7 +326,7 @@ void CSG_Table_DBase::Header_Write(void)
 		// Bytes 32-n: Field Descriptor Array...
 		for(iField=0; iField<nFields; iField++)
 		{
-			FieldDesc[iField].Name[11]	= '\0';
+			FieldDesc[iField].Name[10]	= '\0';
 			_strupr(FieldDesc[iField].Name);
 
 			fwrite( FieldDesc[iField].Name			, sizeof(char), 11, hFile);	// 00-10	Field Name ASCII padded with 0x00
@@ -379,7 +391,6 @@ bool CSG_Table_DBase::Header_Read(void)
 		while(	ftell(hFile) < (long)nHeaderBytes - 1 && !feof(hFile) )
 		{
 			FieldDesc	= (TFieldDesc *)SG_Realloc(FieldDesc, (nFields + 1) * sizeof(TFieldDesc));
-			FieldDesc[nFields].Name[12]	= '\0';
 
 			fread( FieldDesc[nFields].Name			, sizeof(char), 11, hFile);	// 0-10		Field Name ASCII padded with 0x00
 			fread(&FieldDesc[nFields].Type			, sizeof(char),  1, hFile);	// 11		Field Type Identifier (see table)
@@ -390,6 +401,8 @@ bool CSG_Table_DBase::Header_Read(void)
 			fread(&FieldDesc[nFields].WorkAreaID	, sizeof(char),  1, hFile);	// 20		dBaseIV work area ID
 			fread( buf								, sizeof(char), 10, hFile);	// 21-30	Reserved
 			fread(&FieldDesc[nFields].ProductionIdx	, sizeof(char),  1, hFile);	// 31	 	Field is part of production index - 0x01 else 0x00
+
+			FieldDesc[nFields].Name[11]	= '\0';
 
 			nFields++;
 		}
@@ -601,19 +614,38 @@ double CSG_Table_DBase::asDouble(int iField)
 //---------------------------------------------------------
 char * CSG_Table_DBase::asString(int iField)
 {
-	int		i;
-
 	if( bOpen && iField >= 0 && iField < nFields )
 	{
-		i					= FieldDesc[iField].Width;
-		Result_String		= (char *)SG_Realloc(Result_String, (i + 1) * sizeof(char));
-		memcpy(Result_String, Record + FieldOffset[iField], FieldDesc[iField].Width);
-
-		Result_String[i--]	= '\0';
-
-		while( i >= 0 && Result_String[i] == ' ' )
+		if( FieldDesc[iField].Type != DBF_FT_DATE )
 		{
+			int		i			= FieldDesc[iField].Width;
+			Result_String		= (char *)SG_Realloc(Result_String, (i + 1) * sizeof(char));
+			memcpy(Result_String, Record + FieldOffset[iField], FieldDesc[iField].Width);
+
 			Result_String[i--]	= '\0';
+
+			while( i >= 0 && Result_String[i] == ' ' )
+			{
+				Result_String[i--]	= '\0';
+			}
+		}
+		else // if( FieldDesc[iField].Type == DBF_FT_DATE )	// SAGA(DD.MM.YYYY) from DBASE(YYYYMMDD)
+		{
+			char	*s	= Record + FieldOffset[iField];
+
+			Result_String		= (char *)SG_Realloc(Result_String, (10 + 1) * sizeof(char));
+
+			Result_String[0]	= s[6];	// D1
+			Result_String[1]	= s[7];	// D2
+			Result_String[2]	= '.';
+			Result_String[3]	= s[4];	// M1
+			Result_String[4]	= s[5];	// M2
+			Result_String[5]	= '.';
+			Result_String[6]	= s[0];	// Y1
+			Result_String[7]	= s[1];	// Y2
+			Result_String[8]	= s[2];	// Y3
+			Result_String[9]	= s[3];	// Y4
+			Result_String[2]	= '\0';
 		}
 
 		return( Result_String );
@@ -661,7 +693,7 @@ bool CSG_Table_DBase::Set_Value(int iField, double Value)
 
 			return( true );
 		}
-		
+
 		if( FieldDesc[iField].Type == DBF_FT_DATE )
 		{
 			int		y	= (int)(Value / 10000);	Value	-= y * 10000;
@@ -690,21 +722,39 @@ bool CSG_Table_DBase::Set_Value(int iField, double Value)
 //---------------------------------------------------------
 bool CSG_Table_DBase::Set_Value(int iField, const char *Value)
 {
-	int		n;
-
 	if( bOpen && iField >= 0 && iField < nFields && FieldDesc[iField].Width > 0 )
 	{
-		if( FieldDesc[iField].Type == DBF_FT_CHARACTER && Value )
+		int		n	= Value && Value[0] ? strlen(Value) : 0;
+
+		if( FieldDesc[iField].Type == DBF_FT_CHARACTER )
 		{
 			bRecModified	= true;
 
-			if( (n = strlen(Value)) > FieldDesc[iField].Width )
+			if( n > FieldDesc[iField].Width )
 			{
 				n	= FieldDesc[iField].Width;
 			}
 
 			memset(Record + FieldOffset[iField], ' '	, FieldDesc[iField].Width);
 			memcpy(Record + FieldOffset[iField], Value	, n);
+
+			return( true );
+		}
+
+		if( FieldDesc[iField].Type == DBF_FT_DATE && n == 10 )	// SAGA(DD.MM.YYYY) to DBASE(YYYYMMDD)
+		{
+			bRecModified	= true;
+
+			char	*s	= Record + FieldOffset[iField];
+
+			s[0]	= Value[6];	// Y1
+			s[1]	= Value[7];	// Y2
+			s[2]	= Value[8];	// Y3
+			s[3]	= Value[9];	// Y4
+			s[4]	= Value[3];	// M1
+			s[5]	= Value[4];	// M2
+			s[6]	= Value[0];	// D1
+			s[7]	= Value[1];	// D2
 
 			return( true );
 		}

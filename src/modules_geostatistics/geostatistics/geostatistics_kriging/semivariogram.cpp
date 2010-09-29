@@ -91,9 +91,9 @@ CSemiVariogram::CSemiVariogram(void)
 	CSG_Parameter	*pNode;
 
 	//-----------------------------------------------------
-	Set_Name		(_TL("Semivariogram (Dialog))"));
+	Set_Name		(_TL("Variogram (Dialog))"));
 
-	Set_Author		(SG_T("(c) 2009 by O.Conrad"));
+	Set_Author		(SG_T("O.Conrad (c) 2009"));
 
 	Set_Description(
 		_TL("")
@@ -241,7 +241,7 @@ bool CSemiVariogram::Get_Variances(CSG_Table *pTable, CSG_Shapes *pPoints, int A
 
 	if( maxDistance <= 0.0 )
 	{
-		maxDistance	= SG_Get_Length(pPoints->Get_Extent().Get_XRange(), pPoints->Get_Extent().Get_XRange());
+		maxDistance	= SG_Get_Length(pPoints->Get_Extent().Get_XRange(), pPoints->Get_Extent().Get_YRange());
 	}
 
 	lagDistance	= maxDistance / nDistances;
@@ -296,7 +296,7 @@ bool CSemiVariogram::Get_Variances(CSG_Table *pTable, CSG_Shapes *pPoints, int A
 	{
 		if( Count[i] > 0 )
 		{
-			n	+= Count[i];
+			n	+= (int)Count[i];
 			z	+= Variance[i];
 
 			pRecord	= pTable->Add_Record();

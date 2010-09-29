@@ -332,17 +332,27 @@ bool CPoints_View_Extent::_Draw_Image(void)
 	dy	= Size.y / m_Extent.Get_YRange();
 
 	//-------------------------------------------------
+	bool	bColorAsRGB	= m_Settings("C_AS_RGB")->asBool();
+
 	for(int i=0; i<m_pPoints->Get_Count(); i++)
 	{
-		TSG_Point_3D	p	= m_pPoints->Get_Point(i);	p.z	= m_pPoints->Get_Value(i, m_cField);
+		TSG_Point_Z	p	= m_pPoints->Get_Point(i);	p.z	= m_pPoints->Get_Value(i, m_cField);
 
 		int	ix	= (p.x - m_Extent.Get_XMin()) * dx;
 		int	iy	= (p.y - m_Extent.Get_YMin()) * dy;
 
 		if( ix >= 0 && ix <= m_Image.GetWidth() && iy >= 0 && iy < m_Image.GetHeight() )
 		{
-			m_Image_Value[iy][ix]	+= p.z;
-			m_Image_Count[iy][ix]	++;
+			if( !bColorAsRGB )
+			{
+				m_Image_Value[iy][ix]	+= p.z;
+			}
+			else
+			{
+				m_Image_Value[iy][ix]	 = p.z;
+			}
+
+			m_Image_Count[iy][ix]++;
 		}
 	}
 
@@ -358,10 +368,17 @@ bool CPoints_View_Extent::_Draw_Image(void)
 		{
 			if( m_Image_Count[iy][ix] > 0 )
 			{
-				int	ic	= (int)(pColors->Get_Count() * (m_Image_Value[iy][ix] / m_Image_Count[iy][ix] - zMin) / zRange);
-				int	c	= pColors->Get_Color(ic < 0 ? 0 : ic >= pColors->Get_Count() ? pColors->Get_Count() - 1 : ic);
+				if( !bColorAsRGB )
+				{
+					int	ic	= (int)(pColors->Get_Count() * (m_Image_Value[iy][ix] / m_Image_Count[iy][ix] - zMin) / zRange);
+					int	c	= pColors->Get_Color(ic < 0 ? 0 : ic >= pColors->Get_Count() ? pColors->Get_Count() - 1 : ic);
 
-				_Draw_Pixel(ix, iy, c);
+					_Draw_Pixel(ix, iy, c);
+				}
+				else
+				{
+					_Draw_Pixel(ix, iy, m_Image_Value[iy][ix]);
+				}
 			}
 			else
 			{

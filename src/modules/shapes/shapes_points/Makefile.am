@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.8 2008/09/26 08:53:19 oconrad Exp $
+# $Id: Makefile.am,v 1.10 2010/07/08 14:11:49 johanvdw Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,9 +10,10 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared
+AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_points.la
 libshapes_points_la_SOURCES =\
+add_polygon_attributes.cpp\
 AddCoordinates.cpp\
 Clip_Points.cpp\
 CountPoints.cpp\
@@ -24,6 +25,7 @@ Points_From_Lines.cpp\
 Points_From_Table.cpp\
 remove_duplicates.cpp\
 separate_by_direction.cpp\
+add_polygon_attributes.h\
 AddCoordinates.h\
 CountPoints.h\
 Clip_Points.h\

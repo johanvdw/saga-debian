@@ -642,7 +642,8 @@ public:
 
 	virtual const SG_Char *		asString				(void);
 
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(int   Value);
+	virtual bool				Set_Value				(void *Value);
 
 	CSG_Table *					Get_Table				(void);
 
@@ -935,6 +936,42 @@ private:
 
 ///////////////////////////////////////////////////////////
 //														 //
+//				Grid Target Selector					 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Parameters_Grid_Target
+{
+public:
+	CSG_Parameters_Grid_Target(void);
+
+	void						Create					(void);
+
+	bool						Add_Parameters_User		(CSG_Parameters *pParameters, bool bAddDefaultGrid = true);
+	bool						Add_Parameters_Grid		(CSG_Parameters *pParameters, bool bAddDefaultGrid = true);
+
+	bool						Add_Grid_Parameter		(const CSG_String &Identifier, const CSG_String &Name, bool bOptional);
+
+	bool						On_User_Changed			(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	bool						Init_User				(const TSG_Rect &Extent, int Rows = 100);
+
+	CSG_Grid *					Get_User				(                              TSG_Data_Type Type = SG_DATATYPE_Float);
+	CSG_Grid *					Get_User				(const CSG_String &Identifier, TSG_Data_Type Type = SG_DATATYPE_Float);
+	CSG_Grid *					Get_Grid				(                              TSG_Data_Type Type = SG_DATATYPE_Float);
+	CSG_Grid *					Get_Grid				(const CSG_String &Identifier, TSG_Data_Type Type = SG_DATATYPE_Float);
+
+
+private:
+
+	CSG_Parameters				*m_pUser, *m_pGrid;
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
 //					CSG_Parameter						 //
 //														 //
 ///////////////////////////////////////////////////////////
@@ -1094,10 +1131,16 @@ public:
 
 	//-----------------------------------------------------
 	CSG_Parameter *				Get_Parameter			(int iParameter);
-	CSG_Parameter *				operator()				(int iParameter)			{	return( Get_Parameter(iParameter) );	}
-
 	CSG_Parameter *				Get_Parameter			(const SG_Char *Identifier);
+
+	CSG_Parameter *				operator()				(int iParameter)			{	return( Get_Parameter(iParameter) );	}
 	CSG_Parameter *				operator()				(const SG_Char *Identifier)	{	return( Get_Parameter(Identifier) );	}
+
+	//-----------------------------------------------------
+	bool						Del_Parameter			(int iParameter);
+	bool						Del_Parameter			(const SG_Char *Identifier);
+
+	bool						Del_Parameters			(void);
 
 	//-----------------------------------------------------
 	CSG_Parameter *				Add_Node				(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description);
@@ -1174,6 +1217,7 @@ public:
 #ifdef _SAGA_UNICODE
 	CSG_Parameter *				Get_Parameter			(const char *Identifier);
 	CSG_Parameter *				operator()				(const char *Identifier)	{	return( Get_Parameter(Identifier) );	}
+	bool						Del_Parameter			(const char *Identifier);
 	CSG_Parameter *				Add_Node				(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description);
 	CSG_Parameter *				Add_Value				(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, TSG_Parameter_Type Type, double Value = 0.0, double Minimum = 0.0, bool bMinimum = false, double Maximum = 0.0, bool bMaximum = false);
 	CSG_Parameter *				Add_Info_Value			(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, TSG_Parameter_Type Type, double Value = 0.0);

@@ -71,13 +71,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#ifndef SWIG
-
-#include <math.h>
-
-#endif	// #ifdef SWIG
-
-//---------------------------------------------------------
 #include "geo_tools.h"
 
 
@@ -463,35 +456,17 @@ public:
 	bool						is_Evaluated		(void)		{	return( m_bEvaluated );	}
 
 	int							Get_Count			(void)		{	return( m_nValues );	}
+	double						Get_Weights			(void)		{	return( m_Weights );	}
 
-	double						Get_Minimum			(void)		{	_Update();	return( m_Minimum	);	}
-	double						Get_Maximum			(void)		{	_Update();	return( m_Maximum	);	}
-	double						Get_Range			(void)		{	_Update();	return( m_Range		);	}
-	double						Get_Mean			(void)		{	_Update();	return( m_Mean		);	}
-	double						Get_Variance		(void)		{	_Update();	return( m_Variance	);	}
-	double						Get_StdDev			(void)		{	_Update();	return( m_StdDev	);	}
+	double						Get_Minimum			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Minimum	);	}
+	double						Get_Maximum			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Maximum	);	}
+	double						Get_Range			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Range	);	}
+	double						Get_Sum				(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Sum		);	}
+	double						Get_Mean			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Mean		);	}
+	double						Get_Variance		(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Variance	);	}
+	double						Get_StdDev			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_StdDev	);	}
 
-	void						Add_Value			(double Value)
-	{
-		if( m_nValues == 0 )
-		{
-			m_Minimum	= m_Maximum	= Value;
-		}
-		else if( m_Minimum > Value )
-		{
-			m_Minimum	= Value;
-		}
-		else if( m_Maximum < Value )
-		{
-			m_Maximum	= Value;
-		}
-
-		m_nValues		++;
-		m_Sum			+= Value;
-		m_Sum2			+= Value * Value;
-
-		m_bEvaluated	= false;
-	}
+	void						Add_Value			(double Value, double Weight = 1.0);
 
 
 protected:
@@ -500,18 +475,10 @@ protected:
 
 	int							m_nValues;
 
-	double						m_Sum, m_Sum2, m_Minimum, m_Maximum, m_Range, m_Mean, m_Variance, m_StdDev;
+	double						m_Weights, m_Sum, m_Sum2, m_Minimum, m_Maximum, m_Range, m_Mean, m_Variance, m_StdDev;
 
 
 	void						_Evaluate			(void);
-
-	void						_Update				(void)
-	{
-		if( !m_bEvaluated )
-		{
-			_Evaluate();
-		}
-	}
 
 };
 
@@ -549,10 +516,63 @@ protected:
 
 	int							m_nValues, m_nBuffer;
 
-	TSG_Point_3D				*m_Values;
+	TSG_Point_Z				*m_Values;
 
 
 	bool						_Create				(double yA, double yB);
+
+};
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Thin_Plate_Spline
+{
+public:
+	CSG_Thin_Plate_Spline(void);
+	virtual ~CSG_Thin_Plate_Spline(void);
+
+	bool					Destroy				(void);
+
+	bool					Set_Point_Count		(int Count)	{	return( m_Points.Set_Count(Count) );	}
+	int						Get_Point_Count		(void)		{	return( m_Points.Get_Count() );			}
+
+	CSG_Points_Z &			Get_Points			(void)		{	return( m_Points );	}
+
+	bool					Add_Point			(double x, double y, double z)	{	return( m_Points.Add(  x,   y, z) );	}
+	bool					Add_Point			(const TSG_Point &p, double z)	{	return( m_Points.Add(p.x, p.y, z) );	}
+
+	bool					Set_Point			(int Index, double x, double y, double z)
+	{
+		if( Index >= 0 && Index < m_Points.Get_Count() )
+		{
+			m_Points[Index].x	= x;
+			m_Points[Index].y	= y;
+			m_Points[Index].z	= z;
+
+			return( true );
+		}
+
+		return( false );
+	}
+
+	bool					Set_Point			(int Index, const TSG_Point &p, double z)	{	return( Set_Point(Index, p.x, p.y, z) );	}
+
+	bool					Create				(double Regularization = 0.0, bool bSilent = true);
+
+	bool					is_Okay				(void)	{	return( m_V.Get_N() > 0 );		}
+
+	double					Get_Value			(double x, double y);
+
+
+private:
+
+	CSG_Points_Z			m_Points;
+
+	CSG_Vector				m_V;
+
+
+	double					_Get_hDistance		(TSG_Point_Z A, TSG_Point_Z B);
+	double					_Get_Base_Funtion	(double x);
+	double					_Get_Base_Funtion	(TSG_Point_Z A, double x, double y);
 
 };
 
@@ -662,12 +682,16 @@ public:
 
 	class CSG_Table *			Get_Result			(void)	{	return( m_pResult );	}
 
-	int							Get_Ordered			(int iOrder);
+	int							Get_Count			(void);
+
+	int							Get_Index			(int iOrder);
 	int							Get_Order			(int iVariable);
-	double						Get_R2				(int iVariable);
-	double						Get_R2_Change		(int iVariable);
+
 	double						Get_RConst			(void);
-	double						Get_RCoeff			(int iVariable);
+	double						Get_RCoeff			(int iVariable, bool bOrdered = false);
+	double						Get_R2				(int iVariable, bool bOrdered = false);
+	double						Get_R2_Change		(int iVariable, bool bOrdered = false);
+	const SG_Char *				Get_Name			(int iVariable, bool bOrdered = false);
 
 
 protected:
@@ -791,7 +815,7 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-enum
+enum ESG_Trend_String
 {
 	SG_TREND_STRING_Formula	= 0,
 	SG_TREND_STRING_Function,

@@ -130,6 +130,10 @@ wxString CWKSP_Shapes::Get_Description(void)
 	));
 
 	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
+		LNG("[CAP] Projection")				, m_pShapes->Get_Projection().Get_Name().c_str()
+	));
+
+	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
 		LNG("[CAP] Modified")				, m_pShapes->is_Modified() ? LNG("[VAL] yes") : LNG("[VAL] no")
 	));
 
@@ -517,6 +521,12 @@ int CWKSP_Shapes::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Paramete
 
 	//-----------------------------------------------------
 	return( 1 );
+}
+
+//---------------------------------------------------------
+void CWKSP_Shapes::On_Update_Views(void)
+{
+	m_pTable->Update_Views();
 }
 
 
@@ -984,10 +994,10 @@ bool CWKSP_Shapes::_Chart_Set_Options(void)
 
 	if( 1 )
 	{
-		int			i, n;
+		int				i, n;
 		CSG_Colors		Colors;
-		CSG_String	sFields;
-		CSG_Parameter	*pFields, *pColors;
+		CSG_String		sFields;
+		CSG_Parameter	*pFields, *pField;
 
 		for(i=0, n=0; i<m_pShapes->Get_Field_Count(); i++)
 		{
@@ -1037,8 +1047,7 @@ bool CWKSP_Shapes::_Chart_Set_Options(void)
 				5, 25, 0, true
 			);
 
-			pFields	= pChart->Add_Node(NULL, "NODE_FIELDS"	, LNG("Fields")			, LNG(""));
-			pColors	= pChart->Add_Node(NULL, "NODE_COLORS"	, LNG("Field Colors")	, LNG(""));
+			pFields	= pChart->Add_Node(NULL, "NODE_FIELDS", LNG("Fields"), LNG(""));
 
 			Colors.Set_Count(n);
 
@@ -1048,14 +1057,14 @@ bool CWKSP_Shapes::_Chart_Set_Options(void)
 				{
 					sFields.Append(CSG_String::Format(wxT("%s|"), m_pShapes->Get_Field_Name(i)));
 
-					pChart->Add_Value(
+					pField	= pChart->Add_Value(
 						pFields	, wxString::Format(wxT("FIELD_%d"), i), m_pShapes->Get_Field_Name(i),
 						LNG(""),
 						PARAMETER_TYPE_Bool , false
 					);
 
 					pChart->Add_Value(
-						pColors	, wxString::Format(wxT("COLOR_%d"), i), m_pShapes->Get_Field_Name(i),
+						pField	, wxString::Format(wxT("COLOR_%d"), i), SG_T(""),
 						LNG(""),
 						PARAMETER_TYPE_Color, Colors.Get_Color(n++)
 					);
@@ -1187,6 +1196,8 @@ void CWKSP_Shapes::_Draw_Chart_Bar(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pReco
 {
 	int		i;
 	double	d, dx, dy, max, ix;
+
+	y	+= sy / 2;
 
 	for(i=1, max=fabs(pRecord->asDouble(m_Chart[0].x)); i<m_Chart.Get_Count(); i++)
 	{

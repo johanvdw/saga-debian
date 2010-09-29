@@ -221,18 +221,23 @@ bool CSG_PRQuadTree::Create(CSG_Shapes *pShapes, int Attribute)
 		{
 			CSG_Shape	*pShape	= pShapes->Get_Shape(iShape);
 
-			for(int iPart=0; iPart<pShape->Get_Part_Count(); iPart++)
+			if( Attribute < 0 || !pShape->is_NoData(Attribute) )
 			{
-				for(int iPoint=0; iPoint<pShape->Get_Point_Count(iPart); iPoint++)
-				{
-					TSG_Point	p	= pShape->Get_Point(iPoint, iPart);
+				double	z	= Attribute < 0 ? iShape : pShape->asDouble(Attribute);
 
-					Add_Point(p.x, p.y, pShape->asDouble(Attribute));
+				for(int iPart=0; iPart<pShape->Get_Part_Count(); iPart++)
+				{
+					for(int iPoint=0; iPoint<pShape->Get_Point_Count(iPart); iPoint++)
+					{
+						TSG_Point	p	= pShape->Get_Point(iPoint, iPart);
+
+						Add_Point(p.x, p.y, z);
+					}
 				}
 			}
 		}
 
-		return( true );
+		return( Get_Point_Count() > 0 );
 	}
 
 	return( false );

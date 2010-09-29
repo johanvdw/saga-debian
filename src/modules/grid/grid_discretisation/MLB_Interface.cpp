@@ -71,19 +71,19 @@ const SG_Char * Get_Info(int i)
 	switch( i )
 	{
 	case MLB_INFO_Name:	default:
-		return( _TL("Grid - Discretisation") );
+		return( _TL("Imagery - Classification") );
 
 	case MLB_INFO_Author:
 		return( _TL("O. Conrad (c) 2002-9") );
 
 	case MLB_INFO_Description:
-		return( _TL("Tools for the discretisation/classification of metric gridded data.") );
+		return( _TL("Classification and segmentation tools for metric gridded data.") );
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Grid|Discretisation") );
+		return( _TL("Imagery") );
 	}
 }
 
@@ -97,6 +97,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_FastSegments.h"
 #include "Grid_Skeletonize.h"
 #include "rga_basic.h"
+#include "grid_seeds.h"
 
 
 //---------------------------------------------------------
@@ -106,12 +107,13 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case 0:		return( new CGrid_Classify_Supervised );
-	case 1:		return( new CGrid_Cluster_Analysis );
-	case 2:		return( new CGrid_Segmentation );
-	case 3:		return( new CGrid_FastSegments );
-	case 4:		return( new CGrid_Skeletonize );
-	case 5:		return( new CRGA_Basic );
+	case  0:	return( new CGrid_Classify_Supervised );
+	case  1:	return( new CGrid_Cluster_Analysis );
+	case  2:	return( new CGrid_Segmentation );
+	case  3:	return( new CGrid_FastSegments );
+	case  4:	return( new CGrid_Skeletonize );
+	case  5:	return( new CRGA_Basic );
+	case  6:	return( new CGrid_Seeds );
 	}
 
 	return( NULL );

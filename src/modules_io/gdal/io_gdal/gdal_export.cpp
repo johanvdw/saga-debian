@@ -200,6 +200,11 @@ bool CGDAL_Export::On_Execute(void)
 	{
 		g_GDAL_Driver.Set_Transform(pDataset, Get_System());
 
+		if( pGrids->asGrid(0)->Get_Projection().Get_Type() != SG_PROJ_TYPE_CS_Undefined )
+		{
+			pDataset->SetProjection(SG_STR_SGTOMB(pGrids->asGrid(0)->Get_Projection().Get_WKT()));
+		}
+
 		zLine	= (double *)SG_Malloc(Get_NX() * sizeof(double));
 
 		for(n=0; n<pGrids->Get_Count(); n++)

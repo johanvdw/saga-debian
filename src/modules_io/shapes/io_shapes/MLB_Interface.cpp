@@ -100,6 +100,7 @@ const SG_Char * Get_Info(int i)
 #include "stl.h"
 #include "gpx.h"
 #include "pointcloud_from_file.h"
+#include "pointcloud_from_text_file.h"
 
 
 //---------------------------------------------------------
@@ -125,6 +126,7 @@ CSG_Module *		Create_Module(int i)
 	case 13:	return( new CGPX_Import );
 	case 14:	return( new CGPX_Export );
 	case 15:	return( new CPointCloud_From_File );
+	case 16:	return( new CPointCloud_From_Text_File );
 	}
 
 	return( NULL );

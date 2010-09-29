@@ -129,6 +129,9 @@ BEGIN_EVENT_TABLE(CVIEW_Table_Control, wxGrid)
 	EVT_MENU					(ID_CMD_TABLE_RECORD_DEL_ALL	, CVIEW_Table_Control::On_Record_Clr)
 	EVT_UPDATE_UI				(ID_CMD_TABLE_RECORD_DEL_ALL	, CVIEW_Table_Control::On_Record_Clr_UI)
 
+	EVT_MENU					(ID_CMD_TABLE_SELECTION_TO_TOP	, CVIEW_Table_Control::On_Sel_To_Top)
+	EVT_UPDATE_UI				(ID_CMD_TABLE_SELECTION_TO_TOP	, CVIEW_Table_Control::On_Sel_To_Top_UI)
+
 	EVT_MENU					(ID_CMD_TABLE_AUTOSIZE_COLS		, CVIEW_Table_Control::On_Autosize_Cols)
 	EVT_MENU					(ID_CMD_TABLE_AUTOSIZE_ROWS		, CVIEW_Table_Control::On_Autosize_Rows)
 END_EVENT_TABLE()
@@ -145,7 +148,9 @@ CVIEW_Table_Control::CVIEW_Table_Control(wxWindow *pParent, CSG_Table *pTable, i
 	: wxGrid(pParent, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS|wxSUNKEN_BORDER)
 {
 	m_pTable		= pTable;
+	m_pRecords		= NULL;
 	m_Constraint	= Constraint;
+	m_bUpdating		= false;
 
 	Set_Labeling(false);
 
@@ -156,7 +161,12 @@ CVIEW_Table_Control::CVIEW_Table_Control(wxWindow *pParent, CSG_Table *pTable, i
 
 //---------------------------------------------------------
 CVIEW_Table_Control::~CVIEW_Table_Control(void)
-{}
+{
+	if( m_pRecords )
+	{
+		SG_Free(m_pRecords);
+	}
+}
 
 
 ///////////////////////////////////////////////////////////
@@ -214,6 +224,8 @@ bool CVIEW_Table_Control::_Set_Table(void)
 	BeginBatch();
 
 	//-----------------------------------------------------
+	m_pRecords	= (CSG_Table_Record **)SG_Realloc(m_pRecords, m_pTable->Get_Count() * sizeof(CSG_Table_Record *));
+
 	Difference	= m_pTable->Get_Record_Count() - GetNumberRows();
 
 	if( Difference > 0 )
@@ -287,20 +299,41 @@ bool CVIEW_Table_Control::_Set_Table(void)
 }
 
 //---------------------------------------------------------
-bool CVIEW_Table_Control::_Set_Records(void)
+bool CVIEW_Table_Control::_Set_Records(bool bSelection_To_Top)
 {
 	BeginBatch();
 
-	for(int iRecord=0; iRecord<m_pTable->Get_Record_Count() && PROGRESSBAR_Set_Position(iRecord, m_pTable->Get_Record_Count()); iRecord++)
+	if( bSelection_To_Top && m_pTable->Get_Selection_Count() > 0 )
 	{
-		_Set_Record(iRecord, m_pTable->Get_Record_byIndex(iRecord));
+		for(int iRecord=0, iSel=0, iNoSel=m_pTable->Get_Selection_Count(); iRecord<m_pTable->Get_Count() && PROGRESSBAR_Set_Position(iRecord, m_pTable->Get_Count()); iRecord++)
+		{
+			CSG_Table_Record	*pRecord	= m_pTable->Get_Record_byIndex(iRecord);
+
+			if( pRecord->is_Selected() )
+			{
+				_Set_Record(iSel  ++, pRecord);
+			}
+			else
+			{
+				_Set_Record(iNoSel++, pRecord);
+			}
+		}
+	}
+	else
+	{
+		for(int iRecord=0; iRecord<m_pTable->Get_Count() && PROGRESSBAR_Set_Position(iRecord, m_pTable->Get_Count()); iRecord++)
+		{
+			CSG_Table_Record	*pRecord	= m_pTable->Get_Record_byIndex(iRecord);
+
+			_Set_Record(iRecord, pRecord);
+		}
 	}
 
 	PROCESS_Set_Okay();
 
-	Update_Selection();
-
 	EndBatch();
+
+	Update_Selection();
 
 	return( true );
 }
@@ -310,6 +343,8 @@ bool CVIEW_Table_Control::_Set_Record(int iRecord, CSG_Table_Record *pRecord)
 {
 	if( pRecord && iRecord >= 0 && iRecord < GetNumberRows() )
 	{
+		m_pRecords[iRecord]	= pRecord;
+
 		if( m_Field_Offset )
 		{
 			SetRowLabelValue(iRecord, pRecord->asString(0));
@@ -320,11 +355,11 @@ bool CVIEW_Table_Control::_Set_Record(int iRecord, CSG_Table_Record *pRecord)
 			switch( m_pTable->Get_Field_Type(iField) )
 			{
 			default:
-				SET_CELL_VALUE(iRecord, iCol, pRecord->asString	(iField));
+				SET_CELL_VALUE(iRecord, iCol, pRecord->is_NoData(iField) ? SG_T("") : pRecord->asString(iField));
 				break;
 
 			case SG_DATATYPE_Color:
-				SET_CELL_COLOR(iRecord, iCol, pRecord->asInt	(iField));
+				SET_CELL_COLOR(iRecord, iCol, pRecord->asInt(iField));
 				break;
 			}
 		}
@@ -345,11 +380,13 @@ bool CVIEW_Table_Control::_Set_Record(int iRecord, CSG_Table_Record *pRecord)
 //---------------------------------------------------------
 bool CVIEW_Table_Control::Add_Record(void)
 {
-	if( !FIXED_ROWS && !m_pTable->is_Private() )
+	if( !FIXED_ROWS && !m_pTable->is_Private() && m_pTable->Get_ObjectType() == DATAOBJECT_TYPE_Table )
 	{
 		AppendRows();
 
-		_Set_Record(m_pTable->Get_Record_Count(), m_pTable->Add_Record());
+		m_pRecords	= (CSG_Table_Record **)SG_Realloc(m_pRecords, GetNumberRows() * sizeof(CSG_Table_Record *));
+
+		_Set_Record(GetNumberRows() - 1, m_pTable->Add_Record());
 
 		return( true );
 	}
@@ -360,13 +397,20 @@ bool CVIEW_Table_Control::Add_Record(void)
 //---------------------------------------------------------
 bool CVIEW_Table_Control::Ins_Record(void)
 {
-	if( !FIXED_ROWS && !m_pTable->is_Private() )
+	if( !FIXED_ROWS && !m_pTable->is_Private() && m_pTable->Get_ObjectType() == DATAOBJECT_TYPE_Table )
 	{
 		int		iRecord	= GetGridCursorRow();
 
 		if( iRecord >= 0 && iRecord < GetNumberRows() )
 		{
 			InsertRows(iRecord);
+
+			m_pRecords	= (CSG_Table_Record **)SG_Realloc(m_pRecords, GetNumberRows() * sizeof(CSG_Table_Record *));
+
+			for(int i=GetNumberRows()-1; i>iRecord; i--)
+			{
+				m_pRecords[i]	= m_pRecords[i - 1];
+			}
 
 			_Set_Record(iRecord, m_pTable->Ins_Record(iRecord));
 
@@ -380,28 +424,15 @@ bool CVIEW_Table_Control::Ins_Record(void)
 //---------------------------------------------------------
 bool CVIEW_Table_Control::Del_Record(void)
 {
-	if( !FIXED_ROWS && (!m_pTable->is_Private() || (m_pTable->Get_Owner() && m_pTable->Get_Owner()->Get_ObjectType() == DATAOBJECT_TYPE_Shapes)) )
+	if( !FIXED_ROWS && !m_pTable->is_Private() )
 	{
-		wxArrayInt	Records	= GetSelectedRows();
+		m_pTable->Del_Selection();
 
-		if( Records.GetCount() > 0 )
-		{
-			do
-			{
-				DeleteRows(Records[0]);
-				Records	= GetSelectedRows();
-			}
-			while( Records.GetCount() > 0 );
+		g_pData->Update_Views(m_pTable);
 
-			if( !m_pTable->is_Private() )
-			{
-				m_pTable->Del_Selection();
+		Update_Table();
 
-				g_pData->Update_Views(m_pTable);
-			}
-
-			return( true );
-		}
+		return( true );
 	}
 
 	return( false );
@@ -430,23 +461,20 @@ bool CVIEW_Table_Control::Del_Records(void)
 //---------------------------------------------------------
 bool CVIEW_Table_Control::Load(const wxChar *File_Name)
 {
-	bool	bResult	= false;
 	CSG_Table	Table;
 
-	if(	Table.Create(File_Name)
-	&&	Table.Get_Record_Count() > 0
-	&&	Table.Get_Field_Count() == m_pTable->Get_Field_Count() )
+	if(	Table.Create(File_Name) && Table.Get_Count() > 0 && Table.Get_Field_Count() == m_pTable->Get_Field_Count() )
 	{
 		m_pTable->Assign_Values(&Table);
 
 		_Set_Table();
 
-		bResult	= true;
+		return( true );
 	}
 
 	PROCESS_Set_Okay();
 
-	return( bResult );
+	return( false );
 }
 
 //---------------------------------------------------------
@@ -482,18 +510,14 @@ void CVIEW_Table_Control::On_Size(wxSizeEvent &event)//&WXUNUSED(event))
 //---------------------------------------------------------
 void CVIEW_Table_Control::On_Change(wxGridEvent &event)
 {
-	CSG_Table_Record	*pRecord;
+	int					iField		= m_Field_Offset + event.GetCol();
+	CSG_Table_Record	*pRecord	= m_pRecords[event.GetRow()];
 
-	if( (pRecord = m_pTable->Get_Record_byIndex(event.GetRow())) != NULL )
+	if( pRecord && iField >= m_Field_Offset && iField < m_pTable->Get_Field_Count() )
 	{
-		int	iField	= m_Field_Offset + event.GetCol();
+		pRecord->Set_Value(iField, GetCellValue(event.GetRow(), event.GetCol()).c_str());
 
-		if( iField >= m_Field_Offset && iField < m_pTable->Get_Field_Count() )
-		{
-			pRecord->Set_Value(iField, GetCellValue(event.GetRow(), event.GetCol()).c_str());
-
-			SET_CELL_VALUE(event.GetRow(), event.GetCol(), pRecord->asString(iField));
-		}
+		SET_CELL_VALUE(event.GetRow(), event.GetCol(), pRecord->asString(iField));
 	}
 }
 
@@ -725,7 +749,7 @@ void CVIEW_Table_Control::On_Record_Add(wxCommandEvent &event)
 
 void CVIEW_Table_Control::On_Record_Add_UI(wxUpdateUIEvent &event)
 {
-	event.Enable(!FIXED_ROWS && !m_pTable->is_Private());
+	event.Enable(!FIXED_ROWS && !m_pTable->is_Private() && m_pTable->Get_ObjectType() == DATAOBJECT_TYPE_Table);
 }
 
 //---------------------------------------------------------
@@ -736,7 +760,7 @@ void CVIEW_Table_Control::On_Record_Ins(wxCommandEvent &event)
 
 void CVIEW_Table_Control::On_Record_Ins_UI(wxUpdateUIEvent &event)
 {
-	event.Enable(!FIXED_ROWS && !m_pTable->is_Private());
+	event.Enable(!FIXED_ROWS && !m_pTable->is_Private() && m_pTable->Get_ObjectType() == DATAOBJECT_TYPE_Table);
 }
 
 //---------------------------------------------------------
@@ -747,7 +771,7 @@ void CVIEW_Table_Control::On_Record_Del(wxCommandEvent &event)
 
 void CVIEW_Table_Control::On_Record_Del_UI(wxUpdateUIEvent &event)
 {
-	event.Enable(!FIXED_ROWS);
+	event.Enable(!FIXED_ROWS && !m_pTable->is_Private() && m_pTable->Get_Selection_Count() > 0);
 }
 
 //---------------------------------------------------------
@@ -758,7 +782,28 @@ void CVIEW_Table_Control::On_Record_Clr(wxCommandEvent &event)
 
 void CVIEW_Table_Control::On_Record_Clr_UI(wxUpdateUIEvent &event)
 {
-	event.Enable(!FIXED_ROWS && !m_pTable->is_Private());
+	event.Enable(!FIXED_ROWS && !m_pTable->is_Private() && !m_pTable->is_Private());
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CVIEW_Table_Control::On_Sel_To_Top(wxCommandEvent  &event)
+{
+	if( !FIXED_ROWS && m_pTable->Get_Selection_Count() > 0 )
+	{
+		_Set_Records(true);
+	}
+}
+
+void CVIEW_Table_Control::On_Sel_To_Top_UI(wxUpdateUIEvent &event)
+{
+	event.Enable(!FIXED_ROWS && m_pTable->Get_Selection_Count() > 0);
 }
 
 
@@ -792,7 +837,9 @@ void CVIEW_Table_Control::On_LClick(wxGridEvent &event)
 {
 	if( event.ControlDown() )
 	{
-		SelectRow	(event.GetRow(), true);
+		m_pTable->Select(m_pRecords[event.GetRow()], true);
+
+		Update_Selection();
 	}
 	else if( event.ShiftDown() )
 	{
@@ -804,7 +851,7 @@ void CVIEW_Table_Control::On_LClick(wxGridEvent &event)
 
 		CSG_Table_Record	*pRecord;
 
-		if( (pRecord = m_pTable->Get_Record_byIndex(event.GetRow())) != NULL )
+		if( (pRecord = m_pRecords[event.GetRow()]) != NULL )
 		{
 			int	iField	= m_Field_Offset + event.GetCol();
 
@@ -899,6 +946,8 @@ void CVIEW_Table_Control::On_RClick_Label(wxGridEvent &event)
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_RECORD_DEL);
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_RECORD_DEL_ALL);
 		pMenu->AppendSeparator();
+		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_SELECTION_TO_TOP);
+		pMenu->AppendSeparator();
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_AUTOSIZE_ROWS);
 
 		PopupMenu(pMenu, event.GetPosition().x - GetRowLabelSize(), event.GetPosition().y);
@@ -928,68 +977,54 @@ void CVIEW_Table_Control::On_LDClick_Label(wxGridEvent &event)
 //---------------------------------------------------------
 void CVIEW_Table_Control::On_Select(wxGridRangeSelectEvent &event)
 {
-	BeginBatch();
-
-	for(int iRow=event.GetTopRow(); iRow<=event.GetBottomRow(); iRow++)
+	if( !m_bUpdating )
 	{
-		_Select(iRow, event.Selecting());
+		BeginBatch();
+
+		for(int iRow=event.GetTopRow(); iRow<=event.GetBottomRow(); iRow++)
+		{
+			if( m_pRecords[iRow]->is_Selected() != event.Selecting() )
+			{
+				m_pTable->Select(m_pRecords[iRow], true);
+			}
+		}
+
+		EndBatch();
+
+		_Update_Views();
 	}
-
-	EndBatch();
-
-	_Update_Views();
 
 	event.Skip();
 }
 
 //---------------------------------------------------------
-inline void CVIEW_Table_Control::_Select(int iRow, bool bSelect)
-{
-	CSG_Table_Record	*pRecord;
-
-	if( (pRecord = m_pTable->Get_Record_byIndex(iRow)) != NULL && bSelect != pRecord->is_Selected() )
-	{
-		m_pTable->Select(pRecord, true);
-
-		_Update_Views();
-	}
-}
-
-//---------------------------------------------------------
 void CVIEW_Table_Control::Update_Selection(void)
 {
-	BeginBatch();
-
-	if( m_pTable->Get_Selection_Count() > 0 )
+	if( !m_bUpdating )
 	{
-		int		iRecord;
-		bool	*Select	= (bool *)SG_Malloc(m_pTable->Get_Record_Count() * sizeof(bool));
+		m_bUpdating	= true;
 
-		for(iRecord=0; iRecord<m_pTable->Get_Record_Count(); iRecord++)
-		{
-			Select[iRecord]	= m_pTable->Get_Record_byIndex(iRecord)->is_Selected();
-		}
+		BeginBatch();
 
 		ClearSelection();
 
-		for(iRecord=0; iRecord<m_pTable->Get_Record_Count(); iRecord++)
+		if( m_pTable->Get_Selection_Count() > 0 )
 		{
-			if( Select[iRecord] )
+			for(int iRecord=0; iRecord<m_pTable->Get_Count(); iRecord++)
 			{
-				SelectRow(iRecord, true);
+				if( m_pRecords[iRecord]->is_Selected() )
+				{
+					SelectRow(iRecord, true);
+				}
 			}
 		}
 
-		SG_Free(Select);
-	}
-	else
-	{
-		ClearSelection();
-	}
+		EndBatch();
 
-	EndBatch();
+		m_bUpdating	= false;
 
-	_Update_Views();
+		_Update_Views();
+	}
 }
 
 

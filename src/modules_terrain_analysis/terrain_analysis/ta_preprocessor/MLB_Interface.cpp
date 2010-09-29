@@ -85,8 +85,10 @@ const SG_Char * Get_Info(int i)
 
 
 //---------------------------------------------------------
+#include "Flat_Detection.h"
 #include "Pit_Router.h"
 #include "Pit_Eliminator.h"
+
 #include "FillSinks.h"
 #include "FillSinks_WL.h"
 
@@ -94,36 +96,18 @@ const SG_Char * Get_Info(int i)
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
 {
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CPit_Router;
-		break;
+	case  0:	return( new CFlat_Detection );
+	case  1:	return( new CPit_Router );
+	case  2:	return( new CPit_Eliminator );
 
-	case 1:
-		pModule	= new CPit_Eliminator;
-		break;
-
-	case 2:
-		pModule	= new CFillSinks;
-		break;
-
-	case 3:
-		pModule	= new CFillSinks_WL;
-		break;
-
-	case 4:
-		pModule	= new CFillSinks_WL_XXL;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	case  3:	return( new CFillSinks );
+	case  4:	return( new CFillSinks_WL );
+	case  5:	return( new CFillSinks_WL_XXL );
 	}
 
-	return( pModule );
+	return( NULL );
 }
 
 

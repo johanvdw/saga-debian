@@ -543,16 +543,12 @@ double CSG_String::asDouble(void) const
 
 bool CSG_String::asDouble(double &Value) const
 {
-	double	dValue	= 0.0;
+	const wxChar	*start = m_pString->c_str();
+	wxChar			*end;
 
-	if( m_pString->ToDouble(&dValue) || dValue != 0.0 )
-	{
-		Value	= dValue;
+	Value	= wxStrtod(start, &end);
 
-		return( true );
-	}
-
-	return( false );
+	return( end > start );
 }
 
 
@@ -679,6 +675,20 @@ int				SG_Printf(const SG_Char *Format, ...)
 	va_start(argptr, Format);
 
 	int		ret	= wxVprintf(Format, argptr);
+
+	va_end(argptr);
+
+	return( ret );
+}
+
+//---------------------------------------------------------
+int				SG_FPrintf(FILE* stream,const SG_Char *Format, ...)
+{
+	va_list	argptr;
+
+	va_start(argptr, Format);
+
+	int		ret	= wxVfprintf(stream, Format, argptr);
 
 	va_end(argptr);
 
@@ -818,7 +828,12 @@ double			SG_Degree_To_Double(const SG_Char *String)
 }
 
 //---------------------------------------------------------
-CSG_String		SG_Double_To_Date(double Value)
+CSG_String		SG_Number_To_Date(int Value)
+{
+	return( SG_Number_To_Date((double)Value) );
+}
+
+CSG_String		SG_Number_To_Date(double Value)
 {
 	int		y, m, d;
 
@@ -830,22 +845,20 @@ CSG_String		SG_Double_To_Date(double Value)
 }
 
 //---------------------------------------------------------
-double			SG_Date_To_Double(const SG_Char *String)
+int				SG_Date_To_Number(const SG_Char *String)
 {
-	int			d, m, y;
-
-	if( String )
+	if( String && String[0] )
 	{
 		CSG_String	s(String), sValue;
 
 		sValue	= s.AfterLast	('.');
-		y		= sValue.asInt();
+		int	y	= sValue.asInt();
 		sValue	= s.BeforeLast	('.');	s		= sValue;
 
 		sValue	= s.AfterLast	('.');
-		m		= sValue.asInt();
+		int	m	= sValue.asInt();
 		sValue	= s.BeforeLast	('.');	s		= sValue;
-		d		= sValue.asInt();
+		int	d	= sValue.asInt();
 
 		if( d < 1 )	d	= 1;	else if( d > 31 )	d	= 31;
 		if( m < 1 )	m	= 1;	else if( m > 12 )	m	= 12;

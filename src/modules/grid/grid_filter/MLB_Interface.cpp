@@ -74,7 +74,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Filter") );
 
 	case MLB_INFO_Author:
-		return( _TL("SAGA User Group Associaton (c) 2002") );
+		return( _TL("SAGA User Group Associaton (c) 2002-2010") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of gridded data.") );
@@ -97,51 +97,27 @@ const SG_Char * Get_Info(int i)
 #include "Filter_Multi_Dir_Lee.h"
 #include "Filter_3x3.h"
 #include "FilterClumps.h"
+#include "Filter_Majority.h"
+#include "Filter_Terrain_SlopeBased.h"
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
 
 CSG_Module *		Create_Module(int i)
 {
-	// Don't forget to continuously enumerate the case switches
-	// when adding new modules! Also bear in mind that the
-	// enumeration always has to start with [case 0:] and
-	// that [default:] must return NULL!...
-
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CFilter;
-		break;
-
-	case 1:
-		pModule	= new CFilter_Gauss;
-		break;
-
-	case 2:
-		pModule	= new CFilter_LoG;
-		break;
-
-	case 3:
-		pModule	= new CFilter_Multi_Dir_Lee;
-		break;
-
-	case 4:
-		pModule	= new CFilter_3x3;
-		break;
-
-	case 5:
-		pModule	= new CFilterClumps;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	case  0:	return( new CFilter );
+	case  1:	return( new CFilter_Gauss );
+	case  2:	return( new CFilter_LoG );
+	case  3:	return( new CFilter_Multi_Dir_Lee );
+	case  4:	return( new CFilter_3x3 );
+	case  5:	return( new CFilterClumps );
+	case  6:	return( new CFilter_Majority );
+	case  7:	return( new CFilter_Terrain_SlopeBased );
 	}
 
-	return( pModule );
+	return( NULL );
 }
 
 

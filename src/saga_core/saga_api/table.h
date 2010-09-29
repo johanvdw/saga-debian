@@ -108,6 +108,17 @@ TSG_Table_Index_Order;
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#define SG_TABLE_REC_FLAG_Modified		0x01
+#define SG_TABLE_REC_FLAG_Selected		0x02
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Table_Record
 {
 	friend class CSG_Table;
@@ -117,14 +128,16 @@ public:
 	class CSG_Table *			Get_Table		(void)				{	return( m_pTable );	}
 	int							Get_Index		(void)	const		{	return( m_Index );	}
 
-	bool						Set_Value		(int           iField, const SG_Char *Value);
-	bool						Set_Value		(const SG_Char *Field, const SG_Char *Value);
-	bool						Set_Value		(int           iField, double         Value);
-	bool						Set_Value		(const SG_Char *Field, double         Value);
-	bool						Add_Value		(int           iField, double         Value);
-	bool						Add_Value		(const SG_Char *Field, double         Value);
-	bool						Mul_Value		(int           iField, double         Value);
-	bool						Mul_Value		(const SG_Char *Field, double         Value);
+	bool						Set_Value		(int           iField, const CSG_Bytes &Value);
+	bool						Set_Value		(const SG_Char *Field, const CSG_Bytes &Value);
+	bool						Set_Value		(int           iField, const SG_Char   *Value);
+	bool						Set_Value		(const SG_Char *Field, const SG_Char   *Value);
+	bool						Set_Value		(int           iField, double           Value);
+	bool						Set_Value		(const SG_Char *Field, double           Value);
+	bool						Add_Value		(int           iField, double           Value);
+	bool						Add_Value		(const SG_Char *Field, double           Value);
+	bool						Mul_Value		(int           iField, double           Value);
+	bool						Mul_Value		(const SG_Char *Field, double           Value);
 
 	bool						Set_NoData		(int           iField);
 	bool						Set_NoData		(const SG_Char *Field);
@@ -146,11 +159,13 @@ public:
 	double						asDouble		(int           iField)	const;
 	double						asDouble		(const SG_Char *Field)	const;
 
+	CSG_Table_Value *			Get_Value		(int           iField)			{	return(  m_Values[iField] );	}
 	CSG_Table_Value &			operator []		(int           iField)	const	{	return( *m_Values[iField] );	}
 
 	virtual bool				Assign			(CSG_Table_Record *pRecord);
 
-	bool						is_Selected		(void)					const	{	return( m_bSelected );	}
+	bool						is_Selected		(void)					const	{	return( (m_Flags & SG_TABLE_REC_FLAG_Selected) != 0 );	}
+	bool						is_Modified		(void)					const	{	return( (m_Flags & SG_TABLE_REC_FLAG_Modified) != 0 );	}
 
 
 protected:
@@ -159,13 +174,17 @@ protected:
 	virtual ~CSG_Table_Record(void);
 
 
-	bool						m_bSelected;
+	char						m_Flags;
 
 	int							m_Index;
 
 	class CSG_Table_Value		**m_Values;
 
 	class CSG_Table				*m_pTable;
+
+
+	void						Set_Selected	(bool bOn = true);
+	void						Set_Modified	(bool bOn = true);
 
 
 	class CSG_Table_Value *		_Create_Value	(TSG_Data_Type Type);
@@ -227,15 +246,16 @@ public:
 	bool							is_Compatible		(CSG_Table *pTable, bool bExactMatch = false)	const;
 
 	//-----------------------------------------------------
-	void							Add_Field			(const SG_Char *Name, TSG_Data_Type Type, int iField = -1);
+	virtual bool					Add_Field			(const SG_Char *Name, TSG_Data_Type Type, int iField = -1);
 #ifdef _SAGA_UNICODE
-	void							Add_Field			(const char    *Name, TSG_Data_Type Type, int iField = -1);
+	virtual bool					Add_Field			(const char    *Name, TSG_Data_Type Type, int iField = -1);
 #endif
-	bool							Del_Field			(int iField);
+	virtual bool					Del_Field			(int iField);
 
 	int								Get_Field_Count		(void)			const	{	return( m_nFields );	}
 	const SG_Char *					Get_Field_Name		(int iField)	const	{	return( iField >= 0 && iField < m_nFields ? m_Field_Name[iField]->c_str() : NULL );			}
 	TSG_Data_Type					Get_Field_Type		(int iField)	const	{	return( iField >= 0 && iField < m_nFields ? m_Field_Type[iField] : SG_DATATYPE_Undefined );	}
+	int								Get_Field_Length	(int iField)	const;	// returns the maximum number of characters for data type string and zero for all other data types.
 
 	bool							Set_Field_Name		(int iField, const SG_Char *Name);
 
@@ -247,15 +267,15 @@ public:
 	double							Get_Variance		(int iField)	const	{	return( _Stats_Update(iField) ? m_Field_Stats[iField]->Get_Variance() : 0.0 );	}
 
 	//-----------------------------------------------------
-	CSG_Table_Record *				Add_Record			(             CSG_Table_Record *pCopy = NULL);
-	CSG_Table_Record *				Ins_Record			(int iRecord, CSG_Table_Record *pCopy = NULL);
-	bool							Del_Record			(int iRecord);
-	bool							Del_Records			(void);
+	virtual CSG_Table_Record *		Add_Record			(             CSG_Table_Record *pCopy = NULL);
+	virtual CSG_Table_Record *		Ins_Record			(int iRecord, CSG_Table_Record *pCopy = NULL);
+	virtual bool					Del_Record			(int iRecord);
+	virtual bool					Del_Records			(void);
 
 	int								Get_Count			(void)			const	{	return( m_nRecords );	}
 	int								Get_Record_Count	(void)			const	{	return( m_nRecords );	}
-	CSG_Table_Record *				Get_Record			(int iRecord)	const	{	return( iRecord >= 0 && iRecord < m_nRecords ? m_Records[iRecord] : NULL );	}
-	CSG_Table_Record &				operator []			(int iRecord)	const	{	return( *Get_Record(iRecord) );	}
+	virtual CSG_Table_Record *		Get_Record			(int iRecord)	const	{	return( iRecord >= 0 && iRecord < m_nRecords ? m_Records[iRecord] : NULL );	}
+	virtual CSG_Table_Record &		operator []			(int iRecord)	const	{	return( *Get_Record(iRecord) );	}
 
 	int								Get_Index			(int Index)		const	{	return( Index >= 0 && Index < m_nRecords ? (m_Index ? m_Index[Index] : Index) : -1 );	}
 
@@ -265,33 +285,35 @@ public:
 		{
 			if( m_Index != NULL )
 			{
-				return( m_Records[m_Index[Index]] );
+				return( Get_Record(m_Index[Index]) );
 			}
 
-			return( m_Records[Index] );
+			return( Get_Record(Index) );
 		}
 
 		return( NULL );
 	}
 
 	//-----------------------------------------------------
-	bool							Set_Value			(int iRecord, int iField, const SG_Char  *Value);
-	bool							Set_Value			(int iRecord, int iField, double          Value);
+	virtual bool					Set_Value			(int iRecord, int iField, const SG_Char  *Value);
+	virtual bool					Set_Value			(int iRecord, int iField, double          Value);
 
-	bool							Get_Value			(int iRecord, int iField, CSG_String     &Value)	const;
-	bool							Get_Value			(int iRecord, int iField, double         &Value)	const;
+	virtual bool					Get_Value			(int iRecord, int iField, CSG_String     &Value)	const;
+	virtual bool					Get_Value			(int iRecord, int iField, double         &Value)	const;
 
-	virtual void					Set_Modified		(bool bModified = true)	{	CSG_Data_Object::Set_Modified(bModified);	if( m_pOwner )	m_pOwner->Set_Modified(bModified);	}
+	virtual void					Set_Modified		(bool bModified = true);
 
 	//-----------------------------------------------------
 	int								Get_Selection_Count	(void)			const	{	return( m_nSelected );	}
-	CSG_Table_Record *				Get_Selection		(int Index = 0)	const	{	return( Index >= 0 && Index < m_nSelected ? m_Selected[Index] : NULL );	}
+	virtual CSG_Table_Record *		Get_Selection		(int Index = 0)	const	{	return( Index >= 0 && Index < m_nSelected ? m_Selected[Index] : NULL );	}
+
+	virtual bool					is_Selected			(int iRecord)	const	{	return( iRecord >= 0 && iRecord < m_nRecords ? m_Records[iRecord]->is_Selected() : false );	}
 
 	virtual bool					Select				(int iRecord						, bool bInvert = false);
 	virtual bool					Select				(CSG_Table_Record *pRecord = NULL	, bool bInvert = false);
 
-	int								Del_Selection		(void);
-	int								Inv_Selection		(void);
+	virtual int						Del_Selection		(void);
+	virtual int						Inv_Selection		(void);
 
 	//-----------------------------------------------------
 	bool							Set_Index			(int Field_1, TSG_Table_Index_Order Order_1, int Field_2 = -1, TSG_Table_Index_Order Order_2 = TABLE_INDEX_None, int Field_3 = -1, TSG_Table_Index_Order Order_3 = TABLE_INDEX_None);
@@ -306,19 +328,13 @@ public:
 
 protected:
 
-	int								m_nFields, m_nRecords, m_nBuffer, m_nSelected, *m_Index, m_Index_Field[3];
+	int								m_nFields, m_nRecords, m_nBuffer, m_nSelected;
 
-	TSG_Data_Type			*m_Field_Type;
-
-	TSG_Table_Index_Order			m_Index_Order[3];
-
-	CSG_Simple_Statistics			**m_Field_Stats;
-
-	CSG_Table_Record				**m_Records, **m_Selected;
+	TSG_Data_Type					*m_Field_Type;
 
 	CSG_String						**m_Field_Name;
 
-	CSG_Data_Object					*m_pOwner;
+	CSG_Simple_Statistics			**m_Field_Stats;
 
 
 	virtual void					_On_Construction	(void);
@@ -328,6 +344,22 @@ protected:
 	bool							_Create				(const CSG_Table &Table);
 	bool							_Create				(const CSG_String &File_Name, TSG_Table_File_Type Format, const SG_Char *Separator);
 	bool							_Create				(CSG_Table *pStructure);
+
+	bool							_Stats_Invalidate	(void)			const;
+	bool							_Stats_Invalidate	(int iField)	const;
+	virtual bool					_Stats_Update		(int iField)	const;
+
+
+private:
+
+	int								*m_Index, m_Index_Field[3];
+
+	TSG_Table_Index_Order			m_Index_Order[3];
+
+	CSG_Table_Record				**m_Records, **m_Selected;
+
+	CSG_Data_Object					*m_pOwner;
+
 
 	bool							_Destroy			(void);
 	bool							_Destroy_Selection	(void);
@@ -341,10 +373,6 @@ protected:
 	CSG_Table_Record *				_Ins_Record			(int iRecord, CSG_Table_Record *pValues = NULL);
 	bool							_Del_Record			(int iRecord);
 	bool							_Del_Records		(void);
-
-	bool							_Stats_Invalidate	(void)			const;
-	bool							_Stats_Invalidate	(int iField)	const;
-	bool							_Stats_Update		(int iField)	const;
 
 	bool							_Load				(const CSG_String &File_Name, TSG_Table_File_Type Format, const SG_Char *Separator);
 	bool							_Load_Text			(const CSG_String &File_Name, bool bHeadline, const SG_Char *Separator);

@@ -247,7 +247,10 @@ bool CParameters_Control::Load(void)
 
 	if( DLG_Open(File_Path, ID_DLG_PARAMETERS_OPEN) )
 	{
-		if( m_pParameters->Serialize(File_Path.c_str(), false) )
+		CSG_File	File(File_Path.c_str());
+
+		if(	m_pParameters->Serialize_Compatibility(File)
+		||	m_pParameters->Serialize(File_Path.c_str(), false) )
 		{
 		//	m_pPG->Freeze();
 			m_pPG->Clear();
@@ -377,20 +380,28 @@ void CParameters_Control::_Add_Properties(CSG_Parameters *pParameters)
 	{
 		if(	pParameters->Get_Parameter(i)->Get_Parent() == NULL )
 		{
+			pRoot	= NULL;
+
 			switch( pParameters->Get_Parameter(i)->Get_Type() )
 			{
 			case PARAMETER_TYPE_DataObject_Output:
-				pRoot	= NULL;
 				break;
 
 			case PARAMETER_TYPE_Grid_System:
-				if(1|| pParameters->Get_Parameter(i)->Get_Children_Count() > 0 )
+				if( pParameters->Get_Parameter(i)->Get_Children_Count() == 0 )
 				{
 					CHECK_DATA_NODE( pGrids	, LNG("[PRM] Grids"), wxT("_DATAOBJECT_GRIDS") );
 				}
 				else
 				{
-					pRoot	= NULL;
+					for(int j=0; j<pParameters->Get_Parameter(i)->Get_Children_Count() && !pRoot; j++)
+					{
+						if(	pParameters->Get_Parameter(i)->Get_Child(j)->Get_Type() != PARAMETER_TYPE_Grid_List
+						||	pParameters->Get_Parameter(i)->Get_Child(j)->is_Input() )
+						{
+							CHECK_DATA_NODE( pGrids	, LNG("[PRM] Grids"), wxT("_DATAOBJECT_GRIDS") );
+						}
+					}
 				}
 				break;
 
@@ -449,22 +460,9 @@ void CParameters_Control::_Add_Property(wxPGProperty *pParent, CSG_Parameter *pP
 
 	if( pParameter->Get_Children_Count() > 0 )
 	{
-		int		i;
-
-		for(i=0; i<pParameter->Get_Children_Count(); i++)
+		for(int i=0; i<pParameter->Get_Children_Count(); i++)
 		{
-			if( pParameter->Get_Child(i)->Get_Children_Count() == 0 )
-			{
-				_Add_Property(pProperty, pParameter->Get_Child(i));
-			}
-		}
-
-		for(i=0; i<pParameter->Get_Children_Count(); i++)
-		{
-			if( pParameter->Get_Child(i)->Get_Children_Count() > 0 )
-			{
-				_Add_Property(pProperty, pParameter->Get_Child(i));
-			}
+			_Add_Property(pProperty, pParameter->Get_Child(i));
 		}
 
 		m_pPG->Expand(pProperty);
@@ -522,13 +520,19 @@ wxPGProperty * CParameters_Control::_Get_Property(wxPGProperty *pParent, CSG_Par
 	case PARAMETER_TYPE_FilePath:
 	case PARAMETER_TYPE_Font:
 	case PARAMETER_TYPE_FixedTable:
+	case PARAMETER_TYPE_Parameters:
+		pProperty	= new CParameters_PG_Dialog	(Name, ID, pParameter);
+		break;
+
 	case PARAMETER_TYPE_Grid_List:
 	case PARAMETER_TYPE_Table_List:
 	case PARAMETER_TYPE_Shapes_List:
 	case PARAMETER_TYPE_TIN_List:
 	case PARAMETER_TYPE_PointCloud_List:
-	case PARAMETER_TYPE_Parameters:
-		pProperty	= new CParameters_PG_Dialog	(Name, ID, pParameter);
+		if( !pParameter->is_Output() )
+		{
+			pProperty	= new CParameters_PG_Dialog	(Name, ID, pParameter);
+		}
 		break;
 
 	case PARAMETER_TYPE_Choice:

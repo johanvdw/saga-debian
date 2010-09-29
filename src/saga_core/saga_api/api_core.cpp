@@ -89,8 +89,69 @@ const SG_Char *	SG_Data_Type_Get_Name	(TSG_Data_Type Type)
 	case SG_DATATYPE_String:	return( LNG("string") );
 	case SG_DATATYPE_Date:		return( LNG("date") );
 	case SG_DATATYPE_Color:		return( LNG("color") );
+	case SG_DATATYPE_Binary:	return( LNG("binary") );
 	}
 };
+
+
+//---------------------------------------------------------
+bool SG_Data_Type_is_Numeric(TSG_Data_Type Type)
+{
+	switch( Type )
+	{
+	case SG_DATATYPE_Bit:
+	case SG_DATATYPE_Byte:
+	case SG_DATATYPE_Char:
+	case SG_DATATYPE_Word:
+	case SG_DATATYPE_Short:
+	case SG_DATATYPE_DWord:
+	case SG_DATATYPE_Int:
+	case SG_DATATYPE_ULong:
+	case SG_DATATYPE_Long:
+	case SG_DATATYPE_Float:
+	case SG_DATATYPE_Double:
+		return( true );
+
+	default:
+	case SG_DATATYPE_String:
+	case SG_DATATYPE_Date:
+	case SG_DATATYPE_Color:
+	case SG_DATATYPE_Binary:
+		return( false );
+	}
+}
+
+//---------------------------------------------------------
+bool SG_DataType_Range_Check(TSG_Data_Type Type, double &Value)
+{
+	double	min, max;
+
+	switch( Type )
+	{
+		default:
+		case SG_DATATYPE_Double:	Value	= (double)Value;	return( true );
+		case SG_DATATYPE_Float:		Value	= (float )Value;	return( true );
+
+		case SG_DATATYPE_Bit:		min	=           0.0;	max =          1.0;	break;
+		case SG_DATATYPE_Byte:		min	=           0.0;	max =        255.0; break;
+		case SG_DATATYPE_Char:		min	=        -128.0;	max =        127.0;	break;
+		case SG_DATATYPE_Word:		min	=           0.0;	max =      65535.0;	break;
+		case SG_DATATYPE_Short:		min	=      -32768.0;	max =      32767.0;	break;
+		case SG_DATATYPE_DWord:		min	=           0.0;	max = 4294967295.0;	break;
+		case SG_DATATYPE_Int:		min	= -2147483648.0;	max = 2147483647.0;	break;
+	}
+
+	if( Value < min )
+	{
+		Value	= min;
+	}
+	else if( Value > max )
+	{
+		Value	= max;
+	}
+
+	return( true );
+}
 
 
 ///////////////////////////////////////////////////////////

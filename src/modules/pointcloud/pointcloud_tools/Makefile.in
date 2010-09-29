@@ -41,7 +41,6 @@ am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -69,11 +68,13 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libpointcloud_tools_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libpointcloud_tools_la_OBJECTS = MLB_Interface.lo pc_cut.lo \
-	pc_from_grid.lo pc_from_shapes.lo pc_to_grid.lo \
-	pc_to_shapes.lo
+am_libpointcloud_tools_la_OBJECTS = MLB_Interface.lo \
+	pc_attribute_calculator.lo pc_cluster_analysis.lo pc_cut.lo \
+	pc_drop_attribute.lo pc_from_grid.lo pc_from_shapes.lo \
+	pc_reclass_extract.lo pc_thinning_simple.lo pc_to_grid.lo \
+	pc_to_shapes.lo pc_transform.lo
 libpointcloud_tools_la_OBJECTS = $(am_libpointcloud_tools_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -119,6 +120,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISABLELIBHARU = @DISABLELIBHARU@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -128,6 +130,7 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -217,25 +220,41 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
+@SAGA_UNICODE_FALSE@DEP_DEFS = -fPIC `wx-config --unicode=no --static=no --cxxflags` $(DBGFLAGS)
+@SAGA_UNICODE_TRUE@DEP_DEFS = -fPIC `wx-config --unicode=yes --static=no --cxxflags` -D_SAGA_UNICODE $(DBGFLAGS)
+@SAGA_UNICODE_FALSE@DEP_LFLG = -fPIC -shared `wx-config --unicode=no --static=no --libs`
+@SAGA_UNICODE_TRUE@DEP_LFLG = -fPIC -shared `wx-config --unicode=yes --static=no --libs`
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared 
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS)
+AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LFLG)
 pkglib_LTLIBRARIES = libpointcloud_tools.la
 libpointcloud_tools_la_SOURCES = \
 MLB_Interface.cpp\
+pc_attribute_calculator.cpp\
+pc_cluster_analysis.cpp\
 pc_cut.cpp\
+pc_drop_attribute.cpp\
 pc_from_grid.cpp\
 pc_from_shapes.cpp\
+pc_reclass_extract.cpp\
+pc_thinning_simple.cpp\
 pc_to_grid.cpp\
 pc_to_shapes.cpp\
+pc_transform.cpp\
 MLB_Interface.h\
+pc_attribute_calculator.h\
+pc_cluster_analysis.h\
 pc_cut.h\
+pc_drop_attribute.h\
 pc_from_grid.h\
 pc_from_shapes.h\
+pc_reclass_extract.h\
+pc_thinning_simple.h\
 pc_to_grid.h\
-pc_to_shapes.h
+pc_to_shapes.h\
+pc_transform.h
 
 libpointcloud_tools_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -313,11 +332,17 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_attribute_calculator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_cluster_analysis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_cut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_drop_attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_from_grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_from_shapes.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_reclass_extract.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_thinning_simple.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_to_grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_to_shapes.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_transform.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

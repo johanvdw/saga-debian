@@ -99,11 +99,10 @@ bool CSG_Grid::Assign(double Value)
 
 		//-------------------------------------------------
 		Get_History().Destroy();
-		Get_History().Add_Child(LNG("[HST] Value assigned to grid"), CSG_String::Format(SG_T("%f"), Value));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Assign"));
 
 		//-------------------------------------------------
 		m_zStats.Invalidate();
-		m_zStats.Add_Value(Value);
 
 		Set_Update_Flag(false);
 
@@ -179,14 +178,11 @@ bool CSG_Grid::Assign(CSG_Grid *pGrid, TSG_Grid_Interpolation Interpolation)
 		//-------------------------------------------------
 		if( bResult )
 		{
-			m_zFactor			= pGrid->m_zFactor;
-
-			m_NoData_Value		= pGrid->m_NoData_Value;
-			m_NoData_hiValue	= pGrid->m_NoData_hiValue;
-
-//			Set_Name			(pGrid->Get_Name());
-			Set_Description		(pGrid->Get_Description());
-			Set_Unit			(pGrid->Get_Unit());
+//			Set_Name				(pGrid->Get_Name());
+			Set_Description			(pGrid->Get_Description());
+			Set_Unit				(pGrid->Get_Unit());
+			Set_ZFactor				(pGrid->Get_ZFactor());
+			Set_NoData_Value_Range	(pGrid->Get_NoData_Value(), pGrid->Get_NoData_hiValue());
 		}
 	}
 
@@ -218,7 +214,7 @@ bool CSG_Grid::_Assign_Interpolated(CSG_Grid *pGrid, TSG_Grid_Interpolation Inte
 	}
 
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(LNG("[DAT] Resampling"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -271,7 +267,7 @@ bool CSG_Grid::_Assign_ExtremeValue(CSG_Grid *pGrid, bool bMaximum)
 
 	//-----------------------------------------------------
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(LNG("[DAT] Resampling"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -400,7 +396,7 @@ bool CSG_Grid::_Assign_MeanValue(CSG_Grid *pGrid, bool bAreaProportional)
 
 	//-----------------------------------------------------
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(LNG("[DAT] Resampling"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -632,19 +628,19 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(const CSG_Grid &Grid, TSG_Grid_Operat
 		switch( Operation )
 		{
 		case GRID_OPERATION_Addition:
-			Get_History().Add_Child(LNG("[HST] Grid addition")		, Grid.Get_Name());
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Addition"));
 			break;
 
 		case GRID_OPERATION_Subtraction:
-			Get_History().Add_Child(LNG("[HST] Grid subtraction")	, Grid.Get_Name());
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Subtraction"));
 			break;
 
 		case GRID_OPERATION_Multiplication:
-			Get_History().Add_Child(LNG("[HST] Grid multiplication"), Grid.Get_Name());
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Multiplication"));
 			break;
 
 		case GRID_OPERATION_Division:
-			Get_History().Add_Child(LNG("[HST] Grid division")		, Grid.Get_Name());
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Division"));
 			break;
 		}
 
@@ -661,23 +657,23 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(double Value, TSG_Grid_Operation Oper
 	switch( Operation )
 	{
 	case GRID_OPERATION_Addition:
-		Get_History().Add_Child(LNG("[HST] Value addition")			, CSG_String::Format(SG_T("%f"), Value));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Addition"));
 		break;
 
 	case GRID_OPERATION_Subtraction:
-		Get_History().Add_Child(LNG("[HST] Value subtraction")		, CSG_String::Format(SG_T("%f"), Value));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Subtraction"));
 		Value	= -Value;
 		break;
 
 	case GRID_OPERATION_Multiplication:
-		Get_History().Add_Child(LNG("[HST] Value multiplication")	, CSG_String::Format(SG_T("%f"), Value));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Multiplication"));
 		break;
 
 	case GRID_OPERATION_Division:
 		if( Value == 0.0 )
 			return( *this );
 
-		Get_History().Add_Child(LNG("[HST] Value division")			, CSG_String::Format(SG_T("%f"), Value));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Division"));
 		Value	= 1.0 / Value;
 		break;
 	}
@@ -741,7 +737,7 @@ void CSG_Grid::Invert(void)
 
 		SG_UI_Process_Set_Ready();
 
-		Get_History().Add_Child(LNG("[HST] Grid operation"), LNG("[HST] Inversion"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Inversion"));
 	}
 }
 
@@ -779,7 +775,7 @@ void CSG_Grid::Flip(void)
 
 		SG_Free(Line);
 
-		Get_History().Add_Child(LNG("[HST] Grid operation"), LNG("[HST] Vertically mirrored"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Vertically mirrored"));
 	}
 }
 
@@ -803,7 +799,7 @@ void CSG_Grid::Mirror(void)
 
 		SG_UI_Process_Set_Ready();
 
-		Get_History().Add_Child(LNG("[HST] Grid operation"), LNG("[HST] Horizontally mirrored"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Horizontally mirrored"));
 	}
 }
 
@@ -858,7 +854,7 @@ void CSG_Grid::Normalise(void)
 
 			SG_UI_Process_Set_Ready();
 
-			Get_History().Add_Child(LNG("[HST] Grid normalisation"), CSG_String::Format(SG_T("%f / %f"), m_zStats.Get_Mean(), m_zStats.Get_StdDev()));
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Normalisation"));
 		}
 	}
 }
@@ -885,7 +881,7 @@ void CSG_Grid::DeNormalise(double ArithMean, double Variance)
 
 		SG_UI_Process_Set_Ready();
 
-		Get_History().Add_Child(LNG("[HST] Grid denormalisation"), CSG_String::Format(SG_T("%f / %f"), ArithMean, Variance));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Denormalisation"));
 	}
 }
 

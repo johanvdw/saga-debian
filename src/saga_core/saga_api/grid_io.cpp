@@ -629,7 +629,7 @@ bool CSG_Grid::_Load_Native(const CSG_String &File_Name, TSG_Grid_Memory_Type Me
 			case GRID_FILE_KEY_POSITION_YMIN:	yMin			= Value.asDouble();	break;
 			case GRID_FILE_KEY_CELLSIZE:		Cellsize		= Value.asDouble();	break;
 			case GRID_FILE_KEY_Z_FACTOR:		m_zFactor		= Value.asDouble();	break;
-			case GRID_FILE_KEY_NODATA_VALUE:	m_NoData_Value	= m_NoData_hiValue	= Value.asDouble();	break;
+			case GRID_FILE_KEY_NODATA_VALUE:	Set_NoData_Value(Value.asDouble());	break;
 
 			case GRID_FILE_KEY_DATAFILE_OFFSET:	hdr_Offset		= Value.asInt();	break;
 			case GRID_FILE_KEY_BYTEORDER_BIG:	hdr_bSwapBytes	= Value.Find(GRID_FILE_KEY_TRUE) >= 0;	break;
@@ -663,12 +663,12 @@ bool CSG_Grid::_Load_Native(const CSG_String &File_Name, TSG_Grid_Memory_Type Me
 		//-------------------------------------------------
 		// Load Data...
 
-		if( hdr_Type < SG_DATATYPE_Undefined && m_System.Assign(Cellsize, xMin, yMin, NX, NY) )
+		if( m_System.Assign(Cellsize, xMin, yMin, NX, NY) )
 		{
 			//---------------------------------------------
 			// ASCII...
 
-			if( hdr_Type >= SG_DATATYPE_Undefined )
+			if( !SG_Data_Type_is_Numeric(hdr_Type) )
 			{
 				if( m_Type >= SG_DATATYPE_Undefined )
 				{
@@ -680,7 +680,7 @@ bool CSG_Grid::_Load_Native(const CSG_String &File_Name, TSG_Grid_Memory_Type Me
 				||	Stream.Open(SG_File_Make_Path(NULL, File_Name, SG_T("sdat"))	, SG_FILE_R, false) )
 				{
 					Stream.Seek(hdr_Offset);
-					bResult	= _Load_ASCII(Stream, Memory_Type);
+					bResult	= _Load_ASCII(Stream, Memory_Type, hdr_bFlip);
 				}
 			}
 
@@ -748,7 +748,7 @@ bool CSG_Grid::_Save_Native(const CSG_String &File_Name, int xA, int yA, int xN,
 		Stream.Printf(SG_T("%s\t= %d\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_CELLCOUNT_Y	], yN );
 		Stream.Printf(SG_T("%s\t= %.10f\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_CELLSIZE		], Get_Cellsize() );
 		Stream.Printf(SG_T("%s\t= %f\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_Z_FACTOR		], m_zFactor );
-		Stream.Printf(SG_T("%s\t= %f\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_NODATA_VALUE	], m_NoData_Value );
+		Stream.Printf(SG_T("%s\t= %f\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_NODATA_VALUE	], Get_NoData_Value() );
 		Stream.Printf(SG_T("%s\t= %s\n")	, gSG_Grid_File_Key_Names[ GRID_FILE_KEY_TOPTOBOTTOM	], GRID_FILE_KEY_FALSE );
 
 
@@ -786,7 +786,7 @@ int CSG_Grid::_Load_Native_Get_Key(CSG_File &Stream, CSG_String &Value)
 
 	if( Stream.Read_Line(sLine) && (i = sLine.Find('=')) > 0 )
 	{
-		Value.Printf(sLine.AfterFirst('='));
+		Value	= sLine.AfterFirst('=');
 		Value.Trim();
 
 		sLine.Remove(i);

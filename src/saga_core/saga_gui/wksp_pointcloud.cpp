@@ -129,6 +129,10 @@ wxString CWKSP_PointCloud::Get_Description(void)
 		LNG("[CAP] File")					, m_pPointCloud->Get_File_Name()
 	));
 
+	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
+		LNG("[CAP] Projection")				, m_pPointCloud->Get_Projection().Get_Name().c_str()
+	));
+
 	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%d</td></tr>"),
 		LNG("[CAP] Number of Points")		, m_pPointCloud->Get_Count()
 	));
@@ -173,7 +177,7 @@ wxString CWKSP_PointCloud::Get_Description(void)
 //---------------------------------------------------------
 wxMenu * CWKSP_PointCloud::Get_Menu(void)
 {
-	wxMenu	*pMenu;
+	wxMenu	*pMenu, *pSubMenu;
 
 	pMenu	= new wxMenu(m_pPointCloud->Get_Name());
 
@@ -183,7 +187,15 @@ wxMenu * CWKSP_PointCloud::Get_Menu(void)
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_POINTCLOUD_SAVEAS);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SETTINGS_COPY);
 
-//	pMenu->AppendSeparator();
+	pMenu->AppendSeparator();
+
+	pSubMenu	= new wxMenu(LNG("[MNU] Classificaton"));
+	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_POINTCLOUD_RANGE_MINMAX);
+	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_POINTCLOUD_RANGE_STDDEV150);
+	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_POINTCLOUD_RANGE_STDDEV200);
+
+	pMenu->Append(ID_CMD_WKSP_FIRST, LNG("[MNU] Classification"), pSubMenu);
+
 
 //	wxMenu	*pTable	= new wxMenu(LNG("[MNU] Table"));
 //	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_SHOW);
@@ -210,6 +222,27 @@ bool CWKSP_PointCloud::On_Command(int Cmd_ID)
 		return( CWKSP_Layer::On_Command(Cmd_ID) );
 
 	case ID_CMD_POINTCLOUD_LAST:
+		break;
+
+	case ID_CMD_POINTCLOUD_RANGE_MINMAX:
+		Set_Color_Range(
+			m_pPointCloud->Get_Minimum(m_Color_Field),
+			m_pPointCloud->Get_Maximum(m_Color_Field)
+		);
+		break;
+
+	case ID_CMD_POINTCLOUD_RANGE_STDDEV150:
+		Set_Color_Range(
+			m_pPointCloud->Get_Mean(m_Color_Field) - 1.5 * m_pPointCloud->Get_StdDev(m_Color_Field),
+			m_pPointCloud->Get_Mean(m_Color_Field) + 1.5 * m_pPointCloud->Get_StdDev(m_Color_Field)
+		);
+		break;
+
+	case ID_CMD_POINTCLOUD_RANGE_STDDEV200:
+		Set_Color_Range(
+			m_pPointCloud->Get_Mean(m_Color_Field) - 2.0 * m_pPointCloud->Get_StdDev(m_Color_Field),
+			m_pPointCloud->Get_Mean(m_Color_Field) + 2.0 * m_pPointCloud->Get_StdDev(m_Color_Field)
+		);
 		break;
 	}
 
@@ -274,6 +307,24 @@ void CWKSP_PointCloud::On_Create_Parameters(void)
 		LNG(""),
 		PARAMETER_TYPE_Double, 0.0, 0.0, true, 100.0, true
 	);
+
+	//-----------------------------------------------------
+	// Classification...
+
+	((CSG_Parameter_Choice *)m_Parameters("COLORS_TYPE")->Get_Data())->Set_Items(
+		wxString::Format(wxT("%s|%s|%s|%s|"),
+			LNG("[VAL] Unique Symbol"),
+			LNG("[VAL] Lookup Table"),
+			LNG("[VAL] Graduated Color"),
+			LNG("[VAL] RGB")
+		)
+	);
+
+	m_Parameters("COLORS_TYPE")->Set_Value(CLASSIFY_METRIC);
+
+
+	//-----------------------------------------------------
+	DataObject_Changed((CSG_Parameters *)NULL);
 }
 
 
@@ -348,6 +399,31 @@ int CWKSP_PointCloud::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Para
 //---------------------------------------------------------
 wxString CWKSP_PointCloud::Get_Value(CSG_Point ptWorld, double Epsilon)
 {
+	CSG_Shape		*pShape;
+
+	if( (pShape = m_pPointCloud->Get_Shape(ptWorld, Epsilon)) != NULL )
+	{
+		if( m_Color_Field >= 0 )
+		{
+			switch( m_pClassify->Get_Mode() )
+			{
+			case CLASSIFY_LUT:
+				return( m_pClassify->Get_Class_Name_byValue(pShape->asDouble(m_Color_Field)) );
+
+			case CLASSIFY_METRIC:	default:
+				return( pShape->asString(m_Color_Field) );
+
+			case CLASSIFY_RGB:
+				double	Value = pShape->asDouble(m_Color_Field);
+				return( wxString::Format(wxT("R%03d G%03d B%03d"), SG_GET_R((int)Value), SG_GET_G((int)Value), SG_GET_B((int)Value)) );
+			}
+		}
+		else
+		{
+			return( wxString::Format(wxT("%s: %d"), LNG("[CAP] Index"), pShape->Get_Index() + 1) );
+		}
+	}
+
 	return( LNG("") );
 }
 
@@ -430,7 +506,11 @@ void CWKSP_PointCloud::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 //---------------------------------------------------------
 inline void CWKSP_PointCloud::_Draw_Point(CWKSP_Map_DC &dc_Map, int x, int y, double z, int Color)
 {
-	if( m_Aggregation == 1 || m_Z.is_InGrid(x, y) )
+	if( m_Aggregation == 1 )	// last value
+	{
+		dc_Map.IMG_Set_Pixel(x, y, Color);
+	}
+	else if( m_Z.is_InGrid(x, y) )
 	{
 		switch( m_Aggregation )
 		{
@@ -439,10 +519,6 @@ inline void CWKSP_PointCloud::_Draw_Point(CWKSP_Map_DC &dc_Map, int x, int y, do
 			{
 				dc_Map.IMG_Set_Pixel(x, y, Color);
 			}
-			break;
-
-		case 1:	// last value
-			dc_Map.IMG_Set_Pixel(x, y, Color);
 			break;
 
 		case 2:	// lowest z
@@ -500,7 +576,7 @@ void CWKSP_PointCloud::_Draw_Points(CWKSP_Map_DC &dc_Map)
 	//-----------------------------------------------------
 	for(int i=0; i<m_pPointCloud->Get_Count(); i++)
 	{
-		TSG_Point_3D	Point	= m_pPointCloud->Get_Point(i);
+		TSG_Point_Z	Point	= m_pPointCloud->Get_Point(i);
 
 		if( dc_Map.m_rWorld.Contains(Point.x, Point.y) )
 		{

@@ -76,14 +76,15 @@
 CSG_File::CSG_File(void)
 {
 	m_pStream	= NULL;
+	m_bUnicode	= false;
 }
 
 //---------------------------------------------------------
-CSG_File::CSG_File(const CSG_String &FileName, int Mode, bool bBinary)
+CSG_File::CSG_File(const CSG_String &FileName, int Mode, bool bBinary, bool bUnicode)
 {
 	m_pStream	= NULL;
 
-	Open(FileName, Mode, bBinary);
+	Open(FileName, Mode, bBinary, bUnicode);
 }
 
 //---------------------------------------------------------
@@ -111,14 +112,17 @@ bool CSG_File::Detach(void)
 }
 
 //---------------------------------------------------------
-bool CSG_File::Open(const CSG_String &File_Name, int Mode, bool bBinary)
+bool CSG_File::Open(const CSG_String &File_Name, int Mode, bool bBinary, bool bUnicode)
 {
 	Close();
+
+	m_bUnicode	= bUnicode;
 
 	const SG_Char *sMode;
 
 	switch( Mode )
 	{
+	default:	return( false );
 	case SG_FILE_R:		sMode	= bBinary ? SG_T("rb" ) : SG_T("r" );	break;
 	case SG_FILE_W:		sMode	= bBinary ? SG_T("wb" ) : SG_T("w" );	break;
 	case SG_FILE_RW:	sMode	= bBinary ? SG_T("wb+") : SG_T("w+");	break;
@@ -141,6 +145,19 @@ bool CSG_File::Close(void)
 		fclose(m_pStream);
 
 		m_pStream	= NULL;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_File::Set_UnicodeFlag(bool bOn)
+{
+	if( m_bUnicode != bOn )
+	{
+		m_bUnicode	= bOn;
 
 		return( true );
 	}
@@ -249,6 +266,17 @@ int CSG_File::Scanf(const SG_Char *Format, ...) const
 }
 
 //---------------------------------------------------------
+int CSG_File::Get_Character(void) const
+{
+	if( m_pStream )
+	{
+		return( getc(m_pStream) );
+	}
+
+	return( 0 );
+}
+
+//---------------------------------------------------------
 size_t CSG_File::Read(void *Buffer, size_t Size, size_t Count) const
 {
 	return( m_pStream ? fread(Buffer, Size, Count, m_pStream) : 0 );
@@ -281,17 +309,20 @@ size_t CSG_File::Write(CSG_String &Buffer) const
 }
 
 //---------------------------------------------------------
-bool CSG_File::Read_Line(CSG_String &sLine)
+bool CSG_File::Read_Line(CSG_String &sLine)	const
 {
-	char	c;
+	int		c;
 
 	if( m_pStream && !feof(m_pStream) )
 	{
 		sLine.Clear();
 
-		while( !feof(m_pStream) && (c = fgetc(m_pStream)) != 0x0A && c != 0x0D && c != EOF )
+		while( !feof(m_pStream) && (c = fgetc(m_pStream)) != 0x0A && c != EOF )
 		{
-			sLine.Append(SG_STR_MBTOSG(c));
+			if( c != 0x0D )
+			{
+				sLine.Append(SG_STR_MBTOSG(c));
+			}
 		}
 
 		return( true );
@@ -301,11 +332,11 @@ bool CSG_File::Read_Line(CSG_String &sLine)
 }
 
 //---------------------------------------------------------
-int CSG_File::Read_Int(bool bByteOrderBig)
+int CSG_File::Read_Int(bool bByteOrderBig) const
 {
 	int		Value	= 0;
 
-	if( Read(&Value, sizeof(Value)) == sizeof(Value) )
+	if( Read(&Value, sizeof(Value)) == 1 )
 	{
 		if( bByteOrderBig )
 		{
@@ -327,11 +358,11 @@ bool CSG_File::Write_Int(int Value, bool bByteOrderBig)
 }
 
 //---------------------------------------------------------
-double CSG_File::Read_Double(bool bByteOrderBig)
+double CSG_File::Read_Double(bool bByteOrderBig) const
 {
 	double	Value	= 0;
 
-	if( Read(&Value, sizeof(Value)) == sizeof(Value) )
+	if( Read(&Value, sizeof(Value)) == 1 )
 	{
 		if( bByteOrderBig )
 		{
@@ -350,6 +381,60 @@ bool CSG_File::Write_Double(double Value, bool bByteOrderBig)
 	}
 
 	return( Write(&Value, sizeof(Value)) == sizeof(Value) );
+}
+
+//---------------------------------------------------------
+bool CSG_File::Scan(int &Value) const
+{
+	return( m_pStream && fscanf(m_pStream, "%d" , &Value) == 1 );
+}
+
+bool CSG_File::Scan(double &Value) const
+{
+	return( m_pStream && fscanf(m_pStream, "%lf", &Value) == 1 );
+}
+
+bool CSG_File::Scan(CSG_String &Value, SG_Char Separator) const
+{
+	if( m_pStream && !feof(m_pStream) )
+	{
+		int		c;
+
+		Value.Clear();
+
+		while( !feof(m_pStream) && (c = fgetc(m_pStream)) != Separator && c != EOF )
+		{
+			Value	+= c;
+		}
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+int CSG_File::Scan_Int(void) const
+{
+	int		Value;
+
+	return( Scan(Value) ? Value : 0 );
+}
+
+double CSG_File::Scan_Double(void) const
+{
+	double	Value;
+
+	return( Scan(Value) ? Value : 0.0 );
+}
+
+CSG_String CSG_File::Scan_String(SG_Char Separator) const
+{
+	CSG_String	Value;
+
+	Scan(Value, Separator);
+
+	return( Value );
 }
 
 
@@ -418,7 +503,7 @@ CSG_String		SG_File_Get_Name(const SG_Char *full_Path, bool bExtension)
 	wxFileName	fn(full_Path);
 	CSG_String	s;
 
-	s.Printf(bExtension ? fn.GetFullName().c_str() : fn.GetName().c_str());
+	s	= bExtension ? fn.GetFullName().c_str() : fn.GetName().c_str();
 
 	return( s );
 }
@@ -426,9 +511,14 @@ CSG_String		SG_File_Get_Name(const SG_Char *full_Path, bool bExtension)
 //---------------------------------------------------------
 CSG_String		SG_File_Get_Path(const SG_Char *full_Path)
 {
-	wxFileName	fn(full_Path);
+	if( full_Path && *full_Path )
+	{
+		wxFileName	fn(full_Path);
 
-	return( fn.GetPath(wxPATH_GET_VOLUME|wxPATH_GET_SEPARATOR).c_str() );
+		return( fn.GetPath(wxPATH_GET_VOLUME|wxPATH_GET_SEPARATOR).c_str() );
+	}
+
+	return( SG_T("") );
 }
 
 //---------------------------------------------------------
@@ -436,7 +526,7 @@ CSG_String		SG_File_Make_Path(const SG_Char *Directory, const SG_Char *Name, con
 {
 	wxFileName	fn;
 
-	fn.AssignDir(SG_Dir_Exists(Directory) ? Directory : SG_File_Get_Path(Name).c_str());
+	fn.AssignDir(Directory && *Directory ? Directory : SG_File_Get_Path(Name).c_str());
 
 	if( Extension && *Extension )
 	{
@@ -457,6 +547,21 @@ bool			SG_File_Cmp_Extension(const SG_Char *File_Name, const SG_Char *Extension)
 	wxFileName	fn(File_Name);
 
 	return( fn.GetExt().CmpNoCase(Extension) == 0 );
+}
+
+//---------------------------------------------------------
+bool			SG_File_Set_Extension(const SG_Char *File_Name, const SG_Char *Extension)
+{
+	if( File_Name && *File_Name && Extension && *Extension )
+	{
+		wxFileName	fn(File_Name);
+
+		fn.SetExt(Extension);
+
+		return( true );
+	}
+
+	return( false );
 }
 
 //---------------------------------------------------------

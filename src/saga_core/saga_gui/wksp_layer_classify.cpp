@@ -75,13 +75,14 @@
 //---------------------------------------------------------
 CWKSP_Layer_Classify::CWKSP_Layer_Classify(void)
 {
-	m_Mode		= CLASSIFY_UNIQUE;
+	m_Mode			= CLASSIFY_UNIQUE;
+	m_Shade_Mode	= SHADE_MODE_DSC_GREY;
 
-	m_pLayer	= NULL;
-	m_pColors	= NULL;
-	m_pLUT		= NULL;
+	m_pLayer		= NULL;
+	m_pColors		= NULL;
+	m_pLUT			= NULL;
 
-	m_HST_Count	= NULL;
+	m_HST_Count		= NULL;
 }
 
 //---------------------------------------------------------
@@ -156,63 +157,113 @@ bool CWKSP_Layer_Classify::Initialise(CWKSP_Layer *pLayer, CSG_Table *pLUT, CSG_
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Layer_Classify::Set_Mode(int Mode)
+double CWKSP_Layer_Classify::Get_Class_Value_Minimum(int iClass)
 {
-	m_Mode		= Mode;
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-wxString CWKSP_Layer_Classify::Get_Class_Name(int iClass)
-{
-	wxString	s;
-
 	switch( m_Mode )
 	{
-	case CLASSIFY_UNIQUE:	default:
+	default:
 		break;
 
 	case CLASSIFY_LUT:
 		if( iClass >= 0 && iClass < m_pLUT->Get_Record_Count() )
 		{
-			s.Printf(wxT("%s"), m_pLUT->Get_Record(iClass)->asString(LUT_TITLE));
+			return( m_pLUT->Get_Record(iClass)->asDouble(LUT_MIN) );
 		}
 		break;
 
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
+	case CLASSIFY_OVERLAY:
 		if( m_zRange > 0.0 )
 		{
-			if( iClass == 0 )
-			{
-				s.Printf(wxT("%f < %f"), Get_RelativeToMetric(1.0 * iClass / Get_Class_Count()), Get_RelativeToMetric(1.0 * (1.0 + iClass) / Get_Class_Count()));
-			}
-			else if( iClass < Get_Class_Count() )
-			{
-				s.Printf(wxT("< %f"), Get_RelativeToMetric(1.0 * (1.0 + iClass) / Get_Class_Count()));
-			}
-		}
-		else
-		{
-			if( iClass == 0 )
-			{
-				s.Printf(wxT("<= %f"), m_zMin);
-			}
-			else
-			{
-				s.Printf(wxT("> %f"), m_zMin);
-			}
+			return( Get_RelativeToMetric(iClass / (double)Get_Class_Count()) );
 		}
 		break;
 	}
 
-	return( s );
+	return( m_zMin );
+}
+
+double CWKSP_Layer_Classify::Get_Class_Value_Maximum(int iClass)
+{
+	switch( m_Mode )
+	{
+	default:
+		break;
+
+	case CLASSIFY_LUT:
+		if( iClass >= 0 && iClass < m_pLUT->Get_Record_Count() )
+		{
+			return( m_pLUT->Get_Record(iClass)->asDouble(LUT_MAX) );
+		}
+		break;
+
+	case CLASSIFY_METRIC:
+	case CLASSIFY_SHADE:
+	case CLASSIFY_OVERLAY:
+		if( m_zRange > 0.0 )
+		{
+			return( Get_RelativeToMetric((1.0 + iClass) / (double)Get_Class_Count()) );
+		}
+		break;
+	}
+
+	return( m_zMin + m_zRange );
+}
+
+double CWKSP_Layer_Classify::Get_Class_Value_Center(int iClass)
+{
+	switch( m_Mode )
+	{
+	default:
+		break;
+
+	case CLASSIFY_LUT:
+		if( iClass >= 0 && iClass < m_pLUT->Get_Record_Count() )
+		{
+			return( 0.5 * (m_pLUT->Get_Record(iClass)->asDouble(LUT_MIN) + m_pLUT->Get_Record(iClass)->asDouble(LUT_MAX)) );
+		}
+		break;
+
+	case CLASSIFY_METRIC:
+	case CLASSIFY_SHADE:
+	case CLASSIFY_OVERLAY:
+		if( m_zRange > 0.0 )
+		{
+			return( Get_RelativeToMetric((0.5 + iClass) / (double)Get_Class_Count()) );
+		}
+		break;
+	}
+
+	return( m_zMin + 0.5 * m_zRange );
+}
+
+//---------------------------------------------------------
+wxString CWKSP_Layer_Classify::Get_Class_Name(int iClass)
+{
+	CSG_String	s;
+
+	switch( m_Mode )
+	{
+	default:
+		break;
+
+	case CLASSIFY_LUT:
+		if( iClass >= 0 && iClass < m_pLUT->Get_Record_Count() )
+		{
+			s.Printf(SG_T("%s"), m_pLUT->Get_Record(iClass)->asString(LUT_TITLE));
+		}
+		break;
+
+	case CLASSIFY_METRIC:
+	case CLASSIFY_SHADE:
+	case CLASSIFY_OVERLAY:
+		s	= SG_Get_String(Get_Class_Value_Minimum(iClass), -2) + SG_T(" < ")
+			+ SG_Get_String(Get_Class_Value_Maximum(iClass), -2);
+		break;
+	}
+
+	return( s.c_str() );
 }
 
 //---------------------------------------------------------

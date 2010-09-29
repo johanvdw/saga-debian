@@ -74,7 +74,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Tools") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad, Victor Olaya, Volker Wichmann (c) 2002-5") );
+		return( _TL("Olaf Conrad, Victor Olaya, Volker Wichmann (c) 2002-10") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of gridded data.") );
@@ -122,6 +122,10 @@ const SG_Char * Get_Info(int i)
 
 #include "CreateGridSystem.h"
 
+#include "Grid_Mask.h"
+#include "Grid_Gaps_Spline_Fill.h"
+#include "Grid_Proximity.h"
+
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -154,6 +158,9 @@ CSG_Module *		Create_Module(int i)
 	case 21: 	return( new CSortRaster );
 	case 22: 	return( new CGridsFromTableAndGrid );
 	case 23: 	return( new CCreateGridSystem );
+	case 24: 	return( new CGrid_Mask );
+	case 25: 	return( new CGrid_Gaps_Spline_Fill );
+	case 26: 	return( new CGrid_Proximity );
 	}
 
 	return( NULL );

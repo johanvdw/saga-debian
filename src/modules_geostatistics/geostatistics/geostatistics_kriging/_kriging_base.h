@@ -78,7 +78,7 @@ public:
 	C_Kriging_Base(void);
 	virtual ~C_Kriging_Base(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Kriging") );	}
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Without Variogram Fit") );	}
 
 
 protected:
@@ -92,7 +92,7 @@ protected:
 
 	double					m_Block;
 
-	CSG_Points_3D			m_Points;
+	CSG_Points_Z			m_Points;
 
 	CSG_Vector				m_G;
 

@@ -454,6 +454,12 @@ void CWKSP_Map::_Create_Parameters(void)
 		PARAMETER_TYPE_Int, 7, 5, true
 	);
 
+	m_Parameters.Add_Value(
+		pNode_0	, "PRINT_SCALE_SHOW"	, LNG("[CAP] Show Scale"),
+		LNG(""),
+		PARAMETER_TYPE_Bool, true
+	);
+
 	//-----------------------------------------------------
 	m_Img_Parms.Set_Name(LNG("[CAP] Save Map as Image..."));
 
@@ -611,9 +617,16 @@ CWKSP_Map_Layer * CWKSP_Map::Add_Layer(CWKSP_Layer *pLayer)
 			Set_Extent(pLayer->Get_Extent());
 		}
 
-		if( Get_Count() == 0 || m_Parameters("GOTO_NEWLAYER")->asBool() )
+		if( Get_Count() == 0 || (m_Parameters("GOTO_NEWLAYER")->asBool() && pLayer->Get_Extent().Get_XRange() > 0.0 && pLayer->Get_Extent().Get_YRange() > 0.0) )
 		{
 			Set_Extent(pLayer->Get_Extent());
+		}
+
+		if( Get_Count() == 0 )
+		{
+			m_Parameters("NAME")->Set_Value(pLayer->Get_Name());
+
+			Parameters_Changed();
 		}
 
 		Add_Item(pItem = new CWKSP_Map_Layer(pLayer));
@@ -629,15 +642,23 @@ CWKSP_Map_Layer * CWKSP_Map::Add_Layer(CWKSP_Layer *pLayer)
 //---------------------------------------------------------
 bool CWKSP_Map::Update(CWKSP_Layer *pLayer, bool bMapOnly)
 {
-	int		iLayer;
-	
-	if( (iLayer = Get_Layer(pLayer)) >= 0 )
-	{
-		if( !bMapOnly )
-		{
-			Get_Layer(iLayer)->Parameters_Changed();
-		}
+	bool	bRefresh	= false;
 
+	for(int i=0; i<Get_Count(); i++)
+	{
+		if( Get_Layer(i)->Get_Layer()->Update(pLayer) )
+		{
+			bRefresh	= true;
+
+			if( !bMapOnly )
+			{
+				Get_Layer(i)->Parameters_Changed();
+			}
+		}
+	}
+
+	if( bRefresh )
+	{
 		if( m_pView )
 		{
 			View_Refresh(bMapOnly);
@@ -675,9 +696,23 @@ void CWKSP_Map::_Set_Extent(const CSG_Rect &Extent)
 //---------------------------------------------------------
 void CWKSP_Map::Set_Extent(const CSG_Rect &Extent, bool bReset)
 {
-	if( m_Extents.Add_Extent(Extent, bReset) )
+	CSG_Rect	r(Extent);
+
+	if( r.Get_XRange() == 0.0 )
 	{
-		_Set_Extent(Extent);
+		r.m_rect.xMin	-= 1.0;
+		r.m_rect.xMax	+= 1.0;
+	}
+
+	if( r.Get_YRange() == 0.0 )
+	{
+		r.m_rect.yMin	-= 1.0;
+		r.m_rect.yMax	+= 1.0;
+	}
+
+	if( m_Extents.Add_Extent(r, bReset) )
+	{
+		_Set_Extent(r);
 	}
 }
 

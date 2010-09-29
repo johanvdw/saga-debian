@@ -160,7 +160,7 @@ void CSG_Module::Set_Author(const SG_Char *String)
 {
 	if( String )
 	{
-		m_Author.Printf(String);
+		m_Author	= String;
 	}
 	else
 	{
@@ -195,6 +195,7 @@ void CSG_Module::Set_Translation(CSG_Translator &Translator)
 bool CSG_Module::Execute(void)
 {
 	bool	bResult	= false;
+	int		i;
 
 	if( m_bExecutes == false )
 	{
@@ -202,6 +203,11 @@ bool CSG_Module::Execute(void)
 
 		if( Parameters.DataObjects_Check() )
 		{
+			for(i=0; i<m_npParameters; i++)
+			{
+				m_pParameters[i]->DataObjects_Check();
+			}
+
 			Destroy();
 
 			Parameters.DataObjects_Create();
@@ -240,6 +246,11 @@ __except(1)
 			Destroy();
 
 			Parameters.DataObjects_Synchronize();
+
+			for(i=0; i<m_npParameters; i++)
+			{
+				m_pParameters[i]->DataObjects_Synchronize();
+			}
 		}
 
 		m_bExecutes		= false;
@@ -351,7 +362,7 @@ bool CSG_Module::Dlg_Parameters(const SG_Char *Identifier)
 //---------------------------------------------------------
 bool CSG_Module::Dlg_Parameters(CSG_Parameters *pParameters, const SG_Char *Caption)
 {
-	return( SG_UI_Dlg_Parameters(pParameters, Caption) );
+	return( pParameters ? SG_UI_Dlg_Parameters(pParameters, Caption) : false );
 }
 
 //---------------------------------------------------------
@@ -397,6 +408,12 @@ bool CSG_Module::Set_Progress(int Position)
 bool CSG_Module::Set_Progress(double Position, double Range)
 {
 	return( m_bShow_Progress ? SG_UI_Process_Set_Progress(Position, Range) : Process_Get_Okay(false) );
+}
+
+//---------------------------------------------------------
+bool CSG_Module::Stop_Execution(void)
+{
+	return( SG_UI_Stop_Execution() );
 }
 
 
@@ -469,7 +486,7 @@ bool CSG_Module::Error_Set(const SG_Char *Error_Text)
 //---------------------------------------------------------
 bool CSG_Module::_Garbage_Add_Item(CSG_Data_Object *pDataObject)
 {
-	if( pDataObject )
+	if( pDataObject && !SG_UI_DataObject_Check(pDataObject, DATAOBJECT_TYPE_Undefined) )
 	{
 		for(int i=0; i<m_nGarbage; i++)
 		{
@@ -632,6 +649,83 @@ bool CSG_Module::DataObject_Get_Parameters(CSG_Data_Object *pDataObject, CSG_Par
 bool CSG_Module::DataObject_Set_Parameters(CSG_Data_Object *pDataObject, CSG_Parameters &Parameters)
 {
 	return( SG_UI_DataObject_Params_Set(pDataObject, &Parameters) );
+}
+
+//---------------------------------------------------------
+CSG_Parameter * CSG_Module::DataObject_Get_Parameter(CSG_Data_Object *pDataObject, const CSG_String &ID)
+{
+	static CSG_Parameters	sParameters;
+
+	return( DataObject_Get_Parameters(pDataObject, sParameters) ? sParameters(ID) : NULL );
+}
+
+bool CSG_Module::DataObject_Set_Parameter(CSG_Data_Object *pDataObject, CSG_Parameter *pParameter)
+{
+	CSG_Parameters	P;
+
+	P._Add(pParameter);
+
+	return( DataObject_Set_Parameters(pDataObject, P) );
+}
+
+bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, int            Value)
+{
+	CSG_Parameters	Parameters;
+
+	if( DataObject_Get_Parameters(pDataObject, Parameters) && Parameters(ID) )
+	{
+		return( Parameters(ID)->Set_Value(Value) && DataObject_Set_Parameters(pDataObject, Parameters) );
+	}
+
+	return( false );
+}
+
+bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, double         Value)
+{
+	CSG_Parameters	Parameters;
+
+	if( DataObject_Get_Parameters(pDataObject, Parameters) && Parameters(ID) )
+	{
+		return( Parameters(ID)->Set_Value(Value) && DataObject_Set_Parameters(pDataObject, Parameters) );
+	}
+
+	return( false );
+}
+
+bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, void          *Value)
+{
+	CSG_Parameters	Parameters;
+
+	if( DataObject_Get_Parameters(pDataObject, Parameters) && Parameters(ID) )
+	{
+		return( Parameters(ID)->Set_Value(Value) && DataObject_Set_Parameters(pDataObject, Parameters) );
+	}
+
+	return( false );
+}
+
+bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, const SG_Char *Value)
+{
+	CSG_Parameters	Parameters;
+
+	if( DataObject_Get_Parameters(pDataObject, Parameters) && Parameters(ID) )
+	{
+		return( Parameters(ID)->Set_Value(Value) && DataObject_Set_Parameters(pDataObject, Parameters) );
+	}
+
+	return( false );
+}
+
+bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, double loVal, double hiVal)	// Range Parameter
+{
+	CSG_Parameters	Parameters;
+
+	if( DataObject_Get_Parameters(pDataObject, Parameters) && Parameters(ID) && Parameters(ID)->Get_Type() == PARAMETER_TYPE_Range )
+	{
+		return( Parameters(ID)->asRange()->Set_Range(loVal, hiVal) && DataObject_Set_Parameters(pDataObject, Parameters) );
+	}
+
+	return( false );
 }
 
 

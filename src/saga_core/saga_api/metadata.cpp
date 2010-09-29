@@ -107,6 +107,19 @@ bool CSG_MetaData::Create(const CSG_String &File, const SG_Char *Extension)
 }
 
 //---------------------------------------------------------
+CSG_MetaData::CSG_MetaData(CSG_File &Stream)
+{
+	_On_Construction();
+
+	Create(Stream);
+}
+
+bool CSG_MetaData::Create(CSG_File &Stream)
+{
+	return( Load(Stream) );
+}
+
+//---------------------------------------------------------
 CSG_MetaData::CSG_MetaData(CSG_MetaData *pParent)
 {
 	_On_Construction();
@@ -571,6 +584,35 @@ void CSG_MetaData::_Save(wxXmlNode *pNode) const
 			Get_Child(i)->_Save(pChild);
 		}
 	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_MetaData::Load_WKT(const CSG_String &WKT)
+{
+	return( false );
+}
+
+bool CSG_MetaData::_Load_WKT(const CSG_String &WKT)
+{
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_MetaData::Save_WKT(CSG_String &WKT) const
+{
+	return( false );
+}
+
+bool CSG_MetaData::_Save_WKT(CSG_String &WKT) const
+{
+	return( false );
 }
 
 

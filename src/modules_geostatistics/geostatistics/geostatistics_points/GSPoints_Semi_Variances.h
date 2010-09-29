@@ -62,6 +62,12 @@
 #define HEADER_INCLUDED__GSPoints_Semi_Variances_H
 
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
 //---------------------------------------------------------
 #include "MLB_Interface.h"
 
@@ -77,19 +83,20 @@ class CGSPoints_Semi_Variances : public CSG_Module
 {
 public:
 	CGSPoints_Semi_Variances(void);
-	virtual ~CGSPoints_Semi_Variances(void);
 
 
 protected:
 
 	virtual bool		On_Execute		(void);
 
-
-private:
-
-	void				Get_Differences	(CSG_Shapes *pShapes, CSG_Table *pTable, int zField, int nSkip, double maxDist);
-	void				Get_Variances	(CSG_Table *pTab_Var, CSG_Table *pTab_Dif, double Dist_Step);
-
 };
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #endif // #ifndef HEADER_INCLUDED__GSPoints_Semi_Variances_H

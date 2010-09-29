@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.7 2009/01/13 16:15:30 oconrad Exp $
+# $Id: Makefile.am,v 1.11 2010/07/13 16:08:11 oconrad Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,7 +10,7 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared
+AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_discretisation.la
 libgrid_discretisation_la_SOURCES =\
 Grid_Classify_Supervised.cpp\
@@ -18,6 +18,7 @@ Grid_Cluster_Analysis.cpp\
 Grid_FastSegments.cpp\
 Grid_Segmentation.cpp\
 Grid_Skeletonize.cpp\
+grid_seeds.cpp\
 MLB_Interface.cpp\
 rga_basic.cpp\
 Grid_Classify_Supervised.h\
@@ -25,6 +26,7 @@ Grid_Cluster_Analysis.h\
 Grid_FastSegments.h\
 Grid_Segmentation.h\
 Grid_Skeletonize.h\
+grid_seeds.h\
 MLB_Interface.h\
 rga_basic.h
 

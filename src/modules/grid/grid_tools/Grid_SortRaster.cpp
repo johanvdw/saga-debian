@@ -68,7 +68,7 @@ bool CSortRaster::On_Execute(void){
 	pSortedGrid->Set_NoData_Value(0.0);
 
 	for(i=0; i<Get_NCells() && Set_Progress(i, Get_NCells()); i++){		
-		pGrid->Get_Sorted(i, iX, iY, bDown);
+		pGrid->Get_Sorted(i, iX, iY, bDown, false);
 		if (pGrid->is_NoData(iX,iY)){
 			pSortedGrid->Set_NoData(iX,iY);
 		}//if
@@ -80,7 +80,6 @@ bool CSortRaster::On_Execute(void){
 	
 	if (bCopy){
 		pGrid->Assign(pSortedGrid);
-		delete pSortedGrid;
 	}//if
 
 	return true;

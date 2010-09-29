@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.7 2007/07/30 07:29:24 oconrad Exp $
+# $Id: Makefile.am,v 1.10 2010/07/08 14:11:49 johanvdw Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,7 +10,7 @@ endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared
+AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_tools.la
 libgrid_tools_la_SOURCES =\
 CreateGridSystem.cpp\
@@ -25,9 +25,12 @@ Grid_Cut.cpp\
 Grid_Fill.cpp\
 Grid_Gaps.cpp\
 Grid_Gaps_OneCell.cpp\
+Grid_Gaps_Spline_Fill.cpp\
 Grid_InvertNoData.cpp\
+Grid_Mask.cpp\
 Grid_Merge.cpp\
 Grid_Orientation.cpp\
+Grid_Proximity.cpp\
 Grid_Resample.cpp\
 Grid_SortRaster.cpp\
 Grid_ThresholdBuffer.cpp\
@@ -50,9 +53,12 @@ Grid_Cut.h\
 Grid_Fill.h\
 Grid_Gaps.h\
 Grid_Gaps_OneCell.h\
+Grid_Gaps_Spline_Fill.h\
 Grid_InvertNoData.h\
+Grid_Mask.h\
 Grid_Merge.h\
 Grid_Orientation.h\
+Grid_Proximity.h\
 Grid_Resample.h\
 Grid_SortRaster.h\
 Grid_ThresholdBuffer.h\

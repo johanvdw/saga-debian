@@ -58,6 +58,10 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#ifdef _SAGA_MSW
+#include <conio.h>
+#endif
+
 #include <wx/utils.h>
 
 #include "callback.h"
@@ -72,9 +76,105 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-static bool				g_bSilent	= false;
-
 static CModule_Library	*g_pLibrary	= NULL;
+
+//---------------------------------------------------------
+void			Set_Library		(CModule_Library *pLibrary)
+{
+	g_pLibrary	= pLibrary;
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+static bool		g_bSilent		= false;
+
+void			Set_Silent		(bool bOn)	{	g_bSilent		= bOn;		}
+
+bool			Get_Silent		(void)		{	return( g_bSilent );		}
+
+//---------------------------------------------------------
+static bool		g_bInteractive	= false;
+
+void			Set_Interactive	(bool bOn)	{	g_bInteractive	= bOn;		}
+
+bool			Get_Interactive	(void)		{	return( g_bInteractive );	}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void			Print			(const SG_Char *String)
+{
+	if( !g_bSilent && String && String[0] )
+	{
+		SG_PRINTF(String);
+	}
+}
+
+//---------------------------------------------------------
+void			Print_Error		(const SG_Char *Error)
+{
+	SG_FPRINTF(stderr, SG_T("\n%s: %s\n"), LNG("error"), Error);
+}
+
+//---------------------------------------------------------
+void			Print_Error		(const SG_Char *Error, const SG_Char *Info)
+{
+	Print_Error(CSG_String::Format(SG_T("%s [%s]"), Error, Info));
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void			Get_Pause		(void)
+{
+	if( g_bInteractive )
+	{
+		SG_PRINTF(SG_T("\n%s..."), LNG("press any key"));
+
+#ifdef _SAGA_MSW
+		_getch();
+#endif
+	}
+}
+
+//---------------------------------------------------------
+bool			Get_YesNo		(const SG_Char *caption, const SG_Char *message)
+{
+	if( g_bInteractive )
+	{
+#ifdef _SAGA_MSW
+		CSG_String	sKey, sYes(SG_T("y")), sNo(SG_T("n"));
+
+		SG_PRINTF(SG_T("\n%s: %s\n"), caption, message);
+
+		SG_PRINTF(SG_T("%s? (%s/%s)"), LNG("continue"), sYes.c_str(), sNo.c_str());
+
+		do
+		{
+			sKey.Printf(SG_T("%c"), _getch());
+		}
+		while( sYes.CmpNoCase(sKey) && sNo.CmpNoCase(sKey) );
+
+		return( sYes.CmpNoCase(sKey) == 0 );
+#endif
+	}
+
+	return( true );
+}
 
 
 ///////////////////////////////////////////////////////////
@@ -86,8 +186,7 @@ static CModule_Library	*g_pLibrary	= NULL;
 //---------------------------------------------------------
 int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 {
-	static int	iBuisy		= 0;
-
+	static int		iBuisy		= 0;
 	const SG_Char	Buisy[4]	= {	'|', '/', '-', '\\'	};
 
 	int		Result;
@@ -107,16 +206,15 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 
 	///////////////////////////////////////////////////////
 	//                                                   //
-	//                                                   //
-	//                                                   //
 	///////////////////////////////////////////////////////
 
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_GET_OKAY:
 
-		if( Param_1 != 0 )
+		if( !g_bSilent && Param_1 != 0 )
 		{
 			SG_PRINTF(SG_T("\r%c   "), Buisy[iBuisy++]);
+
 			iBuisy	%= 4;
 		}
 
@@ -132,10 +230,13 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_PROGRESS:
 
-		d1	= *((double *)Param_1);
-		d2	= *((double *)Param_2);
+		if( !g_bSilent )
+		{
+			d1	= *((double *)Param_1);
+			d2	= *((double *)Param_2);
 
-		SG_PRINTF(SG_T("\r%3d%%"), d2 != 0.0 ? 1 + (int)(100.0 * d1 / d2) : 100);
+			SG_PRINTF(SG_T("\r%3d%%"), d2 != 0.0 ? 1 + (int)(100.0 * d1 / d2) : 100);
+		}
 
 		break;
 
@@ -148,21 +249,25 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_TEXT:
 
-		SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		if( !g_bSilent )
+		{
+			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		}
 
 		break;
 
 
 	///////////////////////////////////////////////////////
 	//                                                   //
-	//                                                   //
-	//                                                   //
 	///////////////////////////////////////////////////////
 
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD:
 
-		SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		if( !g_bSilent )
+		{
+			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		}
 
 		break;
 
@@ -170,7 +275,7 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD_ERROR:
 
-		SG_PRINTF(SG_T("\n%s: %s\n"), LNG("error"), (SG_Char *)Param_1);
+		Print_Error((SG_Char *)Param_1);
 
 		break;
 
@@ -178,21 +283,25 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD_EXECUTION:
 
-		SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		if( !g_bSilent )
+		{
+			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1);
+		}
 
 		break;
 
 
 	///////////////////////////////////////////////////////
 	//                                                   //
-	//                                                   //
-	//                                                   //
 	///////////////////////////////////////////////////////
 
 	//-----------------------------------------------------
 	case CALLBACK_DLG_MESSAGE:
 
-		SG_PRINTF(SG_T("\n%s: %s\n"), (const SG_Char *)Param_2, (const SG_Char *)Param_1);
+		if( !g_bSilent )
+		{
+			SG_PRINTF(SG_T("\n%s: %s\n"), (const SG_Char *)Param_2, (const SG_Char *)Param_1);
+		}
 
 		break;
 
@@ -214,8 +323,6 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 
 
 	///////////////////////////////////////////////////////
-	//                                                   //
-	//                                                   //
 	//                                                   //
 	///////////////////////////////////////////////////////
 
@@ -276,8 +383,6 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 
 	///////////////////////////////////////////////////////
 	//                                                   //
-	//                                                   //
-	//                                                   //
 	///////////////////////////////////////////////////////
 
 	//-----------------------------------------------------
@@ -291,6 +396,13 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 		}
 
 		break;
+
+
+	///////////////////////////////////////////////////////
+	//                                                   //
+	///////////////////////////////////////////////////////
+
+	//-----------------------------------------------------
 	}
 
 	return( Result );
@@ -307,102 +419,6 @@ int		Callback(TSG_UI_Callback_ID ID, long Param_1, long Param_2)
 TSG_PFNC_UI_Callback	Get_Callback	(void)
 {
 	return( &Callback );
-}
-
-//---------------------------------------------------------
-void			Set_Library		(CModule_Library *pLibrary)
-{
-	g_pLibrary	= pLibrary;
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-void			Set_Silent		(bool bOn)
-{
-	g_bSilent	= bOn;
-}
-
-//---------------------------------------------------------
-#ifdef _SAGA_MSW
-
-#include <conio.h>
-
-//---------------------------------------------------------
-void			Get_Pause		(void)
-{
-	if( !g_bSilent )
-	{
-		SG_PRINTF(SG_T("\n%s..."), LNG("press any key"));
-
-		_getch();
-	}
-}
-
-//---------------------------------------------------------
-bool			Get_YesNo		(const SG_Char *caption, const SG_Char *message)
-{
-	SG_PRINTF(SG_T("\n%s: %s\n"), caption, message);
-
-	if( !g_bSilent )
-	{
-		CSG_String	sKey, sYes(SG_T("y")), sNo(SG_T("n"));
-
-		SG_PRINTF(SG_T("%s? (%s/%s)"), LNG("continue"), sYes.c_str(), sNo.c_str());
-
-		do
-		{
-			sKey.Printf(SG_T("%c"), _getch());
-		}
-		while( sYes.CmpNoCase(sKey) && sNo.CmpNoCase(sKey) );
-
-		return( sYes.CmpNoCase(sKey) == 0 );
-	}
-
-	return( true );
-}
-
-#else
-
-//---------------------------------------------------------
-void			Get_Pause		(void)
-{
-	if( !g_bSilent )
-	{
-		SG_PRINTF(SG_T("\n%s..."), LNG("press any key"));
-	}
-}
-
-//---------------------------------------------------------
-bool			Get_YesNo		(const SG_Char *caption, const SG_Char *message)
-{
-	return( true );
-}
-
-#endif
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-void			Print_Error		(const SG_Char *Error)
-{
-	SG_PRINTF(SG_T("\n%s: %s\n"), LNG("error"), Error);
-}
-
-//---------------------------------------------------------
-void			Print_Error		(const SG_Char *Error, const SG_Char *Info)
-{
-	Print_Error(CSG_String::Format(SG_T("%s [%s]"), Error, Info));
 }
 
 

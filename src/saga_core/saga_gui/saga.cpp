@@ -63,6 +63,7 @@
 #include <wx/image.h>
 #include <wx/splash.h>
 #include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 #include <saga_api/saga_api.h>
 
@@ -101,8 +102,8 @@ END_EVENT_TABLE()
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define SAGA_GUI_VERSION		wxT("2.0.4")
-#define SAGA_GUI_BUILD			wxT("20090929")
+#define SAGA_GUI_VERSION		wxT("2.0.5")
+#define SAGA_GUI_BUILD			wxT("20100719")
 
 //---------------------------------------------------------
 const wxChar *	SAGA_GUI_Get_Version(void)
@@ -142,16 +143,22 @@ CSAGA::~CSAGA(void)
 bool CSAGA::OnInit(void)
 {
 	//-----------------------------------------------------
+	g_pSAGA				= this;
+
 	SetVendorName		(wxT("SAGA-GIS.org"));
 	SetAppName			(wxT("SAGA"));
 
-	g_pSAGA				= this;
+	wxInitAllImageHandlers();
 
-	m_Process_bContinue	= true;
+	m_App_Path			= wxFileName(argv[0]).GetPath();
 
 	_Init_Config();
 
-	wxInitAllImageHandlers();
+	//-----------------------------------------------------
+	long			lValue;
+
+	m_Process_bContinue	= true;
+	m_Process_Frequency	= CONFIG_Read(wxT("/MODULES"), wxT("PROC_FREQ"), lValue) ? lValue : 0;
 
 	//-----------------------------------------------------
 	long			iLogo;
@@ -176,6 +183,20 @@ bool CSAGA::OnInit(void)
 	}
 
 	wxYield();
+
+	//-----------------------------------------------------
+#if defined(_SAGA_MSW)
+	wxString	Path;
+
+	if( wxGetEnv(wxT("PATH"), &Path) && Path.Length() > 0 )
+	{
+		wxSetEnv(wxT("PATH"), wxString::Format(wxT("%s;%s\\dll"), Path.c_str(), Get_App_Path().c_str()));
+	}
+	else
+	{
+		wxSetEnv(wxT("PATH"), wxString::Format(wxT("%s\\dll"), Get_App_Path().c_str()));
+	}
+#endif // defined(_SAGA_MSW)
 
 	//-----------------------------------------------------
 	SG_Get_Translator() .Create(SG_File_Make_Path(Get_App_Path(), wxT("saga"), wxT("lng")), false);
@@ -232,7 +253,8 @@ void CSAGA::_Init_Config(void)
 	if(	( fConfig.FileExists() && (!fConfig.IsFileReadable() || !fConfig.IsFileWritable()))
 	||	(!fConfig.FileExists() && (!fConfig.IsDirReadable () || !fConfig.IsDirWritable ())) )
 	{
-		fConfig.Assign(wxFileName::GetTempDir(), wxT("saga_gui"), wxT("ini"));
+		fConfig.Assign(wxGetHomeDir(), wxT("saga_gui"), wxT("ini"));
+		//fConfig.Assign(wxFileName::GetTempDir(), wxT("saga_gui"), wxT("ini"));
 	}
 
 	pConfig = new wxFileConfig(wxEmptyString, wxEmptyString, fConfig.GetFullPath(), fConfig.GetFullPath(), wxCONFIG_USE_LOCAL_FILE|wxCONFIG_USE_GLOBAL_FILE|wxCONFIG_USE_RELATIVE_PATH);
@@ -270,19 +292,6 @@ void CSAGA::_Init_Config(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxString CSAGA::Get_App_Path(void)
-{
-	return( SG_File_Get_Path(argv[0]).c_str() );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
 void CSAGA::On_Key_Down(wxKeyEvent &event)
 {
 	switch( event.GetKeyCode() )
@@ -298,11 +307,25 @@ void CSAGA::On_Key_Down(wxKeyEvent &event)
 }
 
 //---------------------------------------------------------
-bool CSAGA::Process_Wait(void)
+bool CSAGA::Process_Wait(bool bEnforce)
 {
-	while( Pending() )
+	static bool			bYield	= false;
+	static wxDateTime	tYield	= wxDateTime::UNow();
+
+	if( !bYield && (bEnforce || m_Process_Frequency <= 0 || (wxDateTime::Now() - tYield).GetMilliseconds() > m_Process_Frequency) )
 	{
-		Dispatch();
+		bYield	= true;
+
+		//	Yield();
+		//	wxSafeYield(g_pSAGA_Frame);
+
+		while( Pending() )
+		{
+			Dispatch();
+		}
+
+		bYield	= false;
+		tYield	= wxDateTime::UNow();
 	}
 
 	return( true );
@@ -319,18 +342,7 @@ bool CSAGA::Process_Set_Okay(bool bOkay)
 //---------------------------------------------------------
 bool CSAGA::Process_Get_Okay(void)
 {
-	static bool	bYield	= false;
-
-	if( !bYield )
-	{
-		bYield	= true;
-
-	//	Yield();
-	//	wxSafeYield(g_pSAGA_Frame);
-		Process_Wait();
-
-		bYield	= false;
-	}
+	Process_Wait();
 
 	return( m_Process_bContinue );
 }

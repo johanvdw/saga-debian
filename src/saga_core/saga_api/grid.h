@@ -72,7 +72,7 @@
 
 //---------------------------------------------------------
 #include "dataobject.h"
-
+#include "table.h"
 #include "grid_pyramid.h"
 
 
@@ -414,6 +414,7 @@ public:		///////////////////////////////////////////////
 	TSG_Data_Type				Get_Type		(void)	const	{	return( m_Type );					}
 
 	int							Get_nValueBytes	(void)	const	{	return( SG_Data_Type_Get_Size(m_Type) );	}
+	int							Get_nLineBytes	(void)	const	{	return( m_Type != SG_DATATYPE_Bit ? SG_Data_Type_Get_Size(m_Type) * Get_NX() : 1 + Get_NX() / 8 );	}
 
 	void						Set_Description	(const SG_Char *String);
 	const SG_Char *				Get_Description	(void)	const;
@@ -451,10 +452,7 @@ public:		///////////////////////////////////////////////
 	double						Get_StdDev		(bool bZFactor = false);
 	double						Get_Variance	(void);
 
-	void						Set_NoData_Value		(double Value);
-	void						Set_NoData_Value_Range	(double loValue, double hiValue);
-	double						Get_NoData_Value		(void)	const	{	return( m_NoData_Value );			}
-	double						Get_NoData_hiValue		(void)	const	{	return( m_NoData_hiValue );			}
+	int							Get_NoData_Count		(void);
 
 	virtual bool				Save	(const CSG_String &File_Name, int Format = GRID_FILE_FORMAT_Binary);
 	virtual bool				Save	(const CSG_String &File_Name, int Format, int xA, int yA, int xN, int yN);
@@ -481,7 +479,7 @@ public:		///////////////////////////////////////////////
 	//-----------------------------------------------------
 	// Memory...
 
-	int							Get_Buffer_Size				(void)					{	return( LineBuffer_Count * _LineBuffer_Get_nBytes() );	}
+	int							Get_Buffer_Size				(void)					{	return( LineBuffer_Count * Get_nLineBytes() );	}
 	bool						Set_Buffer_Size				(int Size);
 
 	bool						Set_Cache					(bool bOn);
@@ -572,16 +570,11 @@ public:		///////////////////////////////////////////////
 	//-----------------------------------------------------
 	// No Data Value...
 
-	virtual bool				is_NoData_Value	(double Value)	const
-	{
-		return( m_NoData_Value < m_NoData_hiValue ? m_NoData_Value <= Value && Value <= m_NoData_hiValue : Value == m_NoData_Value );
-	}
-
 	virtual bool				is_NoData		(int x, int y)	const	{	return( is_NoData_Value(asDouble(x, y)) );	}
 	virtual bool				is_NoData		(long n)		const	{	return( is_NoData_Value(asDouble(   n)) );	}
 
-	virtual void				Set_NoData		(int x, int y)	{	Set_Value(x, y, m_NoData_Value );	}
-	virtual void				Set_NoData		(long n)		{	Set_Value(   n, m_NoData_Value );	}
+	virtual void				Set_NoData		(int x, int y)	{	Set_Value(x, y, Get_NoData_Value() );	}
+	virtual void				Set_NoData		(long n)		{	Set_Value(   n, Get_NoData_Value() );	}
 
 
 	//-----------------------------------------------------
@@ -654,14 +647,14 @@ public:		///////////////////////////////////////////////
 		{
 			switch( m_Type )
 			{
-				default:				Result	= 0.0;							break;
-				case SG_DATATYPE_Byte:	Result	= ((BYTE   **)m_Values)[y][x];	break;
-				case SG_DATATYPE_Char:	Result	= ((char   **)m_Values)[y][x];	break;
-				case SG_DATATYPE_Word:	Result	= ((WORD   **)m_Values)[y][x];	break;
-				case SG_DATATYPE_Short:	Result	= ((short  **)m_Values)[y][x];	break;
-				case SG_DATATYPE_DWord:	Result	= ((DWORD  **)m_Values)[y][x];	break;
+				default:					Result	= 0.0;							break;
+				case SG_DATATYPE_Byte:		Result	= ((BYTE   **)m_Values)[y][x];	break;
+				case SG_DATATYPE_Char:		Result	= ((char   **)m_Values)[y][x];	break;
+				case SG_DATATYPE_Word:		Result	= ((WORD   **)m_Values)[y][x];	break;
+				case SG_DATATYPE_Short:		Result	= ((short  **)m_Values)[y][x];	break;
+				case SG_DATATYPE_DWord:		Result	= ((DWORD  **)m_Values)[y][x];	break;
 				case SG_DATATYPE_Int:		Result	= ((int    **)m_Values)[y][x];	break;
-				case SG_DATATYPE_Float:	Result	= ((float  **)m_Values)[y][x];	break;
+				case SG_DATATYPE_Float:		Result	= ((float  **)m_Values)[y][x];	break;
 				case SG_DATATYPE_Double:	Result	= ((double **)m_Values)[y][x];	break;
 				case SG_DATATYPE_Bit:		Result	=(((BYTE   **)m_Values)[y][x / 8] & m_Bitmask[x % 8]) == 0 ? 0.0 : 1.0;	break;
 			}
@@ -702,13 +695,13 @@ public:		///////////////////////////////////////////////
 			switch( m_Type )
 			{
 			    default:																break;
-				case SG_DATATYPE_Byte:	((BYTE   **)m_Values)[y][x]	= (BYTE  )Value;	break;
-				case SG_DATATYPE_Char:	((char   **)m_Values)[y][x]	= (char  )Value;	break;
-				case SG_DATATYPE_Word:	((WORD   **)m_Values)[y][x]	= (WORD  )Value;	break;
-				case SG_DATATYPE_Short:	((short  **)m_Values)[y][x]	= (short )Value;	break;
-				case SG_DATATYPE_DWord:	((DWORD  **)m_Values)[y][x]	= (DWORD )Value;	break;
+				case SG_DATATYPE_Byte:		((BYTE   **)m_Values)[y][x]	= (BYTE  )Value;	break;
+				case SG_DATATYPE_Char:		((char   **)m_Values)[y][x]	= (char  )Value;	break;
+				case SG_DATATYPE_Word:		((WORD   **)m_Values)[y][x]	= (WORD  )Value;	break;
+				case SG_DATATYPE_Short:		((short  **)m_Values)[y][x]	= (short )Value;	break;
+				case SG_DATATYPE_DWord:		((DWORD  **)m_Values)[y][x]	= (DWORD )Value;	break;
 				case SG_DATATYPE_Int:		((int    **)m_Values)[y][x]	= (int   )Value;	break;
-				case SG_DATATYPE_Float:	((float  **)m_Values)[y][x]	= (float )Value;	break;
+				case SG_DATATYPE_Float:		((float  **)m_Values)[y][x]	= (float )Value;	break;
 				case SG_DATATYPE_Double:	((double **)m_Values)[y][x]	= (double)Value;	break;
 				case SG_DATATYPE_Bit:		((BYTE   **)m_Values)[y][x / 8]	= Value != 0.0
 						? ((BYTE  **)m_Values)[y][x / 8] |   m_Bitmask[x % 8]
@@ -746,7 +739,7 @@ private:	///////////////////////////////////////////////
 
 	long						*m_Index, Cache_Offset;
 
-	double						m_zFactor, m_NoData_Value, m_NoData_hiValue;
+	double						m_zFactor;
 
 	CSG_Simple_Statistics		m_zStats;
 
@@ -794,7 +787,6 @@ private:	///////////////////////////////////////////////
 
 	void						_LineBuffer_Create		(void);
 	void						_LineBuffer_Destroy		(void);
-	int							_LineBuffer_Get_nBytes	(void) const	{	return( SG_Data_Type_Get_Size(m_Type) * Get_NX() );	}
 	void						_LineBuffer_Flush		(void);
 	TSG_Grid_Line *				_LineBuffer_Get_Line	(int y)							const;
 	void						_LineBuffer_Set_Value	(int x, int y, double Value);
@@ -900,6 +892,108 @@ SAGA_API_DLL_EXPORT void			SG_Grid_Cache_Set_Threshold		(int nBytes);
 SAGA_API_DLL_EXPORT void			SG_Grid_Cache_Set_Threshold_MB	(double nMegabytes);
 SAGA_API_DLL_EXPORT int				SG_Grid_Cache_Get_Threshold		(void);
 SAGA_API_DLL_EXPORT double			SG_Grid_Cache_Get_Threshold_MB	(void);
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//                                                       //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CSG_Grid_Stack : public CSG_Stack
+{
+public:
+	CSG_Grid_Stack(void) : CSG_Stack(sizeof(TSG_Point_Int))	{}
+
+	//-----------------------------------------------------
+	virtual void			Push			(int  x, int  y)
+	{
+		TSG_Point_Int	*pPoint	= (TSG_Point_Int *)Get_Record_Push();
+
+		if( pPoint )
+		{
+			pPoint->x	= x;
+			pPoint->y	= y;
+		}
+	}
+
+	//-----------------------------------------------------
+	virtual void			Pop				(int &x, int &y)
+	{
+		TSG_Point_Int	*pPoint	= (TSG_Point_Int *)Get_Record_Pop();
+
+		if( pPoint )
+		{
+			x	= pPoint->x;
+			y	= pPoint->y;
+		}
+	}
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Grid_Cell_Addressor
+{
+public:
+	CSG_Grid_Cell_Addressor(void);
+
+	bool						Destroy				(void);
+
+	CSG_Distance_Weighting &	Get_Weighting		(void)								{	return( m_Weighting );		}
+
+	bool						Set_Radius			(int Radius);
+	bool						Set_Sector			(int Radius, double Direction, double Tolerance);
+
+	int							Get_Count			(void)	const						{	return( m_Cells.Get_Count() );	}
+
+	int							Get_X				(int Index, int Offset = 0)	const	{	return( Offset + (Index >= 0 && Index < Get_Count() ? m_Cells.Get_Record_byIndex(Index)->asInt(0) : 0) );	}
+	int							Get_Y				(int Index, int Offset = 0)	const	{	return( Offset + (Index >= 0 && Index < Get_Count() ? m_Cells.Get_Record_byIndex(Index)->asInt(1) : 0) );	}
+
+	double						Get_Distance		(int Index)	const					{	return( Index >= 0 && Index < Get_Count() ? m_Cells.Get_Record_byIndex(Index)->asDouble(2) : -1.0 );	}
+	double						Get_Weight			(int Index)	const					{	return( Index >= 0 && Index < Get_Count() ? m_Cells.Get_Record_byIndex(Index)->asDouble(3) : -1.0 );	}
+
+	bool						Get_Values			(int Index, int &x, int &y, double &Distance, double &Weight, bool bOffset = false)	const
+	{
+		if( Index >= 0 && Index < Get_Count() )
+		{
+			CSG_Table_Record	*pCell	= m_Cells.Get_Record_byIndex(Index);
+
+			if( bOffset )
+			{
+				x	+= pCell->asInt(0);
+				y	+= pCell->asInt(1);
+			}
+			else
+			{
+				x	 = pCell->asInt(0);
+				y	 = pCell->asInt(1);
+			}
+
+			Distance	= pCell->asDouble(2);
+			Weight		= pCell->asDouble(3);
+
+			return( true );
+		}
+
+		return( false );
+	}
+
+
+private:
+
+	CSG_Distance_Weighting		m_Weighting;
+
+	CSG_Table					m_Cells;
+
+};
 
 
 ///////////////////////////////////////////////////////////

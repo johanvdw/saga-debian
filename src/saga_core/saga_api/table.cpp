@@ -60,8 +60,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <string.h>
-
 #include "table.h"
 #include "shapes.h"
 
@@ -409,7 +407,7 @@ bool CSG_Table::is_Compatible(CSG_Table *pTable, bool bExactMatch) const
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field)
+bool CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field)
 {
 	int		iField, iRecord;
 
@@ -446,12 +444,14 @@ void CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field
 	}
 
 	Set_Modified();
+
+	return( true );
 }
 
 //---------------------------------------------------------
 #ifdef _SAGA_UNICODE
-void CSG_Table::Add_Field(const char *Name, TSG_Data_Type Type, int iField)
-{	Add_Field(CSG_String(Name), Type, iField);	}
+bool CSG_Table::Add_Field(const char *Name, TSG_Data_Type Type, int iField)
+{	return( Add_Field(CSG_String(Name), Type, iField) );	}
 #endif
 
 //---------------------------------------------------------
@@ -507,6 +507,32 @@ bool CSG_Table::Set_Field_Name(int iField, const SG_Char *Name)
 	}
 
 	return( false );
+}
+
+//---------------------------------------------------------
+int CSG_Table::Get_Field_Length(int iField)	const
+{
+	int		Length	= 0;
+
+	if( iField >= 0 && iField < m_nFields && m_Field_Type[iField] == SG_DATATYPE_String )
+	{
+		for(int i=0; i<m_nRecords; i++)
+		{
+			const SG_Char	*s	= m_Records[i]->asString(iField);
+
+			if( s && s[0] )
+			{
+				int		n	= SG_STR_LEN(s);
+
+				if( Length < n )
+				{
+					Length	= n;
+				}
+			}
+		}
+	}
+
+	return( Length );
 }
 
 
@@ -791,6 +817,28 @@ bool CSG_Table::_Del_Records(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+void CSG_Table::Set_Modified(bool bModified)
+{
+	if( bModified != is_Modified() )
+	{
+		CSG_Data_Object::Set_Modified(bModified);
+
+		if( m_pOwner )
+		{
+			m_pOwner->Set_Modified(bModified);
+		}
+
+		if( bModified == false )
+		{
+			for(int iRecord=0; iRecord<Get_Count() && SG_UI_Process_Set_Progress(iRecord, Get_Count()); iRecord++)
+			{
+				Get_Record(iRecord)->Set_Modified(false);
+			}
+		}
+	}
+}
+
+//---------------------------------------------------------
 bool CSG_Table::Set_Value(int iRecord, int iField, const SG_Char  *Value)
 {
 	CSG_Table_Record	*pRecord;
@@ -888,7 +936,10 @@ bool CSG_Table::_Stats_Update(int iField) const
 
 			for(int iRecord=0; iRecord<m_nRecords; iRecord++, ppRecord++)
 			{
-				m_Field_Stats[iField]->Add_Value((*ppRecord)->asDouble(iField));
+				if( !(*ppRecord)->is_NoData(iField) )
+				{
+					m_Field_Stats[iField]->Add_Value((*ppRecord)->asDouble(iField));
+				}
 			}
 		}
 

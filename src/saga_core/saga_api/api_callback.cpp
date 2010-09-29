@@ -60,6 +60,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <wx/stdpaths.h>
+
 #include "api_core.h"
 #include "grid.h"
 #include "parameters.h"
@@ -198,6 +200,24 @@ void		SG_UI_Process_Set_Text(const SG_Char *Text)
 			SG_PRINTF(SG_T("\n%s"), Text);
 		}
 	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool		SG_UI_Stop_Execution(void)
+{
+	if( gSG_UI_Callback )
+	{
+		return( gSG_UI_Callback(CALLBACK_STOP_EXECUTION, 0, 0) != 0 );
+	}
+
+	return( false );
 }
 
 
@@ -507,6 +527,12 @@ void *		SG_UI_Get_Window_Main(void)
 	}
 
 	return( NULL );
+}
+
+//---------------------------------------------------------
+CSG_String	SG_UI_Get_Application_Path(void)
+{
+	return( wxStandardPaths::Get().GetExecutablePath().c_str() );
 }
 
 

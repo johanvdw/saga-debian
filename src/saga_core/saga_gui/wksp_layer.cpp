@@ -281,6 +281,12 @@ void CWKSP_Layer::Create_Parameters(void)
 		PARAMETER_TYPE_Bool, true
 	);
 
+	m_Parameters.Add_Range(
+		m_Parameters("NODE_GENERAL")	, "GENERAL_NODATA"		, LNG("[CAP] No Data"),
+		LNG("")
+	);
+
+
 	//-----------------------------------------------------
 	m_Parameters.Add_Node(
 		NULL							, "NODE_DISPLAY"		, LNG("[CAP] Display"),
@@ -424,6 +430,8 @@ bool CWKSP_Layer::Save(void)
 	bool		bResult;
 	wxString	File_Path;
 
+	File_Path	= m_pObject->Get_File_Name() ? m_pObject->Get_File_Name() : m_pObject->Get_Name();
+
 	switch( Get_Type() )
 	{
 	default:
@@ -490,16 +498,31 @@ void CWKSP_Layer::DataObject_Changed(CSG_Parameters *pParameters)
 	}
 	else
 	{
-		double	m, s, min, max;
-
 		if( m_pObject->Get_ObjectType() == DATAOBJECT_TYPE_Grid )
 		{
+			double		m, s, min, max;
 			CSG_Grid	*pGrid	= (CSG_Grid *)m_pObject;
 
-			m	= pGrid->Get_ArithMean(true);
-			s	= pGrid->Get_StdDev   (true) * 2.0;
-			min	= m - s;	if( min < pGrid->Get_ZMin(true) )	min	= pGrid->Get_ZMin(true);
-			max	= m + s;	if( max > pGrid->Get_ZMax(true) )	max	= pGrid->Get_ZMax(true);
+			switch( g_pData->Get_Parameters()->Get_Parameter("GRID_DISPLAY_RANGEFIT")->asInt() )
+			{
+			case 0:
+				min	= pGrid->Get_ZMin(true);
+				max	= pGrid->Get_ZMax(true);
+				break;
+
+			case 1:
+				m	= pGrid->Get_ArithMean(true);
+				s	= pGrid->Get_StdDev   (true) * 1.5;
+				min	= m - s;	if( min < pGrid->Get_ZMin(true) )	min	= pGrid->Get_ZMin(true);
+				max	= m + s;	if( max > pGrid->Get_ZMax(true) )	max	= pGrid->Get_ZMax(true);
+				break;
+
+			case 2:
+				m	= pGrid->Get_ArithMean(true);
+				s	= pGrid->Get_StdDev   (true) * 2.0;
+				min	= m - s;	if( min < pGrid->Get_ZMin(true) )	min	= pGrid->Get_ZMin(true);
+				max	= m + s;	if( max > pGrid->Get_ZMax(true) )	max	= pGrid->Get_ZMax(true);
+			}
 
 			m_Parameters("METRIC_ZRANGE")->asRange()->Set_Range(min, max);
 		}
@@ -525,6 +548,11 @@ void CWKSP_Layer::DataObject_Changed(void)
 
 	m_Parameters("OBJECT_NAME")->Set_Value(m_pObject->Get_Name());
 
+	m_Parameters("GENERAL_NODATA")->asRange()->Set_Range(
+		m_pObject->Get_NoData_Value(),
+		m_pObject->Get_NoData_hiValue()
+	);
+
 	//-----------------------------------------------------
 	On_DataObject_Changed();
 
@@ -544,6 +572,11 @@ void CWKSP_Layer::Parameters_Changed(void)
 		bUpdates	= true;
 
 		m_pObject->Set_Name(m_Parameters("OBJECT_NAME")->asString());
+
+		m_pObject->Set_NoData_Value_Range(
+			m_Parameters("GENERAL_NODATA")->asRange()->Get_LoVal(),
+			m_Parameters("GENERAL_NODATA")->asRange()->Get_HiVal()
+		);
 
 		//-----------------------------------------------------
 		m_pClassify->Set_Mode(m_Parameters("COLORS_TYPE")->asInt());

@@ -256,9 +256,9 @@ wxMenu * CVIEW_Map_3D::_Create_Menu(void)
 	CMD_Menu_Add_Item(pMenu_Sub, false, ID_CMD_MAP3D_SEQ_POS_DEL_ALL);
 	CMD_Menu_Add_Item(pMenu_Sub, false, ID_CMD_MAP3D_SEQ_POS_EDIT);
 	pMenu_Sub->AppendSeparator();
-	CMD_Menu_Add_Item(pMenu_Sub, false, ID_CMD_MAP3D_SEQ_PLAY);
-	CMD_Menu_Add_Item(pMenu_Sub, false, ID_CMD_MAP3D_SEQ_PLAY_LOOP);
-	CMD_Menu_Add_Item(pMenu_Sub, false, ID_CMD_MAP3D_SEQ_SAVE);
+	CMD_Menu_Add_Item(pMenu_Sub,  true, ID_CMD_MAP3D_SEQ_PLAY);
+	CMD_Menu_Add_Item(pMenu_Sub,  true, ID_CMD_MAP3D_SEQ_PLAY_LOOP);
+	CMD_Menu_Add_Item(pMenu_Sub,  true, ID_CMD_MAP3D_SEQ_SAVE);
 	pMenu->Append(ID_CMD_MAP3D_FIRST, LNG("[MNU] Sequencer"), pMenu_Sub);
 
 	return( pMenu );
@@ -411,6 +411,8 @@ void CVIEW_Map_3D::On_Key_Down(wxKeyEvent &event)
 //---------------------------------------------------------
 void CVIEW_Map_3D::On_Mouse_LDown(wxMouseEvent &event)
 {
+	SetFocus();
+
 	m_Mouse_Down	= event.GetPosition();
 	m_xDown			= m_pImage->m_zRotate;
 	m_yDown			= m_pImage->m_xRotate;
@@ -437,6 +439,8 @@ void CVIEW_Map_3D::On_Mouse_LUp(wxMouseEvent &event)
 //---------------------------------------------------------
 void CVIEW_Map_3D::On_Mouse_RDown(wxMouseEvent &event)
 {
+	SetFocus();
+
 	m_Mouse_Down	= event.GetPosition();
 	m_xDown			= m_pImage->m_xShift;
 	m_yDown			= m_pImage->m_yShift;
@@ -463,6 +467,8 @@ void CVIEW_Map_3D::On_Mouse_RUp(wxMouseEvent &event)
 //---------------------------------------------------------
 void CVIEW_Map_3D::On_Mouse_MDown(wxMouseEvent &event)
 {
+	SetFocus();
+
 	m_Mouse_Down	= event.GetPosition();
 	m_xDown			= m_pImage->m_yRotate;
 	m_yDown			= m_pImage->m_zShift;
@@ -554,6 +560,18 @@ void CVIEW_Map_3D::On_Command_UI(wxUpdateUIEvent &event)
 
 	case ID_CMD_MAP3D_STEREO:
 		event.Check(m_pImage->m_bStereo);
+		break;
+
+	case ID_CMD_MAP3D_SEQ_PLAY:
+		event.Check(m_Play_Mode == PLAY_MODE_RUN_ONCE);
+		break;
+
+	case ID_CMD_MAP3D_SEQ_PLAY_LOOP:
+		event.Check(m_Play_Mode == PLAY_MODE_RUN_LOOP);
+		break;
+
+	case ID_CMD_MAP3D_SEQ_SAVE:
+		event.Check(m_Play_Mode == PLAY_MODE_RUN_SAVE);
 		break;
 	}
 }
@@ -1095,7 +1113,7 @@ bool CVIEW_Map_3D::_Play(void)
 
 				if( m_Play_Mode == PLAY_MODE_RUN_SAVE )
 				{
-					m_pImage->Save(wxString::Format(wxT("%s_%03d"), file.c_str(), iFrame++), type);
+					m_pImage->Save(wxString::Format(wxT("%s_%04d.%s"), file.BeforeLast('.').c_str(), iFrame++, file.AfterLast('.').c_str()), type);
 				}
 
 				PROCESS_Wait();

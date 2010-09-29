@@ -61,6 +61,7 @@
 #include <wx/filename.h>
 
 #include <saga_api/saga_api.h>
+#include <saga_odbc/saga_odbc.h>
 
 #include "saga.h"
 
@@ -73,6 +74,7 @@
 #include "wksp_module_library.h"
 #include "wksp_module_menu.h"
 #include "wksp_module.h"
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -116,6 +118,12 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 			LNG("until user closes it")
 		), 1
 	);
+
+	m_Parameters.Add_Value(
+		NULL	, "PROC_FREQ"	, LNG("Process Update Frequency [milliseconds]"),
+		LNG(""),
+		PARAMETER_TYPE_Int	, 0, 0, true
+	);
 }
 
 //---------------------------------------------------------
@@ -152,6 +160,8 @@ bool CWKSP_Module_Manager::Initialise(void)
 //---------------------------------------------------------
 bool CWKSP_Module_Manager::Finalise(void)
 {
+	SG_ODBC_Get_Connection_Manager().Destroy();
+
 	_Config_Write();
 
 	return( true );
@@ -196,6 +206,8 @@ wxMenu * CWKSP_Module_Manager::Get_Menu(void)
 	{
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_MODULES_SAVE_HTML);
+		pMenu->AppendSeparator();
+		CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SEARCH);
 	}
 
 	return( pMenu );
@@ -290,6 +302,14 @@ void CWKSP_Module_Manager::On_Execute_UI(wxUpdateUIEvent &event)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+void CWKSP_Module_Manager::Parameters_Changed(void)
+{
+	g_pSAGA->Process_Set_Frequency(m_Parameters("PROC_FREQ")->asInt());
+
+	CWKSP_Base_Item::Parameters_Changed();
+}
+
+//---------------------------------------------------------
 bool CWKSP_Module_Manager::Do_Beep(void)
 {
 	return( m_Parameters("BEEP")->asBool() );
@@ -323,6 +343,11 @@ void CWKSP_Module_Manager::_Config_Read(void)
 		m_Parameters("START_LOGO")	->Set_Value((int)lValue);
 	}
 
+	if( CONFIG_Read(wxT("/MODULES"), wxT("PROC_FREQ")	, lValue) )
+	{
+		m_Parameters("PROC_FREQ")	->Set_Value((int)lValue);
+	}
+
 	for(int i=0; CONFIG_Read(CFG_LIBS, wxString::Format(CFG_LIBF, i), sValue); i++)
 	{
 		Open(sValue);
@@ -336,6 +361,7 @@ void CWKSP_Module_Manager::_Config_Write(void)
 {
 	CONFIG_Write(wxT("/MODULES")	, wxT("BEEP")		,		m_Parameters("BEEP")		->asBool());
 	CONFIG_Write(wxT("/MODULES")	, wxT("START_LOGO")	, (long)m_Parameters("START_LOGO")	->asInt());
+	CONFIG_Write(wxT("/MODULES")	, wxT("PROC_FREQ")	, (long)m_Parameters("PROC_FREQ")	->asInt());
 
 	CONFIG_Delete(CFG_LIBS);
 
@@ -377,7 +403,10 @@ int CWKSP_Module_Manager::_Open_Directory(const wxChar *sDirectory, bool bOnlySu
 		{
 			do
 			{
-				nOpened	+= _Open_Directory(SG_File_Make_Path(Dir.GetName(), FileName, NULL));
+				if( FileName.CmpNoCase(wxT("dll")) )
+				{
+					nOpened	+= _Open_Directory(SG_File_Make_Path(Dir.GetName(), FileName, NULL));
+				}
 			}
 			while( Dir.GetNext(&FileName) );
 		}
@@ -417,9 +446,9 @@ bool CWKSP_Module_Manager::Open(const wxChar *File_Name)
 	CWKSP_Module_Library	*pLibrary;
 
 	//-----------------------------------------------------
-	if( SG_File_Cmp_Extension(File_Name, SG_T("mlb"))
+	if( SG_File_Cmp_Extension(File_Name, wxT("mlb"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("dll"))
-	||	SG_File_Cmp_Extension(File_Name, wxT("so")) )
+	||	SG_File_Cmp_Extension(File_Name, wxT("so" )) )
 	{
 		MSG_General_Add(wxString::Format(wxT("%s: %s..."), LNG("[MSG] Load library"), File_Name), true, true);
 
@@ -554,6 +583,7 @@ void CWKSP_Module_Manager::_Make_HTML_Docs(void)
 				if( Stream_Libs.is_Open() )
 				{
 					s	= Get_FilePath_Relative(Directory.c_str(), FileName.GetFullPath().c_str()).c_str();	if( s[0] == '\\' )	s	= s.AfterFirst('\\');
+                    if(s[0]=='/') s = s.AfterFirst('/');
 					Stream_Libs.Printf(wxT("<li><a href=\"%s\">%s</a></li>\n"), s.c_str(), Get_Library(i)->Get_Name().c_str());
 				}
 
@@ -570,7 +600,11 @@ void CWKSP_Module_Manager::_Make_HTML_Docs(void)
 			if( bDirectory )
 				s	= wxT("./../index");
 			else
-				s	= Get_FilePath_Relative(Main.c_str(), FileName.GetFullPath().c_str()).c_str();	if( s[0] == '\\' )	s	= s.AfterFirst('\\');
+				s	= Get_FilePath_Relative(Main.c_str(), FileName.GetFullPath().c_str()).c_str();	
+                if( s[0] == '\\' )	
+                    s = s.AfterFirst('\\');
+                if(s[0]=='/') 
+                    s = s.AfterFirst('/');
 
 			FileName.SetName(wxT("modules"));
 			Stream_List.Open(FileName.GetFullPath().c_str(), SG_FILE_W, false);

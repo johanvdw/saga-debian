@@ -75,13 +75,13 @@ CGSGrid_Residuals::CGSGrid_Residuals(void)
 
 	Set_Name		(_TL("Residual Analysis (Grid)"));
 
-	Set_Author		(SG_T("(c) 2003 by O.Conrad"));
+	Set_Author		(SG_T("O.Conrad (c) 2003"));
 
 	Set_Description	(_TW("Relations of each grid cell to its neighborhood. "
 		"Wilson & Gallant (2000) used this type of calculation in terrain analysis.\n"
 		"\n"
 		"Reference:\n"
-		"- Wilson, J.P., Gallant, J.C., (Eds.), 2000: "
+		"- Wilson, J.P., Gallant, J.C., [Eds.] (2000): "
 		"'Terrain analysis - principles and applications', "
 		"New York, John Wiley & Sons, Inc.\n"
 	));
@@ -90,18 +90,23 @@ CGSGrid_Residuals::CGSGrid_Residuals(void)
 	//-----------------------------------------------------
 	// 2. Parameters...
 
-	Parameters.Add_Grid(	NULL, "INPUT"		, _TL("Grid")						, _TL(""), PARAMETER_INPUT);
+	Parameters.Add_Grid(	NULL, "GRID"	, _TL("Grid")						, _TL(""), PARAMETER_INPUT);
 
-	Parameters.Add_Grid(	NULL, "MEAN"		, _TL("Mean Value")					, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "DIFF"		, _TL("Difference from Mean Value")	, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "STDDEV"		, _TL("Standard Deviation")			, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "RANGE"		, _TL("Value Range")				, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "MIN"			, _TL("Minimum Value")				, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "MAX"			, _TL("Maximum Value")				, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "DEVMEAN"		, _TL("Deviation from Mean Value")	, _TL(""), PARAMETER_OUTPUT);
-	Parameters.Add_Grid(	NULL, "PERCENTILE"	, _TL("Percentile")					, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "MEAN"	, _TL("Mean Value")					, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "DIFF"	, _TL("Difference from Mean Value")	, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "STDDEV"	, _TL("Standard Deviation")			, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "RANGE"	, _TL("Value Range")				, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "MIN"		, _TL("Minimum Value")				, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "MAX"		, _TL("Maximum Value")				, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "DEVMEAN"	, _TL("Deviation from Mean Value")	, _TL(""), PARAMETER_OUTPUT);
+	Parameters.Add_Grid(	NULL, "PERCENT"	, _TL("Percentile")					, _TL(""), PARAMETER_OUTPUT);
 
-	Parameters.Add_Value(	NULL, "RADIUS"		, _TL("Radius (Cells)")				, _TL(""), PARAMETER_TYPE_Int, 7, 1, true);
+	Parameters.Add_Value(	NULL, "RADIUS"	, _TL("Radius (Cells)")				, _TL(""), PARAMETER_TYPE_Int, 7, 1, true);
+
+	Parameters.Add_Parameters(
+		NULL, "WEIGHTING"	, _TL("Weighting"),
+		_TL("")
+	)->asParameters()->Assign(m_Cells.Get_Weighting().Get_Parameters());
 }
 
 
@@ -114,127 +119,112 @@ CGSGrid_Residuals::CGSGrid_Residuals(void)
 //---------------------------------------------------------
 bool CGSGrid_Residuals::On_Execute(void)
 {
-	pInput		= Parameters("INPUT")		->asGrid();
+	m_pGrid		= Parameters("GRID")	->asGrid();
 
-	pMean		= Parameters("MEAN")		->asGrid();
-	pDiff		= Parameters("DIFF")		->asGrid();
-	pStdDev		= Parameters("STDDEV")		->asGrid();
-	pRange		= Parameters("RANGE")		->asGrid();
-	pMin		= Parameters("MIN")			->asGrid();
-	pMax		= Parameters("MAX")			->asGrid();
-	pDevMean	= Parameters("DEVMEAN")		->asGrid();
-	pPercentile	= Parameters("PERCENTILE")	->asGrid();
+	m_pMean		= Parameters("MEAN")	->asGrid();
+	m_pDiff		= Parameters("DIFF")	->asGrid();
+	m_pStdDev	= Parameters("STDDEV")	->asGrid();
+	m_pRange	= Parameters("RANGE")	->asGrid();
+	m_pMin		= Parameters("MIN")		->asGrid();
+	m_pMax		= Parameters("MAX")		->asGrid();
+	m_pDevMean	= Parameters("DEVMEAN")	->asGrid();
+	m_pPercent	= Parameters("PERCENT")	->asGrid();
 
-	DataObject_Set_Colors(pDiff			, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pStdDev		, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pRange		, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pMin			, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pMax			, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pDevMean		, 100, SG_COLORS_RED_GREY_BLUE, true);
-	DataObject_Set_Colors(pPercentile	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pDiff	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pStdDev	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pRange	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pMin	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pMax	, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pDevMean, 100, SG_COLORS_RED_GREY_BLUE, true);
+	DataObject_Set_Colors(m_pPercent, 100, SG_COLORS_RED_GREY_BLUE, true);
 
 	//-----------------------------------------------------
-	m_Radius.Create(Parameters("RADIUS")->asInt() + 1);
+	m_Cells.Get_Weighting().Set_Parameters(Parameters("WEIGHTING")->asParameters());
 
-	Values		= (double *)malloc(m_Radius.Get_nPoints() * sizeof(double));
+	if( !m_Cells.Set_Radius(Parameters("RADIUS")->asInt()) )
+	{
+		return( false );
+	}
 
 	//-----------------------------------------------------
 	for(int y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
 		for(int x=0; x<Get_NX(); x++)
 		{
-			Get_Value(x, y);
+			Get_Statistics(x, y);
 		}
 	}
 
 	//-----------------------------------------------------
-	m_Radius.Destroy();
-
-	free(Values);
+	m_Cells.Destroy();
 
 	return( true );
 }
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
 //---------------------------------------------------------
-int CGSGrid_Residuals::Get_Value(int x, int y)
+bool CGSGrid_Residuals::Get_Statistics(int x, int y)
 {
-	int		iPoint, ix, iy, nPoints, nLower;
-	double	Value, zValue, zMin, zMax, Mean, StdDev;
-
-	//-----------------------------------------------------
-	nPoints	= 0;
-
-	if( pInput->is_InGrid(x, y) )
+	if( m_pGrid->is_InGrid(x, y) )
 	{
-		nLower	= 0;
-		Mean	= 0.0;
-		zValue	= pInput->asDouble(x, y);
+		int		i, ix, iy, nLower;
+		double	z, iz, id, iw;
 
-		for(iPoint=0; iPoint<m_Radius.Get_nPoints(); iPoint++)
+		CSG_Simple_Statistics	Statistics;
+
+		for(i=0, nLower=0, z=m_pGrid->asDouble(x, y); i<m_Cells.Get_Count(); i++)
 		{
-			m_Radius.Get_Point(iPoint, x, y, ix, iy);
-
-			if( pInput->is_InGrid(ix, iy) )
+			if( m_Cells.Get_Values(i, ix = x, iy = y, id, iw, true) && id > 0.0 && m_pGrid->is_InGrid(ix, iy) )
 			{
-				Mean	+= (Values[nPoints++]	= Value	= pInput->asDouble(ix, iy));
+				Statistics.Add_Value(iz = m_pGrid->asDouble(ix, iy), iw);
 
-				if( nPoints <= 1 )
-				{
-					zMin	= zMax	= Value;
-				}
-				else if( zMin > Value )
-				{
-					zMin	= Value;
-				}
-				else if( zMax < Value )
-				{
-					zMax	= Value;
-				}
-
-				if( Value < zValue )
+				if( z > iz )
 				{
 					nLower++;
 				}
 			}
 		}
+
+		//-------------------------------------------------
+		if( Statistics.Get_Weights() > 0.0 )
+		{
+			m_pMean		->Set_Value(x, y, Statistics.Get_Mean());
+			m_pDiff		->Set_Value(x, y, z - Statistics.Get_Mean());
+			m_pStdDev	->Set_Value(x, y, Statistics.Get_StdDev());
+			m_pRange	->Set_Value(x, y, Statistics.Get_Range());
+			m_pMin		->Set_Value(x, y, Statistics.Get_Minimum());
+			m_pMax		->Set_Value(x, y, Statistics.Get_Maximum());
+			m_pDevMean	->Set_Value(x, y, Statistics.Get_StdDev() > 0.0 ? ((z - Statistics.Get_Mean()) / Statistics.Get_StdDev()) : 0.0);
+			m_pPercent	->Set_Value(x, y, 100.0 * nLower / (double)Statistics.Get_Count());
+
+			return( true );
+		}
 	}
 
 	//-----------------------------------------------------
-	if( nPoints <= 1 )
-	{
-		pMean		->Set_NoData(x, y);
-		pDiff		->Set_NoData(x, y);
-		pStdDev		->Set_NoData(x, y);
-		pRange		->Set_NoData(x, y);
-		pMin		->Set_NoData(x, y);
-		pMax		->Set_NoData(x, y);
-		pDevMean	->Set_NoData(x, y);
-		pPercentile	->Set_NoData(x, y);
-	}
-	else
-	{
-		Mean		/= (double)nPoints;
+	m_pMean		->Set_NoData(x, y);
+	m_pDiff		->Set_NoData(x, y);
+	m_pStdDev	->Set_NoData(x, y);
+	m_pRange	->Set_NoData(x, y);
+	m_pMin		->Set_NoData(x, y);
+	m_pMax		->Set_NoData(x, y);
+	m_pDevMean	->Set_NoData(x, y);
+	m_pPercent	->Set_NoData(x, y);
 
-		StdDev		= 0.0;
-
-		for(iPoint=0; iPoint<nPoints; iPoint++)
-		{
-			Value	= Values[iPoint] - Mean;
-
-			StdDev	+= Value * Value;
-		}
-
-		StdDev		/= (double)(nPoints - 1.0);
-
-		pMean		->Set_Value(x, y, Mean);
-		pDiff		->Set_Value(x, y, zValue - Mean);
-		pStdDev		->Set_Value(x, y, StdDev);
-		pRange		->Set_Value(x, y, zMax - zMin);
-		pMin		->Set_Value(x, y, zMin);
-		pMax		->Set_Value(x, y, zMax);
-		pDevMean	->Set_Value(x, y, (zValue - Mean) / StdDev);
-		pPercentile	->Set_Value(x, y, 100.0 * (double)nLower / (double)(nPoints - 1.0));
-	}
-
-	return( nPoints );
+	return( false );
 }
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

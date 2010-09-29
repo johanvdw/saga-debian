@@ -111,6 +111,7 @@ public:
 
 	void						On_Size					(wxSizeEvent  &event);
 	void						On_Paint				(wxPaintEvent &event);
+	void						On_Key_Down				(wxKeyEvent   &event);
 	void						On_Mouse_LDown			(wxMouseEvent &event);
 	void						On_Mouse_LUp			(wxMouseEvent &event);
 	void						On_Mouse_RDown			(wxMouseEvent &event);
@@ -156,7 +157,7 @@ private:
 	void						_Draw_Point				(int x, int y, double z, int color, int Size);
 	void						_Draw_Pixel				(int x, int y, double z, int color);
 
-	TSG_Point_3D				_Get_Projection			(TSG_Point_3D &p);
+	TSG_Point_Z				_Get_Projection			(TSG_Point_Z &p);
 
 
 	DECLARE_EVENT_TABLE()

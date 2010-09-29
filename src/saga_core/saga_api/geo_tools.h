@@ -72,6 +72,7 @@
 
 //---------------------------------------------------------
 #include "api_core.h"
+#include "metadata.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -101,6 +102,16 @@ typedef enum ESG_Intersection
 }
 TSG_Intersection;
 
+//---------------------------------------------------------
+typedef enum ESG_Point_Type
+{
+	SG_POINT_TYPE_XY			 = 0,
+	SG_POINT_TYPE_XYZ,
+	SG_POINT_TYPE_XYZM,
+	SG_POINT_TYPE_XY_Int
+}
+TSG_Point_Type;
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -116,18 +127,25 @@ typedef struct SSG_Point
 TSG_Point;
 
 //---------------------------------------------------------
+typedef struct SSG_Point_Z
+{
+	double						x, y, z;
+}
+TSG_Point_Z;
+
+//---------------------------------------------------------
+typedef struct SSG_Point_ZM
+{
+	double						x, y, z, m;
+}
+TSG_Point_ZM;
+
+//---------------------------------------------------------
 typedef struct SSG_Point_Int
 {
 	int							x, y;
 }
 TSG_Point_Int;
-
-//---------------------------------------------------------
-typedef struct SSG_Point_3D
-{
-	double						x, y, z;
-}
-TSG_Point_3D;
 
 //---------------------------------------------------------
 typedef struct SSG_Rect
@@ -152,32 +170,125 @@ public:
 	CSG_Point(const TSG_Point &Point);
 	CSG_Point(double x, double y);
 
-	~CSG_Point(void);
+	virtual ~CSG_Point(void)	{}
 
-	operator TSG_Point &						(void)			{	return( m_point );		}
+	virtual TSG_Point_Type		Get_Type		(void)	const	{	return( SG_POINT_TYPE_XY );	}
 
-	double						Get_X			(void)	const	{	return( m_point.x );	}
-	double						Get_Y			(void)	const	{	return( m_point.y );	}
+	operator TSG_Point							(void)	const	{	TSG_Point p; p.x = m_x; p.y = m_y; return( p );	}
 
-	bool						operator ==		(const CSG_Point &Point)	const;
-	bool						operator !=		(const CSG_Point &Point)	const;
+	double						Get_X			(void)	const	{	return( m_x );	}
+	void						Set_X			(double x)		{	m_x	= x;		}
+	double						Get_Y			(void)	const	{	return( m_y );	}
+	void						Set_Y			(double y)		{	m_y	= y;		}
 
-	CSG_Point &					operator  =		(const CSG_Point &Point);
-	void						operator +=		(const CSG_Point &Point);
-	void						operator -=		(const CSG_Point &Point);
+	virtual bool				operator ==		(const CSG_Point &Point)	const	{	return(  is_Equal(Point) );	}
+	virtual bool				operator !=		(const CSG_Point &Point)	const	{	return( !is_Equal(Point) );	}
 
-	CSG_Point					operator +		(const CSG_Point &Point)	const;
-	CSG_Point					operator -		(const CSG_Point &Point)	const;
+	virtual CSG_Point			operator +		(const CSG_Point &Point)	const	{	return( CSG_Point(m_x + Point.m_x, m_y + Point.m_y)	);	}
+	virtual CSG_Point			operator -		(const CSG_Point &Point)	const	{	return( CSG_Point(m_x - Point.m_x, m_y - Point.m_y)	);	}
 
-	void						Assign			(double x, double y);
-	void						Assign			(const CSG_Point &Point);
+	virtual CSG_Point &			operator  =		(const CSG_Point &Point)			{	Assign  (Point);	return( *this );	}
+	virtual CSG_Point &			operator +=		(const CSG_Point &Point)			{	Add     (Point);	return( *this );	}
+	virtual CSG_Point &			operator -=		(const CSG_Point &Point)			{	Subtract(Point);	return( *this );	}
 
-	bool						is_Equal		(double x, double y)		const;
-	bool						is_Equal		(const CSG_Point &Point)	const;
+	virtual void				Assign			(double x, double y);
+	virtual void				Assign			(const CSG_Point &Point);
+	virtual void				Add				(const CSG_Point &Point);
+	virtual void				Subtract		(const CSG_Point &Point);
+
+	virtual bool				is_Equal		(double x, double y)		const	{	return(	m_x == x && m_y == y );	}
+	virtual bool				is_Equal		(const CSG_Point &Point)	const	{	return(	m_x == Point.m_x && m_y == Point.m_y );	}
 
 
-	//-----------------------------------------------------
-	TSG_Point					m_point;
+protected:
+
+	double						m_x, m_y;
+
+};
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Point_Z : public CSG_Point
+{
+public:
+	CSG_Point_Z(void);
+	CSG_Point_Z(const CSG_Point_Z &Point);
+	CSG_Point_Z(const TSG_Point_Z &Point);
+	CSG_Point_Z(double x, double y, double z);
+
+	virtual ~CSG_Point_Z(void)	{}
+
+	virtual TSG_Point_Type		Get_Type		(void)	const	{	return( SG_POINT_TYPE_XYZ );	}
+
+	operator TSG_Point_Z						(void)	const	{	TSG_Point_Z p; p.x = m_x; p.y = m_y; p.z = m_z; return( p );	}
+
+	double						Get_Z			(void)	const	{	return( m_z );	}
+	void						Set_Z			(double z)		{	m_z	= z;		}
+
+	virtual bool				operator ==		(const CSG_Point_Z &Point)	const	{	return(  is_Equal(Point) );	}
+	virtual bool				operator !=		(const CSG_Point_Z &Point)	const	{	return( !is_Equal(Point) );	}
+
+	virtual CSG_Point_Z			operator +		(const CSG_Point_Z &Point)	const	{	return( CSG_Point_Z(m_x + Point.m_x, m_y + Point.m_y, m_z + Point.m_z)	);	}
+	virtual CSG_Point_Z			operator -		(const CSG_Point_Z &Point)	const	{	return( CSG_Point_Z(m_x - Point.m_x, m_y - Point.m_y, m_z - Point.m_z)	);	}
+
+	virtual CSG_Point_Z &		operator  =		(const CSG_Point_Z &Point)			{	Assign  (Point);	return( *this );	}
+	virtual CSG_Point_Z &		operator +=		(const CSG_Point_Z &Point)			{	Add     (Point);	return( *this );	}
+	virtual CSG_Point_Z &		operator -=		(const CSG_Point_Z &Point)			{	Subtract(Point);	return( *this );	}
+
+	virtual void				Assign			(double x, double y, double z);
+	virtual void				Assign			(const CSG_Point_Z &Point);
+	virtual void				Add				(const CSG_Point_Z &Point);
+	virtual void				Subtract		(const CSG_Point_Z &Point);
+
+	virtual bool				is_Equal		(double x, double y, double z)	const	{	return(	m_x == x && m_y == y && m_z == z );	}
+	virtual bool				is_Equal		(const CSG_Point_Z &Point)		const	{	return(	m_x == Point.m_x && m_y == Point.m_y && m_z == Point.m_z );	}
+
+
+protected:
+
+	double						m_z;
+
+};
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Point_ZM : public CSG_Point_Z
+{
+public:
+	CSG_Point_ZM(void);
+	CSG_Point_ZM(const CSG_Point_ZM &Point);
+	CSG_Point_ZM(const TSG_Point_ZM &Point);
+	CSG_Point_ZM(double x, double y, double z, double m);
+
+	virtual ~CSG_Point_ZM(void)	{}
+
+	virtual TSG_Point_Type		Get_Type		(void)	const	{	return( SG_POINT_TYPE_XYZM );	}
+
+	operator TSG_Point_ZM						(void)	const	{	TSG_Point_ZM p; p.x = m_x; p.y = m_y; p.z = m_z; p.m = m_m; return( p );	}
+
+	double						Get_M			(void)	const	{	return( m_m );	}
+	void						Set_M			(double m)		{	m_m	= m;		}
+
+	virtual bool				operator ==		(const CSG_Point_ZM &Point)	const	{	return(  is_Equal(Point) );	}
+	virtual bool				operator !=		(const CSG_Point_ZM &Point)	const	{	return( !is_Equal(Point) );	}
+
+	virtual CSG_Point_ZM		operator +		(const CSG_Point_ZM &Point)	const	{	return( CSG_Point_ZM(m_x + Point.m_x, m_y + Point.m_y, m_z + Point.m_z, m_m + Point.m_m) );	}
+	virtual CSG_Point_ZM		operator -		(const CSG_Point_ZM &Point)	const	{	return( CSG_Point_ZM(m_x - Point.m_x, m_y - Point.m_y, m_z - Point.m_z, m_m - Point.m_m) );	}
+
+	virtual CSG_Point_ZM &		operator  =		(const CSG_Point_ZM &Point)			{	Assign  (Point);	return( *this );	}
+	virtual CSG_Point_ZM &		operator +=		(const CSG_Point_ZM &Point)			{	Add     (Point);	return( *this );	}
+	virtual CSG_Point_ZM &		operator -=		(const CSG_Point_ZM &Point)			{	Subtract(Point);	return( *this );	}
+
+	virtual void				Assign			(double x, double y, double z, double m);
+	virtual void				Assign			(const CSG_Point_ZM &Point);
+	virtual void				Add				(const CSG_Point_ZM &Point);
+	virtual void				Subtract		(const CSG_Point_ZM &Point);
+
+	virtual bool				is_Equal		(double x, double y, double z, double m)	const	{	return(	m_x == x && m_y == y && m_z == z && m_m == m );	}
+	virtual bool				is_Equal		(const CSG_Point_ZM &Point)					const	{	return(	m_x == Point.m_x && m_y == Point.m_y && m_z == Point.m_z && m_m == Point.m_m );	}
+
+
+protected:
+
+	double						m_m;
 
 };
 
@@ -215,7 +326,7 @@ public:
 
 private:
 
-	int							m_nPoints;
+	int							m_nPoints, m_nBuffer;
 
 	TSG_Point					*m_Points;
 
@@ -248,33 +359,33 @@ public:
 
 private:
 
-	int							m_nPoints;
+	int							m_nPoints, m_nBuffer;
 
 	TSG_Point_Int				*m_Points;
 
 };
 
 //---------------------------------------------------------
-class SAGA_API_DLL_EXPORT CSG_Points_3D
+class SAGA_API_DLL_EXPORT CSG_Points_Z
 {
 public:
-	CSG_Points_3D(void);
-	virtual ~CSG_Points_3D(void);
+	CSG_Points_Z(void);
+	virtual ~CSG_Points_Z(void);
 
 	void						Clear			(void);
 
-	CSG_Points_3D &				operator  =		(const CSG_Points_3D &Points);
-	bool						Assign			(const CSG_Points_3D &Points);
+	CSG_Points_Z &				operator  =		(const CSG_Points_Z &Points);
+	bool						Assign			(const CSG_Points_Z &Points);
 
 	bool						Add				(double x, double y, double z);
-	bool						Add				(const TSG_Point_3D &Point);
+	bool						Add				(const TSG_Point_Z &Point);
 	bool						Del				(int Index);
 
 	bool						Set_Count		(int nPoints);
 	int							Get_Count		(void)		const	{	return( m_nPoints );	}
 
-	TSG_Point_3D &				operator []		(int Index)			{	return( m_Points[Index]   );	}
-	TSG_Point_3D &				Get_Point		(int Index)			{	return( m_Points[Index]   );	}
+	TSG_Point_Z &				operator []		(int Index)			{	return( m_Points[Index]   );	}
+	TSG_Point_Z &				Get_Point		(int Index)			{	return( m_Points[Index]   );	}
 	double						Get_X			(int Index)	const	{	return( m_Points[Index].x );	}
 	double						Get_Y			(int Index)	const	{	return( m_Points[Index].y );	}
 	double						Get_Z			(int Index)	const	{	return( m_Points[Index].z );	}
@@ -282,9 +393,9 @@ public:
 
 private:
 
-	int							m_nPoints;
+	int							m_nPoints, m_nBuffer;
 
-	TSG_Point_3D				*m_Points;
+	TSG_Point_Z					*m_Points;
 
 };
 
@@ -403,6 +514,101 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+typedef enum ESG_Distance_Weighting
+{
+	SG_DISTWGHT_None	= 0,
+	SG_DISTWGHT_IDW,
+	SG_DISTWGHT_EXP,
+	SG_DISTWGHT_GAUSS
+}
+TSG_Distance_Weighting;
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Distance_Weighting
+{
+public:
+	CSG_Distance_Weighting(void);
+	virtual ~CSG_Distance_Weighting(void);
+
+	class CSG_Parameters *	Get_Parameters		(void)	const		{	return( m_pParameters );	}
+	bool					Set_Parameters		(class CSG_Parameters *pParameters);
+
+	TSG_Distance_Weighting	Get_Weighting		(void)	const		{	return( m_Weighting );		}
+	bool					Set_Weighting		(TSG_Distance_Weighting Weighting);
+
+	double					Get_IDW_Power		(void)	const		{	return( m_IDW_Power );		}
+	bool					Set_IDW_Power		(double Value);
+
+	bool					Get_IDW_Offset		(void)	const		{	return( m_IDW_bOffset );	}
+	bool					Set_IDW_Offset		(bool bOn = true);
+
+	double					Get_BandWidth		(void)	const		{	return( m_Bandwidth );		}
+	bool					Set_BandWidth		(double Value);
+
+	//-----------------------------------------------------
+	double					Get_Weight			(double Distance)	const
+	{
+		if( Distance < 0.0 )
+		{
+			return( 0.0 );
+		}
+
+		switch( m_Weighting )
+		{
+		case SG_DISTWGHT_None: default:
+			return( 1.0 );
+
+		case SG_DISTWGHT_IDW:
+			if( m_IDW_bOffset )
+				return( pow(1.0 + Distance, -m_IDW_Power) );
+			else
+				return( Distance > 0.0 ? pow(Distance, -m_IDW_Power) : 0.0 );
+
+		case SG_DISTWGHT_EXP:
+			return( exp(-Distance / m_Bandwidth) );
+
+		case SG_DISTWGHT_GAUSS:
+			Distance	/= m_Bandwidth;
+			return( exp(-0.5 * Distance*Distance) );
+		}
+	}
+
+
+private:
+
+	bool					m_IDW_bOffset;
+
+	double					m_IDW_Power, m_Bandwidth;
+
+	TSG_Distance_Weighting	m_Weighting;
+
+	class CSG_Parameters	*m_pParameters;
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+typedef enum ESG_Projection_Format
+{
+	SG_PROJ_FMT_WKT,
+	SG_PROJ_FMT_Proj4,
+	SG_PROJ_FMT_EPSG,
+	SG_PROJ_FMT_Undefined
+}
+TSG_Projection_Format;
+
+//---------------------------------------------------------
 typedef enum ESG_Projection_Type
 {
 	SG_PROJ_TYPE_CS_Undefined	= 0,
@@ -433,48 +639,56 @@ public:
 
 									CSG_Projection			(const CSG_Projection &Projection);
 	bool							Create					(const CSG_Projection &Projection);
-
-									CSG_Projection			(int SRID, const SG_Char *Authority, const SG_Char *OpenGIS, const SG_Char *Proj4);
-	bool							Create					(int SRID, const SG_Char *Authority, const SG_Char *OpenGIS, const SG_Char *Proj4);
-
-	bool							Assign					(int SRID, const SG_Char *Authority, const SG_Char *OpenGIS, const SG_Char *Proj4);
 	bool							Assign					(const CSG_Projection &Projection);
-	CSG_Projection &				operator =				(const CSG_Projection &Projection)			{	Assign(Projection);	return( *this );	}
+	CSG_Projection &				operator =				(const CSG_Projection &Projection)	{	Assign(Projection);	return( *this );	}
 
+									CSG_Projection			(int EPSG_SRID);
+	bool							Create					(int EPSG_SRID);
+	bool							Assign					(int EPSG_SRID);
+	CSG_Projection &				operator =				(int EPSG_SRID)						{	Assign(EPSG_SRID);	return( *this );	}
+
+									CSG_Projection			(const CSG_String &Projection, TSG_Projection_Format Format = SG_PROJ_FMT_WKT);
+	bool							Create					(const CSG_String &Projection, TSG_Projection_Format Format = SG_PROJ_FMT_WKT);
+	bool							Assign					(const CSG_String &Projection, TSG_Projection_Format Format = SG_PROJ_FMT_WKT);
+	CSG_Projection &				operator =				(const CSG_String &Projection)		{	Assign(Projection);	return( *this );	}
+
+	bool							is_Okay					(void)	const	{	return( m_Type != SG_PROJ_TYPE_CS_Undefined );	}
 	bool							is_Equal				(const CSG_Projection &Projection)	const;
 	bool							operator ==				(const CSG_Projection &Projection)	const	{	return( is_Equal(Projection) );	}
 
-	int								Get_SRID				(void)	const	{	return( m_SRID );			}
-	TSG_Projection_Type				Get_Type				(void)	const	{	return( m_Type );			}
-	const CSG_String &				Get_Name				(void)	const	{	return( m_Name );			}
-	const CSG_String &				Get_OpenGIS				(void)	const	{	return( m_OpenGIS );		}
-	const CSG_String &				Get_Proj4				(void)	const	{	return( m_Proj4 );			}
-	const CSG_String &				Get_Authority			(void)	const	{	return( m_Authority );		}
+	bool							Load					(const CSG_String &File_Name, TSG_Projection_Format Format);
+	bool							Save					(const CSG_String &File_Name, TSG_Projection_Format Format)	const;
+
+	bool							Load					(const CSG_MetaData &Projection);
+	bool							Save					(      CSG_MetaData &Projection)	const;
+
+	const CSG_String &				Get_Name				(void)	const	{	return( m_Name  );	}
+	const CSG_String &				Get_WKT					(void)	const	{	return( m_WKT   );	}
+	const CSG_String &				Get_Proj4				(void)	const	{	return( m_Proj4 );	}
+	int								Get_EPSG				(void)	const	{	return( m_EPSG  );	}
+
+	TSG_Projection_Type				Get_Type				(void)	const	{	return( m_Type  );	}
 	CSG_String						Get_Type_Name			(void)	const	{	return( gSG_Projection_Type_Identifier[m_Type] );	}
-	CSG_String						Get_Type_Identifier		(void)	const	{	return( SG_Get_Projection_Type_Name(m_Type) );	}
-
-	CSG_String						asString				(void)	const;
-
-	bool							from_ESRI				(const CSG_String &ESRI_PRJ);
-	bool							to_ESRI					(CSG_String &ESRI_PRJ)	const;
+	CSG_String						Get_Type_Identifier		(void)	const	{	return( SG_Get_Projection_Type_Name(m_Type) );		}
 
 
 private:
 
-	int								m_SRID;
+	int								m_EPSG;
 
 	TSG_Projection_Type				m_Type;
 
-	CSG_String						m_Name, m_Authority, m_OpenGIS, m_Proj4;
+	CSG_String						m_Name, m_WKT, m_Proj4;
 
 
 	void							_Reset					(void);
 
-	bool							_Get_OpenGIS_from_Proj4	(const SG_Char *Text);
-	bool							_Get_Proj4_from_OpenGIS	(const SG_Char *Text);
-
 };
 
+//---------------------------------------------------------
+/** CSG_Projections is a projections dictionary and translator
+  * for EPSG codes, OpenGIS Well-Known-Text, ESRI and Proj.4.
+*/
 //---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Projections
 {
@@ -494,32 +708,27 @@ public:
 	bool							Save					(const CSG_String &File_Name);
 
 	bool							Add						(const CSG_Projection &Projection);
-	bool							Add						(int SRID, const SG_Char *Authority, const SG_Char *OpenGIS, const SG_Char *Proj4);
+	bool							Add						(int SRID, const SG_Char *Authority, const SG_Char *WKT, const SG_Char *Proj4);
 
-	int								Get_Count				(void)	const	{	return( m_nProjections );	}
-	const CSG_Projection &			Get_Projection			(int i)	const	{	return( i >= 0 && i < m_nProjections ? *(m_pProjections[i]) : m_Undefined );	}
-	const CSG_Projection &			operator []				(int i) const	{	return( i >= 0 && i < m_nProjections ? *(m_pProjections[i]) : m_Undefined );	}
+	int								Get_Count				(void)	const;
+	const CSG_Projection &			Get_Projection			(int i)	const;
+	const CSG_Projection &			operator []				(int i) const;
+
+	bool							Get_Projection			(int EPSG, CSG_Projection &Projection)	const;
 
 	CSG_String						Get_Names				(void)	const;
 	int								Get_SRID_byNamesIndex	(int i)	const;
 
+	static bool						WKT_to_Proj4			(CSG_String &Proj4, const CSG_String &WKT  );
+	static bool						WKT_from_Proj4			(CSG_String &WKT  , const CSG_String &Proj4);
+
 
 private:
 
-	int								m_nProjections, m_nBuffer;
-
-	CSG_Projection					**m_pProjections, m_Undefined;
-
-	static CSG_Projections			*s_pProjections;
-
-	class CSG_Index					*m_pIdx_Names, *m_pIdx_SRIDs;
+	class CSG_Table					*m_pProjections;
 
 
 	void							_On_Construction		(void);
-	CSG_Projection *				_Add					(void);
-
-	static int						_Cmp_Names				(const int iElement_1, const int iElement_2);
-	static int						_Cmp_SRIDs				(const int iElement_1, const int iElement_2);
 
 };
 

@@ -258,14 +258,29 @@ void CWKSP::On_Page_Changed(wxNotebookEvent &event)
 //---------------------------------------------------------
 void CWKSP::On_Command(wxCommandEvent &event)
 {
-	switch( event.GetId() )
+	if(	(event.GetId() >= ID_CMD_TABLES_RECENT_FIRST       && event.GetId() <= ID_CMD_TABLES_RECENT_LAST)
+	||	(event.GetId() >= ID_CMD_SHAPES_RECENT_FIRST       && event.GetId() <= ID_CMD_SHAPES_RECENT_LAST)
+	||	(event.GetId() >= ID_CMD_POINTCLOUD_RECENT_FIRST   && event.GetId() <= ID_CMD_POINTCLOUD_RECENT_LAST)
+	||	(event.GetId() >= ID_CMD_TIN_RECENT_FIRST          && event.GetId() <= ID_CMD_TIN_RECENT_LAST)
+	||	(event.GetId() >= ID_CMD_GRIDS_RECENT_FIRST        && event.GetId() <= ID_CMD_GRIDS_RECENT_LAST)
+	||	(event.GetId() >= ID_CMD_DATA_PROJECT_RECENT_FIRST && event.GetId() <= ID_CMD_DATA_PROJECT_RECENT_LAST) )
+	{
+		m_pData   ->On_Command(event);
+	}
+	else switch( event.GetId() )
 	{
 	default:
-		if(	!g_pACTIVE->Get_Item() || !g_pACTIVE->Get_Item()->On_Command(event.GetId()) )
+		if( !g_pACTIVE->Get_Item() || !g_pACTIVE->Get_Item()->On_Command(event.GetId()) )
 		{
-			m_pModules->On_Command(event);
-			m_pData   ->On_Command(event);
-			m_pMaps   ->On_Command(event);
+			if( GetCurrentPage() )
+			{
+				switch( GetCurrentPage()->GetId() )
+				{
+				case ID_WND_WKSP_MODULES:	m_pModules->On_Command(event);	break;
+				case ID_WND_WKSP_DATA:		m_pData   ->On_Command(event);	break;
+				case ID_WND_WKSP_MAPS:		m_pMaps   ->On_Command(event);	break;
+				}
+			}
 		}
 		break;
 
@@ -279,6 +294,22 @@ void CWKSP::On_Command(wxCommandEvent &event)
 			case ID_WND_WKSP_MAPS:		m_pMaps   ->On_Command(event);	break;
 			}
 		}
+		break;
+
+	case ID_CMD_MODULES_OPEN:
+		m_pModules->On_Command(event);
+		break;
+
+	case ID_CMD_DATA_PROJECT_NEW:
+	case ID_CMD_DATA_PROJECT_OPEN:
+	case ID_CMD_DATA_PROJECT_OPEN_ADD:
+	case ID_CMD_DATA_PROJECT_SAVE:
+	case ID_CMD_DATA_PROJECT_SAVE_AS:
+	case ID_CMD_TABLES_OPEN:
+	case ID_CMD_SHAPES_OPEN:
+	case ID_CMD_POINTCLOUD_OPEN:
+	case ID_CMD_GRIDS_OPEN:
+		m_pData   ->On_Command(event);
 		break;
 
 	case ID_CMD_WKSP_OPEN:

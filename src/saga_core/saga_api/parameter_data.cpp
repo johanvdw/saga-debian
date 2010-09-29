@@ -853,7 +853,7 @@ bool CSG_Parameter_String::Set_Value(void *Value)
 	{
 		if( m_String.Cmp((SG_Char *)Value) )
 		{
-			m_String.Printf((SG_Char *)Value);
+			m_String	= (SG_Char *)Value;
 
 			return( true );
 		}
@@ -877,7 +877,7 @@ const SG_Char * CSG_Parameter_String::asString(void)
 //---------------------------------------------------------
 void CSG_Parameter_String::On_Assign(CSG_Parameter_Data *pSource)
 {
-	m_String.Printf(((CSG_Parameter_String *)pSource)->m_String.c_str());
+	m_String	= ((CSG_Parameter_String *)pSource)->m_String.c_str();
 
 	bPassword	= ((CSG_Parameter_String *)pSource)->bPassword;
 }
@@ -1113,9 +1113,9 @@ bool CSG_Parameter_Font::On_Serialize(CSG_MetaData &Entry, bool bSave)
 		if( (pEntry = Entry.Get_Child(SG_T("COLOR"))) != NULL )
 		{
 			m_Color	= SG_GET_RGB(
-				Entry.Get_Content().AfterFirst(SG_T('R')).asInt(),
-				Entry.Get_Content().AfterFirst(SG_T('G')).asInt(),
-				Entry.Get_Content().AfterFirst(SG_T('B')).asInt()
+				pEntry->Get_Content().AfterFirst(SG_T('R')).asInt(),
+				pEntry->Get_Content().AfterFirst(SG_T('G')).asInt(),
+				pEntry->Get_Content().AfterFirst(SG_T('B')).asInt()
 			);
 		}
 
@@ -1555,6 +1555,29 @@ bool CSG_Parameter_Table_Field::Set_Value(int Value)
 }
 
 //---------------------------------------------------------
+bool CSG_Parameter_Table_Field::Set_Value(void *Value)
+{
+	CSG_Table	*pTable;
+
+	if( Value && *((SG_Char *)Value) && (pTable = Get_Table()) != NULL )
+	{
+		CSG_String	s((SG_Char *)Value);
+
+		for(int i=0; i<pTable->Get_Field_Count(); i++)
+		{
+			if( s.CmpNoCase(pTable->Get_Field_Name(i)) == 0 )
+			{
+				m_Value	= i;
+
+				return( true );
+			}
+		}
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
 CSG_Table * CSG_Parameter_Table_Field::Get_Table(void)
 {
 	CSG_Table		*pTable;
@@ -1572,15 +1595,13 @@ CSG_Table * CSG_Parameter_Table_Field::Get_Table(void)
 		case PARAMETER_TYPE_Table:
 		case PARAMETER_TYPE_Shapes:
 		case PARAMETER_TYPE_TIN:
-			pTable	= pParent->asTable();
-			break;
-
 		case PARAMETER_TYPE_PointCloud:
+			pTable	= pParent->asTable();
 			break;
 		}
 	}
 
-	return( pTable && pTable->Get_Field_Count() > 0 ? pTable : NULL );
+	return( pTable && pTable != DATAOBJECT_CREATE && pTable->Get_Field_Count() > 0 ? pTable : NULL );
 }
 
 
@@ -1652,20 +1673,24 @@ bool CSG_Parameter_Data_Object::On_Serialize(CSG_MetaData &Entry, bool bSave)
 		{
 			Entry.Set_Content(SG_T("CREATE"));
 		}
-		else if( m_pDataObject != DATAOBJECT_NOTSET && m_pDataObject->Get_File_Name() )
+		else if( m_pDataObject == DATAOBJECT_NOTSET || !m_pDataObject->Get_File_Name() )
 		{
-			Entry.Set_Content(m_pDataObject->Get_File_Name());
+			Entry.Set_Content(SG_T("NOT SET"));
 		}
 		else
 		{
-			Entry.Set_Content(SG_T("NOT SET"));
+			Entry.Set_Content(m_pDataObject->Get_File_Name());
 		}
 	}
 	else
 	{
-		if( !Entry.Cmp_Content(SG_T("CREATE")) )
+		if( Entry.Cmp_Content(SG_T("CREATE")) )
 		{
 			Set_Value(DATAOBJECT_CREATE);
+		}
+		else if( Entry.Cmp_Content(SG_T("NOT SET")) )
+		{
+			Set_Value(DATAOBJECT_NOTSET);
 		}
 		else
 		{
@@ -2255,7 +2280,7 @@ bool CSG_Parameter_Parameters::On_Serialize(CSG_MetaData &Entry, bool bSave)
 		if( bSave )
 		{
 			Entry.Set_Property(SG_T("id")  , m_pOwner->Get_Identifier());
-			Entry.Set_Property(SG_T("type"), m_pOwner->Get_Type_Name());
+			Entry.Set_Property(SG_T("type"), m_pOwner->Get_Type_Identifier());
 		}
 
 		return( true );

@@ -162,6 +162,7 @@ public:
 	void						Set_Show_Progress			(bool bOn = true);
 
 	virtual bool				On_Before_Execution			(void)	{	return( true );	}
+	virtual bool				On_After_Execution			(void)	{	return( true );	}
 
 	bool						Execute						(void);
 
@@ -201,6 +202,8 @@ protected:
 	virtual bool				Set_Progress				(int Position);
 	virtual bool				Set_Progress				(double Position, double Range);
 
+	bool						Stop_Execution				(void);
+
 	void						Message_Add					(const SG_Char *Text, bool bNewLine = true);
 	void						Message_Dlg					(const SG_Char *Text, const SG_Char *Caption = NULL);
 	bool						Message_Dlg_Confirm			(const SG_Char *Text, const SG_Char *Caption = NULL);
@@ -222,6 +225,14 @@ protected:
 
 	bool						DataObject_Get_Parameters	(CSG_Data_Object *pDataObject, CSG_Parameters &Parameters);
 	bool						DataObject_Set_Parameters	(CSG_Data_Object *pDataObject, CSG_Parameters &Parameters);
+
+	CSG_Parameter *				DataObject_Get_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, CSG_Parameter *pParameter);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, int            Value);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, double         Value);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, void          *Value);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, const SG_Char *Value);
+	bool						DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const CSG_String &ID, double loVal, double hiVal);	// Range Parameter
 
 
 private:
@@ -384,13 +395,13 @@ protected:
 	virtual bool				On_Execute_Keyboard		(int Character);
 	virtual bool				On_Execute_Finish		(void);
 
-	CSG_Point &					Get_Position			(void)	{	return( m_Point );					}
-	double						Get_xPosition			(void)	{	return( m_Point.m_point.x );		}
-	double						Get_yPosition			(void)	{	return( m_Point.m_point.y );		}
+	CSG_Point &					Get_Position			(void)	{	return( m_Point );				}
+	double						Get_xPosition			(void)	{	return( m_Point.Get_X() );		}
+	double						Get_yPosition			(void)	{	return( m_Point.Get_Y() );		}
 
-	CSG_Point &					Get_Position_Last		(void)	{	return( m_Point_Last );				}
-	double						Get_xPosition_Last		(void)	{	return( m_Point_Last.m_point.x );	}
-	double						Get_yPosition_Last		(void)	{	return( m_Point_Last.m_point.y );	}
+	CSG_Point &					Get_Position_Last		(void)	{	return( m_Point_Last );			}
+	double						Get_xPosition_Last		(void)	{	return( m_Point_Last.Get_X() );	}
+	double						Get_yPosition_Last		(void)	{	return( m_Point_Last.Get_Y() );	}
 
 	bool						is_Shift				(void)	{	return( (m_Keys & MODULE_INTERACTIVE_KEY_SHIFT) != 0 );	}
 	bool						is_Alt					(void)	{	return( (m_Keys & MODULE_INTERACTIVE_KEY_ALT)   != 0 );	}
@@ -523,14 +534,27 @@ private:
 #define SYMBOL_MLB_Initialize			SG_T("MLB_Initialize")
 typedef bool							(* TSG_PFNC_MLB_Initialize)		(const SG_Char *);
 
-//---------------------------------------------------------
+#define SYMBOL_MLB_Finalize			SG_T("MLB_Finalize")
+typedef bool							(* TSG_PFNC_MLB_Finalize)		(void);
+
 #define SYMBOL_MLB_Get_Interface		SG_T("MLB_Get_Interface")
 typedef CSG_Module_Library_Interface *	(* TSG_PFNC_MLB_Get_Interface)	(void);
 
 //---------------------------------------------------------
-#define MLB_INTERFACE	CSG_Module_Library_Interface		MLB_Interface;\
+#define MLB_INTERFACE_CORE	CSG_Module_Library_Interface	MLB_Interface;\
 \
-extern "C" _SAGA_DLL_EXPORT bool							MLB_Initialize		(const SG_Char *File_Name)\
+extern "C" _SAGA_DLL_EXPORT CSG_Module_Library_Interface *	MLB_Get_Interface   (void)\
+{\
+	return( &MLB_Interface );\
+}\
+\
+extern "C" _SAGA_DLL_EXPORT const SG_Char *					Get_API_Version		(void)\
+{\
+	return( SAGA_API_VERSION );\
+}\
+
+//---------------------------------------------------------
+#define MLB_INTERFACE_INITIALIZE	extern "C" _SAGA_DLL_EXPORT bool MLB_Initialize	(const SG_Char *File_Name)\
 {\
 	MLB_Interface.Set_File_Name(File_Name);\
 \
@@ -545,16 +569,15 @@ extern "C" _SAGA_DLL_EXPORT bool							MLB_Initialize		(const SG_Char *File_Name
 \
 	return( MLB_Interface.Get_Count() > 0 );\
 }\
-\
-extern "C" _SAGA_DLL_EXPORT CSG_Module_Library_Interface *	MLB_Get_Interface   (void)\
+
+//---------------------------------------------------------
+#define MLB_INTERFACE_FINALIZE		extern "C" _SAGA_DLL_EXPORT bool MLB_Finalize	(void)\
 {\
-	return( &MLB_Interface );\
+	return( true );\
 }\
-\
-extern "C" _SAGA_DLL_EXPORT const SG_Char *					Get_API_Version		(void)\
-{\
-	return( SAGA_API_VERSION );\
-}\
+
+//---------------------------------------------------------
+#define MLB_INTERFACE	MLB_INTERFACE_CORE MLB_INTERFACE_INITIALIZE MLB_INTERFACE_FINALIZE
 
 //---------------------------------------------------------
 #ifndef SWIG

@@ -224,6 +224,14 @@ void CWKSP_Base_Control::On_Command(wxCommandEvent &event)
 	}
 
 	//-----------------------------------------------------
+	if( event.GetId() == ID_CMD_WKSP_ITEM_SEARCH )
+	{
+		_Search_Item();
+
+		return;
+	}
+
+	//-----------------------------------------------------
 	if( m_pManager->On_Command(event.GetId()) )
 	{
 		return;
@@ -559,7 +567,28 @@ bool CWKSP_Base_Control::_Del_Active(bool bSilent)
 			if( DLG_Message_Confirm(ID_DLG_DELETE)
 			&&	(m_pManager->Get_Type() != WKSP_ITEM_Data_Manager || g_pData->Save_Modified_Sel()) )
 			{
-				for(size_t i=0; i<IDs.GetCount(); i++)
+				size_t	i;
+
+				for(i=0; i<IDs.GetCount(); i++)
+				{
+					if( IDs[i].IsOk() )
+					{
+						switch( ((CWKSP_Base_Item *)GetItemData(IDs[i]))->Get_Type() )
+						{
+						case WKSP_ITEM_Shapes:
+						case WKSP_ITEM_TIN:
+						case WKSP_ITEM_PointCloud:
+						case WKSP_ITEM_Grid:
+							g_pMaps->Del((CWKSP_Layer *)GetItemData(IDs[i]));
+							break;
+
+						default:
+							break;
+						}
+					}
+				}
+
+				for(i=0; i<IDs.GetCount(); i++)
 				{
 					if( IDs[i].IsOk() )
 					{
@@ -736,6 +765,7 @@ CSG_Parameters *	DLG_Copy_Settings(void)
 	DLG_Copy_Settings(List, (CWKSP_Base_Item *)g_pData->Get_Grids());
 	DLG_Copy_Settings(List, (CWKSP_Base_Item *)g_pData->Get_Shapes());
 	DLG_Copy_Settings(List, (CWKSP_Base_Item *)g_pData->Get_TINs());
+	DLG_Copy_Settings(List, (CWKSP_Base_Item *)g_pData->Get_PointClouds());
 
 	if( List.Get_Count() > 0 )
 	{
@@ -820,6 +850,115 @@ bool CWKSP_Base_Control::_Copy_Settings(void)
 	}
 
 	return( false );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CWKSP_Base_Control::_Search_Compare(wxString A, wxString B, bool bCase)
+{
+	return( bCase ? B.Find(A) != wxNOT_FOUND : B.MakeUpper().Find(A.MakeUpper().c_str()) != wxNOT_FOUND );
+}
+
+//---------------------------------------------------------
+bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pItem, const wxChar *String, bool bName, bool bDesc, bool bCase)
+{
+	if( pItem == NULL )
+	{
+		return( false );
+	}
+
+	if(	(bName && _Search_Compare(String, pItem->Get_Name       (), bCase))
+	||	(bDesc && _Search_Compare(String, pItem->Get_Description(), bCase)) )
+	{
+		CSG_Table_Record	*pRecord	= pList->Add_Record();
+
+		pRecord->Set_Value(0, pItem->Get_Name().c_str());
+		pRecord->Set_Value(1, pItem->Get_Type_Name(pItem->Get_Type()).c_str());
+		pRecord->Set_Value(2, (long)pItem);
+	}
+
+	if( pItem->is_Manager() )
+	{
+		for(int i=0; i<((CWKSP_Base_Manager *)pItem)->Get_Count(); i++)
+		{
+			_Search_Get_List(pList, ((CWKSP_Base_Manager *)pItem)->Get_Item(i), String, bName, bDesc, bCase);
+		}
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CWKSP_Base_Control::_Search_Item(void)
+{
+	static CSG_Parameters	Search(NULL, LNG("Search for..."), LNG(""));
+
+	if( Search.Get_Count() == 0 )
+	{
+		Search.Add_String	(NULL, "STRING"	, LNG("Search for...")	, LNG(""), SG_T(""));
+		Search.Add_Value	(NULL, "NAME"	, LNG("Name")			, LNG(""), PARAMETER_TYPE_Bool, true);
+		Search.Add_Value	(NULL, "DESC"	, LNG("Description")	, LNG(""), PARAMETER_TYPE_Bool, false);
+		Search.Add_Value	(NULL, "CASE"	, LNG("Case Sensitive")	, LNG(""), PARAMETER_TYPE_Bool, false);
+	}
+
+	if( !DLG_Parameters(&Search) )
+	{
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	CSG_Table	List;
+
+	List.Add_Field(LNG("NAME")	, SG_DATATYPE_String);
+	List.Add_Field(LNG("TYPE")	, SG_DATATYPE_String);
+	List.Add_Field(LNG("ADDR")	, SG_DATATYPE_Long);
+
+	_Search_Get_List(&List, m_pManager, Search("STRING")->asString(), Search("NAME")->asBool(), Search("DESC")->asBool(), Search("CASE")->asBool());
+
+	if( List.Get_Count() <= 0 )
+	{
+		wxMessageBox(LNG("Search text not found"), LNG("Search for..."), wxOK|wxICON_EXCLAMATION);
+
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	wxString	*pItems	= new wxString[List.Get_Count()];
+
+	for(int i=0; i<List.Get_Count(); i++)
+	{
+		pItems[i].Printf(wxT("[%s] %s"), List[i].asString(1), List[i].asString(0));
+	}
+
+	wxSingleChoiceDialog	dlg(MDI_Get_Top_Window(),
+		LNG("Locate..."),
+		wxString::Format(wxT("%s: %s"), LNG("Search Text"), Search("STRING")->asString()),
+		List.Get_Count(), pItems
+	);
+
+	if( dlg.ShowModal() != wxID_OK )
+	{
+		delete[](pItems);
+
+		return( false );
+	}
+
+	delete[](pItems);
+
+	//-----------------------------------------------------
+	CWKSP_Base_Item	*pItem	= (CWKSP_Base_Item *)List.Get_Record(dlg.GetSelection())->asInt(2);
+
+	EnsureVisible	(pItem->GetId());
+	SelectItem		(pItem->GetId());
+	ScrollTo		(pItem->GetId());
+
+	return( true );
 }
 
 
