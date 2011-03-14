@@ -22,7 +22,7 @@ saga (2.0.4+dfsg-3) unstable; urgency=low
 saga (2.0.4+dfsg-2) unstable; urgency=low
 
   [ Johan Van de Wauw ]
-  * Fix program description (#578419)
+  * Fix program description (closes: #578419)
   * Fix bug: deep map window zoom freezes SAGA
   * Fix Esri E00 import
   * Fix bug: printf() crashes
