@@ -233,6 +233,29 @@ const SG_Char * CSG_Parameter_Data::asString(void)
 }
 
 //---------------------------------------------------------
+void CSG_Parameter_Data::Set_Default(int            Value)
+{
+	m_Default.Printf(SG_T("%d"), Value);
+}
+
+void CSG_Parameter_Data::Set_Default(double         Value)
+{
+	m_Default.Printf(SG_T("%f"), Value);
+}
+
+void CSG_Parameter_Data::Set_Default(const SG_Char *Value)
+{
+	if( Value )
+	{
+		m_Default	= Value;
+	}
+	else
+	{
+		m_Default.Clear();
+	}
+}
+
+//---------------------------------------------------------
 bool CSG_Parameter_Data::Assign(CSG_Parameter_Data *pSource)
 {
 	if( pSource && Get_Type() == pSource->Get_Type() )
@@ -762,12 +785,9 @@ bool CSG_Parameter_Choice::Set_Value(void *Value)
 //---------------------------------------------------------
 const SG_Char * CSG_Parameter_Choice::asString(void)
 {
-	if( m_Value >= 0 && m_Value < Items.Get_Count() )
-	{
-		return( Items[m_Value].c_str() );
-	}
+	const SG_Char	*String	= Get_Item(m_Value);
 
-	return( LNG("[VAL] [no choice available]") );
+	return( String ? String : LNG("[VAL] [no choice available]") );
 }
 
 //---------------------------------------------------------
@@ -801,10 +821,74 @@ const SG_Char * CSG_Parameter_Choice::Get_Item(int Index)
 {
 	if( Index >= 0 && Index < Items.Get_Count() )
 	{
-		return( Items[Index].c_str() );
+		const SG_Char	*Item	= Items[Index].c_str();
+
+		if( *Item == SG_T('{') )
+		{
+			do	{	Item++;	}	while( *Item != SG_T('\0') && *Item != SG_T('}') );
+
+			if( *Item == SG_T('\0') )
+			{
+				return( Items[Index].c_str() );
+			}
+
+			Item++;
+		}
+
+		return( Item );
 	}
 
 	return( NULL );
+}
+
+//---------------------------------------------------------
+bool CSG_Parameter_Choice::Get_Data(int        &Value)
+{
+	CSG_String	sValue;
+
+	if( Get_Data(sValue) )
+	{
+		return( sValue.asInt(Value) );
+	}
+
+	return( false );
+}
+
+bool CSG_Parameter_Choice::Get_Data(double     &Value)
+{
+	CSG_String	sValue;
+
+	if( Get_Data(sValue) )
+	{
+		return( sValue.asDouble(Value) );
+	}
+
+	return( false );
+}
+
+bool CSG_Parameter_Choice::Get_Data(CSG_String &Value)
+{
+	if( m_Value >= 0 && m_Value < Items.Get_Count() )
+	{
+		const SG_Char	*Item	= Items[m_Value].c_str();
+
+		if( *Item == SG_T('{') )
+		{
+			Item++;
+
+			Value.Clear();
+
+			do
+			{
+				Value	+= *(Item++);
+			}
+			while( *Item && *Item != SG_T('}') );
+
+			return( Value.Length() > 0 );
+		}
+	}
+
+	return( false );
 }
 
 //---------------------------------------------------------
@@ -1416,7 +1500,7 @@ bool CSG_Parameter_Grid_System::Set_Value(void *Value)
 				case PARAMETER_TYPE_Grid:
 					pGrid	= pParameters->Get_Parameter(i)->asGrid();
 
-					if(	!SG_UI_DataObject_Check(pGrid, DATAOBJECT_TYPE_Grid) || (pGrid != DATAOBJECT_NOTSET && pGrid != DATAOBJECT_CREATE && !m_System.is_Equal(pGrid->Get_System())) )
+					if(	!m_System.is_Valid() || !SG_UI_DataObject_Check(pGrid, DATAOBJECT_TYPE_Grid) || (pGrid != DATAOBJECT_NOTSET && pGrid != DATAOBJECT_CREATE && !m_System.is_Equal(pGrid->Get_System())) )
 					{
 						pParameters->Get_Parameter(i)->Set_Value(DATAOBJECT_NOTSET);
 					}
@@ -1427,7 +1511,7 @@ bool CSG_Parameter_Grid_System::Set_Value(void *Value)
 
 					for(j=pGrids->Get_Count()-1; j>=0; j--)
 					{
-						if( !SG_UI_DataObject_Check(pGrids->asGrid(j), DATAOBJECT_TYPE_Grid) || m_System.is_Equal(pGrids->asGrid(j)->Get_System()) == false )
+						if( !m_System.is_Valid() || !SG_UI_DataObject_Check(pGrids->asGrid(j), DATAOBJECT_TYPE_Grid) || m_System.is_Equal(pGrids->asGrid(j)->Get_System()) == false )
 						{
 							pGrids->Del_Item(j);
 						}

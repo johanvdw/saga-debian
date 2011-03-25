@@ -85,10 +85,11 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define PARAMETER_INPUT						0x01
+#define PARAMETER_INPUT					0x01
 #define PARAMETER_OUTPUT					0x02
 #define PARAMETER_OPTIONAL					0x04
 #define PARAMETER_INFORMATION				0x08
+#define PARAMETER_IGNORE_PROJECTION		0x10
 
 #define PARAMETER_INPUT_OPTIONAL			(PARAMETER_INPUT  | PARAMETER_OPTIONAL)
 #define PARAMETER_OUTPUT_OPTIONAL			(PARAMETER_OUTPUT | PARAMETER_OPTIONAL)
@@ -212,9 +213,9 @@ public:
 	bool						Assign					(CSG_Parameter_Data *pSource);
 	bool						Serialize				(CSG_MetaData &Entry, bool bSave);
 
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(int    Value);
 	virtual bool				Set_Value				(double Value);
-	virtual bool				Set_Value				(void *Value);
+	virtual bool				Set_Value				(void  *Value);
 
 	virtual int					asInt					(void);
 	virtual double				asDouble				(void);
@@ -222,12 +223,17 @@ public:
 
 	virtual const SG_Char *		asString				(void);
 
+	CSG_String					Get_Default				(void)	{	return( m_Default );	}
+	void						Set_Default				(int            Value);
+	void						Set_Default				(double         Value);
+	void						Set_Default				(const SG_Char *Value);
+
 
 protected:
 
 	int							m_Constraint;
 
-	CSG_String					m_String;
+	CSG_String					m_String, m_Default;
 
 	CSG_Parameter				*m_pOwner;
 
@@ -260,7 +266,7 @@ public:
 	virtual bool				Set_Value				(int Value);
 	virtual bool				Set_Value				(double Value);
 
-	virtual int					asInt					(void)	{	return( m_Value );	}
+	virtual int					asInt					(void)	{	return( m_Value );		}
 
 	virtual const SG_Char *		asString				(void);
 
@@ -424,6 +430,10 @@ public:
 	void						Set_Items				(const SG_Char *String);
 
 	const SG_Char *				Get_Item				(int Index);
+
+	bool						Get_Data				(int        &Value);
+	bool						Get_Data				(double     &Value);
+	bool						Get_Data				(CSG_String &Value);
 
 	int							Get_Count				(void)	{	return( Items.Get_Count() );	}
 
@@ -950,6 +960,7 @@ public:
 
 	bool						Add_Parameters_User		(CSG_Parameters *pParameters, bool bAddDefaultGrid = true);
 	bool						Add_Parameters_Grid		(CSG_Parameters *pParameters, bool bAddDefaultGrid = true);
+	bool						Add_Parameters_System	(CSG_Parameters *pParameters);
 
 	bool						Add_Grid_Parameter		(const CSG_String &Identifier, const CSG_String &Name, bool bOptional);
 
@@ -962,10 +973,13 @@ public:
 	CSG_Grid *					Get_Grid				(                              TSG_Data_Type Type = SG_DATATYPE_Float);
 	CSG_Grid *					Get_Grid				(const CSG_String &Identifier, TSG_Data_Type Type = SG_DATATYPE_Float);
 
+	bool						Get_System_User			(CSG_Grid_System &System);
+	bool						Get_System				(CSG_Grid_System &System);
+
 
 private:
 
-	CSG_Parameters				*m_pUser, *m_pGrid;
+	CSG_Parameters				*m_pUser, *m_pGrid, *m_pSystem;
 
 };
 
@@ -1000,11 +1014,13 @@ public:
 	bool						Set_Enabled				(bool bEnabled);
 	bool						is_Enabled				(void)	{	return( m_bEnabled );				}
 
+	bool						ignore_Projection		(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_IGNORE_PROJECTION) );	}
+
 	bool						is_Valid				(void)	{	return( m_pData->is_Valid() );		}
-	bool						is_Input				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_INPUT)	      );	}
-	bool						is_Output				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_OUTPUT)      );	}
-	bool						is_Optional				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_OPTIONAL)    );	}
-	bool						is_Information			(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_INFORMATION) );	}
+	bool						is_Input				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_INPUT)	        );	}
+	bool						is_Output				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_OUTPUT)        );	}
+	bool						is_Optional				(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_OPTIONAL)      );	}
+	bool						is_Information			(void)	{	return( !!(m_pData->Get_Constraint() & PARAMETER_INFORMATION)   );	}
 	bool						is_Option				(void);
 	bool						is_DataObject			(void);
 	bool						is_DataObject_List		(void);
@@ -1019,6 +1035,10 @@ public:
 	bool						Set_Value				(double         Value);
 	bool						Set_Value				(void          *Value);
 	bool						Set_Value				(const SG_Char *Value);
+
+	void						Set_Default				(int            Value)	{	m_pData->Set_Default(Value);	}
+	void						Set_Default				(double         Value)	{	m_pData->Set_Default(Value);	}
+	void						Set_Default				(const SG_Char *Value)	{	m_pData->Set_Default(Value);	}
 
 	bool						has_Changed				(void);
 
@@ -1109,17 +1129,17 @@ public:
 	void						Destroy					(void);
 
 	//-----------------------------------------------------
-	void *						Get_Owner				(void)	{	return( m_pOwner );			}
-	int							Get_Count				(void)	{	return( m_nParameters );	}
+	void *						Get_Owner				(void)	const	{	return( m_pOwner );			}
+	int							Get_Count				(void)	const	{	return( m_nParameters );	}
 
 	void						Set_Identifier			(const SG_Char *String);
-	const SG_Char *				Get_Identifier			(void);
+	const SG_Char *				Get_Identifier			(void)	const	{	return( m_Identifier );		}
 
 	void						Set_Name				(const SG_Char *String);
-	const SG_Char *				Get_Name				(void);
+	const SG_Char *				Get_Name				(void)	const	{	return( m_Name );			}
 
 	void						Set_Description			(const SG_Char *String);
-	const SG_Char *				Get_Description			(void);
+	const SG_Char *				Get_Description			(void)	const	{	return( m_Description );	}
 
 	void						Set_Translation			(CSG_Translator &Translator);
 
@@ -1277,8 +1297,10 @@ private:
 	CSG_Parameter *				_Add					(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description, TSG_Parameter_Type Type, int Constraint);
 	CSG_Parameter *				_Add					(CSG_Parameter *pSource);
 
-	bool						DataObjects_Create		(void);
-	bool						DataObjects_Synchronize	(void);
+	bool						DataObjects_Create			(void);
+	bool						DataObjects_Synchronize		(void);
+	bool						DataObjects_Get_Projection	(CSG_Projection &Projection)		const;
+	bool						DataObjects_Set_Projection	(const CSG_Projection &Projection);
 
 };
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.20 2010/06/28 23:22:27 johanvdw Exp $
+# $Id: Makefile.am,v 1.24 2010/11/08 09:20:52 johanvdw Exp $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -14,6 +14,7 @@ endif
 libsaga_api_la_LDFLAGS =$(AM_LDFLAGS) -release $(VERSION)
 
 lib_LTLIBRARIES = libsaga_api.la
+
 libsaga_api_la_SOURCES =\
 api_callback.cpp\
 api_colors.cpp\
@@ -23,9 +24,6 @@ api_memory.cpp\
 api_string.cpp\
 api_translator.cpp\
 dataobject.cpp\
-doc_html.cpp\
-doc_pdf.cpp\
-doc_svg.cpp\
 geo_classes.cpp\
 geo_functions.cpp\
 grid.cpp\
@@ -79,9 +77,6 @@ tin_elements.cpp\
 tin_triangulation.cpp\
 api_core.h\
 dataobject.h\
-doc_html.h\
-doc_pdf.h\
-doc_svg.h\
 geo_tools.h\
 grid.h\
 grid_pyramid.h\
@@ -100,3 +95,22 @@ tin.h
 
 install-exec-hook:
 	-ldconfig
+
+if SAGA_UNICODE
+SWIGUNICODEFLAGS = -D_SWIG_WCHAR -D_SAGA_UNICODE
+endif
+
+if SAGA_PYTHON
+_saga_api_la_CPPFLAGS = $(PYTHON_CPPFLAGS) $(SWIGUNICODEFLAGS) $(DISABLELIBHARU)
+_saga_api_la_LDFLAGS = -module -release $(VERSION) $(SWIG_LIB)
+_saga_api_la_SOURCES = saga_api_wrap.cxx
+_saga_api_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
+
+python_LTLIBRARIES = _saga_api.la
+python_PYTHON = saga_api.py
+
+saga_api_wrap.cxx:
+	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) ./saga_api.h 
+endif
+
+CLEANFILES = saga_api_wrap.cxx

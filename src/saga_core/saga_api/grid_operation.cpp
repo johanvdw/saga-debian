@@ -122,9 +122,14 @@ bool CSG_Grid::Assign(double Value)
 //---------------------------------------------------------
 bool CSG_Grid::Assign(CSG_Data_Object *pObject)
 {
-	if( pObject && pObject->is_Valid() && pObject->Get_ObjectType() == Get_ObjectType() )
+	if( pObject && pObject->is_Valid() && pObject->Get_ObjectType() == Get_ObjectType() && Assign((CSG_Grid *)pObject, GRID_INTERPOLATION_Undefined) )
 	{
-		return( Assign((CSG_Grid *)pObject, GRID_INTERPOLATION_Undefined) );
+		if( pObject->Get_Projection().is_Okay() )
+		{
+			Get_Projection()	= pObject->Get_Projection();
+		}
+
+		return( true );
 	}
 
 	return( false );
@@ -161,6 +166,10 @@ bool CSG_Grid::Assign(CSG_Grid *pGrid, TSG_Grid_Interpolation Interpolation)
 			case GRID_INTERPOLATION_Minimum:
 			case GRID_INTERPOLATION_Maximum:
 				bResult	= _Assign_ExtremeValue	(pGrid, Interpolation == GRID_INTERPOLATION_Maximum);
+				break;
+
+			case GRID_INTERPOLATION_Majority:
+				bResult	= _Assign_Majority		(pGrid);
 				break;
 
 			default:
@@ -390,6 +399,99 @@ bool CSG_Grid::_Assign_MeanValue(CSG_Grid *pGrid, bool bAreaProportional)
 			else
 			{
 				Set_NoData(x, y);
+			}
+		}
+	}
+
+	//-----------------------------------------------------
+	Get_History()	= pGrid->Get_History();
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
+
+	SG_UI_Process_Set_Ready();
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Grid::_Assign_Majority(CSG_Grid *pGrid)
+{
+	if( Get_Cellsize() < pGrid->Get_Cellsize() || is_Intersecting(pGrid->Get_Extent()) == INTERSECTION_None )
+	{
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	CSG_Class_Statistics	m;
+
+	Set_NoData_Value(pGrid->Get_NoData_Value());
+
+	Assign_NoData();
+
+	//-----------------------------------------------------
+	int	ay, by	= (int)(1.0 + (((0 - 0.5) * Get_Cellsize() + Get_YMin()) - pGrid->Get_YMin()) / pGrid->Get_Cellsize());
+
+	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
+	{
+		ay	= by;
+		by	= (int)(1.0 + (((y + 0.5) * Get_Cellsize() + Get_YMin()) - pGrid->Get_YMin()) / pGrid->Get_Cellsize());
+
+		if( ay < pGrid->Get_NY() && by > 0 )
+		{
+			if( ay < 0 )
+			{
+				ay	= 0;
+			}
+
+			if( by > pGrid->Get_NY() )
+			{
+				by	= pGrid->Get_NY();
+			}
+
+			int	ax, bx	= (int)(1.0 + (((0 - 0.5) * Get_Cellsize() + Get_XMin()) - pGrid->Get_XMin()) / pGrid->Get_Cellsize());
+
+			for(int x=0; x<Get_NX(); x++)
+			{
+				ax	= bx;
+				bx	= (int)(1.0 + (((x + 0.5) * Get_Cellsize() + Get_XMin()) - pGrid->Get_XMin()) / pGrid->Get_Cellsize());
+
+				if( ax < pGrid->Get_NX() && bx > 0 )
+				{
+					m.Reset();
+
+					if( ax < 0 )
+					{
+						ax	= 0;
+					}
+
+					if( bx > pGrid->Get_NX() )
+					{
+						bx	= pGrid->Get_NX();
+					}
+
+					for(int iy=ay; iy<by; iy++)
+					{
+						for(int ix=ax; ix<bx; ix++)
+						{
+							if( !pGrid->is_NoData(ix, iy) )
+							{
+								m.Add_Value(pGrid->asDouble(ix, iy));
+							}
+						}
+					}
+
+					int		n;
+					double	z;
+
+					if( m.Get_Majority(z, n) )//&& n > 1 )
+					{
+						Set_Value(x, y, z);
+					}
+				}
 			}
 		}
 	}
@@ -657,15 +759,24 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(double Value, TSG_Grid_Operation Oper
 	switch( Operation )
 	{
 	case GRID_OPERATION_Addition:
+		if( Value == 0.0 )
+			return( *this );
+
 		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Addition"));
 		break;
 
 	case GRID_OPERATION_Subtraction:
+		if( Value == 0.0 )
+			return( *this );
+
 		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Subtraction"));
 		Value	= -Value;
 		break;
 
 	case GRID_OPERATION_Multiplication:
+		if( Value == 1.0 )
+			return( *this );
+
 		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Multiplication"));
 		break;
 

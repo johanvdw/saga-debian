@@ -70,7 +70,7 @@ CGDAL_Export::CGDAL_Export(void)
 {
 	Set_Name	(_TL("GDAL: Export Raster"));
 
-	Set_Author	(SG_T("(c) 2007 by O.Conrad"));
+	Set_Author	(SG_T("O.Conrad (c) 2007"));
 
 	CSG_String	Description, Formats;
 
@@ -85,18 +85,19 @@ CGDAL_Export::CGDAL_Export(void)
 		"<table border=\"1\"><tr><th>ID</th><th>Name</th></tr>\n"
 	);
 
-	for(int i=0; i<g_GDAL_Driver.Get_Count(); i++)
+	for(int i=0; i<SG_Get_GDAL_Drivers().Get_Count(); i++)
     {
-		if( CSLFetchBoolean(g_GDAL_Driver.Get_Driver(i)->GetMetadata(), GDAL_DCAP_CREATE, false) )
+		if( SG_Get_GDAL_Drivers().Can_Write(i) )
 		{
 			Description	+= CSG_String::Format(SG_T("<tr><td>%s</td><td>%s</td></tr>\n"),
-				SG_STR_MBTOSG(g_GDAL_Driver.Get_Description(i)),
-				SG_STR_MBTOSG(g_GDAL_Driver.Get_Name(i))
+				SG_Get_GDAL_Drivers().Get_Description(i).c_str(),
+				SG_Get_GDAL_Drivers().Get_Name       (i).c_str()
 			);
 
-			Formats		+= CSG_String::Format(SG_T("%s|"), SG_STR_MBTOSG(g_GDAL_Driver.Get_Name(i)));
-
-			m_DriverNames.Add(SG_STR_MBTOSG(g_GDAL_Driver.Get_Description(i)));
+			Formats		+= CSG_String::Format(SG_T("{%s}%s|"),
+				SG_Get_GDAL_Drivers().Get_Description(i).c_str(),
+				SG_Get_GDAL_Drivers().Get_Name       (i).c_str()
+			);
 		}
     }
 
@@ -140,10 +141,6 @@ CGDAL_Export::CGDAL_Export(void)
 	);
 }
 
-//---------------------------------------------------------
-CGDAL_Export::~CGDAL_Export(void)
-{}
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -154,87 +151,53 @@ CGDAL_Export::~CGDAL_Export(void)
 //---------------------------------------------------------
 bool CGDAL_Export::On_Execute(void)
 {
-	char					**pOptions	= NULL;
-	int						x, y, n;
-	double					*zLine;
-	CSG_String				File_Name;
+	TSG_Data_Type			Type;
+	CSG_String				File_Name, Driver;
+	CSG_Projection			Projection;
 	CSG_Parameter_Grid_List	*pGrids;
-	CSG_Grid				*pGrid;
-	GDALDataType			gdal_Type;
-	GDALDriver				*pDriver;
-	GDALDataset				*pDataset;
-	GDALRasterBand			*pBand;
+	CSG_GDAL_DataSet		DataSet;
 
 	//-----------------------------------------------------
 	pGrids		= Parameters("GRIDS")	->asGridList();
 	File_Name	= Parameters("FILE")	->asString();
 
+	Get_Projection(Projection);
+
 	//-----------------------------------------------------
 	switch( Parameters("TYPE")->asInt() )
 	{
 	default:
-	case 0:	gdal_Type	= g_GDAL_Driver.Get_GDAL_Type(pGrids);	break;	// match input data
-	case 1:	gdal_Type	= GDT_Byte;		break;	// Eight bit unsigned integer
-	case 2:	gdal_Type	= GDT_UInt16;	break;	// Sixteen bit unsigned integer
-	case 3:	gdal_Type	= GDT_Int16;	break;	// Sixteen bit signed integer
-	case 4:	gdal_Type	= GDT_UInt32;	break;	// Thirty two bit unsigned integer
-	case 5:	gdal_Type	= GDT_Int32;	break;	// Thirty two bit signed integer
-	case 6:	gdal_Type	= GDT_Float32;	break;	// Thirty two bit floating point
-	case 7:	gdal_Type	= GDT_Float64;	break;	// Sixty four bit floating point
+	case 0:	Type	= SG_Get_Grid_Type(pGrids);	break;	// match input data
+	case 1:	Type	= SG_DATATYPE_Byte;			break;	// Eight bit unsigned integer
+	case 2:	Type	= SG_DATATYPE_Word;			break;	// Sixteen bit unsigned integer
+	case 3:	Type	= SG_DATATYPE_Short;		break;	// Sixteen bit signed integer
+	case 4:	Type	= SG_DATATYPE_DWord;		break;	// Thirty two bit unsigned integer
+	case 5:	Type	= SG_DATATYPE_Int;			break;	// Thirty two bit signed integer
+	case 6:	Type	= SG_DATATYPE_Float;		break;	// Thirty two bit floating point
+	case 7:	Type	= SG_DATATYPE_Double;		break;	// Sixty four bit floating point
 	}
 
 	//-----------------------------------------------------
-	if( (pDriver = g_GDAL_Driver.Get_Driver(SG_STR_SGTOMB(m_DriverNames[Parameters("FORMAT")->asInt()]))) == NULL )
+	if( !Parameters("FORMAT")->asChoice()->Get_Data(Driver) )
 	{
-		Message_Add(_TL("Driver not found."));
-	}
-	else if( CSLFetchBoolean(pDriver->GetMetadata(), GDAL_DCAP_CREATE, false) == false )
-	{
-		Message_Add(_TL("Driver does not support file creation."));
-	}
-	else if( (pDataset = pDriver->Create(File_Name.b_str(), Get_NX(), Get_NY(), pGrids->Get_Count(), gdal_Type, pOptions)) == NULL )
-	{
-		Message_Add(_TL("Could not create dataset."));
-	}
-	else
-	{
-		g_GDAL_Driver.Set_Transform(pDataset, Get_System());
-
-		if( pGrids->asGrid(0)->Get_Projection().Get_Type() != SG_PROJ_TYPE_CS_Undefined )
-		{
-			pDataset->SetProjection(SG_STR_SGTOMB(pGrids->asGrid(0)->Get_Projection().Get_WKT()));
-		}
-
-		zLine	= (double *)SG_Malloc(Get_NX() * sizeof(double));
-
-		for(n=0; n<pGrids->Get_Count(); n++)
-		{
-			Process_Set_Text(CSG_String::Format(SG_T("%s %d"), _TL("Band"), n + 1));
-
-			pGrid	= pGrids->asGrid(n);
-			pBand	= pDataset->GetRasterBand(n + 1);
-
-			for(y=0; y<Get_NY() && Set_Progress(y, Get_NY()); y++)
-			{
-				for(x=0; x<Get_NX(); x++)
-				{
-					zLine[x]	= pGrid->asDouble(x, Get_NY() - 1 - y);
-				}
-
-				pBand->RasterIO(GF_Write, 0, y, Get_NX(), 1, zLine, Get_NX(), 1, GDT_Float64, 0, 0);
-			}
-		}
-
-		//-------------------------------------------------
-		SG_Free(zLine);
-
-		GDALClose(pDataset);
-
-		return( true );
+		return( false );
 	}
 
 	//-----------------------------------------------------
-	return( false );
+	if( !DataSet.Open_Write(File_Name, Driver, Type, pGrids->Get_Count(), *Get_System(), Projection) )
+	{
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	for(int i=0; i<pGrids->Get_Count(); i++)
+	{
+		Process_Set_Text(CSG_String::Format(SG_T("%s %d"), _TL("Band"), i + 1));
+
+		DataSet.Write(i, pGrids->asGrid(i));
+	}
+
+	return( true );
 }
 
 

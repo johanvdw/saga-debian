@@ -125,6 +125,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_Mask.h"
 #include "Grid_Gaps_Spline_Fill.h"
 #include "Grid_Proximity.h"
+#include "Grid_Tiling.h"
 
 
 //---------------------------------------------------------
@@ -161,6 +162,7 @@ CSG_Module *		Create_Module(int i)
 	case 24: 	return( new CGrid_Mask );
 	case 25: 	return( new CGrid_Gaps_Spline_Fill );
 	case 26: 	return( new CGrid_Proximity );
+	case 27: 	return( new CGrid_Tiling );
 	}
 
 	return( NULL );

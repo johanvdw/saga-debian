@@ -98,6 +98,7 @@ const SG_Char * Get_Info(int i)
 #include "GSGrid_Statistics.h"
 #include "GSGrid_Zonal_Statistics.h"
 #include "GSGrid_Directional_Statistics.h"
+#include "grid_autocorrelation.h"
 
 
 //---------------------------------------------------------
@@ -114,6 +115,7 @@ CSG_Module *		Create_Module(int i)
 	case  4:	return( new CGSGrid_Statistics );
 	case  5:	return( new CGSGrid_Zonal_Statistics );
 	case  6:	return( new CGSGrid_Directional_Statistics );
+	case  7:	return( new CGrid_Autocorrelation );
 	}
 
 	return( NULL );

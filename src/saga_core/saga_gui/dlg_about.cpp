@@ -196,20 +196,32 @@ wxString CDLG_About::_Get_Version(void)
 		wxT("http://www.saga-gis.org\n")
 	);
 
-#ifdef _SAGA_UNICODE
-	s.Append(wxT("_______________________\n\n"));
+	//-----------------------------------------------------
+	// Target
 
-	s.Append(
-		wxT("UNICODE\n")
-	);
+	s	+= wxT("_______________________\n\n");
+
+#ifdef _SAGA_MSW
+	#ifdef _WIN64
+		s	+= wxT("64 bit\n");
+	#else
+		s	+= wxT("32 bit\n");
+	#endif
 #endif
 
+#ifdef _SAGA_UNICODE
+	s	+= wxT("unicode\n");
+#else
+	s	+= wxT("single byte characters\n");
+#endif
+
+	//-----------------------------------------------------
 	s.Append(wxT("_______________________\n\n"));
 
 	s.Append(wxString::Format(
 		wxT("SAGA GUI\nSAGA Graphical User Interface - Version: %s\n")
 		wxT("\n")
-		wxT("Copyrights (c) 2005-2009 by Olaf Conrad\n")
+		wxT("Copyrights (c) 2005-2010 by Olaf Conrad\n")
 		wxT("\n")
 		wxT("GNU General Public License (GPL)\n"),
 		SAGA_GUI_Get_Version()
@@ -220,7 +232,7 @@ wxString CDLG_About::_Get_Version(void)
 	s.Append(wxString::Format(
 		wxT("SAGA API\n%s\n")
 		wxT("\n")
-		wxT("Copyrights (c) 2002-2009 by Olaf Conrad\n")
+		wxT("Copyrights (c) 2002-2010 by Olaf Conrad\n")
 		wxT("Portions (c) 2002 by Andre Ringeler\n")	// " (mat_formula.cpp)\n")
 		wxT("Portions (c) 2005-2006 by Victor Olaya\n")
 		wxT("\n")
@@ -246,24 +258,6 @@ wxString CDLG_About::_Get_Version(void)
 	s.Append(wxString::Format(wxT(".%d"), Version / 10));
 	Version	-= (Version / 10  ) * 10;
 	s.Append(wxT("\n"));
-
-	if( CSG_Doc_PDF::Get_Version() != NULL )
-	{
-		s.Append(wxT("_______________________\n\n"));
-
-		s.Append(
-			wxT("SAGA uses\n")
-		);
-
-		s.Append(
-			CSG_Doc_PDF::Get_Version()
-		);
-
-		s.Append(
-			wxT("\n")
-			wxT("http://sourceforge.net/projects/libharu\n")
-		);
-	}
 
 	s.Append(wxT("_______________________\n\n"));
 

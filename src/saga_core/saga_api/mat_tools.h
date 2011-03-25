@@ -490,6 +490,145 @@ protected:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Class_Statistics
+{
+private:
+
+	typedef struct SClass
+	{
+		int		Count;
+
+		double	Value;
+	}
+	TClass;
+
+
+public:
+	 CSG_Class_Statistics(void);
+	~CSG_Class_Statistics(void);
+
+	void			Create					(void);
+	void			Destroy					(void);
+
+	void			Reset					(void)	{	m_Array.Set_Array(0, (void **)&m_Classes, false);	}
+
+	int				Get_Count				(void)	{	return( (int)m_Array.Get_Size() );	}
+
+	int				Get_Class_Count			(int i)	{	return( i >= 0 && i < Get_Count() ? m_Classes[i].Count : 0 );	}
+	double			Get_Class_Value			(int i)	{	return( i >= 0 && i < Get_Count() ? m_Classes[i].Value : 0 );	}
+
+	bool			Get_Class				(int i, double &Value, int &Count)
+	{
+		if( i >= 0 && i < Get_Count() )
+		{
+			Count	= m_Classes[i].Count;
+			Value	= m_Classes[i].Value;
+
+			return( true );
+		}
+
+		return( false );
+	}
+
+	bool			Get_Class				(int i, int &Value, int &Count)
+	{
+		if( i >= 0 && i < Get_Count() )
+		{
+			Count	=      m_Classes[i].Count;
+			Value	= (int)m_Classes[i].Value;
+
+			return( true );
+		}
+
+		return( false );
+	}
+
+	void			Add_Value				(double Value);
+
+	int				Get_Majority			(void);
+	bool			Get_Majority			(double &Value);
+	bool			Get_Majority			(double &Value, int &Count);
+
+	int				Get_Minority			(void);
+	bool			Get_Minority			(double &Value);
+	bool			Get_Minority			(double &Value, int &Count);
+
+
+private:
+
+	CSG_Array		m_Array;
+
+	TClass			*m_Classes;
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+enum ESG_Cluster_Analysis_Method
+{
+	SG_CLUSTERANALYSIS_Minimum_Distance	= 0,
+	SG_CLUSTERANALYSIS_Hill_Climbing,
+	SG_CLUSTERANALYSIS_Combined
+};
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Cluster_Analysis
+{
+public:
+	CSG_Cluster_Analysis(void);
+	~CSG_Cluster_Analysis(void);
+	
+	bool					Create				(int nFeatures);
+	bool					Destroy				(void);
+
+	bool					Add_Element			(void);
+	bool					Set_Feature			(int iElement, int iFeature, double Value);
+
+	int						Get_Cluster			(int iElement)	const	{	return( iElement >= 0 && iElement < Get_nElements() ? m_Cluster[iElement] : -1 );	}
+
+	bool					Execute				(int Method, int nClusters);
+
+	int						Get_nElements		(void)	const	{	return( (int)m_Features.Get_Size() );	}
+	int						Get_nFeatures		(void)	const	{	return( m_nFeatures );	}
+	int						Get_nClusters		(void)	const	{	return( m_nClusters );	}
+
+	int						Get_Iteration		(void)	const	{	return( m_Iteration );	}
+
+	double					Get_SP				(void)	const	{	return( m_SP );			}
+
+	int						Get_nMembers		(int iCluster)					const	{	return( m_nMembers[iCluster] );	}
+	double					Get_Variance		(int iCluster)					const	{	return( m_Variance[iCluster] );	}
+	double					Get_Centroid		(int iCluster, int iFeature)	const	{	return( m_Centroid[iCluster][iFeature] );	}
+
+
+private:
+
+	int						*m_Cluster, m_Iteration, m_nFeatures, m_nClusters, *m_nMembers;
+
+	double					*m_Variance, **m_Centroid, m_SP;
+
+	CSG_Array				m_Features;
+
+
+	bool					Minimum_Distance	(bool bInitialize);
+	bool					Hill_Climbing		(bool bInitialize);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Spline
 {
 public:

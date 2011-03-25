@@ -87,7 +87,6 @@ public:
 
 	virtual TWKSP_Item			Get_Type				(void)	{	return( WKSP_ITEM_Shapes );	}
 
-	virtual wxString			Get_Name				(void);
 	virtual wxString			Get_Description			(void);
 
 	virtual wxMenu *			Get_Menu				(void);
@@ -111,7 +110,7 @@ public:
 
 protected:
 
-	int							m_iColor, m_iLabel, m_iLabel_Size, m_iExtraInfo, m_Edit_iPart, m_Edit_iPoint, m_Chart_Type, m_Chart_sField, m_Chart_sType;
+	int							m_iColor, m_iLabel, m_iLabel_Size, m_Label_Prec, m_iExtraInfo, m_Edit_iPart, m_Edit_iPoint, m_Chart_Type, m_Chart_sField, m_Chart_sType;
 
 	double						m_Chart_sSize, m_Chart_sRange;
 

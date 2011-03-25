@@ -78,54 +78,47 @@ CWKSP_Map_DC::CWKSP_Map_DC(const CSG_Rect &rWorld, const wxRect &rDC, double Sca
 	m_rDC			= rDC;
 	m_Scale			= Scale;
 
-	//-----------------------------------------------------
-	if( m_rWorld.Get_XRange() == 0.0 )
-	{
-		m_rWorld.m_rect.xMin	-= 1.0;
-		m_rWorld.m_rect.xMax	+= 1.0;
-	}
-
-	if( m_rWorld.Get_YRange() == 0.0 )
-	{
-		m_rWorld.m_rect.yMin	-= 1.0;
-		m_rWorld.m_rect.yMax	+= 1.0;
-	}
-
-	//-----------------------------------------------------
-	double	d		= (double)m_rDC.GetWidth() / (double)m_rDC.GetHeight();
-
-	if( d > m_rWorld.Get_XRange() / m_rWorld.Get_YRange() )
-	{
-		d	= (m_rWorld.Get_YRange() * d - m_rWorld.Get_XRange()) / 2.0;
-		m_rWorld.Inflate(d, 0.0, false);
-	}
-	else if( d < m_rWorld.Get_XRange() / m_rWorld.Get_YRange() )
-	{
-		d	= (m_rWorld.Get_XRange() / d - m_rWorld.Get_YRange()) / 2.0;
-		m_rWorld.Inflate(0.0, d, false);
-	}
-
-	//-----------------------------------------------------
-	m_World2DC		= (double)m_rDC.GetWidth() / m_rWorld.Get_XRange();
-	m_DC2World		= m_rWorld.Get_XRange() / (double)m_rDC.GetWidth();
-
-	dc_BMP.Create(m_rDC.GetWidth(), m_rDC.GetHeight());
-	dc.SelectObject(dc_BMP);
-	dc.SetBackground(wxBrush(Get_Color_asWX(Background), wxSOLID));
-	dc.Clear();
-
 	m_img_rgb		= NULL;
 	m_img_dc_rgb	= NULL;
 
 	m_Mask_Red		= 1;
 	m_Mask_Green	= 2;
 	m_Mask_Blue		= 3;
+
+	//-----------------------------------------------------
+	if( m_rWorld.Get_XRange() == 0.0 || m_rWorld.Get_YRange() == 0.0 )
+	{
+		m_rWorld.Inflate(m_rWorld.Get_XRange() ? 0.0 : 1.0, m_rWorld.Get_YRange() ? 0.0 : 1.0, false);
+	}
+
+	//-----------------------------------------------------
+	// ensure cellsize in x-/y-direction are identical...
+	double	dxdyDC		= (double)m_rDC.GetWidth() / (double)m_rDC.GetHeight();
+	double	dxdyWorld	= m_rWorld.Get_XRange() / m_rWorld.Get_YRange();
+
+	if( dxdyDC > dxdyWorld )
+	{
+		m_rWorld.Inflate(0.5 * (m_rWorld.Get_YRange() * dxdyDC - m_rWorld.Get_XRange()), 0.0, false);
+	}
+	else if( dxdyDC < dxdyWorld )
+	{
+		m_rWorld.Inflate(0.0, 0.5 * (m_rWorld.Get_XRange() / dxdyDC - m_rWorld.Get_YRange()), false);
+	}
+
+	//-----------------------------------------------------
+	m_World2DC		= (double)m_rDC.GetWidth() / m_rWorld.Get_XRange();
+	m_DC2World		= 1.0 / m_World2DC;
+
+	//-----------------------------------------------------
+	dc_BMP.Create(m_rDC.GetWidth(), m_rDC.GetHeight());
+	dc.SelectObject(dc_BMP);
+	dc.SetBackground(wxBrush(Get_Color_asWX(Background), wxSOLID));
+	dc.Clear();
 }
 
 //---------------------------------------------------------
 CWKSP_Map_DC::~CWKSP_Map_DC(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////

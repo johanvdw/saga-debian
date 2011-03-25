@@ -292,9 +292,16 @@ bool CSG_Array::Set_Growth(TSG_Array_Growth Growth)
 }
 
 //---------------------------------------------------------
-bool CSG_Array::Set_Array(size_t nValues)
+bool CSG_Array::Set_Array(size_t nValues, bool bShrink)
 {
 	if( nValues >= m_nValues && nValues <= m_nBuffer )
+	{
+		m_nValues	= nValues;
+
+		return( true );
+	}
+
+	if( nValues < m_nValues && !bShrink )
 	{
 		m_nValues	= nValues;
 
@@ -319,11 +326,26 @@ bool CSG_Array::Set_Array(size_t nValues)
 		break;
 
 	case SG_ARRAY_GROWTH_1:
+		nBuffer	= nValues <    100 ?      nValues
+				: nValues <   1000 ? (1 + nValues /    10) *    10
+				: nValues <  10000 ? (1 + nValues /   100) *   100
+				: nValues < 100000 ? (1 + nValues /  1000) *  1000
+				:                    (1 + nValues / 10000) * 10000;
+		break;
+
 	case SG_ARRAY_GROWTH_2:
+		nBuffer	= nValues <     10 ?      nValues
+				: nValues <    100 ? (1 + nValues /    10) *    10
+				: nValues <   1000 ? (1 + nValues /   100) *   100
+				: nValues <  10000 ? (1 + nValues /  1000) *  1000
+				:                    (1 + nValues / 10000) * 10000;
+		break;
+
 	case SG_ARRAY_GROWTH_3:
-		nBuffer	= nValues <  256 ? nValues
-				: nValues < 8192 ? (1 + nValues /  256) *  256
-				:                  (1 + nValues / 1024) * 1024;
+		nBuffer	= nValues <    1000 ? (1 + nValues /    1000) *    1000
+				: nValues <   10000 ? (1 + nValues /   10000) *   10000
+				: nValues <  100000 ? (1 + nValues /  100000) *  100000
+				:                     (1 + nValues / 1000000) * 1000000;
 		break;
 	}
 
@@ -351,9 +373,9 @@ bool CSG_Array::Set_Array(size_t nValues)
 }
 
 //---------------------------------------------------------
-bool CSG_Array::Set_Array(size_t nValues, void **pArray)
+bool CSG_Array::Set_Array(size_t nValues, void **pArray, bool bShrink)
 {
-	if( Set_Array(nValues) )
+	if( Set_Array(nValues, bShrink) )
 	{
 		*pArray	= m_Values;
 
@@ -363,6 +385,28 @@ bool CSG_Array::Set_Array(size_t nValues, void **pArray)
 	*pArray	= m_Values;
 
 	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Array::Inc_Array		(void)
+{
+	return( Set_Array(m_nValues + 1) );
+}
+
+bool CSG_Array::Inc_Array		(void **pArray)
+{
+	return( Set_Array(m_nValues + 1, pArray) );
+}
+
+//---------------------------------------------------------
+bool CSG_Array::Dec_Array		(bool bShrink)
+{
+	return( m_Values > 0 ? Set_Array(m_nValues - 1, bShrink) : false );
+}
+
+bool CSG_Array::Dec_Array		(void **pArray, bool bShrink)
+{
+	return( m_Values > 0 ? Set_Array(m_nValues - 1, pArray, bShrink) : false );
 }
 
 

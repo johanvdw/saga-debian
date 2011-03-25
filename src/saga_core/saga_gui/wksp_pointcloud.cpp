@@ -57,8 +57,12 @@
 
 //---------------------------------------------------------
 #include "res_commands.h"
+#include "res_dialogs.h"
 
 #include "helper.h"
+
+#include "active.h"
+#include "active_attributes.h"
 
 #include "wksp_map_control.h"
 
@@ -106,10 +110,8 @@ CWKSP_PointCloud::~CWKSP_PointCloud(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxString CWKSP_PointCloud::Get_Name(void)
-{
-	return( wxString::Format(wxT("%02d. %s"), 1 + Get_ID(), m_pPointCloud->Get_Name()) );
-}
+#define DESC_ADD_STR(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, value))
+#define DESC_ADD_INT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value))
 
 //---------------------------------------------------------
 wxString CWKSP_PointCloud::Get_Description(void)
@@ -117,58 +119,23 @@ wxString CWKSP_PointCloud::Get_Description(void)
 	wxString	s;
 
 	//-----------------------------------------------------
-	s.Append(wxString::Format(wxT("<b>%s</b><table border=\"0\">"),
-		LNG("[CAP] Point Cloud")
-	));
+	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("[CAP] Point Cloud"));
 
-	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
-		LNG("[CAP] Name")					, m_pPointCloud->Get_Name()
-	));
+	s	+= wxT("<table border=\"0\">");
 
-	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
-		LNG("[CAP] File")					, m_pPointCloud->Get_File_Name()
-	));
+	DESC_ADD_STR(LNG("[CAP] Name")				, m_pPointCloud->Get_Name());
+	DESC_ADD_STR(LNG("[CAP] File")				, m_pPointCloud->Get_File_Name());
+	DESC_ADD_STR(LNG("[CAP] Projection")		, m_pPointCloud->Get_Projection().Get_Description().c_str());
+	DESC_ADD_INT(LNG("[CAP] Number of Points")	, m_pPointCloud->Get_Count());
 
-	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
-		LNG("[CAP] Projection")				, m_pPointCloud->Get_Projection().Get_Name().c_str()
-	));
+	s	+= wxT("</table>");
 
-	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%d</td></tr>"),
-		LNG("[CAP] Number of Points")		, m_pPointCloud->Get_Count()
-	));
-
-	s.Append(wxT("</table>"));
+	s	+= Get_TableInfo_asHTML(m_pPointCloud);
 
 	//-----------------------------------------------------
-	s.Append(wxString::Format(wxT("<table border=\"1\"><tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th>"),
-		LNG("[CAP] Field"),
-		LNG("[CAP] Name"),
-		LNG("[CAP] Type"),
-		LNG("[CAP] Minimum"),
-		LNG("[CAP] Maximum"),
-		LNG("[CAP] Mean"),
-		LNG("[CAP] Standard Deviation")
-	));
-
-	for(int i=0; i<m_pPointCloud->Get_Field_Count(); i++)
-	{
-		s.Append(wxString::Format(wxT("<tr><td>%d</td><td>%s</td><td>%s</td><td>%f</td><td>%f</td><td>%f</td><td>%f</td></tr>"),
-			i + 1,
-			m_pPointCloud->Get_Field_Name(i),
-			SG_Data_Type_Get_Name(m_pPointCloud->Get_Field_Type(i)),
-			m_pPointCloud->Get_Minimum(i),
-			m_pPointCloud->Get_Maximum(i),
-			m_pPointCloud->Get_Mean(i),
-			m_pPointCloud->Get_StdDev(i)
-		));
-	}
-
-	s.Append(wxT("</table>"));
-
-	//-----------------------------------------------------
-//	s.Append(wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), LNG("[CAP] Data History")));
-//	s.Append(m_pPointCloud->Get_History().Get_HTML());
-//	s.Append(wxString::Format(wxT("</font")));
+//	s	+= wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), LNG("[CAP] Data History"));
+//	s	+= m_pPointCloud->Get_History().Get_HTML();
+//	s	+= wxString::Format(wxT("</font"));
 
 	//-----------------------------------------------------
 	return( s );
@@ -243,6 +210,19 @@ bool CWKSP_PointCloud::On_Command(int Cmd_ID)
 			m_pPointCloud->Get_Mean(m_Color_Field) - 2.0 * m_pPointCloud->Get_StdDev(m_Color_Field),
 			m_pPointCloud->Get_Mean(m_Color_Field) + 2.0 * m_pPointCloud->Get_StdDev(m_Color_Field)
 		);
+		break;
+
+	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
+		m_pPointCloud->Inv_Selection();
+		Update_Views(false);
+		break;
+
+	case ID_CMD_SHAPES_EDIT_DEL_SHAPE:
+		if( m_pPointCloud->Get_Selection_Count() > 0 && DLG_Message_Confirm(LNG("[DLG] Delete selected point(s)."), LNG("[CAP] Edit Point Cloud")) )
+		{
+			m_pPointCloud->Del_Selection();
+			Update_Views(false);
+		}
 		break;
 	}
 
@@ -454,13 +434,57 @@ bool CWKSP_PointCloud::asImage(CSG_Grid *pImage)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+wxMenu * CWKSP_PointCloud::On_Edit_Get_Menu(void)
+{
+	wxMenu	*pMenu;
+
+	pMenu	= new wxMenu;
+
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_DEL_SHAPE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_SEL_INVERT);
+
+	return( pMenu );
+}
+
+//---------------------------------------------------------
 bool CWKSP_PointCloud::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
 {
-	CSG_Rect	rWorld(m_Edit_Mouse_Down, Point);
-
-	if( rWorld.Get_XRange() == 0.0 && rWorld.Get_YRange() == 0.0 )
+	if( Key & MODULE_INTERACTIVE_KEY_RIGHT )
 	{
-		rWorld.Inflate(2.0 * ClientToWorld, false);
+		return( false );
+	}
+	else
+	{
+		CSG_Rect	rWorld(m_Edit_Mouse_Down, Point);
+
+		if( rWorld.Get_XRange() == 0.0 && rWorld.Get_YRange() == 0.0 )
+		{
+			rWorld.Inflate(2.0 * ClientToWorld, false);
+		}
+
+		g_pACTIVE->Get_Attributes()->Set_Attributes();
+
+		m_pPointCloud->Select(rWorld, (Key & MODULE_INTERACTIVE_KEY_CTRL) != 0);
+
+		//-----------------------------------------------------
+		m_Edit_Attributes.Del_Records();
+
+		CSG_Table_Record	*pRecord	= m_pPointCloud->Get_Selection();
+
+		if( pRecord != NULL )
+		{
+			for(int i=0; i<m_pPointCloud->Get_Field_Count(); i++)
+			{
+				CSG_Table_Record	*pAttribute	= m_Edit_Attributes.Add_Record();
+				pAttribute->Set_Value(0, pRecord->Get_Table()->Get_Field_Name(i));
+				pAttribute->Set_Value(1, pRecord->asString(i));
+			}
+		}
+
+		//-----------------------------------------------------
+		g_pACTIVE->Get_Attributes()->Set_Attributes();
+
+		Update_Views(true);
 	}
 
 	return( true );
@@ -469,7 +493,21 @@ bool CWKSP_PointCloud::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld
 //---------------------------------------------------------
 bool CWKSP_PointCloud::On_Edit_Set_Attributes(void)
 {
-	return( true );
+	CSG_Table_Record	*pRecord;
+
+	if( (pRecord = m_pPointCloud->Get_Selection()) != NULL )
+	{
+		for(int i=0; i<m_Edit_Attributes.Get_Record_Count(); i++)
+		{
+			pRecord->Set_Value(i, m_Edit_Attributes.Get_Record(i)->asString(1));
+		}
+
+		Update_Views(true);
+
+		return( true );
+	}
+
+	return( false );
 }
 
 //---------------------------------------------------------
@@ -580,13 +618,22 @@ void CWKSP_PointCloud::_Draw_Points(CWKSP_Map_DC &dc_Map)
 
 		if( dc_Map.m_rWorld.Contains(Point.x, Point.y) )
 		{
-			int		Color;
 			int		x	= (int)dc_Map.xWorld2DC(Point.x);
 			int		y	= (int)dc_Map.yWorld2DC(Point.y);
 
-			m_pClassify->Get_Class_Color_byValue(m_pPointCloud->Get_Value(i, m_Color_Field), Color);
+			if( m_pPointCloud->is_Selected(i) )
+			{
+				_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_RED   , m_PointSize + 2);
+				_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_YELLOW, m_PointSize);
+			}
+			else
+			{
+				int		Color;
 
-			_Draw_Point(dc_Map, x, y, Point.z, Color, m_PointSize);
+				m_pClassify->Get_Class_Color_byValue(m_pPointCloud->Get_Value(i, m_Color_Field), Color);
+
+				_Draw_Point(dc_Map, x, y, Point.z, Color, m_PointSize);
+			}
 		}
 	}
 }

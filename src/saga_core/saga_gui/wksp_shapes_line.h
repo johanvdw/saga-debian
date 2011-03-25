@@ -93,7 +93,7 @@ protected:
 
 	bool						m_bPoints;
 
-	int							m_iSize, m_Size_Type, m_Line_Style;
+	int							m_iSize, m_Size_Type, m_Line_Style, m_Label_Freq;
 
 	double						m_Size, m_dSize, m_Size_Min;
 

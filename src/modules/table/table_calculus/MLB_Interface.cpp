@@ -96,6 +96,8 @@ const SG_Char * Get_Info(int i)
 #include "Table_CalculatorShapes.h"
 #include "Table_Trend.h"
 #include "table_running_average.h"
+#include "table_running_average.h"
+#include "table_cluster_analysis.h"
 
 
 //---------------------------------------------------------
@@ -111,6 +113,7 @@ CSG_Module *		Create_Module(int i)
 	case 3:		return( new CTable_Trend );
 	case 4:		return( new CTable_Trend_Shapes );
 	case 5:		return( new CTable_Running_Average );
+	case 6:		return( new CTable_Cluster_Analysis );
 	}
 
 	return( NULL );

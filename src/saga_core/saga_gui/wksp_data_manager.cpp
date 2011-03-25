@@ -217,6 +217,18 @@ CWKSP_Data_Manager::CWKSP_Data_Manager(void)
 			LNG("automatically save and load")
 		), lValue
 	);
+
+	//-----------------------------------------------------
+	if( CONFIG_Read(wxT("/DATA"), wxT("NUMBERING")				, lValue) == false )
+	{
+		lValue	= 2;
+	}
+
+	m_Parameters.Add_Value(
+		pNode	, "NUMBERING"				, LNG("Numbering of Data Sets"),
+		LNG("Leading zeros for data set numbering. Set to -1 for not using numbers at all."),
+		PARAMETER_TYPE_Int, m_Numbering = lValue, -1, true
+	);
 }
 
 //---------------------------------------------------------
@@ -279,6 +291,7 @@ bool CWKSP_Data_Manager::Finalise(void)
 	CONFIG_Write(wxT("/DATA/GRIDS")	, wxT("DISPLAY_RANGEFIT")	, (long)m_Parameters("GRID_DISPLAY_RANGEFIT")->asInt());
 
 	CONFIG_Write(wxT("/DATA")		, wxT("PROJECT_START")		, (long)m_Parameters("PROJECT_START")->asInt());
+	CONFIG_Write(wxT("/DATA")		, wxT("NUMBERING")			, (long)m_Parameters("NUMBERING")->asInt());
 
 	if( Get_Count() == 0 )
 	{
@@ -512,6 +525,8 @@ void CWKSP_Data_Manager::Parameters_Changed(void)
 	SG_Grid_Cache_Set_Confirm		(m_Parameters("GRID_MEM_CACHE_CONFIRM")	->asInt());
 	SG_Grid_Cache_Set_Directory		(m_Parameters("GRID_MEM_CACHE_TMPDIR")	->asString());
 
+	m_Numbering	= m_Parameters("NUMBERING")->asInt();
+
 	CWKSP_Base_Manager::Parameters_Changed();
 }
 
@@ -625,35 +640,35 @@ bool CWKSP_Data_Manager::Open_CMD(int Cmd_ID)
 //---------------------------------------------------------
 bool CWKSP_Data_Manager::Open(const wxChar *File_Name)
 {
+	if( SG_File_Cmp_Extension(File_Name, wxT("sprj")) )
+	{
+		return( m_pProject->Load(File_Name, false, true) );
+	}
+
 	if( SG_File_Cmp_Extension(File_Name, wxT("txt"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("dbf")) )
 	{
-		return( Open(DATAOBJECT_TYPE_Table , File_Name) != NULL );
+		return( Open(DATAOBJECT_TYPE_Table		, File_Name) != NULL );
 	}
 
 	if( SG_File_Cmp_Extension(File_Name, wxT("shp")) )
 	{
-		return( Open(DATAOBJECT_TYPE_Shapes, File_Name) != NULL );
+		return( Open(DATAOBJECT_TYPE_Shapes		, File_Name) != NULL );
 	}
 
 	if( SG_File_Cmp_Extension(File_Name, wxT("spc")) )
 	{
-		return( Open(DATAOBJECT_TYPE_PointCloud, File_Name) != NULL );
+		return( Open(DATAOBJECT_TYPE_PointCloud	, File_Name) != NULL );
 	}
 
 	if(	SG_File_Cmp_Extension(File_Name, wxT("sgrd"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("dgm"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("grd")) )
 	{
-		return( Open(DATAOBJECT_TYPE_Grid  , File_Name) != NULL );
+		return( Open(DATAOBJECT_TYPE_Grid		, File_Name) != NULL );
 	}
 
-	if( SG_File_Cmp_Extension(File_Name, wxT("sprj")) )
-	{
-		return( m_pProject->Load(File_Name, false, true) );
-	}
-
-	return( false );
+	return( Open_GDAL(File_Name) );
 }
 
 //---------------------------------------------------------
@@ -678,7 +693,10 @@ bool CWKSP_Data_Manager::Open(int DataType)
 
 		for(size_t i=0; i<File_Paths.GetCount(); i++)
 		{
-			Open(DataType, File_Paths[i]);
+			if( Open(DataType, File_Paths[i]) == NULL )
+			{
+				Open_GDAL(File_Paths[i]);
+			}
 		}
 
 		return( true );
@@ -690,34 +708,17 @@ bool CWKSP_Data_Manager::Open(int DataType)
 //---------------------------------------------------------
 CWKSP_Base_Item * CWKSP_Data_Manager::Open(int DataType, const wxChar *FileName)
 {
-	CSG_Data_Object		*pObject;
+	CSG_Data_Object	*pObject;
 	CWKSP_Base_Item	*pItem;
 
 	switch( DataType )
 	{
-	default:
-		pObject	= NULL;
-		break;
-
-	case DATAOBJECT_TYPE_Table:
-		pObject	= new CSG_Table		(FileName);
-		break;
-
-	case DATAOBJECT_TYPE_Shapes:
-		pObject	= new CSG_Shapes	(FileName);
-		break;
-
-	case DATAOBJECT_TYPE_TIN:
-		pObject	= new CSG_TIN		(FileName);
-		break;
-
-	case DATAOBJECT_TYPE_PointCloud:
-		pObject	= new CSG_PointCloud(FileName);
-		break;
-
-	case DATAOBJECT_TYPE_Grid:
-		pObject	= new CSG_Grid		(FileName);
-		break;
+	default:							pObject	= NULL;								break;
+	case DATAOBJECT_TYPE_Table:			pObject	= new CSG_Table			(FileName);	break;
+	case DATAOBJECT_TYPE_Shapes:		pObject	= new CSG_Shapes		(FileName);	break;
+	case DATAOBJECT_TYPE_TIN:			pObject	= new CSG_TIN			(FileName);	break;
+	case DATAOBJECT_TYPE_PointCloud:	pObject	= new CSG_PointCloud	(FileName);	break;
+	case DATAOBJECT_TYPE_Grid:			pObject	= new CSG_Grid			(FileName);	break;
 	}
 
 	PROCESS_Set_Okay();
@@ -726,7 +727,7 @@ CWKSP_Base_Item * CWKSP_Data_Manager::Open(int DataType, const wxChar *FileName)
 	{
 		if( pObject->is_Valid() && (pItem = Add(pObject)) != NULL )
 		{
-			m_pMenu_Files->Recent_Add(DataType, FileName);
+			m_pMenu_Files->Recent_Add(pObject->Get_ObjectType(), FileName);
 
 			return( pItem );
 		}
@@ -734,9 +735,72 @@ CWKSP_Base_Item * CWKSP_Data_Manager::Open(int DataType, const wxChar *FileName)
 		delete(pObject);
 	}
 
-	m_pMenu_Files->Recent_Del(DataType, FileName);
+	if( !Open_GDAL(FileName) )
+	{
+		m_pMenu_Files->Recent_Del(DataType, FileName);
+	}
 
 	return( NULL );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+#include "wksp_module_manager.h"
+#include "wksp_module_library.h"
+#include "wksp_module.h"
+
+//---------------------------------------------------------
+bool CWKSP_Data_Manager::Open_GDAL(const wxChar *File_Name)
+{
+	int			i;
+	CSG_Module	*pGDAL	= NULL, *pOGR	= NULL;
+
+	for(i=0; i<g_pModules->Get_Count() && !pGDAL && !pOGR; i++)
+	{
+		wxFileName	fName(g_pModules->Get_Library(i)->Get_File_Name());
+
+		if( !fName.GetName().Cmp(SG_T("io_gdal")) || !fName.GetName().Cmp(SG_T("libio_gdal")) )
+		{
+			pGDAL	= g_pModules->Get_Library(i)->Get_Module(0)->Get_Module();	// GDAL_Import
+			pOGR	= g_pModules->Get_Library(i)->Get_Module(3)->Get_Module();	// OGR_Import
+		}
+	}
+
+	if( pGDAL && pGDAL->Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) && pGDAL->Execute() )
+	{
+		CSG_Parameter_Grid_List	*pGrids	= pGDAL->Get_Parameters()->Get_Parameter(SG_T("GRIDS"))->asGridList();
+
+		for(i=0; i<pGrids->Get_Count(); i++)
+		{
+			SG_UI_DataObject_Add(pGrids->asGrid(i), SG_UI_DATAOBJECT_UPDATE_ONLY);
+
+			m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Grid, File_Name);
+		}
+
+		return( true );
+	}
+
+	if( pOGR && pOGR->Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) && pOGR->Execute() )
+	{
+		CSG_Parameter_Shapes_List	*pShapes	= pOGR->Get_Parameters()->Get_Parameter(SG_T("SHAPES"))->asShapesList();
+
+		for(i=0; i<pShapes->Get_Count(); i++)
+		{
+			SG_UI_DataObject_Add(pShapes->asShapes(i), SG_UI_DATAOBJECT_UPDATE_ONLY);
+
+			m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Shapes, File_Name);
+		}
+
+		return( true );
+	}
+
+	return( false );
 }
 
 

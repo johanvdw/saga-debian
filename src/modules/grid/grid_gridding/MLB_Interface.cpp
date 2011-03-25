@@ -74,7 +74,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Gridding") );
 
 	case MLB_INFO_Author:
-		return( _TL("O. Conrad (c) 2002-8") );
+		return( _TL("O. Conrad (c) 2002-10") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the gridding of points and other vector data.") );
@@ -97,6 +97,7 @@ const SG_Char * Get_Info(int i)
 #include "Interpolation_Shepard.h"
 #include "Interpolation_Triangulation.h"
 #include "Shapes2Grid.h"
+#include "kernel_density.h"
 
 
 //---------------------------------------------------------
@@ -112,6 +113,7 @@ CSG_Module *		Create_Module(int i)
 	case 3:	return( new CInterpolation_NaturalNeighbour );
 	case 4:	return( new CInterpolation_Shepard );
 	case 5:	return( new CInterpolation_Triangulation );
+	case 6:	return( new CKernel_Density );
 	}
 
 	return( NULL );

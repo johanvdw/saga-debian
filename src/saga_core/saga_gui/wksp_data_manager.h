@@ -123,6 +123,7 @@ public:
 	bool							Open				(const wxChar *FileName);
 	bool							Open				(int DataType);
 	CWKSP_Base_Item *				Open				(int DataType, const wxChar *FileName);
+	bool							Open_GDAL			(const wxChar *File_Name);
 
 	bool							Exists				(class CSG_Grid_System *pSystem);
 	bool							Exists				(class CSG_Data_Object *pObject, int DataType = -1);
@@ -144,8 +145,12 @@ public:
 	bool							Get_Parameters		(class CSG_Data_Object *pObject, class CSG_Parameters *pParameters);
 	bool							Set_Parameters		(class CSG_Data_Object *pObject, class CSG_Parameters *pParameters);
 
+	int								Get_Numbering		(void)	const	{	return( m_Numbering );	}
+
 
 private:
+
+	int								m_Numbering;
 
 	CSG_Parameters					m_Parameters;
 

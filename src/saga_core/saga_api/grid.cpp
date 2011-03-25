@@ -251,7 +251,14 @@ bool CSG_Grid::Create(const CSG_Grid &Grid)
 //---------------------------------------------------------
 bool CSG_Grid::Create(CSG_Grid *pGrid, TSG_Data_Type Type, TSG_Grid_Memory_Type Memory_Type)
 {
-	return( Create(Type, pGrid->Get_NX(), pGrid->Get_NY(), pGrid->Get_Cellsize(), pGrid->Get_XMin(), pGrid->Get_YMin(), Memory_Type) );
+	if( pGrid && Create(Type, pGrid->Get_NX(), pGrid->Get_NY(), pGrid->Get_Cellsize(), pGrid->Get_XMin(), pGrid->Get_YMin(), Memory_Type) )
+	{
+		Get_Projection()	= pGrid->Get_Projection();
+
+		return( true );
+	}
+
+	return( false );
 }
 
 //---------------------------------------------------------
@@ -477,7 +484,7 @@ bool CSG_Grid::Get_Value(TSG_Point Position, double &Value, int Interpolation, b
 //---------------------------------------------------------
 bool CSG_Grid::Get_Value(double xPosition, double yPosition, double &Value, int Interpolation, bool bZFactor, bool bByteWise, bool bOnlyValidCells) const
 {
-	if(	m_System.Get_Extent_Cells().Contains(xPosition, yPosition) )
+	if(	m_System.Get_Extent(true).Contains(xPosition, yPosition) )
 	{
 		int		x	= (int)(xPosition	= (xPosition - Get_XMin()) / Get_Cellsize());
 		int		y	= (int)(yPosition	= (yPosition - Get_YMin()) / Get_Cellsize());

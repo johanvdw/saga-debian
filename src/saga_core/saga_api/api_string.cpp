@@ -337,6 +337,11 @@ SG_Char & CSG_String::operator [] (int i)
 	return( m_pString->GetWritableChar(i) );
 }
 
+SG_Char CSG_String::operator [] (int i) const
+{
+	return( m_pString->GetChar(i) );
+}
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -345,15 +350,15 @@ SG_Char & CSG_String::operator [] (int i)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CSG_String::Cmp(const SG_Char *String)	const
+int CSG_String::Cmp(const CSG_String &String)	const
 {
-	return( m_pString->Cmp(String) );
+	return( m_pString->Cmp(String.c_str()) );
 }
 
 //---------------------------------------------------------
-int CSG_String::CmpNoCase(const SG_Char *String) const
+int CSG_String::CmpNoCase(const CSG_String &String) const
 {
-	return( m_pString->CmpNoCase(String) );
+	return( m_pString->CmpNoCase(String.c_str()) );
 }
 
 //---------------------------------------------------------
@@ -425,19 +430,19 @@ int CSG_String::Trim(bool fromRight)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CSG_String::Find(SG_Char Character, bool fromEnd)
+int CSG_String::Find(SG_Char Character, bool fromEnd) const
 {
 	return( m_pString->Find(Character, fromEnd) );
 }
 
 //---------------------------------------------------------
-int CSG_String::Find(const SG_Char *String)
+int CSG_String::Find(const SG_Char *String) const
 {
 	return( m_pString->Find(String) );
 }
 
 //---------------------------------------------------------
-bool CSG_String::Contains(const SG_Char *String)
+bool CSG_String::Contains(const SG_Char *String) const
 {
 	return( m_pString->Contains(String) );
 }
@@ -886,7 +891,7 @@ int				SG_Get_Significant_Decimals(double Value, int maxDecimals)
 
 	for(Decimals=0; Decimals<maxDecimals; Decimals++)
 	{
-		Reminder	= Value - (int)(Value);
+		Reminder	= Value - floor(Value);
 
 		if( Reminder == 0.0 )
 		{
@@ -941,7 +946,7 @@ CSG_String		SG_Get_String(double Value, int Precision, bool bScientific)
 	}
 	else // if( Precision == -2 )
 	{
-		s.Printf(SG_T("%.*f"), SG_Get_Significant_Decimals(Value, 10), Value);
+		s.Printf(SG_T("%.*f"), SG_Get_Significant_Decimals(Value, abs(Precision)), Value);
 	}
 
 	s.Replace(SG_T(","), SG_T("."));
