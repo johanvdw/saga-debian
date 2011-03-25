@@ -1,0 +1,4 @@
+0001-Remove-libfire-from-configure.in-Makefile.am.patch
+0002-Enable-qhull-replaces-triangle.c.patch
+0003-Remove-references-to-triangle.c-from-Makefile.am.patch
+0004-Use-debian-version-of-libgrib.patch

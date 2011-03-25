@@ -1,0 +1,22 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Fri, 25 Mar 2011 23:25:10 +0100
+Subject: [PATCH] Enable qhull (replaces triangle.c)
+
+---
+ src/modules/grid/grid_gridding/nn/delaunay.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/modules/grid/grid_gridding/nn/delaunay.c b/src/modules/grid/grid_gridding/nn/delaunay.c
+index a5ec8ed..f511a63 100644
+--- a/src/modules/grid/grid_gridding/nn/delaunay.c
++++ b/src/modules/grid/grid_gridding/nn/delaunay.c
+@@ -21,7 +21,7 @@
+  *
+  *****************************************************************************/
+ 
+-//#define USE_QHULL
++#define USE_QHULL
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
+-- 
