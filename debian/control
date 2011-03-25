@@ -1,3 +1,4 @@
+
 Source: saga
 Section: science
 Priority: optional
@@ -41,7 +42,7 @@ Package: libsaga
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: libsaga-2.0.4
+Provides: libsaga-2.0.6
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
