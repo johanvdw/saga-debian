@@ -31,6 +31,8 @@ Section: libdevel
 Architecture: any
 Suggests: saga (= ${binary:Version})
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: libsaga (<< 2.0.4+dfsg-3~)
+Breaks: libsaga (<< 2.0.4+dfsg-3~)
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.

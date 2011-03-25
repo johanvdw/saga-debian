@@ -15,25 +15,43 @@ Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
 Package: saga
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: System for Automated Geoscientific Analyses
- SAGA GIS (System for Automated Geoscientific Analyses) is a free and
- open source geographic information system used for editing and 
- analysing spatial data. It includes a large number of modules for the
- analysis of vector (point, line and polygon), table, grid and image 
- data. Among others the package includes modules for geostatistics, 
- image classification, projections, simulation of dynamic processes 
- (hydrology, landscape development) and terrain analysis.
- The functionality can be accessed through a GUI, the command line or 
- by using the C++ API.
+Description: System for Automatic Geoscientific Analysis
+ SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
+ information system usable for editing and analysing spatial data. Among
+ others it includes modules for:
+ . 
+ * File access: interfaces to various table, vector, image and grid file
+   formats.
+ * Filter for grids: gaussian, laplacian, multi direction lee filter.
+ * Gridding: interpolation from vector data using triangulation, nearest
+   neighbour, inverse distance
+ * Geostatistics: residual analysis, ordinary and universal kriging,
+   single and multiple regression analysis, variance analysis.
+ * Grid calculator: combine grids through user defined functions.
+ * Grid discretisation: skeletonisation, segmentation.
+ * Grid tools: merging, resampling, gaps filling.
+ * Image classification:cluster analysis, box classification, maximum
+   likelihood, pattern recognition, region growing.
+ * Projections:various coordinate transformations for vector and grid
+   data (using Proj4 and GeoTrans libraries), georeferencing of grids
+ * Simulation of dynamic processes: TOPMODEL, nitrogen distributions,
+   erosion, landscape development.
+ * Terrain analysis:slope, aspect, curvatures, curvature classification,
+   analytical hillshading, sink eliminition, flow path analysis,
+   catchment delineation, solar radiation, channel lines, relative
+   altitudes.
+ * Vector tools: polygon intersection, contour lines from grid.
 
 Package: libsaga-dev
 Section: libdevel
 Architecture: any
 Suggests: saga (= ${binary:Version})
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: libsaga (<< 2.0.4+dfsg-3~)
+Breaks: libsaga (<< 2.0.4+dfsg-3~)
 Description: SAGA GIS development files
- SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
- information system used for editing and analysing spatial data.
+ SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
+ information system usable for editing and analysing spatial data.
  . 
  This package contains the header files for developing with SAGA.
  Install this package if you wish to develop software that uses the SAGA API.
@@ -44,7 +62,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Provides: libsaga-2.0.6
 Description: SAGA GIS development files
- SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
- information system used for editing and analysing spatial data.
+ SAGA GIS (System for Automated Geoscientific Analysis) is a geographic
+ information system usable for editing and analysing spatial data.
  . 
  This package contains the library files for developing with SAGA.
