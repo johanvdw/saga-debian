@@ -1,0 +1,5 @@
+src/saga_core/saga_api/*.h /usr/include/saga_api/
+src/saga_core/saga_gdi/*.h /usr/include/saga_gdi/
+debian/saga-depends /usr/bin/
+/usr/lib/libsaga_api.so
+/usr/lib/libsaga_gdi.so

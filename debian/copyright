@@ -1,0 +1,250 @@
+The original source was downloaded from http://www.saga-gis.org 
+The main upstream author is: Olaf Conrad <oconrad@saga-gis.org>
+
+On two places files were removed to adhere to the DFSG:
+- the files triangle.c and triangle.h were removed from libgrid_gridding
+  because they are incompatible with the DFSG. The functionality
+  could be retained by linking to libqhull
+  src/modules/grid/grid_gridding/nn/triangle.[c/h]
+- the module fire simulation: src/modules_simulation/fire/*
+  it relies on a non DFSG library: libfire  (www.fire.org)
+
+
+***Saga API and cli/gui - Copyright***
+src/saga_core/*:
+Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2003-2006 Victor Olaya 
+Copyright: 2001-2004 Andre Ringeler 
+Copyright: 2007      Thomas Schorr
+Copyright: 2003-2009 Volker Wichmann
+
+src/saga_core/saga_gui/wx/propgrid/*
+Copyright: 2004-2007 Jaakko Salli
+http://wxpropgrid.sourceforge.net/
+
+src/saga_core/saga_api/mat_formula.cpp
+contains code base on work by:
+Copyright 1993-1998 Herald Helfgott
+
+src/saga_core/saga_odbc/otlv4.h
+Copyright (C) 1996-2010, Sergei Kuchin (skuchin@gmail.com)
+
+***Saga API and cli/gui - License***
+src/saga_core/saga_api/*
+src/saga_core/saga_gdi/*
+src/saga_core/saga_odbc/*
+License: LGPGL-2.1 available on debian at: /usr/share/common-licenses/LGPL-2.1
+
+src/saga_core/saga_odbc/otlv4.h
+=================================================================================
+ORACLE, ODBC and DB2/CLI Template Library, Version 4.0.210,
+Copyright (C) 1996-2010, Sergei Kuchin (skuchin@gmail.com)
+
+This library is free software. Permission to use, copy, modify,
+and/or distribute this software for any purpose with or without fee
+is hereby granted, provided that the above copyright notice and
+this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+src/saga_core/saga_gui/*
+src/saga_core/saga_cmd/*
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+src/saga_core/saga_gui/wx/propgrid/*
+License: wxWindows Library License, this equals the LPGL with exception that object code may be distributed under own terms. 
+wxWindows library licence:
+Copyright (c) 1998 Julian Smart, Robert Roebling [, ...]
+
+Everyone is permitted to copy and distribute verbatim copies
+of this licence document, but changing it is not allowed.
+
+WXWINDOWS LIBRARY LICENCE
+
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public Licence as published by
+the Free Software Foundation; either version 2 of the Licence, or (at
+your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library
+General Public Licence for more details.
+
+You should have received a copy of the GNU Library General Public Licence
+along with this software, usually in a file named COPYING.LIB. If not,
+write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA.
+
+EXCEPTION NOTICE
+
+1. As a special exception, the copyright holders of this library give
+permission for additional uses of the text contained in this release of
+the library as licenced under the wxWindows Library Licence, applying
+either version 3 of the Licence, or (at your option) any later version of
+the Licence as published by the copyright holders of version 3 of the
+Licence document.
+
+2. The exception is that you may use, copy, link, modify and distribute
+under the user's own terms, binary object code versions of works based
+on the Library.
+
+3. If you copy code from files distributed under the terms of the GNU
+General Public Licence or the GNU Library General Public Licence into a
+copy of this library, as this licence permits, the exception does not
+apply to the code that you add in this way. To avoid misleading anyone as
+to the status of such modified files, you must delete this exception
+notice from such code and/or adjust the licensing conditions notice
+accordingly.
+
+4. If you write modifications of your own for this library, it is your
+choice whether to permit this exception to apply to your modifications.
+If you do not wish that, you must delete the exception notice from such
+code and/or adjust the licensing conditions notice accordingly.
+
+*** SAGA modules: Copyright ***
+src/modules/*
+src/modules_*
+Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2003-2006 Victor Olaya
+Copyright: 2001-2004 Andre Ringeler
+Copyright: 2007 Thomas Schorr
+Copyright: 2003-2009 Volker Wichmann
+Copyright: 2004 Antonio Boggia
+Copyright: 2004 Gianluca Massei
+Copyright: 2006 Stefan Liersch
+Copyright:      Alessandro Perego
+Copyright: 2007 Johan Van de Wauw
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+Some modules contain (parts of) previously published software:
+src/modules_io/esri_e00/io_esri_e00/e00compr/*
+Copyright 1998-1999 Frank Warmerdam and Daniel Morisette
+MIT license:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+shapes/io_shapes_dxf/dxflib
+Copyright (C) 2001-2003 RibbonSoft. All rights reserved.
+Copyright (C) 2001 Robert J. Campbell Jr
+License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
+
+src/modules/shapes/shapes_lines_ex/*
+Contains code from Plot Graphic Library
+a C++/MFC charting library.
+http://pgl.codeplex.com/
+Copyright (C) 2001  de Halleux Jonathan
+LGPLv2.1+ (2.1 or higher)
+the complete text of this license can be found in the file:
+/usr/share/common-licenses/LGPL-2.1
+
+src/modules_projection/pj_georeference/pj_georeference/*
+A number of files in this directory comes from CMinpack:
+http://devernay.free.fr/hacks/cminpack.html
+
+Minpack Copyright Notice (1999) University of Chicago.  All rights reserved
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the
+following conditions are met:
+
+1. Redistributions of source code must retain the above
+copyright notice, this list of conditions and the following
+disclaimer.
+
+2. Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials
+provided with the distribution.
+
+3. The end-user documentation included with the
+redistribution, if any, must include the following
+acknowledgment:
+
+   "This product includes software developed by the
+   University of Chicago, as Operator of Argonne National
+   Laboratory.
+
+Alternately, this acknowledgment may appear in the software
+itself, if and wherever such third-party acknowledgments
+normally appear.
+
+4. WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS"
+WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT HOLDER, THE
+UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND
+THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE
+OR NON-INFRINGEMENT, (2) DO NOT ASSUME ANY LEGAL LIABILITY
+OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR
+USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF
+THE SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4)
+DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION
+UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL
+BE CORRECTED.
+
+5. LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT
+HOLDER, THE UNITED STATES, THE UNITED STATES DEPARTMENT OF
+ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF
+ANY KIND OR NATURE, INCLUDING BUT NOT LIMITED TO LOSS OF
+PROFITS OR LOSS OF DATA, FOR ANY REASON WHATSOEVER, WHETHER
+SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT
+(INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE,
+EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
+POSSIBILITY OF SUCH LOSS OR DAMAGES.
+
+src/modules/grid/grid_gridding/nn/*.[c|h]
+upstream URL: http://code.google.com/p/nn-c/source/browse/nn/LICENSE
+the files triangle.[c|h] are removed
+Copyright (C) 2000-2008 Pavel Sakov and CSIRO
+
+Redistribution and use of material from the package `nn', with or without
+modification, are permitted provided that the following conditions are 
+met:
+
+   1. Redistributions of material must retain the above copyright notice, this
+      list of conditions and the following disclaimer.
+   2. The names of the authors may not be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.
+
+*** Debian packaging ***
+Files: debian/*
+Copyright: 2010 Johan Van de Wauw <johan.vandewauw@gmail.com>
+License: LGPLv2.1+ (2.1 or higher)
+the complete text of this license can be found in the file:
+/usr/share/common-licenses/LGPL-2.1

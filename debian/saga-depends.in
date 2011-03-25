@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# This tiny script is a debhelper script that adds substitution vars for 
+# packages that have to depend on the libsaga libraries.
+#
+# Use: saga-depends [binary-name ...]
+#
+
+if [ $# -ne 0 ]; then
+    cat >>debian/${PKG}.substvars <<EOF
+saga:Depends=libsaga-@VERSION@
+EOF
+else
+    cat >>debian/substvars <<EOF
+saga:Depends=libsaga-@VERSION@
+EOF
+
+fi
+

@@ -1,0 +1,60 @@
+saga (2.0.5+dfsg-0) unstable; urgency=low
+
+  * Update to 2.0.5
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Wed, 29 Sep 2010 14:23:48 +0200
+
+saga (2.0.4+dfsg-3) unstable; urgency=low
+
+  * Update build-depends to enable backport to lenny
+  * Move unversioned libraries to -dev package
+  * Fix module description html generation
+  * Bump standards version to 3.9.0, no changes required
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 22 Jul 2010 13:27:01 +0200
+
+saga (2.0.4+dfsg-2) unstable; urgency=low
+
+  [ Johan Van de Wauw ]
+  * Fix program description (#578419)
+  * Fix bug: deep map window zoom freezes SAGA
+  * Fix Esri E00 import
+  * Fix bug: printf() crashes
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 10 May 2010 16:00:39 +0200
+
+saga (2.0.4+dfsg-1) unstable; urgency=low
+
+  * Initial release, with copyright fixes and non-free removals.
+    (closes: #570014)
+
+  [ Johan Van de Wauw ]
+  * Initial import debian files
+  * Fix tip of the day
+  * Add saga_gdi to lib instead of pkglib (fixes errors when running
+    saga_cmd)
+  * Fix upstream bug 2896803 Grid to shapefile
+  * Update manfile (multiple files example)
+  * Remove unneccesary CVS files
+  * Add libsaga_gdi.so to /usr/lib instead of /usr/lib/saga
+  * Use grib2 in debian instead of static linked version
+  * Separate saga-dev package
+  * Fix sonumbers for saga_api.so and saga_gdi
+  * Remove non-free components (in grid_gridding and fire_simulation)
+
+  [ Francesco Paolo Lovergine ]
+  * Maintainer set to DebianGis team, with git maintenance.
+  * Added Johan and me as uploaders.
+  * Set Vcs-* fields.
+  * Long description revised.
+  * Set libproj-dev build-dep.
+  * Moved to Debhelper level 7.
+  * Minor layout changes to debian/control to respect 80 cols width.
+  * Debian revision reset to 2.0.4-1.
+  * Apps -> Applications in debian/menu.
+  * Now libtool helper files .la are not installed.
+  * Added ITP bug number.
+  * Added a templated debhelper saga-depends little script to provide required
+    substvars for third-parties packages.
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Thu, 25 Mar 2010 13:22:43 +0100

@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+DEB_CONFIGURE_EXTRA_FLAGS = --enable-unicode
+DEB_INSTALL_MANPAGES_saga = saga_cmd.1
+VERSION := $(shell grep '^AC_INIT' configure.in | \
+	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
+UPSTREAM_URL ?=$(shell uscan --dehs | sed -n 's/.*<upstream-url>\(.*\)<\/upstream-url>.*/\1/p')
+UPSTREAM_VERSION ?=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\/upstream-version>.*/\1/p')
+# remove libtool helpers
+install/saga::
+	find debian/tmp/usr/lib ! -type d -a -name "*.la" -delete
+
+build/saga::
+	pod2man --section=1 --release=$(VERSION) --center " " debian/saga_cmd.pod >saga_cmd.1
+	pod2man --section=1 --release=$(VERSION) --center " " debian/saga_gui.pod >saga_gui.1
+
+cleanbuilddir/saga::
+	rm -f saga_cmd.1
+	rm -f saga_gui.1
+
+debian/% :: debian/%.in
+	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
+
+get-orig-source:
+	wget $(UPSTREAM_URL)
+	gunzip *.tar.gz
+	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.c
+	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.h
+	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules_simulation/fire
+	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules_io/grid/io_grid_grib2/g2clib-1.0.4
+	gzip -9n saga_$(UPSTREAM_VERSION).tar
+	mv saga_$(UPSTREAM_VERSION).tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
