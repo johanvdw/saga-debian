@@ -2,6 +2,7 @@ saga (2.0.6+dfsg-0) unstable; urgency=low
 
   [ Johan Van de Wauw ]
   * Update to 2.0.6 
+  * Add libvigra-impex-dev - enables extra modules
 
   [ Francesco Paolo Lovergine ]
   * Dropped obsolete pre-squeeze proj alternative build-dep.
@@ -9,7 +10,7 @@ saga (2.0.6+dfsg-0) unstable; urgency=low
   * Dropped cdbs dependency, now using debhelper dh_* rules.
   * Using source 3.0 format with quilt support.
 
- -- Francesco Paolo Lovergine <frankie@debian.org>  Sat, 26 Mar 2011 16:27:55 +0100
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Sat, 26 Mar 2011 18:51:16 +0100
 
 saga (2.0.5+dfsg-0) unstable; urgency=low
 
