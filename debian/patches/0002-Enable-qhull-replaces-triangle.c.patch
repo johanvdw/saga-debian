@@ -3,9 +3,23 @@ Date: Fri, 25 Mar 2011 23:25:10 +0100
 Subject: [PATCH] Enable qhull (replaces triangle.c)
 
 ---
+ src/modules/grid/grid_gridding/Makefile.am   |    2 +-
  src/modules/grid/grid_gridding/nn/delaunay.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/modules/grid/grid_gridding/Makefile.am b/src/modules/grid/grid_gridding/Makefile.am
+index 88aed2b..646bb20 100644
+--- a/src/modules/grid/grid_gridding/Makefile.am
++++ b/src/modules/grid/grid_gridding/Makefile.am
+@@ -13,7 +13,7 @@ endif
+ DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
+ CXX_INCS           = -I$(top_srcdir)/src/saga_core
+ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+-AM_LDFLAGS         = -fPIC -shared -avoid-version
++AM_LDFLAGS         = -fPIC -shared -avoid-version -lqhull
+ pkglib_LTLIBRARIES = libgrid_gridding.la
+ libgrid_gridding_la_SOURCES =\
+ Interpolation.cpp\
 diff --git a/src/modules/grid/grid_gridding/nn/delaunay.c b/src/modules/grid/grid_gridding/nn/delaunay.c
 index a5ec8ed..f511a63 100644
 --- a/src/modules/grid/grid_gridding/nn/delaunay.c

@@ -7,7 +7,7 @@ Subject: [PATCH] Remove references to triangle.c from Makefile.am
  1 files changed, 0 insertions(+), 2 deletions(-)
 
 diff --git a/src/modules/grid/grid_gridding/Makefile.am b/src/modules/grid/grid_gridding/Makefile.am
-index 88aed2b..dfac16b 100644
+index 646bb20..401b164 100644
 --- a/src/modules/grid/grid_gridding/Makefile.am
 +++ b/src/modules/grid/grid_gridding/Makefile.am
 @@ -33,7 +33,6 @@ Shepard.cpp\
