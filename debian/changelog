@@ -9,8 +9,9 @@ saga (2.0.6+dfsg-0) unstable; urgency=low
   * Policy bumped to current 3.9.1, without changes.
   * Dropped cdbs dependency, now using debhelper dh_* rules.
   * Using source 3.0 format with quilt support.
+  * Debhelper level set to 8.
 
- -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Sat, 26 Mar 2011 18:51:16 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 28 Mar 2011 12:39:13 +0200
 
 saga (2.0.5+dfsg-0) unstable; urgency=low
 
