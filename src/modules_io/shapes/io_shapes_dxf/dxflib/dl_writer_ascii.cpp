@@ -1,5 +1,8 @@
+/**********************************************************
+ * Version $Id: dl_writer_ascii.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /****************************************************************************
-** $Id: dl_writer_ascii.cpp,v 1.3 2009/07/02 07:56:46 reklov_w Exp $
+** $Id: dl_writer_ascii.cpp 911 2011-02-14 16:38:15Z reklov_w $
 **
 ** Copyright (C) 2001-2003 RibbonSoft. All rights reserved.
 ** Copyright (C) 2001 Robert J. Campbell Jr.

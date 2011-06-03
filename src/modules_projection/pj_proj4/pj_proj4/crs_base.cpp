@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: crs_base.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -73,21 +76,22 @@ CCRS_Base::CCRS_Base(void)
 	CSG_Parameter	*pNode_0, *pNode_1;
 
 	//-----------------------------------------------------
-	Parameters.Add_Choice(
-		NULL	, "CRS_METHOD"		, _TL("Get CRS Definition from..."),
-		_TL(""),
-		CSG_String::Format(SG_T("%s|%s|%s|"),
-			_TL("Proj4 Parameters"),
-			_TL("EPSG Code"),
-			_TL("Well Known Text File")
-		), 0
-	);
+	if( SG_UI_Get_Window_Main() == NULL )
+	{
+		Parameters.Add_Choice(
+			NULL	, "CRS_METHOD"		, _TL("Get CRS Definition from..."),
+			_TL(""),
+			CSG_String::Format(SG_T("%s|%s|%s|"),
+				_TL("Proj4 Parameters"),
+				_TL("EPSG Code"),
+				_TL("Well Known Text File")
+			), 0
+		);
+	}
 
 	//-----------------------------------------------------
-	pNode_0	= Parameters.Add_Node(NULL, "NODE_PROJ4", _TL("Proj4 Parameters"), _TL(""));
-
-	pNode_1	= Parameters.Add_String(
-		pNode_0	, "CRS_PROJ4"		, _TL("Proj4 Parameters"),
+	pNode_0	= Parameters.Add_String(
+		NULL	, "CRS_PROJ4"		, _TL("Proj4 Parameters"),
 		_TL(""),
 		SG_T("+proj=longlat +ellps=WGS84 +datum=WGS84"), true
 	);
@@ -95,7 +99,7 @@ CCRS_Base::CCRS_Base(void)
 	if( SG_UI_Get_Window_Main() )
 	{
 		Parameters.Add_Parameters(
-			pNode_1	, "CRS_DIALOG"		, _TL("Dialog"),
+			pNode_0	, "CRS_DIALOG"		, _TL("Dialog"),
 			_TL("")
 		);
 
@@ -103,11 +107,20 @@ CCRS_Base::CCRS_Base(void)
 	}
 
 	//-----------------------------------------------------
-	pNode_0	= Parameters.Add_Node(
-		NULL	, "NODE_EPSG"	, _TL("EPSG"),
-		_TL("")
+	Parameters.Add_FilePath(
+		pNode_0	, "CRS_FILE"		, _TL("Well Known Text File"),
+		_TL(""),
+		CSG_String::Format(
+			SG_T("%s|*.prj;*.wkt;*.txt|%s|*.prj|%s|*.wkt|%s|*.txt|%s|*.*"),
+			_TL("All Recognized Files"),
+			_TL("ESRI WKT Files (*.prj)"),
+			_TL("WKT Files (*.wkt)"),
+			_TL("Text Files (*.txt)"),
+			_TL("All Files")
+		)
 	);
 
+	//-----------------------------------------------------
 	pNode_1	= Parameters.Add_Value(
 		pNode_0	, "CRS_EPSG"	, _TL("EPSG Code"),
 		_TL(""),
@@ -128,22 +141,6 @@ CCRS_Base::CCRS_Base(void)
 			SG_Get_Projections().Get_Names_List(SG_PROJ_TYPE_CS_Projected)
 		);
 	}
-
-	//-----------------------------------------------------
-	pNode_0	= Parameters.Add_Node(NULL, "NODE_FILE", _TL("Well Known Text File"), _TL(""));
-
-	Parameters.Add_FilePath(
-		pNode_0	, "CRS_FILE"		, _TL("Well Known Text File"),
-		_TL(""),
-		CSG_String::Format(
-			SG_T("%s|*.prj;*.wkt;*.txt|%s|*.prj|%s|*.wkt|%s|*.txt|%s|*.*"),
-			_TL("All Recognized Files"),
-			_TL("ESRI WKT Files (*.prj)"),
-			_TL("WKT Files (*.wkt)"),
-			_TL("Text Files (*.txt)"),
-			_TL("All Files")
-		)
-	);
 
 	//-----------------------------------------------------
 	if( SG_UI_Get_Window_Main() )
@@ -172,40 +169,12 @@ CCRS_Base::CCRS_Base(void)
 //---------------------------------------------------------
 int CCRS_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
 {
-	int				i;
 	CSG_Projection	Projection;
-
-	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG")) )
-	{
-		if( Projection.Create(pParameter->asInt()) )
-		{
-			pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(Projection.Get_Proj4().c_str());
-		}
-	}
-
-	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_GEOGCS"))
-	||	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_PROJCS")) )
-	{
-		if( pParameter->asChoice()->Get_Data(i) && (i = SG_Get_Projections().Get_Projection(i).Get_EPSG()) >= 0 )
-		{
-			pParameters->Get_Parameter("CRS_EPSG")->Set_Value(i);
-
-			On_Parameter_Changed(pParameters, pParameters->Get_Parameter("CRS_EPSG"));
-		}
-	}
 
 	//-----------------------------------------------------
 	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_DIALOG")) )
 	{
 		pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(Get_User_Definition(*pParameter->asParameters()));
-	}
-
-	if(	!SG_STR_CMP(pParameters->Get_Identifier(), SG_T("CRS_DIALOG")) )
-	{
-		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("PROJ_TYPE")) )
-		{
-			pParameters->Get_Parameter("OPTIONS")->asParameters()->Assign(Get_Parameters(SG_STR_MBTOSG(pj_list[pParameter->asInt()].id)));
-		}
 	}
 
 	//-----------------------------------------------------
@@ -223,6 +192,29 @@ int CCRS_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *
 			{
 				pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(Projection.Get_Proj4().c_str());
 			}
+		}
+	}
+
+	//-----------------------------------------------------
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG")) )
+	{
+		if( Projection.Create(pParameter->asInt()) )
+		{
+			pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(Projection.Get_Proj4().c_str());
+		}
+	}
+
+	//-----------------------------------------------------
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_GEOGCS"))
+	||	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_PROJCS")) )
+	{
+		int		i;
+
+		if( pParameter->asChoice()->Get_Data(i) && (i = SG_Get_Projections().Get_Projection(i).Get_EPSG()) >= 0 )
+		{
+			pParameters->Get_Parameter("CRS_EPSG")->Set_Value(i);
+
+			On_Parameter_Changed(pParameters, pParameters->Get_Parameter("CRS_EPSG"));
 		}
 	}
 
@@ -247,7 +239,69 @@ int CCRS_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *
 		pParameter->Set_Value((void *)NULL);
 	}
 
-	return( 0 );
+	//-----------------------------------------------------
+	if(	!SG_STR_CMP(pParameters->Get_Identifier(), SG_T("CRS_DIALOG")) )
+	{
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("PROJ_TYPE")) )
+		{
+			pParameters->Get_Parameter("OPTIONS")->asParameters()->Assign(Get_Parameters(SG_STR_MBTOSG(pj_list[pParameter->asInt()].id)));
+		}
+	}
+
+	//-----------------------------------------------------
+	return( 1 );
+}
+
+//---------------------------------------------------------
+int CCRS_Base::On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+{
+	if(	!SG_STR_CMP(pParameters->Get_Identifier(), SG_T("CRS_DIALOG")) )
+	{
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("PROJ_TYPE")) )
+		{
+			pParameters->Get_Parameter("OPTIONS")->asParameters()->Assign(Get_Parameters(SG_STR_MBTOSG(pj_list[pParameter->asInt()].id)));
+
+			pParameters->Get_Parameter("OPTIONS")->Set_Enabled(pParameters->Get_Parameter("OPTIONS")->asParameters()->Get_Count() > 0);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("DATUM_DEF")) )
+		{
+			int		Value	= pParameter->asInt();
+
+			pParameters->Get_Parameter("DATUM"    )->Set_Enabled(Value == 0);
+			pParameters->Get_Parameter("ELLIPSOID")->Set_Enabled(Value == 1);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("ELLIPSOID")) )
+		{
+			int		Value	= pParameter->asInt();
+
+			pParameters->Get_Parameter("ELLPS_DEF")->Set_Enabled(Value == 0);
+			pParameters->Get_Parameter("ELLPS_A"  )->Set_Enabled(Value != 0);
+			pParameters->Get_Parameter("ELLPS_B"  )->Set_Enabled(Value == 1);
+			pParameters->Get_Parameter("ELLPS_F"  )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("ELLPS_RF" )->Set_Enabled(Value == 3);
+			pParameters->Get_Parameter("ELLPS_E"  )->Set_Enabled(Value == 4);
+			pParameters->Get_Parameter("ELLPS_ES" )->Set_Enabled(Value == 5);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("DATUM_SHIFT")) )
+		{
+			int		Value	= pParameter->asInt();
+
+			pParameters->Get_Parameter("DS_DX"     )->Set_Enabled(Value == 1 || Value == 2);
+			pParameters->Get_Parameter("DS_DY"     )->Set_Enabled(Value == 1 || Value == 2);
+			pParameters->Get_Parameter("DS_DZ"     )->Set_Enabled(Value == 1 || Value == 2);
+			pParameters->Get_Parameter("DS_RX"     )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("DS_RY"     )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("DS_RZ"     )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("DS_SC"     )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("DATUM_GRID")->Set_Enabled(Value == 3);
+		}
+	}
+
+	//-----------------------------------------------------
+	return( 1 );
 }
 
 
@@ -258,7 +312,7 @@ int CCRS_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *
 //---------------------------------------------------------
 bool CCRS_Base::Get_Projection(CSG_Projection &Projection)
 {
-	switch( Parameters("CRS_METHOD")->asInt() )
+	switch( Parameters("CRS_METHOD") ? Parameters("CRS_METHOD")->asInt() : 0 )
 	{
 	case 0:	default:	// Proj4 Parameters"),
 		Projection.Create	(Parameters("CRS_PROJ4")->asString(), SG_PROJ_FMT_Proj4);
@@ -689,7 +743,7 @@ bool CCRS_Base::Add_User_Projection(const CSG_String &sID, const CSG_String &sNa
 //---------------------------------------------------------
 #define STR_ADD_BOL(key, val)		(val ? CSG_String::Format(SG_T("+%s "), key) : SG_T(""))
 #define STR_ADD_INT(key, val)		CSG_String::Format(SG_T("+%s=%d "), key, val)
-#define STR_ADD_FLT(key, val)		CSG_String::Format(SG_T("+%s=%f "), key, val)
+#define STR_ADD_FLT(key, val)		CSG_String::Format(SG_T("+%s=%s "), key, SG_Get_String(val, -32).c_str())
 #define STR_ADD_STR(key, val)		CSG_String::Format(SG_T("+%s=%s "), key, val)
 
 //---------------------------------------------------------
@@ -728,7 +782,7 @@ CSG_String CCRS_Base::Get_User_Definition(CSG_Parameters &P)
 		switch( P("ELLIPSOID")->asInt() )
 		{
 		case 0:	// Predefined Ellipsoid
-			Proj4	+= STR_ADD_STR(SG_T("ellps")	, SG_STR_MBTOSG(pj_ellps[P("ELLPS_PREDEF")->asInt()].id));
+			Proj4	+= STR_ADD_STR(SG_T("ellps")	, SG_STR_MBTOSG(pj_ellps[P("ELLPS_DEF")->asInt()].id));
 			break;
 
 		case 1:	// Semiminor axis
@@ -760,33 +814,34 @@ CSG_String CCRS_Base::Get_User_Definition(CSG_Parameters &P)
 		switch( P("DATUM_SHIFT")->asInt() )
 		{
 		case 1:	// 3 parameters
-			Proj4	+= CSG_String::Format(SG_T("+towgs84=%f,%f,%f "),
-				P("DS_DX")->asDouble(),
-				P("DS_DY")->asDouble(),
-				P("DS_DZ")->asDouble()
+			Proj4	+= CSG_String::Format(SG_T("+towgs84=%s,%s,%s "),
+				SG_Get_String(P("DS_DX")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_DY")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_DZ")->asDouble(), -32).c_str()
 			);
 			break;
 
 		case 2:	// 7 parameters
-			Proj4	+= CSG_String::Format(SG_T("+towgs84=%f,%f,%f,%f,%f,%f,%f "),
-				P("DS_DX")->asDouble(),
-				P("DS_DY")->asDouble(),
-				P("DS_DZ")->asDouble(),
-				P("DS_RX")->asDouble(),
-				P("DS_RY")->asDouble(),
-				P("DS_RZ")->asDouble(),
-				P("DS_SC")->asDouble()
+			Proj4	+= CSG_String::Format(SG_T("+towgs84=%s,%s,%s,%s,%s,%s,%s "),
+				SG_Get_String(P("DS_DX")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_DY")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_DZ")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_RX")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_RY")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_RZ")->asDouble(), -32).c_str(),
+				SG_Get_String(P("DS_SC")->asDouble(), -32).c_str()
 			);
+			break;
+
+		case 3:	// datum shift grid...
+			if( SG_File_Exists(P("DATUM_GRID")->asString()) )
+			{
+				Proj4	+= STR_ADD_STR(SG_T("nadgrids"), P("DATUM_GRID")->asString());
+			}
 			break;
 		}
 
 		break;
-	}
-
-	// datum shift grid...
-	if( SG_File_Exists(P("DATUM_GRID")->asString()) )
-	{
-		Proj4	+= STR_ADD_STR(SG_T("nadgrids"), P("DATUM_GRID")->asString());
 	}
 
 	//-----------------------------------------------------

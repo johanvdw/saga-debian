@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -70,7 +73,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Terrain Analysis - Profiles") );
 
 	case MLB_INFO_Author:
-		return( _TL("O. Conrad and V. Olaya, (c) 2004-06") );
+		return( SG_T("O. Conrad, V. Olaya (c) 2004-06") );
 
 	case MLB_INFO_Description:
 		return( _TL("Simple, flow path and swath profiles.") );

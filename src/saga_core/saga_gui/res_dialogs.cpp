@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: res_dialogs.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -68,6 +71,8 @@
 #include <wx/choicdlg.h>
 
 #include <saga_api/saga_api.h>
+
+#include "saga_frame.h"
 
 #include "res_dialogs.h"
 
@@ -360,7 +365,8 @@ const wxChar * DLG_Get_FILE_Config(int ID_DLG)
 //---------------------------------------------------------
 wxRect		DLG_Get_Def_Rect(void)
 {
-	wxRect	r(wxGetClientDisplayRect());
+//	wxRect	r(wxGetClientDisplayRect());
+	wxRect	r(g_pSAGA_Frame->GetScreenRect());
 
 	r.Deflate((int)(0.15 * r.GetWidth()), (int)(0.15 * r.GetHeight()));
 

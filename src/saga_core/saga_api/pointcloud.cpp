@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: pointcloud.cpp 1034 2011-05-03 10:53:01Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -113,6 +116,8 @@ CSG_PointCloud::CSG_PointCloud(void)
 	: CSG_Shapes()
 {
 	_On_Construction();
+
+	Create();
 }
 
 bool CSG_PointCloud::Create(void)
@@ -383,7 +388,9 @@ bool CSG_PointCloud::_Save(const CSG_String &File_Name)
 
 	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), LNG("[MSG] Save point cloud"), File_Name.c_str()), true);
 
-	if( Stream.Open(File_Name, SG_FILE_W, true) == false )
+	CSG_String	sFile_Name = SG_File_Make_Path(NULL, File_Name, SG_T("spc"));
+
+	if( Stream.Open(sFile_Name, SG_FILE_W, true) == false )
 	{
 		SG_UI_Msg_Add(LNG("[MSG] failed"), false, SG_UI_MSG_STYLE_FAILURE);
 		SG_UI_Msg_Add_Error(LNG("[ERR] unable to create file."));
@@ -401,7 +408,7 @@ bool CSG_PointCloud::_Save(const CSG_String &File_Name)
 	{
 		Stream.Write(&m_Field_Type[i], sizeof(TSG_Data_Type));
 
-		iBuffer	= m_Field_Name[i]->Length();	if( iBuffer >= 1024 - 1 )	iBuffer	= 1024 - 1;
+		iBuffer	= (int)m_Field_Name[i]->Length();	if( iBuffer >= 1024 - 1 )	iBuffer	= 1024 - 1;
 		Stream.Write(&iBuffer, sizeof(int));
 		Stream.Write((void *)m_Field_Name[i]->b_str(), sizeof(char), iBuffer);
 	}
@@ -415,7 +422,7 @@ bool CSG_PointCloud::_Save(const CSG_String &File_Name)
 
 	Set_Modified(false);
 
-	Set_File_Name(SG_File_Make_Path(NULL, File_Name, SG_T("spc")));
+	Set_File_Name(sFile_Name);
 
 	Save_MetaData(File_Name);
 
@@ -517,14 +524,14 @@ bool CSG_PointCloud::_Add_Field(const SG_Char *Name, TSG_Data_Type Type, int iFi
 	m_Field_Name  [m_nFields]	= new CSG_String(Name);
 	m_Field_Type  [m_nFields]	= Type;
 	m_Field_Stats [m_nFields]	= new CSG_Simple_Statistics();
-	m_Field_Offset[m_nFields]	= m_nFields == 0 ? 1 : m_Field_Offset[m_nFields - 1] + SG_Data_Type_Get_Size(m_Field_Type[m_nFields - 1]);
+	m_Field_Offset[m_nFields]	= m_nFields == 0 ? 1 : m_Field_Offset[m_nFields - 1] + (int)SG_Data_Type_Get_Size(m_Field_Type[m_nFields - 1]);
 
 	if( m_nFields == 0 )
 	{
 		m_nPointBytes	= 1;
 	}
 
-	m_nPointBytes	+= SG_Data_Type_Get_Size(m_Field_Type[m_nFields]);
+	m_nPointBytes	+= (int)SG_Data_Type_Get_Size(m_Field_Type[m_nFields]);
 	m_nFields		++;
 
 	m_Shapes.Add_Field(Name, Type);
@@ -575,7 +582,7 @@ bool CSG_PointCloud::Del_Field(int iField)
 
 	//-----------------------------------------------------
 	m_nFields		--;
-	m_nPointBytes	-= SG_Data_Type_Get_Size(m_Field_Type[iField]);
+	m_nPointBytes	-= (int)SG_Data_Type_Get_Size(m_Field_Type[iField]);
 
 	for(i=0; i<m_nRecords; i++)
 	{
@@ -600,7 +607,7 @@ bool CSG_PointCloud::Del_Field(int iField)
 		m_Field_Name  [i]	= m_Field_Name  [i + 1];
 		m_Field_Type  [i]	= m_Field_Type  [i + 1];
 		m_Field_Stats [i]	= m_Field_Stats [i + 1];
-		m_Field_Offset[i]	= m_Field_Offset[i - 1] + SG_Data_Type_Get_Size(m_Field_Type[i - 1]);
+		m_Field_Offset[i]	= m_Field_Offset[i - 1] + (int)SG_Data_Type_Get_Size(m_Field_Type[i - 1]);
 	}
 
 	m_Field_Name	= (CSG_String            **)SG_Realloc(m_Field_Name  , m_nFields * sizeof(CSG_String *));
@@ -634,6 +641,8 @@ bool CSG_PointCloud::_Set_Field_Value(char *pPoint, int iField, double Value)
 		case SG_DATATYPE_Float:		*((float  *)pPoint)	= (float )Value;	break;
 		case SG_DATATYPE_Double:	*((double *)pPoint)	= (double)Value;	break;
 		}
+
+		m_Field_Stats[iField]->Invalidate();
 
 		return( true );
 	}
@@ -950,20 +959,23 @@ CSG_Shape * CSG_PointCloud::_Set_Shape(int iPoint)
 		Set_Value(1, pShape->Get_Point(0).y);
 	}
 
-	if( iPoint != m_Shapes_Index && iPoint >= 0 && iPoint < Get_Count() )
+	if( iPoint >= 0 && iPoint < Get_Count() )
 	{
-		m_Cursor	= m_Points[iPoint];
-
-		pShape->Set_Point(Get_X(), Get_Y(), 0, 0);
-
-		for(int i=0; i<Get_Field_Count(); i++)
+		if( iPoint != m_Shapes_Index )
 		{
-			pShape->Set_Value(i, Get_Value(i));
+			m_Cursor	= m_Points[iPoint];
+
+			pShape->Set_Point(Get_X(), Get_Y(), 0, 0);
+
+			for(int i=0; i<Get_Field_Count(); i++)
+			{
+				pShape->Set_Value(i, Get_Value(i));
+			}
+
+			m_Shapes_Index	= iPoint;
 		}
 
 		m_Shapes.Set_Modified(false);
-
-		m_Shapes_Index	= iPoint;
 
 		SG_UI_Progress_Lock(false);
 

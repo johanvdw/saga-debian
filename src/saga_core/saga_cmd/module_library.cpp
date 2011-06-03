@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: module_library.cpp 985 2011-04-07 14:42:47Z oconrad $
+ *********************************************************/
  
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -90,9 +93,7 @@
 //---------------------------------------------------------
 CModule_Library::CModule_Library(void)
 {
-	m_nModules	= 0;
-	m_Modules	= NULL;
-	m_pSelected	= NULL;
+	m_pModule	= NULL;
 	m_pCMD		= NULL;
 }
 
@@ -112,50 +113,26 @@ CModule_Library::~CModule_Library(void)
 //---------------------------------------------------------
 bool CModule_Library::Create(const SG_Char *FileName, const SG_Char *FilePath)
 {
-	TSG_PFNC_MLB_Initialize		MLB_Initialize;
-	TSG_PFNC_MLB_Get_Interface	MLB_Get_Interface;
-
-	CSG_Module_Library_Interface	*pInterface;
-	CSG_Module						*pModule;
-
-	//-----------------------------------------------------
 	Destroy();
 
-	m_FileName	= SG_File_Make_Path(FilePath, FileName, NULL).c_str();
-
-	m_Library.Load(m_FileName);
-
-	//-----------------------------------------------------
-	if( !m_Library.IsLoaded() )
+	if( !m_Library.Create(SG_File_Make_Path(FilePath, FileName, NULL).c_str()) )
 	{
 		Print_Error(LNG("[ERR] Library could not be loaded"), FileName);
 	}
 	else
 	{
-		MLB_Initialize		= (TSG_PFNC_MLB_Initialize)		m_Library.GetSymbol(SYMBOL_MLB_Initialize);
-		MLB_Get_Interface	= (TSG_PFNC_MLB_Get_Interface)	m_Library.GetSymbol(SYMBOL_MLB_Get_Interface);
-
-		if(	!MLB_Get_Interface	|| !(pInterface = MLB_Get_Interface())
-		||	!MLB_Initialize		|| !MLB_Initialize(m_FileName) )
+		for(int i=0; i<m_Library.Get_Count(); i++)
 		{
-			Print_Error(LNG("[ERR] Invalid library"), FileName);
-		}
-		else
-		{
-			while( (pModule = pInterface->Get_Module(m_nModules)) != NULL )
-			{
-				m_Modules	= (CSG_Module **)SG_Realloc(m_Modules, (m_nModules + 1) * sizeof(CSG_Module *));
-				m_Modules[m_nModules++]	= pModule;
-			}
-
-			if( m_nModules > 0 )
+			if( m_Library.Get_Module(i) && !m_Library.Get_Module(i)->is_Interactive() )
 			{
 				return( true );
 			}
-
-			Print_Error(LNG("[ERR] Library does not contain any modules"), FileName);
 		}
+
+		Print_Error(LNG("[ERR] Library does not contain executable modules"), FileName);
 	}
+
+	Destroy();
 
 	return( false );
 }
@@ -163,24 +140,15 @@ bool CModule_Library::Create(const SG_Char *FileName, const SG_Char *FilePath)
 //---------------------------------------------------------
 void CModule_Library::Destroy(void)
 {
-	if( m_nModules > 0 )
-	{
-		SG_Free(m_Modules);
-		m_nModules	= 0;
-		m_Modules	= NULL;
-		m_pSelected	= NULL;
-	}
-
 	if( m_pCMD )
 	{
 		delete(m_pCMD);
-		m_pCMD		= NULL;
 	}
 
-	if( m_Library.IsLoaded() )
-	{
-		m_Library.Unload();
-	}
+	m_pCMD		= NULL;
+	m_pModule	= NULL;
+
+	m_Library.Destroy();
 }
 
 
@@ -203,39 +171,41 @@ CSG_Module * CModule_Library::Select(const SG_Char *ModuleName)
 		m_pCMD	= NULL;
 	}
 
-	for(i=0, m_pSelected=NULL; i<m_nModules && !m_pSelected; i++)
+	for(i=0, m_pModule=NULL; i<Get_Count() && !m_pModule; i++)
 	{
-		if( !SG_STR_CMP(ModuleName, Get_Module(i)->Get_Name()) )
+		if( Get_Module(i) && !SG_STR_CMP(ModuleName, Get_Module(i)->Get_Name()) )
 		{
-			m_pSelected	= Get_Module(i);
+			m_pModule	= Get_Module(i);
 		}
 	}
 
-	if( !m_pSelected )
+	if( !m_pModule )
 	{
 		long		l;
 		wxString	s(ModuleName);
 
 		if( s.ToLong(&l) )
 		{
-			m_pSelected	= Get_Module((int)l);
+			m_pModule	= Get_Module((int)l);
 		}
 	}
 
 	//-----------------------------------------------------
-	if( m_pSelected )
+	if( m_pModule )
 	{
 		m_pCMD	= new wxCmdLineParser;
 
-		_Set_CMD(m_pSelected->Get_Parameters(), false);
+		m_pModule->Set_Managed();
 
-		for(i=0; i<m_pSelected->Get_Parameters_Count(); i++)
+		_Set_CMD(m_pModule->Get_Parameters(), false);
+
+		for(i=0; i<m_pModule->Get_Parameters_Count(); i++)
 		{
-			_Set_CMD(m_pSelected->Get_Parameters(i), true);
+			_Set_CMD(m_pModule->Get_Parameters(i), true);
 		}
 	}
 
-	return( m_pSelected );
+	return( m_pModule );
 }
 
 
@@ -250,7 +220,7 @@ bool CModule_Library::Execute(int argc, char *argv[])
 {
 	bool	bResult	= false;
 
-	if( m_pSelected && m_pCMD )
+	if( m_pModule && m_pCMD )
 	{
 		m_Data_Objects.Clear();
 
@@ -263,11 +233,11 @@ bool CModule_Library::Execute(int argc, char *argv[])
 			return( true );
 		}
 
-		if( _Get_CMD(m_pSelected->Get_Parameters()) && m_pSelected->On_Before_Execution() )
+		if( _Get_CMD(m_pModule->Get_Parameters()) && m_pModule->On_Before_Execution() )
 		{
-			bResult	= m_pSelected->Execute();
+			bResult	= m_pModule->Execute();
 
-			m_pSelected->On_After_Execution();
+			m_pModule->On_After_Execution();
 		}
 
 		_Destroy_DataObjects(bResult);
@@ -277,7 +247,7 @@ bool CModule_Library::Execute(int argc, char *argv[])
 
 	if( !bResult )
 	{
-		Print_Error(LNG("executing module"), m_pSelected->Get_Name());
+		Print_Error(LNG("executing module"), m_pModule->Get_Name());
 	}
 
 	return( bResult );
@@ -313,6 +283,8 @@ void CModule_Library::_Set_CMD(CSG_Parameters *pParameters, bool bExtra)
 			Description	= pParameter->Get_Description(
 							PARAMETER_DESCRIPTION_NAME|PARAMETER_DESCRIPTION_TYPE|PARAMETER_DESCRIPTION_PROPERTIES, SG_T("\n\t")
 						).c_str();
+
+			Description.Replace(wxT("\xb2"), wxT("2"));	// unicode problem: quick'n'dirty bug fix, to be replaced
 
 			if( pParameter->is_Input() || pParameter->is_Output() )
 			{
@@ -743,13 +715,13 @@ bool CModule_Library::Add_DataObject(CSG_Data_Object *pObject)
 //---------------------------------------------------------
 bool CModule_Library::_Destroy_DataObjects(bool bSave)
 {
-	if( m_pSelected && m_pCMD )
+	if( m_pModule && m_pCMD )
 	{
-		_Destroy_DataObjects(bSave, m_pSelected->Get_Parameters());
+		_Destroy_DataObjects(bSave, m_pModule->Get_Parameters());
 
-		for(int i=0; i<m_pSelected->Get_Parameters_Count(); i++)
+		for(int i=0; i<m_pModule->Get_Parameters_Count(); i++)
 		{
-			_Destroy_DataObjects(bSave, m_pSelected->Get_Parameters(i));
+			_Destroy_DataObjects(bSave, m_pModule->Get_Parameters(i));
 		}
 
 		return( true );

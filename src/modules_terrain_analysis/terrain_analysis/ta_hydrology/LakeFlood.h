@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: LakeFlood.h 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -109,7 +112,7 @@ public:
 	CLakeFlood(void);
 	virtual ~CLakeFlood(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Lakes") );	}
+	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Miscellaneous") );	}
 
 
 protected:
@@ -136,7 +139,7 @@ public:
 	CLakeFloodInteractive(void);
 	virtual ~CLakeFloodInteractive(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Lakes") );	}
+	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Miscellaneous") );	}
 
 
 protected:

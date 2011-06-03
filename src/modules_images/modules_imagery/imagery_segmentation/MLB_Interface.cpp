@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -87,7 +90,10 @@ const SG_Char * Get_Info(int i)
 //---------------------------------------------------------
 // 3. Include the headers of your modules here...
 
-#include "fast_region_growing.h"
+#include "watershed_segmentation.h"
+#include "skeletonization.h"
+#include "grid_seeds.h"
+#include "rga_basic.h"
 
 
 //---------------------------------------------------------
@@ -97,8 +103,10 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case  0:	return( new CFast_Region_Growing );
-	default:	return( NULL );
+	case  0:	return( new CWatershed_Segmentation );
+	case  1:	return( new CSkeletonization );
+	case  2:	return( new CGrid_Seeds );
+	case  3:	return( new CRGA_Basic );
 	}
 
 	return( NULL );

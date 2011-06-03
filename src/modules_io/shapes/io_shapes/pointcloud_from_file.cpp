@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: pointcloud_from_file.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -71,7 +74,7 @@ CPointCloud_From_File::CPointCloud_From_File(void)
 	//-----------------------------------------------------
 	Set_Name		(_TL("Import Point Cloud from File"));
 
-	Set_Author		(_TL("O. Conrad (c) 2009"));
+	Set_Author		(SG_T("O. Conrad (c) 2009"));
 
 	Set_Description	(_TW(
 		""

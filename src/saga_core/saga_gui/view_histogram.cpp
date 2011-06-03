@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: view_histogram.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -277,8 +280,8 @@ void CVIEW_Histogram_Control::On_Mouse_RDown(wxMouseEvent &event)
 
 		case WKSP_ITEM_Shapes:
 			m_pLayer->Set_Color_Range(
-				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Minimum(m_pLayer->Get_Parameters()->Get_Parameter("COLORS_ATTRIB")->asInt()),
-				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Maximum(m_pLayer->Get_Parameters()->Get_Parameter("COLORS_ATTRIB")->asInt())
+				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Minimum(m_pLayer->Get_Parameters()->Get_Parameter("METRIC_ATTRIB")->asInt()),
+				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Maximum(m_pLayer->Get_Parameters()->Get_Parameter("METRIC_ATTRIB")->asInt())
 			);
 			break;
 		}

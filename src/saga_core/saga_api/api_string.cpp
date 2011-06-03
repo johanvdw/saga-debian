@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: api_string.cpp 998 2011-04-18 13:41:58Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -208,7 +211,7 @@ int CSG_String::Printf(const SG_Char *Format, ...)
 
 	va_end(argptr);
 
-	return( Length() );
+	return( (int)Length() );
 }
 
 //---------------------------------------------------------
@@ -415,11 +418,11 @@ CSG_String & CSG_String::Remove(size_t pos, size_t len)
 //---------------------------------------------------------
 int CSG_String::Trim(bool fromRight)
 {
-	int		n	= m_pString->Length();
+	size_t	n	= m_pString->Length();
 
 	m_pString->Trim(fromRight);
 
-	return( n - m_pString->Length() );
+	return( (int)(n - m_pString->Length()) );
 }
 
 
@@ -518,22 +521,16 @@ int CSG_String::asInt(void) const
 	asInt(Value);
 
 	return( Value );
-
-//	return( asInt(Value) ? Value : 0 );
 }
 
 bool CSG_String::asInt(int &Value) const
 {
-	long	lValue	= 0;
+	const wxChar	*start = m_pString->c_str();
+	wxChar			*end;
 
-	if( m_pString->ToLong(&lValue) || lValue != 0 )
-	{
-		Value	= (int)lValue;
+	Value	= wxStrtol(start, &end, 10);
 
-		return( true );
-	}
-
-	return( false );
+	return( end > start );
 }
 
 //---------------------------------------------------------

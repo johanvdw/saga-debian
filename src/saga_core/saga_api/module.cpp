@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: module.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -72,6 +75,8 @@
 //---------------------------------------------------------
 CSG_Module::CSG_Module(void)
 {
+	m_ID			= -1;
+
 	m_bError_Ignore	= false;
 	m_bExecutes		= false;
 
@@ -202,11 +207,6 @@ bool CSG_Module::Execute(void)
 
 		if( Parameters.DataObjects_Check() )
 		{
-			for(int i=0; i<m_npParameters; i++)
-			{
-				m_pParameters[i]->DataObjects_Check();
-			}
-
 			Destroy();
 
 			Parameters.DataObjects_Create();
@@ -354,13 +354,23 @@ void CSG_Module::Set_Show_Progress(bool bOn)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CSG_Module::_On_Parameter_Changed(CSG_Parameter *pParameter)
+int CSG_Module::_On_Parameter_Changed(CSG_Parameter *pParameter, int Flags)
 {
 	if( pParameter && pParameter->Get_Owner() && pParameter->Get_Owner()->Get_Owner() )
 	{
-		return( ((CSG_Module *)pParameter->Get_Owner()->Get_Owner())->
-			On_Parameter_Changed(pParameter->Get_Owner(), pParameter)
-		);
+		if( Flags & PARAMETER_CHECK_VALUES )
+		{
+			((CSG_Module *)pParameter->Get_Owner()->Get_Owner())->
+				On_Parameter_Changed(pParameter->Get_Owner(), pParameter);
+		}
+
+		if( Flags & PARAMETER_CHECK_ENABLE )
+		{
+			((CSG_Module *)pParameter->Get_Owner()->Get_Owner())->
+				On_Parameters_Enable(pParameter->Get_Owner(), pParameter);
+		}
+
+		return( 1 );
 	}
 
 	return( 0 );
@@ -368,6 +378,12 @@ int CSG_Module::_On_Parameter_Changed(CSG_Parameter *pParameter)
 
 //---------------------------------------------------------
 int CSG_Module::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+{
+	return( true );
+}
+
+//---------------------------------------------------------
+int CSG_Module::On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
 {
 	return( true );
 }
@@ -812,6 +828,8 @@ void CSG_Module::_Set_Output_History(void)
 	Parameters.Set_History(History);
 
 	History.Assign(History_Supplement, true);
+
+	History.Del_Children(SG_Get_History_Depth());
 
 	//-----------------------------------------------------
 	for(int j=-1; j<Get_Parameters_Count(); j++)

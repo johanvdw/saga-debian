@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: NewLayerFromSelectedShapes.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /*******************************************************************************
     NewLayerFromSelectedShapes.h
     Copyright (C) Victor Olaya
@@ -17,23 +20,82 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
 
+//---------------------------------------------------------
 #include "MLB_Interface.h"
 
-class CNewLayerFromSelectedShapes : public CSG_Module{
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CSelection_Copy : public CSG_Module
+{
 public:
-	CNewLayerFromSelectedShapes(void);
-	virtual ~CNewLayerFromSelectedShapes(void);
+	CSelection_Copy(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Selection") );	}
 
 
 protected:
-	virtual bool On_Execute(void);
+
+	virtual bool				On_Execute		(void);
 
 };
 
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CSelection_Delete : public CSG_Module
+{
+public:
+	CSelection_Delete(void);
+
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Selection") );	}
+
+
+protected:
+
+	virtual bool				On_Execute		(void);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CSelection_Invert : public CSG_Module
+{
+public:
+	CSelection_Invert(void);
+
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Selection") );	}
+
+
+protected:
+
+	virtual bool				On_Execute		(void);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

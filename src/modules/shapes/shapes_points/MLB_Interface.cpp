@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 939 2011-02-25 10:36:35Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -99,6 +102,10 @@ const SG_Char * Get_Info(int i)
 #include "Clip_Points.h"
 #include "separate_by_direction.h"
 #include "add_polygon_attributes.h"
+#include "points_filter.h"
+#include "convex_hull.h"
+#include "select_points.h"
+#include "points_thinning.h"
 
 
 //---------------------------------------------------------
@@ -119,6 +126,10 @@ CSG_Module *		Create_Module(int i)
 	case  8:	return( new CClip_Points );
 	case  9:	return( new CSeparate_by_Direction );
 	case 10:	return( new CAdd_Polygon_Attributes );
+	case 11:	return( new CPoints_Filter );
+	case 12:	return( new CConvex_Hull );
+	case 13:	return( new CSelect_Points );
+	case 14:	return( new CPoints_Thinning );
 	}
 
 	return( NULL );

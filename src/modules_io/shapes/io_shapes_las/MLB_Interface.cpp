@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -72,7 +75,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Import/Export - LAS") );
 
 	case MLB_INFO_Author:
-		return( _TL("O. Conrad, V. Wichmann (c) 2009-10") );
+		return( SG_T("O. Conrad, V. Wichmann (c) 2009-10") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the import and export of ASPRS LAS files.") );
@@ -89,8 +92,9 @@ const SG_Char * Get_Info(int i)
 //---------------------------------------------------------
 // 3. Include the headers of your modules here...
 
-#include "las_import.h"
 #include "las_export.h"
+#include "las_import.h"
+#include "las_info.h"
 
 
 //---------------------------------------------------------
@@ -100,8 +104,9 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case  0:	return( new CLAS_Import );
-	case  1:	return( new CLAS_Export );
+	case  0:	return( new CLAS_Export );
+	case  1:	return( new CLAS_Import );
+	case  2:	return( new CLAS_Info );
 	default:	return( NULL );
 	}
 

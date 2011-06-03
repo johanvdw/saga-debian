@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: fast_representativeness.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -294,7 +297,7 @@ void CFast_Representativeness::FastRep_Initialize(void)
 		}
 	}	
 	
-	Pow2Grid->Normalise();
+	Pow2Grid->Standardise();
 
 	pOutput->Assign_NoData();
 		

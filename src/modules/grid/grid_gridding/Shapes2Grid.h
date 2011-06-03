@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Shapes2Grid.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -94,13 +97,13 @@ protected:
 
 private:
 
-	int							m_Lock_ID, m_Method_Lines;
+	int							m_Method_Multi, m_Method_Lines;
 
 	double						m_Value;
 
 	CSG_Parameters_Grid_Target	m_Grid_Target;
 
-	CSG_Grid					*m_pGrid, *m_pLock;
+	CSG_Grid					*m_pGrid, *m_pCount, m_Count;
 
 	CSG_Shapes					*m_pShapes;
 

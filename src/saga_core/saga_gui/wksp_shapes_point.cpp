@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_shapes_point.cpp 1033 2011-05-03 10:21:46Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -81,13 +84,12 @@
 CWKSP_Shapes_Point::CWKSP_Shapes_Point(CSG_Shapes *pShapes)
 	: CWKSP_Shapes(pShapes)
 {
-	Create_Parameters();
+	Initialise();
 }
 
 //---------------------------------------------------------
 CWKSP_Shapes_Point::~CWKSP_Shapes_Point(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -107,19 +109,19 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE"			, LNG("[CAP] Outline"),
+		m_Parameters("NODE_DISPLAY")	, "OUTLINE"					, LNG("[CAP] Outline"),
 		LNG(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE_COLOR"	, LNG("[CAP] Outline Color"),
+		m_Parameters("OUTLINE")			, "OUTLINE_COLOR"			, LNG("[CAP] Color"),
 		LNG(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(0, 0, 0)
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE_SIZE"	, LNG("[CAP] Outline Size"),
+		m_Parameters("OUTLINE")			, "OUTLINE_SIZE"			, LNG("[CAP] Size"),
 		LNG(""),
 		PARAMETER_TYPE_Int, 0, 0, true
 	);
@@ -127,7 +129,6 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 	m_Parameters.Add_Choice(
 		m_Parameters("NODE_DISPLAY")	, "DISPLAY_SYMBOL_TYPE"		, LNG("[CAP] Symbol Type"),
 		LNG(""),
-
 		CSG_String::Format(wxT("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|"),
 			LNG("circle"),
 			LNG("square"),
@@ -147,7 +148,7 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 	);
 
 	m_Parameters.Add_FilePath(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_SYMBOL_IMAGE"	, LNG("[CAP] Symbol Image"),
+		m_Parameters("DISPLAY_SYMBOL_TYPE")	, "DISPLAY_SYMBOL_IMAGE"	, LNG("[CAP] Symbol Image"),
 		LNG(""),
 		CSG_String::Format(
 			wxT("%s|*.bmp;*.ico;*.gif;*.jpg;*.jif;*.jpeg;*.pcx;*.png;*.pnm;*.tif;*.tiff;*.xpm|")
@@ -173,65 +174,21 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 
 
 	//-----------------------------------------------------
-	// Size...
-
-	m_Parameters.Add_Node(
-		NULL						, "NODE_SIZE"		, LNG("[CAP] Display: Size"),
-		LNG("")
-	);
-
-	_AttributeList_Add(
-		m_Parameters("NODE_SIZE")	, "SIZE_ATTRIB"		, LNG("[CAP] Attribute"),
-		LNG("")
-	);
-
-	m_Parameters.Add_Choice(
-		m_Parameters("SIZE_ATTRIB")	, "SIZE_SCALE"		, LNG("[CAP] Attribute Values"),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("[VAL] no scaling"),
-			LNG("[VAL] scale to size range")
-		), 1
-	);
-
-	m_Parameters.Add_Range(
-		m_Parameters("SIZE_ATTRIB")	, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
-		LNG(""),
-		2, 10, 0, true
-	);
-
-	m_Parameters.Add_Choice(
-		m_Parameters("NODE_SIZE")	, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("[VAL] Screen"),
-			LNG("[VAL] Map Units")
-		), 0
-	);
-
-	m_Parameters.Add_Value(
-		m_Parameters("NODE_SIZE")	, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
-		LNG(""),
-		PARAMETER_TYPE_Double, 5, 0, true
-	);
-
-
-	//-----------------------------------------------------
 	// Label...
 
+	_AttributeList_Add(
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ANGLE_ATTRIB"	, LNG("[CAP] Rotation by Attribute"),
+		LNG("")
+	);
+
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_LABEL")	, "LABEL_ANGLE"			, LNG("[CAP] Rotation (Degree)"),
-		LNG(""),
+		m_Parameters("LABEL_ANGLE_ATTRIB"), "LABEL_ANGLE"		, LNG("[CAP] Default Rotation"),
+		LNG("rotation clockwise in degree"),
 		PARAMETER_TYPE_Double, 0.0, -360.0, true, 360.0, true
 	);
 
-	_AttributeList_Add(
-		m_Parameters("NODE_LABEL")	, "LABEL_ANGLE_ATTRIB"	, LNG("[CAP] Rotation by Attribute"),
-		LNG("")
-	);
-
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_LABEL")	, "LABEL_ALIGN_X"		, LNG("[CAP] Horizontal Align"),
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ALIGN_X"		, LNG("[CAP] Horizontal Align"),
 		LNG(""),
 		wxString::Format(wxT("%s|%s|%s|"),
 			LNG("left"),
@@ -241,7 +198,7 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 	);
 
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_LABEL")	, "LABEL_ALIGN_Y"		, LNG("[CAP] Vertical Align"),
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ALIGN_Y"		, LNG("[CAP] Vertical Align"),
 		LNG(""),
 		wxString::Format(wxT("%s|%s|%s|"),
 			LNG("top"),
@@ -250,11 +207,51 @@ void CWKSP_Shapes_Point::On_Create_Parameters(void)
 		), 0
 	);
 
+
+	//-----------------------------------------------------
+	// Size...
+
+	m_Parameters.Add_Choice(
+		m_Parameters("NODE_SIZE")		, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
+		LNG(""),
+		wxString::Format(wxT("%s|%s|"),
+			LNG("[VAL] Screen"),
+			LNG("[VAL] Map Units")
+		), 0
+	);
+
+	_AttributeList_Add(
+		m_Parameters("NODE_SIZE")		, "SIZE_ATTRIB"		, LNG("[CAP] Attribute"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Choice(
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_SCALE"		, LNG("[CAP] Attribute Values"),
+		LNG(""),
+		wxString::Format(wxT("%s|%s|"),
+			LNG("[VAL] no scaling"),
+			LNG("[VAL] scale to size range")
+		), 1
+	);
+
+	m_Parameters.Add_Range(
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
+		LNG(""),
+		2, 10, 0, true
+	);
+
+	m_Parameters.Add_Value(
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
+		LNG(""),
+		PARAMETER_TYPE_Double, 5, 0, true
+	);
+
+
 	//-----------------------------------------------------
 	// Edit...
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_SELECTION")	, "EDIT_SEL_COLOR_FILL"	, LNG("[CAP] Fill Color"),
+		m_Parameters("NODE_SELECTION")	, "SEL_COLOR_FILL"	, LNG("[CAP] Fill Color"),
 		LNG(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(255, 255, 0)
 	);
@@ -340,22 +337,56 @@ void CWKSP_Shapes_Point::On_Parameters_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CWKSP_Shapes_Point::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+int CWKSP_Shapes_Point::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter);
-
 	//-----------------------------------------------------
-	if(	!SG_STR_CMP(pParameter->Get_Identifier(), wxT("COLORS_FONT")) )
+	if( Flags & PARAMETER_CHECK_VALUES )
 	{
-		int		zField	= pParameters->Get_Parameter("COLORS_ATTRIB")->asInt();
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), wxT("COLORS_FONT")) )
+		{
+			int		zField	= pParameters->Get_Parameter("METRIC_ATTRIB")->asInt();
 
-		pParameters->Get_Parameter("METRIC_ZRANGE")->asRange()->Set_Range(
-			m_pShapes->Get_Minimum(zField),
-			m_pShapes->Get_Maximum(zField)
-		);
+			pParameters->Get_Parameter("METRIC_ZRANGE")->asRange()->Set_Range(
+				m_pShapes->Get_Minimum(zField),
+				m_pShapes->Get_Maximum(zField)
+			);
+		}
 	}
 
-	return( 1 );
+	//-----------------------------------------------------
+	if( Flags & PARAMETER_CHECK_ENABLE )
+	{
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("DISPLAY_SYMBOL_TYPE")) )
+		{
+			pParameters->Get_Parameter("DISPLAY_SYMBOL_IMAGE")->Set_Enabled(pParameter->asInt() == pParameter->asChoice()->Get_Count() - 1);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("LABEL_ATTRIB")) )
+		{
+			bool	Value	= pParameter->asInt() < m_pShapes->Get_Field_Count();
+
+			pParameters->Get_Parameter("LABEL_ANGLE_ATTRIB")->Set_Enabled(Value);
+			pParameters->Get_Parameter("LABEL_ANGLE"       )->Set_Enabled(Value);
+			pParameters->Get_Parameter("LABEL_ALIGN_X"     )->Set_Enabled(Value);
+			pParameters->Get_Parameter("LABEL_ALIGN_Y"     )->Set_Enabled(Value);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("SIZE_ATTRIB")) )
+		{
+			bool	Value	= pParameter->asInt() < m_pShapes->Get_Field_Count();
+
+			pParameters->Get_Parameter("SIZE_SCALE"  )->Set_Enabled(Value == true);
+			pParameters->Get_Parameter("SIZE_RANGE"  )->Set_Enabled(Value == true);
+			pParameters->Get_Parameter("SIZE_DEFAULT")->Set_Enabled(Value == false);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("LABEL_ANGLE_ATTRIB")) )
+		{
+			pParameters->Get_Parameter("LABEL_ANGLE")->Set_Enabled(pParameter->asInt() >= m_pShapes->Get_Field_Count());
+		}
+	}
+
+	return( CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 
@@ -368,9 +399,9 @@ int CWKSP_Shapes_Point::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Pa
 //---------------------------------------------------------
 bool CWKSP_Shapes_Point::Get_Style(wxPen &Pen, wxBrush &Brush, bool &bOutline, wxString *pName)
 {
-	bOutline	= m_Parameters("DISPLAY_OUTLINE")->asBool();
+	bOutline	= m_Parameters("OUTLINE")->asBool();
 	Brush		= wxBrush(m_Def_Color, _BrushList_Get_Style(m_Parameters("DISPLAY_BRUSH")->asInt()));
-	Pen			= wxPen(!bOutline ? m_Def_Color : Get_Color_asWX(m_Parameters("DISPLAY_OUTLINE_COLOR")->asColor()), m_Parameters("DISPLAY_OUTLINE_SIZE")->asInt(), wxSOLID);
+	Pen			= wxPen(!bOutline ? m_Def_Color : Get_Color_asWX(m_Parameters("OUTLINE_COLOR")->asColor()), m_Parameters("OUTLINE_SIZE")->asInt(), wxSOLID);
 
 	if( pName )
 	{
@@ -421,7 +452,7 @@ inline void CWKSP_Shapes_Point::_Draw_Initialize(CWKSP_Map_DC &dc_Map)
 	dc_Map.dc.SetBrush	(m_Brush);
 	dc_Map.dc.SetPen	(m_Pen);
 
-	m_Sel_Color_Fill	= Get_Color_asWX(m_Parameters("EDIT_SEL_COLOR_FILL")->asInt());
+	m_Sel_Color_Fill	= Get_Color_asWX(m_Parameters("SEL_COLOR_FILL")->asInt());
 }
 
 //---------------------------------------------------------
@@ -488,8 +519,10 @@ inline bool CWKSP_Shapes_Point::_Draw_Initialize(CWKSP_Map_DC &dc_Map, int &Size
 //---------------------------------------------------------
 void CWKSP_Shapes_Point::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection)
 {
-	if( (m_iSize >= 0 && pShape->is_NoData(m_iSize)) || (m_iColor >= 0 && pShape->is_NoData(m_iColor)) )
+	if( m_iSize >= 0 && pShape->is_NoData(m_iSize) )
+	{
 		return;
+	}
 
 	//-----------------------------------------------------
 	int		Size;
@@ -512,21 +545,24 @@ void CWKSP_Shapes_Point::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bo
 void CWKSP_Shapes_Point::_Draw_Label(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 {
 	TSG_Point_Int	p(dc_Map.World2DC(pShape->Get_Point(0)));
+	wxString		s(pShape->asString(m_iLabel, m_Label_Prec));
+
+	s.Trim(true).Trim(false);
 
 	if( m_iLabel_Angle < 0 )
 	{
 		if( m_Label_Angle == 0.0 )
 		{
-			Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, pShape->asString(m_iLabel, m_Label_Prec));
+			Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, s);
 		}
 		else
 		{
-			Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, m_Label_Angle, pShape->asString(m_iLabel, m_Label_Prec));
+			Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, m_Label_Angle, s);
 		}
 	}
 	else
 	{
-		Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, pShape->asDouble(m_iLabel_Angle), pShape->asString(m_iLabel, m_Label_Prec));
+		Draw_Text(dc_Map.dc, m_Label_Align, p.x, p.y, pShape->asDouble(m_iLabel_Angle), s);
 	}
 }
 

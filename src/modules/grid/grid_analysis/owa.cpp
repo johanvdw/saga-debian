@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: owa.cpp 961 2011-03-24 23:56:28Z johanvdw $
+ *********************************************************/
 /*******************************************************************************
     OWA.cpp
     Copyright (C) Victor Olaya
@@ -119,11 +122,11 @@ bool COWA::On_Execute(void){
 				}//else
 			}//for
 		}//for
-	}//if
 
 	delete [] pCoefs;
 	delete [] pOrderedValues;
 
+	}//if
 	return true;
 
 }//method

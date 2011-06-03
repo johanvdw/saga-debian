@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: parameters.h 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -85,11 +88,11 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define PARAMETER_INPUT					0x01
+#define PARAMETER_INPUT						0x01
 #define PARAMETER_OUTPUT					0x02
 #define PARAMETER_OPTIONAL					0x04
 #define PARAMETER_INFORMATION				0x08
-#define PARAMETER_IGNORE_PROJECTION		0x10
+#define PARAMETER_IGNORE_PROJECTION			0x10
 
 #define PARAMETER_INPUT_OPTIONAL			(PARAMETER_INPUT  | PARAMETER_OPTIONAL)
 #define PARAMETER_OUTPUT_OPTIONAL			(PARAMETER_OUTPUT | PARAMETER_OPTIONAL)
@@ -164,8 +167,9 @@ TSG_Parameter_Type;
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-SAGA_API_DLL_EXPORT const SG_Char *		SG_Parameter_Type_Get_Identifier	(TSG_Parameter_Type Type);
 SAGA_API_DLL_EXPORT const SG_Char *		SG_Parameter_Type_Get_Name			(TSG_Parameter_Type Type);
+SAGA_API_DLL_EXPORT const SG_Char *		SG_Parameter_Type_Get_Identifier	(TSG_Parameter_Type Type);
+SAGA_API_DLL_EXPORT TSG_Parameter_Type	SG_Parameter_Type_Get_Type			(const CSG_String &Identifier);
 
 
 ///////////////////////////////////////////////////////////
@@ -186,7 +190,12 @@ class CSG_Parameter;
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-typedef int		(* TSG_PFNC_Parameter_Changed)	(CSG_Parameter *pSender);
+#define PARAMETER_CHECK_VALUES				0x01
+#define PARAMETER_CHECK_ENABLE				0x02
+#define PARAMETER_CHECK_ALL					(PARAMETER_CHECK_VALUES | PARAMETER_CHECK_ENABLE)
+
+//---------------------------------------------------------
+typedef int		(* TSG_PFNC_Parameter_Changed)	(CSG_Parameter *pParameter, int Flags);
 
 
 ///////////////////////////////////////////////////////////
@@ -228,6 +237,8 @@ public:
 	void						Set_Default				(double         Value);
 	void						Set_Default				(const SG_Char *Value);
 
+	virtual bool				Restore_Default			(void)	{	return( false );		}
+
 
 protected:
 
@@ -263,12 +274,14 @@ public:
 
 	virtual TSG_Parameter_Type	Get_Type				(void)	{	return( PARAMETER_TYPE_Bool );	}
 
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(int    Value);
 	virtual bool				Set_Value				(double Value);
 
 	virtual int					asInt					(void)	{	return( m_Value );		}
 
 	virtual const SG_Char *		asString				(void);
+
+	virtual bool				Restore_Default			(void)	{	return( Set_Value(m_Default.asInt()) );	}
 
 
 protected:
@@ -319,13 +332,15 @@ public:
 
 	virtual TSG_Parameter_Type	Get_Type				(void)	{	return( PARAMETER_TYPE_Int );		}
 
-	virtual bool				Set_Value				(void *Value);
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(void  *Value);
+	virtual bool				Set_Value				(int    Value);
 	virtual bool				Set_Value				(double Value);
 
 	virtual int					asInt					(void)	{	return( m_Value );		}
 	virtual double				asDouble				(void)	{	return( m_Value );		}
 	virtual const SG_Char *		asString				(void);
+
+	virtual bool				Restore_Default			(void)	{	return( Set_Value(m_Default.asInt()) );	}
 
 
 protected:
@@ -346,13 +361,15 @@ public:
 
 	virtual TSG_Parameter_Type	Get_Type				(void)	{	return( PARAMETER_TYPE_Double );	}
 
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(int    Value);
 	virtual bool				Set_Value				(double Value);
-	virtual bool				Set_Value				(void *Value);
+	virtual bool				Set_Value				(void  *Value);
 
 	virtual int					asInt					(void)	{	return( (int)m_Value );	}
 	virtual double				asDouble				(void)	{	return( m_Value );		}
 	virtual const SG_Char *		asString				(void);
+
+	virtual bool				Restore_Default			(void)	{	return( Set_Value(m_Default.asDouble()) );	}
 
 
 protected:
@@ -400,6 +417,8 @@ public:
 
 	CSG_Parameter *				Get_LoParm				(void)	{	return( pLo );	}
 	CSG_Parameter *				Get_HiParm				(void)	{	return( pHi );	}
+
+	virtual bool				Restore_Default			(void);
 
 
 protected:
@@ -464,6 +483,8 @@ public:
 
 	void						Set_Password			(bool bOn);
 	bool						is_Password				(void);
+
+	virtual bool				Restore_Default			(void)	{	return( Set_Value((void *)m_Default.c_str()) );	}
 
 
 protected:
@@ -531,13 +552,15 @@ public:
 
 	virtual TSG_Parameter_Type	Get_Type				(void)	{	return( PARAMETER_TYPE_Font );		}
 
-	virtual bool				Set_Value				(int Value);
+	virtual bool				Set_Value				(int   Value);
 	virtual bool				Set_Value				(void *Value);
 
 	virtual int					asInt					(void)	{	return( m_Color );	}
 	virtual void *				asPointer				(void)	{	return( m_pFont );	}
 
 	virtual const SG_Char *		asString				(void);
+
+	virtual bool				Restore_Default			(void)	{	return( Set_Value((void *)m_Default.c_str()) );	}
 
 
 protected:
@@ -930,6 +953,8 @@ public:
 	virtual const SG_Char *		asString				(void);
 	virtual void *				asPointer				(void)		{	return( m_pParameters );	}
 
+	virtual bool				Restore_Default			(void);
+
 
 protected:
 
@@ -1040,7 +1065,9 @@ public:
 	void						Set_Default				(double         Value)	{	m_pData->Set_Default(Value);	}
 	void						Set_Default				(const SG_Char *Value)	{	m_pData->Set_Default(Value);	}
 
-	bool						has_Changed				(void);
+	bool						Restore_Default			(void)	{	return( m_pData->Restore_Default() );	}
+
+	bool						has_Changed				(int Check_Flags = PARAMETER_CHECK_ALL);
 
 	bool						asBool					(void)	{	return( (bool          )!!m_pData->asInt	() );	}
 	int							asInt					(void)	{	return( (int           )m_pData->asInt		() );	}
@@ -1208,10 +1235,12 @@ public:
 
 	//-----------------------------------------------------
 	bool						Set_Parameter			(const SG_Char *Identifier, CSG_Parameter *pSource);
-	bool						Set_Parameter			(const SG_Char *Identifier, int Type, int           Value);
-	bool						Set_Parameter			(const SG_Char *Identifier, int Type, double        Value);
+	bool						Set_Parameter			(const SG_Char *Identifier, int Type, int            Value);
+	bool						Set_Parameter			(const SG_Char *Identifier, int Type, double         Value);
 	bool						Set_Parameter			(const SG_Char *Identifier, int Type, void          *Value);
 	bool						Set_Parameter			(const SG_Char *Identifier, int Type, const SG_Char *Value);
+
+	bool						Restore_Defaults		(void);
 
 	int							Assign					(CSG_Parameters *pSource);
 	int							Assign_Values			(CSG_Parameters *pSource);
@@ -1288,7 +1317,7 @@ private:
 
 	void						_On_Construction		(void);
 
-	bool						_On_Parameter_Changed	(CSG_Parameter *pSender);
+	bool						_On_Parameter_Changed	(CSG_Parameter *pParameter, int Flags);
 
 	CSG_Parameter *				_Add_Value				(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description, bool bInformation, TSG_Parameter_Type Type, double Value, double Minimum, bool bMinimum, double Maximum, bool bMaximum);
 	CSG_Parameter *				_Add_Range				(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description, bool bInformation, double Range_Min, double Range_Max, double Minimum, bool bMinimum, double Maximum, bool bMaximum);

@@ -229,6 +229,7 @@ class CSG_Array(_object):
     def Destroy(self): return _saga_api.CSG_Array_Destroy(self)
     def Set_Growth(self, *args): return _saga_api.CSG_Array_Set_Growth(self, *args)
     def Get_Growth(self): return _saga_api.CSG_Array_Get_Growth(self)
+    def Get_Value_Size(self): return _saga_api.CSG_Array_Get_Value_Size(self)
     def Get_Size(self): return _saga_api.CSG_Array_Get_Size(self)
     def Get_Entry(self, *args): return _saga_api.CSG_Array_Get_Entry(self, *args)
     def Get_Array(self, *args): return _saga_api.CSG_Array_Get_Array(self, *args)
@@ -500,6 +501,10 @@ SG_File_Set_Extension = _saga_api.SG_File_Set_Extension
 def SG_Read_Line(*args):
   return _saga_api.SG_Read_Line(*args)
 SG_Read_Line = _saga_api.SG_Read_Line
+
+def SG_Set_Environment(*args):
+  return _saga_api.SG_Set_Environment(*args)
+SG_Set_Environment = _saga_api.SG_Set_Environment
 SG_COLOR_NONE = _saga_api.SG_COLOR_NONE
 SG_COLOR_RANDOM = _saga_api.SG_COLOR_RANDOM
 SG_COLORS_DEFAULT = _saga_api.SG_COLORS_DEFAULT
@@ -562,12 +567,18 @@ class CSG_Colors(_object):
     def Load(self, *args): return _saga_api.CSG_Colors_Load(self, *args)
     def Save(self, *args): return _saga_api.CSG_Colors_Save(self, *args)
     def Serialize(self, *args): return _saga_api.CSG_Colors_Serialize(self, *args)
+    def to_Text(self, *args): return _saga_api.CSG_Colors_to_Text(self, *args)
+    def from_Text(self, *args): return _saga_api.CSG_Colors_from_Text(self, *args)
 CSG_Colors_swigregister = _saga_api.CSG_Colors_swigregister
 CSG_Colors_swigregister(CSG_Colors)
 
 def SG_File_Make_Path(*args):
   return _saga_api.SG_File_Make_Path(*args)
 SG_File_Make_Path = _saga_api.SG_File_Make_Path
+
+def SG_Get_Environment(*args):
+  return _saga_api.SG_Get_Environment(*args)
+SG_Get_Environment = _saga_api.SG_Get_Environment
 
 class CSG_Translator(_object):
     __swig_setmethods__ = {}
@@ -790,11 +801,13 @@ class CSG_MetaData(_object):
     def Set_Name(self, *args): return _saga_api.CSG_MetaData_Set_Name(self, *args)
     def Get_Content(self): return _saga_api.CSG_MetaData_Get_Content(self)
     def Set_Content(self, *args): return _saga_api.CSG_MetaData_Set_Content(self, *args)
+    def Fmt_Content(self, *args): return _saga_api.CSG_MetaData_Fmt_Content(self, *args)
     def Cmp_Content(self, *args): return _saga_api.CSG_MetaData_Cmp_Content(self, *args)
     def Get_Children_Count(self): return _saga_api.CSG_MetaData_Get_Children_Count(self)
     def Get_Child(self, *args): return _saga_api.CSG_MetaData_Get_Child(self, *args)
     def Add_Child(self, *args): return _saga_api.CSG_MetaData_Add_Child(self, *args)
     def Del_Child(self, *args): return _saga_api.CSG_MetaData_Del_Child(self, *args)
+    def Del_Children(self, Depth = 0): return _saga_api.CSG_MetaData_Del_Children(self, Depth)
     def is_Valid(self): return _saga_api.CSG_MetaData_is_Valid(self)
     def Get_Property_Count(self): return _saga_api.CSG_MetaData_Get_Property_Count(self)
     def Get_Property_Name(self, *args): return _saga_api.CSG_MetaData_Get_Property_Name(self, *args)
@@ -1472,16 +1485,21 @@ def SG_Matrix_Solve(*args):
   return _saga_api.SG_Matrix_Solve(*args)
 SG_Matrix_Solve = _saga_api.SG_Matrix_Solve
 
+def SG_Matrix_Eigen_Reduction(*args):
+  return _saga_api.SG_Matrix_Eigen_Reduction(*args)
+SG_Matrix_Eigen_Reduction = _saga_api.SG_Matrix_Eigen_Reduction
+
 class CSG_Simple_Statistics(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_Simple_Statistics, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, CSG_Simple_Statistics, name)
     __repr__ = _swig_repr
-    def __init__(self): 
-        this = _saga_api.new_CSG_Simple_Statistics()
+    def __init__(self, *args): 
+        this = _saga_api.new_CSG_Simple_Statistics(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Create(self, *args): return _saga_api.CSG_Simple_Statistics_Create(self, *args)
     def Invalidate(self): return _saga_api.CSG_Simple_Statistics_Invalidate(self)
     def is_Evaluated(self): return _saga_api.CSG_Simple_Statistics_is_Evaluated(self)
     def Get_Count(self): return _saga_api.CSG_Simple_Statistics_Get_Count(self)
@@ -1494,6 +1512,8 @@ class CSG_Simple_Statistics(_object):
     def Get_Variance(self): return _saga_api.CSG_Simple_Statistics_Get_Variance(self)
     def Get_StdDev(self): return _saga_api.CSG_Simple_Statistics_Get_StdDev(self)
     def Add_Value(self, *args): return _saga_api.CSG_Simple_Statistics_Add_Value(self, *args)
+    def Get_Value(self, *args): return _saga_api.CSG_Simple_Statistics_Get_Value(self, *args)
+    def __iadd__(self, *args): return _saga_api.CSG_Simple_Statistics___iadd__(self, *args)
     __swig_destroy__ = _saga_api.delete_CSG_Simple_Statistics
     __del__ = lambda self : None;
 CSG_Simple_Statistics_swigregister = _saga_api.CSG_Simple_Statistics_swigregister
@@ -1688,7 +1708,7 @@ class CSG_Formula(_object):
     if _newclass:Get_Help_Operators = staticmethod(_saga_api.CSG_Formula_Get_Help_Operators)
     __swig_getmethods__["Get_Help_Usage"] = lambda x: _saga_api.CSG_Formula_Get_Help_Usage
     if _newclass:Get_Help_Usage = staticmethod(_saga_api.CSG_Formula_Get_Help_Usage)
-    def Get_Error(self, pPosition = None, pMessage = None): return _saga_api.CSG_Formula_Get_Error(self, pPosition, pMessage)
+    def Get_Error(self, *args): return _saga_api.CSG_Formula_Get_Error(self, *args)
     def Add_Function(self, *args): return _saga_api.CSG_Formula_Add_Function(self, *args)
     def Del_Function(self, *args): return _saga_api.CSG_Formula_Del_Function(self, *args)
     def Set_Formula(self, *args): return _saga_api.CSG_Formula_Set_Formula(self, *args)
@@ -1791,6 +1811,14 @@ SG_Get_DataObject_Identifier = _saga_api.SG_Get_DataObject_Identifier
 def SG_Get_DataObject_Name(*args):
   return _saga_api.SG_Get_DataObject_Name(*args)
 SG_Get_DataObject_Name = _saga_api.SG_Get_DataObject_Name
+
+def SG_Set_History_Depth(*args):
+  return _saga_api.SG_Set_History_Depth(*args)
+SG_Set_History_Depth = _saga_api.SG_Set_History_Depth
+
+def SG_Get_History_Depth():
+  return _saga_api.SG_Get_History_Depth()
+SG_Get_History_Depth = _saga_api.SG_Get_History_Depth
 class CSG_Data_Object(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_Data_Object, name, value)
@@ -1809,6 +1837,8 @@ class CSG_Data_Object(_object):
     def Assign(self, *args): return _saga_api.CSG_Data_Object_Assign(self, *args)
     def Set_Name(self, *args): return _saga_api.CSG_Data_Object_Set_Name(self, *args)
     def Get_Name(self): return _saga_api.CSG_Data_Object_Get_Name(self)
+    def Set_Description(self, *args): return _saga_api.CSG_Data_Object_Set_Description(self, *args)
+    def Get_Description(self): return _saga_api.CSG_Data_Object_Get_Description(self)
     def Set_Modified(self, bOn = True): return _saga_api.CSG_Data_Object_Set_Modified(self, bOn)
     def is_Modified(self): return _saga_api.CSG_Data_Object_is_Modified(self)
     def Update(self): return _saga_api.CSG_Data_Object_Update(self)
@@ -2165,20 +2195,45 @@ class CSG_Grid_System(_object):
     def Get_yWorld_to_Grid(self, *args): return _saga_api.CSG_Grid_System_Get_yWorld_to_Grid(self, *args)
     def Get_World_to_Grid(self, *args): return _saga_api.CSG_Grid_System_Get_World_to_Grid(self, *args)
     def Get_Neighbor_Pos(self, *args): return _saga_api.CSG_Grid_System_Get_Neighbor_Pos(self, *args)
-    def Get_xTo(self, *args): return _saga_api.CSG_Grid_System_Get_xTo(self, *args)
-    def Get_yTo(self, *args): return _saga_api.CSG_Grid_System_Get_yTo(self, *args)
-    def Get_xFrom(self, *args): return _saga_api.CSG_Grid_System_Get_xFrom(self, *args)
-    def Get_yFrom(self, *args): return _saga_api.CSG_Grid_System_Get_yFrom(self, *args)
+    __swig_getmethods__["Get_xTo"] = lambda x: _saga_api.CSG_Grid_System_Get_xTo
+    if _newclass:Get_xTo = staticmethod(_saga_api.CSG_Grid_System_Get_xTo)
+    __swig_getmethods__["Get_yTo"] = lambda x: _saga_api.CSG_Grid_System_Get_yTo
+    if _newclass:Get_yTo = staticmethod(_saga_api.CSG_Grid_System_Get_yTo)
+    __swig_getmethods__["Get_xFrom"] = lambda x: _saga_api.CSG_Grid_System_Get_xFrom
+    if _newclass:Get_xFrom = staticmethod(_saga_api.CSG_Grid_System_Get_xFrom)
+    __swig_getmethods__["Get_yFrom"] = lambda x: _saga_api.CSG_Grid_System_Get_yFrom
+    if _newclass:Get_yFrom = staticmethod(_saga_api.CSG_Grid_System_Get_yFrom)
     def Get_xToSave(self, *args): return _saga_api.CSG_Grid_System_Get_xToSave(self, *args)
     def Get_yToSave(self, *args): return _saga_api.CSG_Grid_System_Get_yToSave(self, *args)
     def Get_xFromSave(self, *args): return _saga_api.CSG_Grid_System_Get_xFromSave(self, *args)
     def Get_yFromSave(self, *args): return _saga_api.CSG_Grid_System_Get_yFromSave(self, *args)
     def is_InGrid(self, *args): return _saga_api.CSG_Grid_System_is_InGrid(self, *args)
     def Get_Length(self, *args): return _saga_api.CSG_Grid_System_Get_Length(self, *args)
-    def Get_UnitLength(self, *args): return _saga_api.CSG_Grid_System_Get_UnitLength(self, *args)
+    __swig_getmethods__["Get_UnitLength"] = lambda x: _saga_api.CSG_Grid_System_Get_UnitLength
+    if _newclass:Get_UnitLength = staticmethod(_saga_api.CSG_Grid_System_Get_UnitLength)
 CSG_Grid_System_swigregister = _saga_api.CSG_Grid_System_swigregister
 CSG_Grid_System_swigregister(CSG_Grid_System)
 gSG_Grid_File_Key_Names = cvar.gSG_Grid_File_Key_Names
+
+def CSG_Grid_System_Get_xTo(*args):
+  return _saga_api.CSG_Grid_System_Get_xTo(*args)
+CSG_Grid_System_Get_xTo = _saga_api.CSG_Grid_System_Get_xTo
+
+def CSG_Grid_System_Get_yTo(*args):
+  return _saga_api.CSG_Grid_System_Get_yTo(*args)
+CSG_Grid_System_Get_yTo = _saga_api.CSG_Grid_System_Get_yTo
+
+def CSG_Grid_System_Get_xFrom(*args):
+  return _saga_api.CSG_Grid_System_Get_xFrom(*args)
+CSG_Grid_System_Get_xFrom = _saga_api.CSG_Grid_System_Get_xFrom
+
+def CSG_Grid_System_Get_yFrom(*args):
+  return _saga_api.CSG_Grid_System_Get_yFrom(*args)
+CSG_Grid_System_Get_yFrom = _saga_api.CSG_Grid_System_Get_yFrom
+
+def CSG_Grid_System_Get_UnitLength(*args):
+  return _saga_api.CSG_Grid_System_Get_UnitLength(*args)
+CSG_Grid_System_Get_UnitLength = _saga_api.CSG_Grid_System_Get_UnitLength
 
 class CSG_Grid(CSG_Data_Object):
     __swig_setmethods__ = {}
@@ -2200,8 +2255,6 @@ class CSG_Grid(CSG_Data_Object):
     def Get_Type(self): return _saga_api.CSG_Grid_Get_Type(self)
     def Get_nValueBytes(self): return _saga_api.CSG_Grid_Get_nValueBytes(self)
     def Get_nLineBytes(self): return _saga_api.CSG_Grid_Get_nLineBytes(self)
-    def Set_Description(self, *args): return _saga_api.CSG_Grid_Set_Description(self, *args)
-    def Get_Description(self): return _saga_api.CSG_Grid_Get_Description(self)
     def Set_Unit(self, *args): return _saga_api.CSG_Grid_Set_Unit(self, *args)
     def Get_Unit(self): return _saga_api.CSG_Grid_Get_Unit(self)
     def Get_System(self): return _saga_api.CSG_Grid_Get_System(self)
@@ -2246,6 +2299,8 @@ class CSG_Grid(CSG_Data_Object):
     def Invert(self): return _saga_api.CSG_Grid_Invert(self)
     def Normalise(self): return _saga_api.CSG_Grid_Normalise(self)
     def DeNormalise(self, *args): return _saga_api.CSG_Grid_DeNormalise(self, *args)
+    def Standardise(self): return _saga_api.CSG_Grid_Standardise(self)
+    def DeStandardise(self, *args): return _saga_api.CSG_Grid_DeStandardise(self, *args)
     def Get_Gradient_NeighborDir(self, *args): return _saga_api.CSG_Grid_Get_Gradient_NeighborDir(self, *args)
     def Get_Gradient(self, *args): return _saga_api.CSG_Grid_Get_Gradient(self, *args)
     def Set_Modified(self, bFlag = True): return _saga_api.CSG_Grid_Set_Modified(self, bFlag)
@@ -2412,8 +2467,10 @@ class CSG_Shape(CSG_Table_Record):
     def Get_MMin(self): return _saga_api.CSG_Shape_Get_MMin(self)
     def Get_MMax(self): return _saga_api.CSG_Shape_Get_MMax(self)
     def Get_Extent(self, *args): return _saga_api.CSG_Shape_Get_Extent(self, *args)
+    def Get_Centroid(self): return _saga_api.CSG_Shape_Get_Centroid(self)
     def Intersects(self, *args): return _saga_api.CSG_Shape_Intersects(self, *args)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Get_Distance(self, *args)
+    def Revert_Points(self, *args): return _saga_api.CSG_Shape_Revert_Points(self, *args)
 CSG_Shape_swigregister = _saga_api.CSG_Shape_swigregister
 CSG_Shape_swigregister(CSG_Shape)
 
@@ -2437,6 +2494,7 @@ class CSG_Shape_Point(CSG_Shape):
     def Get_Point_Count(self, *args): return _saga_api.CSG_Shape_Point_Get_Point_Count(self, *args)
     def Get_Point(self, *args): return _saga_api.CSG_Shape_Point_Get_Point(self, *args)
     def Get_Extent(self): return _saga_api.CSG_Shape_Point_Get_Extent(self)
+    def Get_Centroid(self): return _saga_api.CSG_Shape_Point_Get_Centroid(self)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Point_Get_Distance(self, *args)
 CSG_Shape_Point_swigregister = _saga_api.CSG_Shape_Point_swigregister
 CSG_Shape_Point_swigregister(CSG_Shape_Point)
@@ -2508,44 +2566,9 @@ class CSG_Shape_Part(_object):
     def Get_M(self, *args): return _saga_api.CSG_Shape_Part_Get_M(self, *args)
     def Get_MMin(self): return _saga_api.CSG_Shape_Part_Get_MMin(self)
     def Get_MMax(self): return _saga_api.CSG_Shape_Part_Get_MMax(self)
+    def Revert_Points(self): return _saga_api.CSG_Shape_Part_Revert_Points(self)
 CSG_Shape_Part_swigregister = _saga_api.CSG_Shape_Part_swigregister
 CSG_Shape_Part_swigregister(CSG_Shape_Part)
-
-class CSG_Shape_Part_Z(CSG_Shape_Part):
-    __swig_setmethods__ = {}
-    for _s in [CSG_Shape_Part]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_Shape_Part_Z, name, value)
-    __swig_getmethods__ = {}
-    for _s in [CSG_Shape_Part]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, CSG_Shape_Part_Z, name)
-    def __init__(self, *args, **kwargs): raise AttributeError("No constructor defined")
-    __repr__ = _swig_repr
-    def Destroy(self): return _saga_api.CSG_Shape_Part_Z_Destroy(self)
-    def Assign(self, *args): return _saga_api.CSG_Shape_Part_Z_Assign(self, *args)
-    def Set_Z(self, *args): return _saga_api.CSG_Shape_Part_Z_Set_Z(self, *args)
-    def Get_Z(self, *args): return _saga_api.CSG_Shape_Part_Z_Get_Z(self, *args)
-    def Get_ZMin(self): return _saga_api.CSG_Shape_Part_Z_Get_ZMin(self)
-    def Get_ZMax(self): return _saga_api.CSG_Shape_Part_Z_Get_ZMax(self)
-CSG_Shape_Part_Z_swigregister = _saga_api.CSG_Shape_Part_Z_swigregister
-CSG_Shape_Part_Z_swigregister(CSG_Shape_Part_Z)
-
-class CSG_Shape_Part_ZM(CSG_Shape_Part_Z):
-    __swig_setmethods__ = {}
-    for _s in [CSG_Shape_Part_Z]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_Shape_Part_ZM, name, value)
-    __swig_getmethods__ = {}
-    for _s in [CSG_Shape_Part_Z]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, CSG_Shape_Part_ZM, name)
-    def __init__(self, *args, **kwargs): raise AttributeError("No constructor defined")
-    __repr__ = _swig_repr
-    def Destroy(self): return _saga_api.CSG_Shape_Part_ZM_Destroy(self)
-    def Assign(self, *args): return _saga_api.CSG_Shape_Part_ZM_Assign(self, *args)
-    def Set_M(self, *args): return _saga_api.CSG_Shape_Part_ZM_Set_M(self, *args)
-    def Get_M(self, *args): return _saga_api.CSG_Shape_Part_ZM_Get_M(self, *args)
-    def Get_MMin(self): return _saga_api.CSG_Shape_Part_ZM_Get_MMin(self)
-    def Get_MMax(self): return _saga_api.CSG_Shape_Part_ZM_Get_MMax(self)
-CSG_Shape_Part_ZM_swigregister = _saga_api.CSG_Shape_Part_ZM_swigregister
-CSG_Shape_Part_ZM_swigregister(CSG_Shape_Part_ZM)
 
 class CSG_Shape_Points(CSG_Shape):
     __swig_setmethods__ = {}
@@ -2558,10 +2581,10 @@ class CSG_Shape_Points(CSG_Shape):
     __repr__ = _swig_repr
     def Destroy(self): return _saga_api.CSG_Shape_Points_Destroy(self)
     def is_Valid(self): return _saga_api.CSG_Shape_Points_is_Valid(self)
+    def Del_Point(self, *args): return _saga_api.CSG_Shape_Points_Del_Point(self, *args)
     def Add_Point(self, *args): return _saga_api.CSG_Shape_Points_Add_Point(self, *args)
     def Ins_Point(self, *args): return _saga_api.CSG_Shape_Points_Ins_Point(self, *args)
     def Set_Point(self, *args): return _saga_api.CSG_Shape_Points_Set_Point(self, *args)
-    def Del_Point(self, *args): return _saga_api.CSG_Shape_Points_Del_Point(self, *args)
     def Del_Part(self, *args): return _saga_api.CSG_Shape_Points_Del_Part(self, *args)
     def Del_Parts(self): return _saga_api.CSG_Shape_Points_Del_Parts(self)
     def Get_Part_Count(self): return _saga_api.CSG_Shape_Points_Get_Part_Count(self)
@@ -2577,7 +2600,9 @@ class CSG_Shape_Points(CSG_Shape):
     def Get_MMin(self): return _saga_api.CSG_Shape_Points_Get_MMin(self)
     def Get_MMax(self): return _saga_api.CSG_Shape_Points_Get_MMax(self)
     def Get_Extent(self): return _saga_api.CSG_Shape_Points_Get_Extent(self)
+    def Get_Centroid(self): return _saga_api.CSG_Shape_Points_Get_Centroid(self)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Points_Get_Distance(self, *args)
+    def Revert_Points(self, *args): return _saga_api.CSG_Shape_Points_Revert_Points(self, *args)
 CSG_Shape_Points_swigregister = _saga_api.CSG_Shape_Points_swigregister
 CSG_Shape_Points_swigregister(CSG_Shape_Points)
 
@@ -2591,6 +2616,7 @@ class CSG_Shape_Line(CSG_Shape_Points):
     def __init__(self, *args, **kwargs): raise AttributeError("No constructor defined")
     __repr__ = _swig_repr
     def is_Valid(self): return _saga_api.CSG_Shape_Line_is_Valid(self)
+    def Get_Centroid(self): return _saga_api.CSG_Shape_Line_Get_Centroid(self)
     def Get_Length(self, *args): return _saga_api.CSG_Shape_Line_Get_Length(self, *args)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Line_Get_Distance(self, *args)
 CSG_Shape_Line_swigregister = _saga_api.CSG_Shape_Line_swigregister
@@ -2609,7 +2635,7 @@ class CSG_Shape_Polygon_Part(CSG_Shape_Part):
     def Get_Perimeter(self): return _saga_api.CSG_Shape_Polygon_Part_Get_Perimeter(self)
     def Get_Area(self): return _saga_api.CSG_Shape_Polygon_Part_Get_Area(self)
     def Get_Centroid(self): return _saga_api.CSG_Shape_Polygon_Part_Get_Centroid(self)
-    def is_Containing(self, *args): return _saga_api.CSG_Shape_Polygon_Part_is_Containing(self, *args)
+    def Contains(self, *args): return _saga_api.CSG_Shape_Polygon_Part_Contains(self, *args)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Polygon_Part_Get_Distance(self, *args)
 CSG_Shape_Polygon_Part_swigregister = _saga_api.CSG_Shape_Polygon_Part_swigregister
 CSG_Shape_Polygon_Part_swigregister(CSG_Shape_Polygon_Part)
@@ -2630,7 +2656,7 @@ class CSG_Shape_Polygon(CSG_Shape_Points):
     def Get_Perimeter(self, *args): return _saga_api.CSG_Shape_Polygon_Get_Perimeter(self, *args)
     def Get_Area(self, *args): return _saga_api.CSG_Shape_Polygon_Get_Area(self, *args)
     def Get_Centroid(self, *args): return _saga_api.CSG_Shape_Polygon_Get_Centroid(self, *args)
-    def is_Containing(self, *args): return _saga_api.CSG_Shape_Polygon_is_Containing(self, *args)
+    def Contains(self, *args): return _saga_api.CSG_Shape_Polygon_Contains(self, *args)
     def Get_Distance(self, *args): return _saga_api.CSG_Shape_Polygon_Get_Distance(self, *args)
 CSG_Shape_Polygon_swigregister = _saga_api.CSG_Shape_Polygon_swigregister
 CSG_Shape_Polygon_swigregister(CSG_Shape_Polygon)
@@ -2687,6 +2713,7 @@ class CSG_PRQuadTree_Item(_object):
     __repr__ = _swig_repr
     def is_Leaf(self): return _saga_api.CSG_PRQuadTree_Item_is_Leaf(self)
     def is_Node(self): return _saga_api.CSG_PRQuadTree_Item_is_Node(self)
+    def has_Statistics(self): return _saga_api.CSG_PRQuadTree_Item_has_Statistics(self)
     def Get_Extent(self): return _saga_api.CSG_PRQuadTree_Item_Get_Extent(self)
     def Get_xMin(self): return _saga_api.CSG_PRQuadTree_Item_Get_xMin(self)
     def Get_yMin(self): return _saga_api.CSG_PRQuadTree_Item_Get_yMin(self)
@@ -2726,6 +2753,30 @@ class CSG_PRQuadTree_Leaf(CSG_PRQuadTree_Item):
 CSG_PRQuadTree_Leaf_swigregister = _saga_api.CSG_PRQuadTree_Leaf_swigregister
 CSG_PRQuadTree_Leaf_swigregister(CSG_PRQuadTree_Leaf)
 
+class CSG_PRQuadTree_Leaf_List(CSG_PRQuadTree_Leaf):
+    __swig_setmethods__ = {}
+    for _s in [CSG_PRQuadTree_Leaf]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_PRQuadTree_Leaf_List, name, value)
+    __swig_getmethods__ = {}
+    for _s in [CSG_PRQuadTree_Leaf]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, CSG_PRQuadTree_Leaf_List, name)
+    def __init__(self, *args, **kwargs): raise AttributeError("No constructor defined")
+    __repr__ = _swig_repr
+    def has_Statistics(self): return _saga_api.CSG_PRQuadTree_Leaf_List_has_Statistics(self)
+    def Get_Count(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Count(self)
+    def Get_Value(self, *args): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Value(self, *args)
+    def Get_Minimum(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Minimum(self)
+    def Get_Maximum(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Maximum(self)
+    def Get_Range(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Range(self)
+    def Get_Sum(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Sum(self)
+    def Get_Mean(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Mean(self)
+    def Get_Variance(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_Variance(self)
+    def Get_StdDev(self): return _saga_api.CSG_PRQuadTree_Leaf_List_Get_StdDev(self)
+    __swig_destroy__ = _saga_api.delete_CSG_PRQuadTree_Leaf_List
+    __del__ = lambda self : None;
+CSG_PRQuadTree_Leaf_List_swigregister = _saga_api.CSG_PRQuadTree_Leaf_List_swigregister
+CSG_PRQuadTree_Leaf_List_swigregister(CSG_PRQuadTree_Leaf_List)
+
 class CSG_PRQuadTree_Node(CSG_PRQuadTree_Item):
     __swig_setmethods__ = {}
     for _s in [CSG_PRQuadTree_Item]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
@@ -2738,8 +2789,29 @@ class CSG_PRQuadTree_Node(CSG_PRQuadTree_Item):
     def is_Node(self): return _saga_api.CSG_PRQuadTree_Node_is_Node(self)
     def Get_Child(self, *args): return _saga_api.CSG_PRQuadTree_Node_Get_Child(self, *args)
     def Add_Point(self, *args): return _saga_api.CSG_PRQuadTree_Node_Add_Point(self, *args)
+    def Get_X(self): return _saga_api.CSG_PRQuadTree_Node_Get_X(self)
+    def Get_Y(self): return _saga_api.CSG_PRQuadTree_Node_Get_Y(self)
+    def Get_Z(self): return _saga_api.CSG_PRQuadTree_Node_Get_Z(self)
 CSG_PRQuadTree_Node_swigregister = _saga_api.CSG_PRQuadTree_Node_swigregister
 CSG_PRQuadTree_Node_swigregister(CSG_PRQuadTree_Node)
+
+class CSG_PRQuadTree_Node_Statistics(CSG_PRQuadTree_Node):
+    __swig_setmethods__ = {}
+    for _s in [CSG_PRQuadTree_Node]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_PRQuadTree_Node_Statistics, name, value)
+    __swig_getmethods__ = {}
+    for _s in [CSG_PRQuadTree_Node]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, CSG_PRQuadTree_Node_Statistics, name)
+    def __init__(self, *args, **kwargs): raise AttributeError("No constructor defined")
+    __repr__ = _swig_repr
+    def has_Statistics(self): return _saga_api.CSG_PRQuadTree_Node_Statistics_has_Statistics(self)
+    def Get_X(self): return _saga_api.CSG_PRQuadTree_Node_Statistics_Get_X(self)
+    def Get_Y(self): return _saga_api.CSG_PRQuadTree_Node_Statistics_Get_Y(self)
+    def Get_Z(self): return _saga_api.CSG_PRQuadTree_Node_Statistics_Get_Z(self)
+    __swig_destroy__ = _saga_api.delete_CSG_PRQuadTree_Node_Statistics
+    __del__ = lambda self : None;
+CSG_PRQuadTree_Node_Statistics_swigregister = _saga_api.CSG_PRQuadTree_Node_Statistics_swigregister
+CSG_PRQuadTree_Node_Statistics_swigregister(CSG_PRQuadTree_Node_Statistics)
 
 class CSG_PRQuadTree(_object):
     __swig_setmethods__ = {}
@@ -2758,10 +2830,15 @@ class CSG_PRQuadTree(_object):
     def Add_Point(self, *args): return _saga_api.CSG_PRQuadTree_Add_Point(self, *args)
     def Get_Point_Count(self): return _saga_api.CSG_PRQuadTree_Get_Point_Count(self)
     def Get_Root(self): return _saga_api.CSG_PRQuadTree_Get_Root(self)
+    def Get_Root_Pointer(self): return _saga_api.CSG_PRQuadTree_Get_Root_Pointer(self)
     def is_Okay(self): return _saga_api.CSG_PRQuadTree_is_Okay(self)
+    def Get_Nearest_Leaf(self, *args): return _saga_api.CSG_PRQuadTree_Get_Nearest_Leaf(self, *args)
     def Get_Nearest_Point(self, *args): return _saga_api.CSG_PRQuadTree_Get_Nearest_Point(self, *args)
     def Select_Nearest_Points(self, *args): return _saga_api.CSG_PRQuadTree_Select_Nearest_Points(self, *args)
     def Get_Selected_Count(self): return _saga_api.CSG_PRQuadTree_Get_Selected_Count(self)
+    def Get_Selected_Leaf(self, *args): return _saga_api.CSG_PRQuadTree_Get_Selected_Leaf(self, *args)
+    def Get_Selected_Z(self, *args): return _saga_api.CSG_PRQuadTree_Get_Selected_Z(self, *args)
+    def Get_Selected_Distance(self, *args): return _saga_api.CSG_PRQuadTree_Get_Selected_Distance(self, *args)
     def Get_Selected_Point(self, *args): return _saga_api.CSG_PRQuadTree_Get_Selected_Point(self, *args)
 CSG_PRQuadTree_swigregister = _saga_api.CSG_PRQuadTree_swigregister
 CSG_PRQuadTree_swigregister(CSG_PRQuadTree)
@@ -3062,13 +3139,20 @@ PARAMETER_TYPE_DataObject_Output = _saga_api.PARAMETER_TYPE_DataObject_Output
 PARAMETER_TYPE_Parameters = _saga_api.PARAMETER_TYPE_Parameters
 PARAMETER_TYPE_Undefined = _saga_api.PARAMETER_TYPE_Undefined
 
+def SG_Parameter_Type_Get_Name(*args):
+  return _saga_api.SG_Parameter_Type_Get_Name(*args)
+SG_Parameter_Type_Get_Name = _saga_api.SG_Parameter_Type_Get_Name
+
 def SG_Parameter_Type_Get_Identifier(*args):
   return _saga_api.SG_Parameter_Type_Get_Identifier(*args)
 SG_Parameter_Type_Get_Identifier = _saga_api.SG_Parameter_Type_Get_Identifier
 
-def SG_Parameter_Type_Get_Name(*args):
-  return _saga_api.SG_Parameter_Type_Get_Name(*args)
-SG_Parameter_Type_Get_Name = _saga_api.SG_Parameter_Type_Get_Name
+def SG_Parameter_Type_Get_Type(*args):
+  return _saga_api.SG_Parameter_Type_Get_Type(*args)
+SG_Parameter_Type_Get_Type = _saga_api.SG_Parameter_Type_Get_Type
+PARAMETER_CHECK_VALUES = _saga_api.PARAMETER_CHECK_VALUES
+PARAMETER_CHECK_ENABLE = _saga_api.PARAMETER_CHECK_ENABLE
+PARAMETER_CHECK_ALL = _saga_api.PARAMETER_CHECK_ALL
 class CSG_Parameter_Data(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, CSG_Parameter_Data, name, value)
@@ -3092,6 +3176,7 @@ class CSG_Parameter_Data(_object):
     def asString(self): return _saga_api.CSG_Parameter_Data_asString(self)
     def Get_Default(self): return _saga_api.CSG_Parameter_Data_Get_Default(self)
     def Set_Default(self, *args): return _saga_api.CSG_Parameter_Data_Set_Default(self, *args)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Data_Restore_Default(self)
 CSG_Parameter_Data_swigregister = _saga_api.CSG_Parameter_Data_swigregister
 CSG_Parameter_Data_swigregister(CSG_Parameter_Data)
 
@@ -3135,6 +3220,7 @@ class CSG_Parameter_Bool(CSG_Parameter_Data):
     def Set_Value(self, *args): return _saga_api.CSG_Parameter_Bool_Set_Value(self, *args)
     def asInt(self): return _saga_api.CSG_Parameter_Bool_asInt(self)
     def asString(self): return _saga_api.CSG_Parameter_Bool_asString(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Bool_Restore_Default(self)
 CSG_Parameter_Bool_swigregister = _saga_api.CSG_Parameter_Bool_swigregister
 CSG_Parameter_Bool_swigregister(CSG_Parameter_Bool)
 
@@ -3178,6 +3264,7 @@ class CSG_Parameter_Int(CSG_Parameter_Value):
     def asInt(self): return _saga_api.CSG_Parameter_Int_asInt(self)
     def asDouble(self): return _saga_api.CSG_Parameter_Int_asDouble(self)
     def asString(self): return _saga_api.CSG_Parameter_Int_asString(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Int_Restore_Default(self)
 CSG_Parameter_Int_swigregister = _saga_api.CSG_Parameter_Int_swigregister
 CSG_Parameter_Int_swigregister(CSG_Parameter_Int)
 
@@ -3200,6 +3287,7 @@ class CSG_Parameter_Double(CSG_Parameter_Value):
     def asInt(self): return _saga_api.CSG_Parameter_Double_asInt(self)
     def asDouble(self): return _saga_api.CSG_Parameter_Double_asDouble(self)
     def asString(self): return _saga_api.CSG_Parameter_Double_asString(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Double_Restore_Default(self)
 CSG_Parameter_Double_swigregister = _saga_api.CSG_Parameter_Double_swigregister
 CSG_Parameter_Double_swigregister(CSG_Parameter_Double)
 
@@ -3246,6 +3334,7 @@ class CSG_Parameter_Range(CSG_Parameter_Data):
     def Get_HiVal(self): return _saga_api.CSG_Parameter_Range_Get_HiVal(self)
     def Get_LoParm(self): return _saga_api.CSG_Parameter_Range_Get_LoParm(self)
     def Get_HiParm(self): return _saga_api.CSG_Parameter_Range_Get_HiParm(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Range_Restore_Default(self)
 CSG_Parameter_Range_swigregister = _saga_api.CSG_Parameter_Range_swigregister
 CSG_Parameter_Range_swigregister(CSG_Parameter_Range)
 
@@ -3293,6 +3382,7 @@ class CSG_Parameter_String(CSG_Parameter_Data):
     def Set_Value(self, *args): return _saga_api.CSG_Parameter_String_Set_Value(self, *args)
     def Set_Password(self, *args): return _saga_api.CSG_Parameter_String_Set_Password(self, *args)
     def is_Password(self): return _saga_api.CSG_Parameter_String_is_Password(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_String_Restore_Default(self)
 CSG_Parameter_String_swigregister = _saga_api.CSG_Parameter_String_swigregister
 CSG_Parameter_String_swigregister(CSG_Parameter_String)
 
@@ -3360,6 +3450,7 @@ class CSG_Parameter_Font(CSG_Parameter_Data):
     def asInt(self): return _saga_api.CSG_Parameter_Font_asInt(self)
     def asPointer(self): return _saga_api.CSG_Parameter_Font_asPointer(self)
     def asString(self): return _saga_api.CSG_Parameter_Font_asString(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Font_Restore_Default(self)
 CSG_Parameter_Font_swigregister = _saga_api.CSG_Parameter_Font_swigregister
 CSG_Parameter_Font_swigregister(CSG_Parameter_Font)
 
@@ -3740,6 +3831,7 @@ class CSG_Parameter_Parameters(CSG_Parameter_Data):
     def Get_Type(self): return _saga_api.CSG_Parameter_Parameters_Get_Type(self)
     def asString(self): return _saga_api.CSG_Parameter_Parameters_asString(self)
     def asPointer(self): return _saga_api.CSG_Parameter_Parameters_asPointer(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Parameters_Restore_Default(self)
 CSG_Parameter_Parameters_swigregister = _saga_api.CSG_Parameter_Parameters_swigregister
 CSG_Parameter_Parameters_swigregister(CSG_Parameter_Parameters)
 
@@ -3802,7 +3894,8 @@ class CSG_Parameter(_object):
     def Get_Child(self, *args): return _saga_api.CSG_Parameter_Get_Child(self, *args)
     def Set_Value(self, *args): return _saga_api.CSG_Parameter_Set_Value(self, *args)
     def Set_Default(self, *args): return _saga_api.CSG_Parameter_Set_Default(self, *args)
-    def has_Changed(self): return _saga_api.CSG_Parameter_has_Changed(self)
+    def Restore_Default(self): return _saga_api.CSG_Parameter_Restore_Default(self)
+    def has_Changed(self, *args): return _saga_api.CSG_Parameter_has_Changed(self, *args)
     def asBool(self): return _saga_api.CSG_Parameter_asBool(self)
     def asInt(self): return _saga_api.CSG_Parameter_asInt(self)
     def asColor(self): return _saga_api.CSG_Parameter_asColor(self)
@@ -3862,6 +3955,7 @@ class CSG_Parameters(_object):
     def Set_Callback(self, bActive = True): return _saga_api.CSG_Parameters_Set_Callback(self, bActive)
     def Del_Parameters(self): return _saga_api.CSG_Parameters_Del_Parameters(self)
     def Set_Parameter(self, *args): return _saga_api.CSG_Parameters_Set_Parameter(self, *args)
+    def Restore_Defaults(self): return _saga_api.CSG_Parameters_Restore_Defaults(self)
     def Assign(self, *args): return _saga_api.CSG_Parameters_Assign(self, *args)
     def Assign_Values(self, *args): return _saga_api.CSG_Parameters_Assign_Values(self, *args)
     def Serialize(self, *args): return _saga_api.CSG_Parameters_Serialize(self, *args)
@@ -3925,6 +4019,7 @@ class CSG_Module(_object):
     __del__ = lambda self : None;
     def Destroy(self): return _saga_api.CSG_Module_Destroy(self)
     def Get_Type(self): return _saga_api.CSG_Module_Get_Type(self)
+    def Get_ID(self): return _saga_api.CSG_Module_Get_ID(self)
     def Get_Name(self): return _saga_api.CSG_Module_Get_Name(self)
     def Get_Description(self): return _saga_api.CSG_Module_Get_Description(self)
     def Get_Author(self): return _saga_api.CSG_Module_Get_Author(self)
@@ -3937,6 +4032,7 @@ class CSG_Module(_object):
     def Garbage_Del_Item(self, *args): return _saga_api.CSG_Module_Garbage_Del_Item(self, *args)
     def Garbage_Clear(self): return _saga_api.CSG_Module_Garbage_Clear(self)
     def do_Sync_Projections(self): return _saga_api.CSG_Module_do_Sync_Projections(self)
+    def is_Grid(self): return _saga_api.CSG_Module_is_Grid(self)
     def is_Interactive(self): return _saga_api.CSG_Module_is_Interactive(self)
     def is_Progress(self): return _saga_api.CSG_Module_is_Progress(self)
     def is_Executing(self): return _saga_api.CSG_Module_is_Executing(self)
@@ -3962,6 +4058,7 @@ class CSG_Module_Grid(CSG_Module):
     __del__ = lambda self : None;
     def Get_Type(self): return _saga_api.CSG_Module_Grid_Get_Type(self)
     def Get_System(self): return _saga_api.CSG_Module_Grid_Get_System(self)
+    def is_Grid(self): return _saga_api.CSG_Module_Grid_is_Grid(self)
 CSG_Module_Grid_swigregister = _saga_api.CSG_Module_Grid_swigregister
 CSG_Module_Grid_swigregister(CSG_Module_Grid)
 

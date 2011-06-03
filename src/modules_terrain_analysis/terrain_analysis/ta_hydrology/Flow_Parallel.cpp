@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Flow_Parallel.cpp 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -70,7 +73,7 @@
 //---------------------------------------------------------
 CFlow_Parallel::CFlow_Parallel(void)
 {
-	Set_Name		(_TL("Parallel Processing"));
+	Set_Name		(_TL("Catchment Area (Parallel)"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2001-2010, T.Grabs portions (c) 2010"));
 

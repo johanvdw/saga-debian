@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Grid_AHP.cpp 961 2011-03-24 23:56:28Z johanvdw $
+ *********************************************************/
 /*******************************************************************************
     AHP.cpp
     Copyright (C) Victor Olaya
@@ -116,13 +119,13 @@ bool CAHP::On_Execute(void){
 				pOutputGrid->Set_Value(x,y,fValue);
 			}//for
 		}//for
+	delete[] pCoefs;
 	}//if
 
 	for (i = 0; i<pGridsList->Get_Count(); i++){
 		delete [] pMatrix[i];
 	}//for
 	delete []pMatrix;
-	delete[] pCoefs;
 
 	return true;
 

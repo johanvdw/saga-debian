@@ -275,13 +275,14 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.24 2010/11/08 09:20:52 johanvdw Exp $
+# $Id: Makefile.am 942 2011-02-25 20:13:19Z johanvdw $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
+@SAGA_PYTHON_TRUE@SAGAPYTHONFLAGS = -D_SAGA_PYTHON
 @SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
-@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
+@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS)
 @SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` $(HARU_LIB)
-@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB)
+@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB) $(SAGAPYTHONFLAGS)
 libsaga_api_la_LDFLAGS = $(AM_LDFLAGS) -release $(VERSION)
 lib_LTLIBRARIES = libsaga_api.la
 libsaga_api_la_SOURCES = \
@@ -843,7 +844,7 @@ install-exec-hook:
 	-ldconfig
 
 @SAGA_PYTHON_TRUE@saga_api_wrap.cxx:
-@SAGA_PYTHON_TRUE@	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) ./saga_api.h 
+@SAGA_PYTHON_TRUE@	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) $(SAGAPYTHONFLAGS) ./saga_api.h 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

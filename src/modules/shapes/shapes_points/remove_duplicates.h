@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: remove_duplicates.h 1047 2011-05-05 16:13:56Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -73,20 +76,23 @@ class CRemove_Duplicates : public CSG_Module
 {
 public:
 	CRemove_Duplicates(void);
-	virtual ~CRemove_Duplicates(void);
 
 
 protected:
+
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	virtual bool				On_Execute				(void);
 
 
 private:
 
-	int							m_Method_Num, m_Method_Str;
+	int							m_Field, m_Method, m_Numeric;
+
+	CSG_Shapes					*m_pPoints;
 
 
-	void						Set_Attributes			(CSG_Table_Record *pTarget, CSG_Table_Record *pSource);
+	void						Set_Attributes			(CSG_Shape *pPoint, CSG_PRQuadTree_Leaf_List *pList);
 
 };
 

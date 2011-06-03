@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_layer.h 1020 2011-04-27 18:46:57Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -87,6 +90,8 @@ public:
 	CWKSP_Layer(CSG_Data_Object *pObject);
 	virtual ~CWKSP_Layer(void);
 
+	bool							Initialise				(void);
+
 	virtual bool					On_Command				(int Cmd_ID);
 	virtual bool					On_Command_UI			(wxUpdateUIEvent &event);
 
@@ -150,8 +155,6 @@ protected:
 
 	CSG_Parameter_Range				*m_pZRange;
 
-	CSG_Parameters					m_Parameters;
-
 	CSG_Point						m_Edit_Mouse_Down;
 
 	CSG_Table						m_Edit_Attributes;
@@ -165,13 +168,10 @@ protected:
 	wxBitmap						m_Thumbnail;
 
 
-	void							Create_Parameters		(void);
-
-	virtual void					On_Create_Parameters	(void)	= 0;
+	virtual void					On_Create_Parameters	(void);
 	virtual void					On_DataObject_Changed	(void)	= 0;
 	virtual void					On_Parameters_Changed	(void)	= 0;
-
-	virtual int						On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int						On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
 	virtual void					On_Update_Views			(void)			{}
 
@@ -187,8 +187,6 @@ protected:
 
 
 private:
-
-	static int						_On_Parameter_Changed	(CSG_Parameter *pParameter);
 
 	bool							_Set_Thumbnail			(void);
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Hypsometry.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -275,10 +278,10 @@ bool CHypsometry::Calculate_A(CSG_Grid *pDEM, CSG_Table *pTable, bool bDown, int
 
 		SG_Free(Cells_Count);
 
-		return( false );
+		return( true );
 	}
 
-	return( true );
+	return( false );
 }
 
 

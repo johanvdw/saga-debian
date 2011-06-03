@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Polygon_Transect.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -219,9 +222,9 @@ bool CPolygon_Transect::On_Execute(void)
                     for (int iPart=0; iPart<pTheme_Shape->Get_Part_Count(); iPart++)
                     {
                         CSG_Shape_Polygon_Part *pPart = (CSG_Shape_Polygon_Part *) pTheme_Shape->Get_Part(iPart);
-                        if (pPart->is_Containing(pLinePart->Get_Point(0)))
+                        if (pPart->Contains(pLinePart->Get_Point(0)))
                             LineBorders[iShape].push_back(0);
-                        if (pPart->is_Containing(pLinePart->Get_Point(pLinePart->Get_Count())))
+                        if (pPart->Contains(pLinePart->Get_Point(pLinePart->Get_Count())))
                             LineBorders[iShape].push_back(pLine->Get_Length(iLinePart));
                         for (int iPoint=0; iPoint<pPart->Get_Count();iPoint++)
                         {

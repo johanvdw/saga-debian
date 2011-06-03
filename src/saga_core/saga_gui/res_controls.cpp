@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: res_controls.cpp 1006 2011-04-20 11:57:39Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -86,6 +89,8 @@ const wxChar * CTRL_Get_Name(int ID_CTRL)
 
 	case ID_BTN_LOAD:					return( LNG("[BTN] Load") );
 	case ID_BTN_SAVE:					return( LNG("[BTN] Save") );
+
+	case ID_BTN_DEFAULTS:				return( LNG("[BTN] Defaults") );
 
 	case ID_BTN_ADD:					return( LNG("[BTN] Add") );
 	case ID_BTN_ADD_ALL:				return( LNG("[BTN] Add All") );

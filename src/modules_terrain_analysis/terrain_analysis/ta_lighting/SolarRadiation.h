@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: SolarRadiation.h 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -86,6 +89,8 @@ public:
 
 
 protected:
+
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	virtual bool			On_Execute				(void);
 

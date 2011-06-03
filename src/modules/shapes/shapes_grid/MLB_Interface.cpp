@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 1025 2011-04-28 16:16:37Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -74,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Shapes - Grid") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad (c) 2002") );
+		return( SG_T("O. Conrad (c) 2002") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools related to gridded and vector data (conversions, combinations, etc.).") );
@@ -101,6 +104,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_Polygon_Clip.h"
 #include "Grid_To_Gradient.h"
 #include "grid_local_extremes_to_points.h"
+#include "grid_extent.h"
 
 
 //---------------------------------------------------------
@@ -108,61 +112,28 @@ const SG_Char * Get_Info(int i)
 
 CSG_Module *		Create_Module(int i)
 {
-	// Don't forget to continuously enumerate the case switches
-	// when adding new modules! Also bear in mind that the
-	// enumeration always has to start with [case 0:] and
-	// that [default:] must return NULL!...
-
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CGrid_Values_AddTo_Points;
-		break;
+	case  0:	return( new CGrid_Values_AddTo_Points );
+	case  1:	return( new CGrid_Values_AddTo_Shapes );
+	case  2:	return( new CGrid_Statistics_AddTo_Polygon );
+	case  3:	return( new CGrid_To_Points );
+	case  4:	return( new CGrid_To_Points_Random );
+	case  5:	return( new CGrid_To_Contour );
+	case  6:	return( new CGrid_Classes_To_Shapes );
+	case  7:	return( new CGrid_Polygon_Clip );
 
-	case 1:
-		pModule	= new CGrid_Values_AddTo_Shapes;
-		break;
+	case  9:	return( new CGrid_Local_Extremes_to_Points );
+	case 10:	return( new CGrid_Extent );
 
-	case 2:
-		pModule	= new CGrid_Statistics_AddTo_Polygon;
-		break;
+	case 15:	return( new CGrid_To_Gradient(0) );
+	case 16:	return( new CGrid_To_Gradient(1) );
+	case 17:	return( new CGrid_To_Gradient(2) );
 
-	case 3:
-		pModule	= new CGrid_To_Points;
-		break;
-
-	case 4:
-		pModule	= new CGrid_To_Points_Random;
-		break;
-
-	case 5:
-		pModule	= new CGrid_To_Contour;
-		break;
-
-	case 6:
-		pModule	= new CGrid_Classes_To_Shapes;
-		break;
-
-	case 7:
-		pModule	= new CGrid_Polygon_Clip;
-		break;
-
-	case 8:
-		pModule	= new CGrid_To_Gradient;
-		break;
-
-	case 9:
-		pModule	= new CGrid_Local_Extremes_to_Points;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	case 20:	return( NULL );
 	}
 
-	return( pModule );
+	return( MLB_INTERFACE_SKIP_MODULE );
 }
 
 

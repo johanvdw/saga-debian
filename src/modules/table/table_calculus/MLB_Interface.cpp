@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -98,6 +101,7 @@ const SG_Char * Get_Info(int i)
 #include "table_running_average.h"
 #include "table_running_average.h"
 #include "table_cluster_analysis.h"
+#include "table_pca.h"
 
 
 //---------------------------------------------------------
@@ -114,6 +118,7 @@ CSG_Module *		Create_Module(int i)
 	case 4:		return( new CTable_Trend_Shapes );
 	case 5:		return( new CTable_Running_Average );
 	case 6:		return( new CTable_Cluster_Analysis );
+	case 7:		return( new CTable_PCA );
 	}
 
 	return( NULL );

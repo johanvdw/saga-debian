@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Filter.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -203,6 +206,8 @@ bool CFilter::On_Execute(void)
 		m_pInput->Assign(pResult);
 
 		delete(pResult);
+
+		DataObject_Update(m_pInput);
 	}
 
 	m_Radius.Destroy();

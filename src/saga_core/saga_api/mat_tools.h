@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: mat_tools.h 924 2011-02-21 15:53:42Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -115,6 +118,8 @@
 #define M_GET_MIN(a, b)				(((a) < (b)) ? (a) : (b))
 #define M_GET_MAX(a, b)				(((a) > (b)) ? (a) : (b))
 #define M_SET_MINMAX(min, max, x)	if( min > x ) { min = x; } else if( max < x ) { max = x; }
+
+#define M_SET_SIGN(x, sign)			((sign) < 0 ? (x < 0 ? x : -x) : (x > 0 ? x : -x))
 
 
 ///////////////////////////////////////////////////////////
@@ -345,7 +350,8 @@ private:
 SAGA_API_DLL_EXPORT CSG_Matrix	operator *			(double Scalar, const CSG_Matrix &Matrix);
 
 //---------------------------------------------------------
-SAGA_API_DLL_EXPORT bool		SG_Matrix_Solve		(CSG_Matrix &Matrix, CSG_Vector &Vector, bool bSilent = true);
+SAGA_API_DLL_EXPORT bool		SG_Matrix_Solve				(CSG_Matrix &Matrix, CSG_Vector &Vector, bool bSilent = true);
+SAGA_API_DLL_EXPORT bool		SG_Matrix_Eigen_Reduction	(const CSG_Matrix &Matrix, CSG_Matrix &Eigen_Vectors, CSG_Vector &Eigen_Values, bool bSilent = true);
 
 
 ///////////////////////////////////////////////////////////
@@ -450,6 +456,11 @@ class SAGA_API_DLL_EXPORT CSG_Simple_Statistics
 {
 public:
 	CSG_Simple_Statistics(void);
+	CSG_Simple_Statistics(bool bHoldValues);
+	CSG_Simple_Statistics(const CSG_Simple_Statistics &Statistics);
+
+	bool						Create				(bool bHoldValues = false);
+	bool						Create				(const CSG_Simple_Statistics &Statistics);
 
 	void						Invalidate			(void);
 
@@ -468,6 +479,11 @@ public:
 
 	void						Add_Value			(double Value, double Weight = 1.0);
 
+	double						Get_Value			(int i)		{	return( i >= 0 && i < (int)m_Values.Get_Size() ? ((double *)m_Values.Get_Array())[i] : Get_Mean() );	}
+
+	CSG_Simple_Statistics &		operator  =			(const CSG_Simple_Statistics &Statistics)	{	Create(Statistics);	return( *this );	}
+	CSG_Simple_Statistics &		operator +=			(double Value)								{	Add_Value(Value);	return( *this );	}
+
 
 protected:
 
@@ -476,6 +492,8 @@ protected:
 	int							m_nValues;
 
 	double						m_Weights, m_Sum, m_Sum2, m_Minimum, m_Maximum, m_Range, m_Mean, m_Variance, m_StdDev;
+
+	CSG_Array					m_Values;
 
 
 	void						_Evaluate			(void);
@@ -871,6 +889,7 @@ public:
 	static CSG_String			Get_Help_Usage		(void);
 
 	bool						Get_Error			(int *pPosition = NULL, CSG_String *pMessage = NULL);
+	bool						Get_Error			(CSG_String &Message);
 
 	int							Add_Function		(SG_Char *Name, TSG_PFNC_Formula_1 f, int N_of_Pars, int Varying);
 	int							Del_Function		(SG_Char *Name);

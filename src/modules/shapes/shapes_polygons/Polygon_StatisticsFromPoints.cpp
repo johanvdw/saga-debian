@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Polygon_StatisticsFromPoints.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /*******************************************************************************
     CPolygonStatisticsFromPoints.cpp
     Copyright (C) 2005 Victor Olaya
@@ -224,11 +227,11 @@ bool CPolygonStatisticsFromPoints::On_Execute(void)
 		{
 			CSG_Shape	*pPoint	= pPoints->Get_Shape(iPoint);
 
-			if( pPolygon->is_Containing(pPoint->Get_Point(0)) )
+			if( pPolygon->Contains(pPoint->Get_Point(0)) )
 			{
 				for(i=0; i<pPoints->Get_Field_Count(); i++)
 				{
-					if( bAttribute[i] )
+					if( bAttribute[i] && !pPoint->is_NoData(i))
 					{
 						Statistics[i].Add_Value(pPoint->asDouble(i));
 					}

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -70,7 +73,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Terrain Analysis - Hydrology") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad, Victor Olaya (c) 2001-4") );
+		return( SG_T("O. Conrad, V. Olaya (c) 2001-4") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for digital terrain analysis.") );
@@ -132,12 +135,15 @@ CSG_Module *		Create_Module(int i)
 	case 11:	return( new CSinuosity );
 	case 12:	return( new CFlowDepth );
 	case 13:	return( new CEdgeContamination );
-	case 14:	return( new CTopographicIndices );
+	case 14:	return( MLB_INTERFACE_SKIP_MODULE );	// removed: CTopographicIndices
 	case 15:	return( new CSAGA_Wetness_Index );
 	case 16:	return( new CLakeFlood );
 	case 17:	return( new CLakeFloodInteractive );
 	case 18:	return( new CFlow_MassFlux );
 	case 19:	return( new CFlow_Width );
+	case 20:	return( new CTWI );
+	case 21:	return( new CStream_Power );
+	case 22:	return( new CLS_Factor );
 	}
 
 	return( NULL );

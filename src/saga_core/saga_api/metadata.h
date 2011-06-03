@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: metadata.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -114,7 +117,7 @@ public:
 	void						Set_Name			(const CSG_String &Name)			{	m_Name		= Name;		}
 	const CSG_String &			Get_Content			(void)						const	{	return( m_Content );	}
 	void						Set_Content			(const CSG_String &Content)			{	m_Content	= Content;	}
-	void						Set_Content			(const SG_Char *Format, ...);
+	void						Fmt_Content			(const SG_Char *Format, ...);
 	bool						Cmp_Content			(const CSG_String &String, bool bNoCase = false)	const;
 
 	int							Get_Children_Count	(void)						const	{	return( m_nChildren );	}
@@ -126,6 +129,8 @@ public:
 	CSG_MetaData *				Add_Child			(const CSG_String &Name, int            Content);
 	bool						Del_Child			(int Index);
 	bool						Del_Child			(const CSG_String &Name)			{	return( Del_Child(_Get_Child(Name)) );	}
+
+	bool						Del_Children		(int Depth = 0);
 
 	const CSG_MetaData &		operator []			(int Index)					const	{	CSG_MetaData	*pData	= Index >= 0 && Index < m_nChildren ? m_pChildren[Index] : NULL;	return( *pData );	}
 	const CSG_MetaData &		operator []			(const CSG_String &Name)	const	{	return( *Get_Child(_Get_Child(Name)) );	}

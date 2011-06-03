@@ -76,8 +76,8 @@ libtable_calculus_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libtable_calculus_la_OBJECTS = Fit.lo LMFit.lo MLB_Interface.lo \
 	Table_Calculator.lo Table_CalculatorShapes.lo \
-	table_cluster_analysis.lo table_running_average.lo \
-	Table_Trend.lo
+	table_cluster_analysis.lo table_pca.lo \
+	table_running_average.lo Table_Trend.lo
 libtable_calculus_la_OBJECTS = $(am_libtable_calculus_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -245,7 +245,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.8 2010/11/05 14:51:46 oconrad Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -261,6 +261,7 @@ MLB_Interface.cpp\
 Table_Calculator.cpp\
 Table_CalculatorShapes.cpp\
 table_cluster_analysis.cpp\
+table_pca.cpp\
 table_running_average.cpp\
 Table_Trend.cpp\
 Fit.h\
@@ -269,6 +270,7 @@ MLB_Interface.h\
 Table_Calculator.h\
 Table_CalculatorShapes.h\
 table_cluster_analysis.h\
+table_pca.h\
 table_running_average.h\
 Table_Trend.h
 
@@ -354,6 +356,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_CalculatorShapes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Trend.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_cluster_analysis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_pca.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_running_average.Plo@am__quote@
 
 .cpp.o:

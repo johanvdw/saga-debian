@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: LeastCostPathProfile_Points.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
 //                         SAGA                          //
@@ -80,7 +83,7 @@ CLeastCostPathProfile_Points::CLeastCostPathProfile_Points(void)
 {
 	Set_Name(_TL("Least Cost Paths"));
 
-	Set_Author(_TL("Olaf Conrad, Victor Olaya & Volker Wichmann (c) 2004-2010"));
+	Set_Author(SG_T("O. Conrad, V. Olaya, V. Wichmann (c) 2004-2010"));
 
 	Parameters.Set_Description(_TW(
 		"This module allows to compute least cost path profile(s). It takes an "

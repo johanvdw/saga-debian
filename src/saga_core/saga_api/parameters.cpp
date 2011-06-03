@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: parameters.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -99,17 +102,17 @@ CSG_Parameters::~CSG_Parameters(void)
 //---------------------------------------------------------
 void CSG_Parameters::_On_Construction(void)
 {
-	m_pOwner		= NULL;
+	m_pOwner			= NULL;
 
-	m_Parameters	= NULL;
-	m_nParameters	= 0;
+	m_Parameters		= NULL;
+	m_nParameters		= 0;
 
-	m_Callback		= NULL;
-	m_bCallback		= false;
+	m_Callback			= NULL;
+	m_bCallback			= false;
 
-	m_pGrid_System	= NULL;
+	m_pGrid_System		= NULL;
 
-	m_bManaged		= true;
+	m_bManaged			= true;
 }
 
 //---------------------------------------------------------
@@ -882,12 +885,12 @@ void CSG_Parameters::Set_Callback(bool bActive)
 }
 
 //---------------------------------------------------------
-bool CSG_Parameters::_On_Parameter_Changed(CSG_Parameter *pSender)
+bool CSG_Parameters::_On_Parameter_Changed(CSG_Parameter *pParameter, int Flags)
 {
 	if( m_Callback && m_bCallback )
 	{
 		m_bCallback	= false;
-		m_Callback(pSender);
+		m_Callback(pParameter, Flags);
 		m_bCallback	= true;
 
 		return( true );
@@ -995,6 +998,24 @@ bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, const SG
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+bool CSG_Parameters::Restore_Defaults(void)
+{
+	for(int i=0; i<Get_Count(); i++)
+	{
+		m_Parameters[i]->Restore_Default();
+	}
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 int CSG_Parameters::Assign(CSG_Parameters *pSource)
 {
 	if( pSource != this )
@@ -1009,8 +1030,8 @@ int CSG_Parameters::Assign(CSG_Parameters *pSource)
 			Set_Name		(pSource->Get_Name());
 			Set_Description	(pSource->Get_Description());
 
-			m_Callback	= pSource->m_Callback;
-			m_bCallback	= pSource->m_bCallback;
+			m_Callback		= pSource->m_Callback;
+			m_bCallback		= pSource->m_bCallback;
 
 			if( pSource->Get_Count() > 0 )
 			{

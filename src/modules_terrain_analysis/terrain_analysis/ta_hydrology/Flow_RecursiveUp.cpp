@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Flow_RecursiveUp.cpp 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -58,8 +61,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <memory.h>
-
 #include "Flow_RecursiveUp.h"
 
 
@@ -72,9 +73,9 @@
 //---------------------------------------------------------
 CFlow_RecursiveUp::CFlow_RecursiveUp(void)
 {
-	Set_Name(_TL("Recursive Upward Processing"));
+	Set_Name		(_TL("Catchment Area (Recursive)"));
 
-	Set_Author		(SG_T("(c) 2001 by O.Conrad"));
+	Set_Author		(SG_T("O.Conrad (c) 2001"));
 
 	Set_Description	(_TW(
 		"Recursive upward processing of cells for calculation of flow accumulation and related parameters. "

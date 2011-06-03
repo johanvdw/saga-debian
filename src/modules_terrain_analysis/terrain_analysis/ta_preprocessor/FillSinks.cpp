@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: FillSinks.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -119,6 +122,8 @@ bool CFillSinks::On_Execute(void)
 
 	pDEM		= Parameters("DEM")->asGrid();
 	pResult		= Parameters("RESULT")->asGrid();
+
+	pResult->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pDEM->Get_Name(), _TL("no sinks")));
 
 	minslope	= tan(Parameters("MINSLOPE")->asDouble() * M_DEG_TO_RAD);
 

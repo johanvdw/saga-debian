@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.8 2010/07/08 14:11:48 johanvdw Exp $
+# $Id: Makefile.am 1029 2011-04-29 11:52:50Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -13,6 +13,7 @@ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libta_preprocessor.la
 libta_preprocessor_la_SOURCES =\
+burn_in_streams.cpp\
 FillSinks.cpp\
 FillSinks_WL.cpp\
 FillSinks_WL_XXL.cpp\
@@ -20,6 +21,7 @@ MLB_Interface.cpp\
 Flat_Detection.cpp\
 Pit_Eliminator.cpp\
 Pit_Router.cpp\
+burn_in_streams.h\
 FillSinks.h\
 FillSinks_WL.h\
 MLB_Interface.h\

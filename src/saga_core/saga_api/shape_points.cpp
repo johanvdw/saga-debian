@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: shape_points.cpp 986 2011-04-12 15:48:49Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -142,19 +145,6 @@ int CSG_Shape_Points::_Add_Part(void)
 }
 
 //---------------------------------------------------------
-CSG_Shape_Part * CSG_Shape_Points::_Get_Part(void)
-{
-	switch( ((CSG_Shapes *)Get_Table())->Get_Vertex_Type() )
-	{
-	default:
-	case SG_VERTEX_TYPE_XY:		return( new CSG_Shape_Part   (this) );
-	case SG_VERTEX_TYPE_XYZ:	return( new CSG_Shape_Part_Z (this) );
-	case SG_VERTEX_TYPE_XYZM:	return( new CSG_Shape_Part_ZM(this) );
-	}
-}
-
-
-//---------------------------------------------------------
 int CSG_Shape_Points::Del_Part(int del_Part)
 {
 	if( del_Part >= 0 && del_Part < m_nParts )
@@ -292,6 +282,36 @@ void CSG_Shape_Points::_Update_Extent(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+TSG_Point CSG_Shape_Points::Get_Centroid(void)
+{
+	int			n	= 0;
+	CSG_Point	c(0.0, 0.0);
+
+	for(int iPart=0; iPart<Get_Part_Count(); iPart++)
+	{
+		for(int iPoint=0; iPoint<Get_Point_Count(iPart); iPoint++)
+		{
+			c	+= Get_Point(iPoint, iPart);
+			n	++;
+		}
+	}
+
+	if( n > 0 )
+	{
+		c.Assign(c.Get_X() / n, c.Get_Y() / n);
+	}
+
+	return( c );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 double CSG_Shape_Points::Get_Distance(TSG_Point Point)
 {
 	TSG_Point	Next;
@@ -361,7 +381,62 @@ double CSG_Shape_Points::Get_Distance(TSG_Point Point, TSG_Point &Next, int iPar
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CSG_Shape_Points::On_Intersects(TSG_Rect Extent)
+TSG_Intersection CSG_Shape_Points::On_Intersects(CSG_Shape *pShape)
+{
+	CSG_Shape	*piPoints, *pjPoints;
+
+	if( CSG_Shape::Get_Point_Count() < pShape->Get_Point_Count() )
+	{
+		piPoints	= this;
+		pjPoints	= pShape;
+	}
+	else
+	{
+		piPoints	= pShape;
+		pjPoints	= this;
+	}
+
+	bool	bIn		= false;
+	bool	bOut	= false;
+
+	for(int iPart=0; iPart<piPoints->Get_Part_Count(); iPart++)
+	{
+		for(int iPoint=0; iPoint<piPoints->Get_Point_Count(iPart); iPoint++)
+		{
+			CSG_Point	Point	= piPoints->Get_Point(iPoint, iPart);
+
+			for(int jPart=0; jPart<pjPoints->Get_Part_Count(); jPart++)
+			{
+				for(int jPoint=0; jPoint<pjPoints->Get_Point_Count(jPart); jPoint++)
+				{
+					if( Point.is_Equal(pjPoints->Get_Point(jPoint, jPart)) )
+					{
+						bIn		= true;
+					}
+					else
+					{
+						bOut	= true;
+					}
+
+					if( bIn && bOut )
+					{
+						return( INTERSECTION_Overlaps );
+					}
+				}
+			}
+		}
+	}
+
+	if( bIn )
+	{
+		return( piPoints == this ? INTERSECTION_Contained : INTERSECTION_Contains );
+	}
+
+	return( INTERSECTION_None );
+}
+
+//---------------------------------------------------------
+TSG_Intersection CSG_Shape_Points::On_Intersects(TSG_Rect Extent)
 {
 	for(int iPart=0; iPart<m_nParts; iPart++)
 	{

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: pc_cluster_analysis.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -318,11 +321,11 @@ bool CPC_Cluster_Analysis::On_Execute(void)
 
 		if( Parameters("UPDATEVIEW")->asBool() )
 		{
-			if( DataObject_Get_Parameters(pResult, Parms) && Parms("COLORS_TYPE") && Parms("COLORS_ATTRIB") && Parms("METRIC_COLORS") && Parms("METRIC_ZRANGE") )
+			if( DataObject_Get_Parameters(pResult, Parms) && Parms("COLORS_TYPE") && Parms("METRIC_ATTRIB") && Parms("METRIC_COLORS") && Parms("METRIC_ZRANGE") )
 			{
 				Parms("COLORS_TYPE")					->Set_Value(2);			// graduated color
 				Parms("METRIC_COLORS")->asColors()		->Set_Count(nCluster);
-				Parms("COLORS_ATTRIB")					->Set_Value(clustField);
+				Parms("METRIC_ATTRIB")					->Set_Value(clustField);
 				Parms("METRIC_ZRANGE")->asRange()		->Set_Range(0, nCluster);
 			}
 			DataObject_Set_Parameters(pResult, Parms);
@@ -383,7 +386,7 @@ bool CPC_Cluster_Analysis::On_Execute(void)
 		Write_Result(Parameters("STATISTICS")->asTable(), nElements, nCluster, SP);
 
 		//-------------------------------------------------
-		if( DataObject_Get_Parameters(pResult, Parms) && Parms("COLORS_TYPE") && Parms("LUT") && Parms("COLORS_ATTRIB") )
+		if( DataObject_Get_Parameters(pResult, Parms) && Parms("COLORS_TYPE") && Parms("LUT") && Parms("LUT_ATTRIB") )
 		{
 			CSG_Table_Record	*pClass;
 			CSG_Table			*pLUT	= Parms("LUT")->asTable();
@@ -408,7 +411,7 @@ bool CPC_Cluster_Analysis::On_Execute(void)
 			}
 
 			Parms("COLORS_TYPE")	->Set_Value(1);	// Color Classification Type: Lookup Table
-			Parms("COLORS_ATTRIB")	->Set_Value(clustField);
+			Parms("LUT_ATTRIB")		->Set_Value(clustField);
 
 			DataObject_Set_Parameters(pResult, Parms);
 		}

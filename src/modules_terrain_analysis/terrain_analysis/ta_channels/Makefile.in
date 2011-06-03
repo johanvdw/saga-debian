@@ -76,8 +76,8 @@ libta_channels_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libta_channels_la_OBJECTS = ChannelNetwork.lo \
 	ChannelNetwork_Altitude.lo ChannelNetwork_Distance.lo \
-	D8_Flow_Analysis.lo Helper.lo MLB_Interface.lo Strahler.lo \
-	Watersheds.lo Watersheds_ext.lo
+	D8_Flow_Analysis.lo MLB_Interface.lo Strahler.lo Watersheds.lo \
+	Watersheds_ext.lo
 libta_channels_la_OBJECTS = $(am_libta_channels_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -245,7 +245,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.6 2010/07/08 14:11:50 johanvdw Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -259,7 +259,6 @@ ChannelNetwork.cpp\
 ChannelNetwork_Altitude.cpp\
 ChannelNetwork_Distance.cpp\
 D8_Flow_Analysis.cpp\
-Helper.cpp\
 MLB_Interface.cpp\
 Strahler.cpp\
 Watersheds.cpp\
@@ -268,7 +267,6 @@ ChannelNetwork.h\
 ChannelNetwork_Altitude.h\
 ChannelNetwork_Distance.h\
 D8_Flow_Analysis.h\
-Helper.h\
 MLB_Interface.h\
 Strahler.h\
 Watersheds.h\
@@ -353,7 +351,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChannelNetwork_Altitude.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChannelNetwork_Distance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/D8_Flow_Analysis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Strahler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Watersheds.Plo@am__quote@

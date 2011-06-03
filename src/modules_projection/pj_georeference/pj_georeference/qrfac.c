@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: qrfac.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /* qrfac.c -- compute qr factorization of matrix. */
 #include <math.h>
 #include "cminpak.h"

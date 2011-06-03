@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_data_manager.h 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -100,7 +103,6 @@ public:
 	virtual bool					On_Command			(int Cmd_ID);
 	virtual bool					On_Command_UI		(wxUpdateUIEvent &event);
 
-	virtual class CSG_Parameters *	Get_Parameters		(void)		{	return( &m_Parameters );	}
 	virtual void					Parameters_Changed	(void);
 
 	CWKSP_Base_Manager *			Get_Manager			(int i)		{	return( (CWKSP_Base_Manager *)Get_Item(i) );	}
@@ -151,8 +153,6 @@ public:
 private:
 
 	int								m_Numbering;
-
-	CSG_Parameters					m_Parameters;
 
 	class CWKSP_Project				*m_pProject;
 

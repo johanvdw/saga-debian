@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: ESRI_E00_Import.h 1061 2011-05-17 13:00:53Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -71,7 +74,6 @@ class CESRI_E00_Import : public CSG_Module
 {
 public:
 	CESRI_E00_Import(void);
-	virtual ~CESRI_E00_Import(void);
 
 
 protected:
@@ -81,41 +83,52 @@ protected:
 
 private:
 
-	E00ReadPtr				hReadPtr;
+	bool						m_bBnd, m_bTic, m_bTables;
 
-	CSG_String				e00_Name;
+	int							m_iFile;
 
-	CSG_Table				*pPAT, *pAAT;
+	E00ReadPtr					m_hReadPtr;
+
+	CSG_String					m_e00_Name;
+
+	CSG_Table					*m_pPAT, *m_pAAT;
+
+	CSG_Parameter_Table_List	*m_pTables;
+
+	CSG_Parameter_Shapes_List	*m_pShapes;
+
+	CSG_Parameter_Grid_List		*m_pGrids;
 
 
-	bool					Open(const SG_Char *FileName);
-	bool					Load(void);
+	bool						Load				(const CSG_String &FileName);
+	bool						Load				(void);
 
-	bool					E00GotoLine(int iLine);
+	const char *				E00_Read_Line		(void);
+	bool						E00_Goto_Line		(int iLine);
 
-	CSG_Grid *				getraster	(int prec, double scale);
-	CSG_Shapes *			getarcs		(int prec, double scale, TSG_Shape_Type &shape_type);
-	CSG_Shapes *			getlabels	(int prec, double scale);
-	CSG_Shapes *			getsites	(int prec, double scale);
-	double					getproj		(void);
+	CSG_Grid *					getraster			(int prec, double scale);
+	CSG_Shapes *				getarcs				(int prec, double scale, TSG_Shape_Type &shape_type);
+	CSG_Shapes *				getlabels			(int prec, double scale);
+	CSG_Shapes *				getsites			(int prec, double scale);
+	double						getproj				(void);
 
-	int						info_Get_Tables	(void);
-	CSG_Table *				info_Get_Table	(struct info_Table info);
-	void					info_Skip_Table	(struct info_Table info);
-	void					info_Get_Record	(char *buffer, int buffer_length);
+	int							info_Get_Tables		(void);
+	CSG_Table *					info_Get_Table		(struct info_Table info);
+	void						info_Skip_Table		(struct info_Table info);
+	void						info_Get_Record		(char *buffer, int buffer_length);
 
-	bool					Assign_Attributes(CSG_Shapes *pShapes);
+	bool						Assign_Attributes	(CSG_Shapes *pShapes);
 
-	CSG_Shapes *			Arcs2Polygons(CSG_Shapes *pArcs);
-	void					Arcs2Polygon (CSG_Shapes *pArcs, CSG_Shapes *pPolygons, int id);
+	CSG_Shapes *				Arcs2Polygons		(CSG_Shapes *pArcs);
+	void						Arcs2Polygon		(CSG_Shapes *pArcs, CSG_Shapes *pPolygons, int id);
 
-	void					skip	(char *end);
-	void					skip_dat(void);
-	void					skip_msk(void);
-	void					skip_arc(int prec);
-	void					skip_lab(int prec);
-	void					skip_pal(int prec);
-	void					skip_txt(int prec);
+	void						skip				(char *end);
+	void						skip_dat			(void);
+	void						skip_msk			(void);
+	void						skip_arc			(int prec);
+	void						skip_lab			(int prec);
+	void						skip_pal			(int prec);
+	void						skip_txt			(int prec);
 
 };
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -70,7 +73,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("TIN - Tools") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad, Goettingen (c) 2004") );
+		return( SG_T("O. Conrad (c) 2004") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for Triangulated Irregular Network (TIN) processing.") );

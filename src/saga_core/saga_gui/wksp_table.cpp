@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_table.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -87,8 +90,7 @@ CWKSP_Table::CWKSP_Table(CSG_Table *pTable, CWKSP_Base_Item *pOwner)
 	m_pDiagram	= NULL;
 
 	//-----------------------------------------------------
-	m_Parameters.Create(this, LNG(""), LNG(""));
-	m_Parameters.Set_Callback_On_Parameter_Changed(&_On_Parameter_Changed);
+	On_Create_Parameters();
 
 	m_Parameters.Add_String(
 		m_Parameters("NODE_GENERAL")	, "NAME"			, LNG("[CAP] Name"),
@@ -130,10 +132,6 @@ wxString CWKSP_Table::Get_Name(void)
 {
 	return( wxString::Format(wxT("%02d. %s"), 1 + Get_ID(), m_pTable->Get_Name()) );
 }
-
-//---------------------------------------------------------
-#define DESC_ADD_STR(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, value))
-#define DESC_ADD_INT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value))
 
 //---------------------------------------------------------
 wxString CWKSP_Table::Get_Description(void)
@@ -281,22 +279,9 @@ void CWKSP_Table::Parameters_Changed(void)
 }
 
 //---------------------------------------------------------
-int CWKSP_Table::_On_Parameter_Changed(CSG_Parameter *pParameter)
+int CWKSP_Table::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	if( pParameter && pParameter->Get_Owner() && pParameter->Get_Owner()->Get_Owner() )
-	{
-		return( ((CWKSP_Table *)pParameter->Get_Owner()->Get_Owner())->
-			On_Parameter_Changed(pParameter->Get_Owner(), pParameter)
-		);
-	}
-
-	return( 0 );
-}
-
-//---------------------------------------------------------
-int CWKSP_Table::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
-{
-	return( 1 );
+	return( CWKSP_Base_Item::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 

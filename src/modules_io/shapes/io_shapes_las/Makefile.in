@@ -74,9 +74,10 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 @HAVE_LLAS_TRUE@libio_shapes_las_la_DEPENDENCIES = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am__libio_shapes_las_la_SOURCES_DIST = las_export.cpp las_import.cpp \
-	MLB_Interface.cpp las_export.h las_import.h MLB_Interface.h
+	las_info.cpp MLB_Interface.cpp las_export.h las_import.h \
+	las_info.h MLB_Interface.h
 @HAVE_LLAS_TRUE@am_libio_shapes_las_la_OBJECTS = las_export.lo \
-@HAVE_LLAS_TRUE@	las_import.lo MLB_Interface.lo
+@HAVE_LLAS_TRUE@	las_import.lo las_info.lo MLB_Interface.lo
 libio_shapes_las_la_OBJECTS = $(am_libio_shapes_las_la_OBJECTS)
 @HAVE_LLAS_TRUE@am_libio_shapes_las_la_rpath = -rpath $(pkglibdir)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -245,7 +246,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.8 2010/11/02 11:03:26 oconrad Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -258,9 +259,11 @@ top_srcdir = @top_srcdir@
 @HAVE_LLAS_TRUE@libio_shapes_las_la_SOURCES = \
 @HAVE_LLAS_TRUE@las_export.cpp\
 @HAVE_LLAS_TRUE@las_import.cpp\
+@HAVE_LLAS_TRUE@las_info.cpp\
 @HAVE_LLAS_TRUE@MLB_Interface.cpp\
 @HAVE_LLAS_TRUE@las_export.h\
 @HAVE_LLAS_TRUE@las_import.h\
+@HAVE_LLAS_TRUE@las_info.h\
 @HAVE_LLAS_TRUE@MLB_Interface.h
 
 @HAVE_LLAS_TRUE@libio_shapes_las_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la $(ADD_MLBS)
@@ -341,6 +344,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/las_export.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/las_import.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/las_info.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

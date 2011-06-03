@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: saga_frame.cpp 1003 2011-04-19 10:21:49Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -462,10 +465,10 @@ void CSAGA_Frame::On_Quit(wxCommandEvent &WXUNUSED(event))
 //---------------------------------------------------------
 void CSAGA_Frame::On_Help(wxCommandEvent &WXUNUSED(event))
 {
-	DLG_Message_Show(
-		LNG("Currently no help files exist for SAGA.\nIt depends on your support, if you will find any help at this place in future!\nThanks a lot..."),
-		LNG("SAGA Help")
-	);
+	if( !Open_WebBrowser(SG_T("http://sourceforge.net/apps/trac/saga-gis/wiki/WikiStart")) )
+	{
+	//	DLG_Message_Show(LNG("Online Help"), LNG("SAGA Help"));
+	}
 }
 
 //---------------------------------------------------------

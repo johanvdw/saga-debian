@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_shapes_polygon.cpp 1033 2011-05-03 10:21:46Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -76,13 +79,12 @@
 CWKSP_Shapes_Polygon::CWKSP_Shapes_Polygon(CSG_Shapes *pShapes)
 	: CWKSP_Shapes(pShapes)
 {
-	Create_Parameters();
+	Initialise();
 }
 
 //---------------------------------------------------------
 CWKSP_Shapes_Polygon::~CWKSP_Shapes_Polygon(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -106,19 +108,19 @@ void CWKSP_Shapes_Polygon::On_Create_Parameters(void)
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE"			, LNG("[CAP] Outline"),
+		m_Parameters("NODE_DISPLAY")	, "OUTLINE"					, LNG("[CAP] Outline"),
 		LNG(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE_COLOR"	, LNG("[CAP] Outline Color"),
+		m_Parameters("OUTLINE")			, "OUTLINE_COLOR"			, LNG("[CAP] Color"),
 		LNG(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(0, 0, 0)
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_OUTLINE_SIZE"	, LNG("[CAP] Outline Size"),
+		m_Parameters("OUTLINE")			, "OUTLINE_SIZE"			, LNG("[CAP] Size"),
 		LNG(""),
 		PARAMETER_TYPE_Int, 0, 0, true
 	);
@@ -136,7 +138,7 @@ void CWKSP_Shapes_Polygon::On_Create_Parameters(void)
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_SELECTION")	, "EDIT_SEL_COLOR_FILL"		, LNG("[CAP] Fill Color"),
+		m_Parameters("NODE_SELECTION")	, "SEL_COLOR_FILL"			, LNG("[CAP] Fill Color"),
 		LNG(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(255, 255, 0)
 	);
@@ -175,11 +177,9 @@ void CWKSP_Shapes_Polygon::On_Parameters_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CWKSP_Shapes_Polygon::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+int CWKSP_Shapes_Polygon::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter);
-
-	return( 1 );
+	return( CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 
@@ -192,9 +192,9 @@ int CWKSP_Shapes_Polygon::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_
 //---------------------------------------------------------
 bool CWKSP_Shapes_Polygon::Get_Style(wxPen &Pen, wxBrush &Brush, bool &bOutline, wxString *pName)
 {
-	bOutline	= m_Parameters("DISPLAY_OUTLINE")->asBool();
+	bOutline	= m_Parameters("OUTLINE")->asBool();
 	Brush		= wxBrush(m_Def_Color, _BrushList_Get_Style(m_Parameters("DISPLAY_BRUSH")->asInt()));
-	Pen			= wxPen(!bOutline ? m_Def_Color : Get_Color_asWX(m_Parameters("DISPLAY_OUTLINE_COLOR")->asColor()), m_Parameters("DISPLAY_OUTLINE_SIZE")->asInt(), wxSOLID);
+	Pen			= wxPen(!bOutline ? m_Def_Color : Get_Color_asWX(m_Parameters("OUTLINE_COLOR")->asColor()), m_Parameters("OUTLINE_SIZE")->asInt(), wxSOLID);
 
 	if( pName )
 	{
@@ -224,7 +224,7 @@ void CWKSP_Shapes_Polygon::_Draw_Initialize(CWKSP_Map_DC &dc_Map)
 	dc_Map.dc.SetBrush(m_Brush);
 	dc_Map.dc.SetPen(m_Pen);
 
-	m_Sel_Color_Fill	= Get_Color_asWX(m_Parameters("EDIT_SEL_COLOR_FILL")->asInt());
+	m_Sel_Color_Fill	= Get_Color_asWX(m_Parameters("SEL_COLOR_FILL")->asInt());
 }
 
 //---------------------------------------------------------
@@ -240,6 +240,10 @@ void CWKSP_Shapes_Polygon::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, 
 
 		dc_Map.dc.SetBrush(m_Brush);
 		dc_Map.dc.SetPen(m_Pen);
+	}
+	else if( m_pClassify->Get_Mode() == CLASSIFY_UNIQUE )
+	{
+		dc_Map.Draw_Polygon((CSG_Shape_Polygon *)pShape);
 	}
 	else if( m_iColor >= 0 && (m_pClassify->Get_Mode() != CLASSIFY_METRIC || !pShape->is_NoData(m_iColor)) )
 	{
@@ -276,29 +280,23 @@ void CWKSP_Shapes_Polygon::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, 
 //---------------------------------------------------------
 void CWKSP_Shapes_Polygon::_Draw_Label(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 {
-	int			iPart;
-	TSG_Point	p;
+	wxString	s(pShape->asString(m_iLabel, m_Label_Prec));	s.Trim(true).Trim(false);
 
 	if( 0 )
 	{
-//		p	= dc_Map.World2DC(((CSG_Shape_Polygon *)pShape)->Get_Centroid());
-		p	= ((CSG_Shape_Polygon *)pShape)->Get_Centroid();
-		p.x	= dc_Map.xWorld2DC(p.x);
-		p.y	= dc_Map.yWorld2DC(p.y);
+		TSG_Point_Int	p	= dc_Map.World2DC(((CSG_Shape_Polygon *)pShape)->Get_Centroid());
 
-		Draw_Text(dc_Map.dc, TEXTALIGN_CENTER, (int)p.x, (int)p.y, pShape->asString(m_iLabel, m_Label_Prec));
+		Draw_Text(dc_Map.dc, TEXTALIGN_CENTER, p.x, p.y, s);
 	}
 	else
 	{
-		for(iPart=0; iPart<pShape->Get_Part_Count(); iPart++)
+		for(int iPart=0; iPart<pShape->Get_Part_Count(); iPart++)
 		{
 			if( !((CSG_Shape_Polygon *)pShape)->is_Lake(iPart) )
 			{
-				p	= ((CSG_Shape_Polygon *)pShape)->Get_Centroid(iPart);
-				p.x	= dc_Map.xWorld2DC(p.x);
-				p.y	= dc_Map.yWorld2DC(p.y);
+				TSG_Point_Int	p	= dc_Map.World2DC(((CSG_Shape_Polygon *)pShape)->Get_Centroid());
 
-				Draw_Text(dc_Map.dc, TEXTALIGN_CENTER, (int)p.x, (int)p.y, pShape->asString(m_iLabel, m_Label_Prec));
+				Draw_Text(dc_Map.dc, TEXTALIGN_CENTER, p.x, p.y, s);
 			}
 		}
 	}

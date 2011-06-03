@@ -228,7 +228,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = grid_visualisation grid_tools grid_spline grid_gridding grid_filter grid_discretisation grid_calculus grid_calculus_bsl grid_analysis
+SUBDIRS = grid_visualisation grid_tools grid_spline grid_gridding grid_filter grid_calculus grid_calculus_bsl grid_analysis
 all: all-recursive
 
 .SUFFIXES:

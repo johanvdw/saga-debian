@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: dataobject.h 1017 2011-04-27 18:42:58Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -149,6 +152,15 @@ SAGA_API_DLL_EXPORT const SG_Char *	SG_Get_DataObject_Name			(TSG_Data_Object_Ty
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+SAGA_API_DLL_EXPORT void			SG_Set_History_Depth			(int Depth);
+SAGA_API_DLL_EXPORT int				SG_Get_History_Depth			(void);
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 /**
   * CSG_Data_Object is the base class for all types of data
   * sets, which are provided by the SAGA API.
@@ -181,6 +193,9 @@ public:
 
 	void							Set_Name		(const SG_Char *Name);
 	const SG_Char *					Get_Name		(void)	const;
+
+	void							Set_Description	(const SG_Char *Description);
+	const SG_Char *					Get_Description	(void)	const;
 
 	virtual void					Set_Modified	(bool bOn = true)	{	m_bModified	= bOn;			}
 	bool							is_Modified		(void)	const		{	return( m_bModified );		}
@@ -232,7 +247,8 @@ private:
 
 	double							m_NoData_Value, m_NoData_hiValue;
 
-	CSG_String						m_File_Name, m_Name;
+	CSG_String						m_File_Name, m_Name, m_Description;
+
 
 	CSG_MetaData					m_MetaData, *m_pMetaData, *m_pHistory, *m_pFile, *m_pProjection, *m_pMetaData_DB;
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: CellBalance.h 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 /*******************************************************************************
     CellBalance.h
     Copyright (C) Victor Olaya
@@ -29,10 +32,12 @@ public:
 	CCellBalance(void);
 	virtual ~CCellBalance(void);
 
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Miscellaneous") );	}
+
 
 protected:
 
-	virtual bool		On_Execute		(void);
+	virtual bool			On_Execute		(void);
 
 
 private:
@@ -40,8 +45,8 @@ private:
 	CSG_Grid				*m_pDEM, *m_pBalance;
 
 
-	void				Set_D8			(int x, int y, double Weight);
-	void				Set_MFD			(int x, int y, double Weight);
+	void					Set_D8			(int x, int y, double Weight);
+	void					Set_MFD			(int x, int y, double Weight);
 
 //	double				getCellBalance	(int x, int y);
 

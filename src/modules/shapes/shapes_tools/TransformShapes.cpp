@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: TransformShapes.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /*******************************************************************************
     TransformShapes.cpp
     Copyright (C) Victor Olaya
@@ -24,7 +27,7 @@
 CTransformShapes::CTransformShapes(void)
 {
 	Set_Name		(_TL("Transform Shapes"));
-	Set_Author		(_TL("(c) 2004 by Victor Olaya"));
+	Set_Author		(SG_T("(c) 2004 by Victor Olaya"));
 	Set_Description	(_TW(
 		"(c) 2004 by Victor Olaya. Use this module to move, rotate and/or scale shapes."
 	));

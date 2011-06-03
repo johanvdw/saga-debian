@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Flow_Distance.h 1023 2011-04-27 19:45:31Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -85,7 +88,7 @@ public:
 	CFlow_Distance(void);
 	virtual ~CFlow_Distance(void);
 
-//	virtual const SG_Char *	Get_MenuPath	(void)	{	return( "R:Catchment Area" );	}
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( SG_T("R:Catchment Area") );	}
 
 
 protected:

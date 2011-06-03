@@ -78,7 +78,8 @@ am_libshapes_polygons_la_OBJECTS = MLB_Interface.lo \
 	Polygon_Centroids.lo Polygon_Geometrics.lo \
 	Polygon_Intersection.lo Polygon_Clipper.lo \
 	Polygon_StatisticsFromPoints.lo Polygon_Union.lo \
-	Polygons_From_Lines.lo polygon_to_points.lo shape_index.lo
+	Polygons_From_Lines.lo polygon_line_intersection.lo \
+	polygon_to_edges_nodes.lo polygon_to_points.lo shape_index.lo
 libshapes_polygons_la_OBJECTS = $(am_libshapes_polygons_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -246,7 +247,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.10 2010/07/08 14:11:49 johanvdw Exp $
+# $Id: Makefile.am 955 2011-03-22 17:05:16Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -264,6 +265,8 @@ Polygon_Clipper.cpp\
 Polygon_StatisticsFromPoints.cpp\
 Polygon_Union.cpp\
 Polygons_From_Lines.cpp\
+polygon_line_intersection.cpp\
+polygon_to_edges_nodes.cpp\
 polygon_to_points.cpp\
 shape_index.cpp\
 MLB_Interface.h\
@@ -274,6 +277,8 @@ Polygon_Clipper.h\
 Polygon_StatisticsFromPoints.h\
 Polygon_Union.h\
 Polygons_From_Lines.h\
+polygon_line_intersection.h\
+polygon_to_edges_nodes.h\
 polygon_to_points.h\
 shape_index.h
 
@@ -360,6 +365,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_StatisticsFromPoints.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Union.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygons_From_Lines.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon_line_intersection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon_to_edges_nodes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon_to_points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shape_index.Plo@am__quote@
 

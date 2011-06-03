@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: lmpar.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /* lmpar.c -- compute parameter for least squares solution */
 #include <math.h>
 #include "cminpak.h"

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Table_Rotate.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -127,7 +130,7 @@ bool CTable_Rotate::On_Execute(void)
 		}
 
 		pOutput->Destroy();
-		pOutput->Set_Name(CSG_String::Format(_TL("%s [rotated]"), pInput->Get_Name()));
+		pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), _TL("rotated")));
 
 		FieldType	= SG_DATATYPE_String;
 

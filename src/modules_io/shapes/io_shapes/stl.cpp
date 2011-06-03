@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: stl.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -75,7 +78,7 @@ CSTL_Import::CSTL_Import(void)
 	//-----------------------------------------------------
 	Set_Name		(_TL("Import Stereo Lithography File (STL)"));
 
-	Set_Author		(_TL("O. Conrad (c) 2008"));
+	Set_Author		(SG_T("O. Conrad (c) 2008"));
 
 	Set_Description	(_TW(
 		"<a href=\"http://www.ennex.com/~fabbers/StL.asp\">The StL Format</a>"

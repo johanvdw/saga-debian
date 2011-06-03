@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: SeparateShapes.h 931 2011-02-21 16:03:49Z oconrad $
+ *********************************************************/
 /*******************************************************************************
     SeparateShapes.h
     Copyright (C) Victor Olaya
@@ -17,20 +20,42 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
 
+//---------------------------------------------------------
 #include "MLB_Interface.h"
 
-class CSeparateShapes : public CSG_Module{
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CSeparateShapes : public CSG_Module
+{
 public:
-	CSeparateShapes();
-	virtual ~CSeparateShapes();	
-	virtual bool is_ProjectDependent(void) {return( false );}
+	CSeparateShapes(void);
+
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Construction") );	}
+
 
 protected:
-	virtual bool On_Execute(void);
+
+	virtual bool				On_Execute		(void);
 
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

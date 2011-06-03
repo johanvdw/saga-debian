@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: parameters_control.cpp 1060 2011-05-17 13:00:24Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -241,6 +244,23 @@ bool CParameters_Control::Restore(void)
 }
 
 //---------------------------------------------------------
+bool CParameters_Control::Restore_Defaults(void)
+{
+	if( m_pParameters->Restore_Defaults() )
+	{
+		_Init_Pararameters();
+
+		_Update_Parameters();
+
+		m_bModified	= true;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
 bool CParameters_Control::Load(void)
 {
 	wxString	File_Path;
@@ -252,16 +272,12 @@ bool CParameters_Control::Load(void)
 		if(	m_pParameters->Serialize_Compatibility(File)
 		||	m_pParameters->Serialize(File_Path.c_str(), false) )
 		{
-		//	m_pPG->Freeze();
-			m_pPG->Clear();
+			_Init_Pararameters();
 
-			_Add_Properties(m_pParameters);
-
-		//	m_pPG->Thaw();
-			m_pPG->Refresh();
+			_Update_Parameters();
 
 			m_bModified	= true;
-		
+
 			return( true );
 		}
 
@@ -299,46 +315,47 @@ bool CParameters_Control::Save(void)
 //---------------------------------------------------------
 bool CParameters_Control::Set_Parameters(CSG_Parameters *pParameters)
 {
-	if( m_pParameters == pParameters )
+	if( pParameters != m_pParameters )
 	{
-		_Update_Parameters();
+		m_pPG->Freeze();
 
-		return( true );
-	}
+		m_bModified	= false;
+		m_pPG->ClearModifiedStatus();
 
-	//-----------------------------------------------------
-	m_bModified	= false;
-	m_pPG->ClearModifiedStatus();
-
-//	m_pPG->Freeze();
-
-	if( m_pOriginal == pParameters )
-	{
-		m_pParameters->Assign_Values(m_pOriginal);
-
-		_Update_Parameters();
-	}
-	else
-	{
-		m_pPG->Clear();
-
-		if( (m_pOriginal = pParameters) != NULL )
+		if( pParameters == NULL || pParameters->Get_Count() == 0 )
 		{
-			m_pParameters->Assign(m_pOriginal);
-			m_pParameters->Set_Callback(true);
+			m_pParameters->Set_Callback(false);
+			m_pParameters->Assign(m_pOriginal = pParameters);
 
-			_Add_Properties(m_pParameters);
-		}
-		else
-		{
+			m_pPG->Clear();
+
 			m_pPG->Append(new wxPropertyCategory(LNG("[TXT] No parameters available."), wxPG_LABEL));
 		}
+		else if( m_pOriginal != pParameters )
+		{
+			m_pParameters->Set_Callback(false);
+			m_pParameters->Assign(m_pOriginal = pParameters);
+
+			m_pPG->Clear();
+
+			_Add_Properties(m_pParameters);
+
+			m_pParameters->Set_Callback(true);
+
+			_Init_Pararameters();
+		}
+		else // if( m_pOriginal == pParameters )
+		{
+			m_pParameters->Assign_Values(m_pOriginal);
+
+			_Init_Pararameters();
+		}
+
+		m_pPG->Thaw();
 	}
 
 	//-----------------------------------------------------
-//	m_pPG->Thaw();
-
-	m_pPG->Refresh();
+	_Update_Parameters();
 
 	return( true );
 }
@@ -478,10 +495,13 @@ wxPGProperty * CParameters_Control::_Get_Property(wxPGProperty *pParent, CSG_Par
 	switch( pParameter->Get_Type() )
 	{
 	case PARAMETER_TYPE_Node:	default:
-		if( pParameter->Get_Parent() == NULL || pParameter->Get_Parent()->Get_Type() == PARAMETER_TYPE_Node )
-			pProperty	= new wxPropertyCategory	(Name, ID);
-		else
-			pProperty	= new wxStringProperty		(Name, ID, wxT(""));
+		if( pParameter->Get_Children_Count() > 0 )
+		{
+			if( pParameter->Get_Parent() == NULL || pParameter->Get_Parent()->Get_Type() == PARAMETER_TYPE_Node )
+				pProperty	= new wxPropertyCategory	(Name, ID);
+			else
+				pProperty	= new wxStringProperty		(Name, ID, wxT(""));
+		}
 		break;
 
 	case PARAMETER_TYPE_Bool:
@@ -588,6 +608,9 @@ wxPGProperty * CParameters_Control::_Get_Property(wxPGProperty *pParent, CSG_Par
 			pProperty->SetAttribute(wxPG_BOOL_USE_CHECKBOX	, (long)true);
 			break;
 
+		case PARAMETER_TYPE_Int:
+			break;
+
 		case PARAMETER_TYPE_Double:
 			pProperty->SetAttribute(wxPG_FLOAT_PRECISION	, (long)16);
 			break;
@@ -623,9 +646,42 @@ wxPGProperty * CParameters_Control::_Get_Property(wxPGProperty *pParent, CSG_Par
 			m_pPG->LimitPropertyEditing(pProperty);
 			break;
 		}
+
+		if( pParameter->is_Information() )
+		{
+			m_pPG->EnableProperty(pProperty, false);
+		}
 	}
 
 	return( pProperty );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+wxString CParameters_Control::_Get_Identifier(CSG_Parameter *pParameter)
+{
+	wxString	id;
+
+	if( pParameter->Get_Parent() )
+	{
+		id	= _Get_Identifier(pParameter->Get_Parent()) + wxT(".");
+	}
+
+	id	+= pParameter->Get_Identifier();
+
+	return( id );
+}
+
+//---------------------------------------------------------
+bool CParameters_Control::_Get_Enabled(CSG_Parameter *pParameter)
+{
+	return( !pParameter || (pParameter->is_Enabled() && _Get_Enabled(pParameter->Get_Parent())) );
 }
 
 
@@ -685,25 +741,14 @@ void CParameters_Control::_Set_Parameter(const wxString &Identifier)
 }
 
 //---------------------------------------------------------
-void CParameters_Control::_Update_Parameters(void)
-{
-	if( m_pParameters )
-	{
-		for(int i=0; i<m_pParameters->Get_Count(); i++)
-		{
-			_Update_Parameter(m_pParameters->Get_Parameter(i));
-		}
-	}
-}
-
-//---------------------------------------------------------
 void CParameters_Control::_Update_Parameter(CSG_Parameter *pParameter)
 {
-	wxPGProperty	*pProperty	= m_pPG->GetProperty(pParameter->Get_Identifier());
+	wxPGProperty	*pProperty	= m_pPG->GetProperty(_Get_Identifier(pParameter));
 
 	if( pProperty )
 	{
-		m_pPG->EnableProperty(pProperty, pParameter->is_Enabled());
+	//	m_pPG->EnableProperty(pProperty, _Get_Enabled(pParameter));
+		m_pPG->HideProperty(pProperty, !_Get_Enabled(pParameter));
 
 		switch( pParameter->Get_Type() )
 		{
@@ -781,7 +826,7 @@ bool CParameters_Control::Update_DataObjects(void)
 		for(int i=0; i<m_pParameters->Get_Count(); i++)
 		{
 			CSG_Parameter	*pParameter	= m_pParameters->Get_Parameter(i);
-			wxPGProperty	*pProperty	= m_pPG->GetProperty(pParameter->Get_Identifier());
+			wxPGProperty	*pProperty	= m_pPG->GetProperty(_Get_Identifier(pParameter));
 
 			if( pProperty  )
 			{
@@ -814,6 +859,32 @@ bool CParameters_Control::Update_DataObjects(void)
 	}
 
 	return( true );
+}
+
+//---------------------------------------------------------
+void CParameters_Control::_Update_Parameters(void)
+{
+	if( m_pParameters )
+	{
+		for(int i=0; i<m_pParameters->Get_Count(); i++)
+		{
+			_Update_Parameter(m_pParameters->Get_Parameter(i));
+		}
+
+		m_pPG->Refresh();
+	}
+}
+
+//---------------------------------------------------------
+void CParameters_Control::_Init_Pararameters(void)
+{
+	if( m_pParameters )
+	{
+		for(int i=0; i<m_pParameters->Get_Count(); i++)
+		{
+			m_pParameters->Get_Parameter(i)->has_Changed(PARAMETER_CHECK_ENABLE);
+		}
+	}
 }
 
 

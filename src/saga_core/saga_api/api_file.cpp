@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: api_file.cpp 1049 2011-05-09 07:55:38Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -287,7 +290,7 @@ size_t CSG_File::Read(CSG_String &Buffer, size_t Size) const
 	if( m_pStream )
 	{
 		char	*b	= (char *)SG_Calloc(Size + 1, sizeof(char));
-		int		i	= fread(b, sizeof(char), Size, m_pStream);
+		size_t	 i	= fread(b, sizeof(char), Size, m_pStream);
 		Buffer		= b;
 		SG_Free(b);
 
@@ -501,11 +504,9 @@ CSG_String		SG_File_Get_TmpName(const SG_Char *Prefix, const SG_Char *Directory)
 CSG_String		SG_File_Get_Name(const SG_Char *full_Path, bool bExtension)
 {
 	wxFileName	fn(full_Path);
-	CSG_String	s;
+	CSG_String	s(fn.GetFullName().c_str());
 
-	s	= bExtension ? fn.GetFullName().c_str() : fn.GetName().c_str();
-
-	return( s );
+	return( !bExtension && s.Find(SG_T(".")) >= 0 ? s.BeforeLast(SG_T('.')) : s );
 }
 
 //---------------------------------------------------------
@@ -599,6 +600,39 @@ bool			SG_Read_Line(FILE *Stream, CSG_String &Line)
 	}
 
 	return( false );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool			SG_Get_Environment(const CSG_String &Variable, CSG_String *Value)
+{
+	if( Value == NULL)
+	{
+		return( wxGetEnv(Variable.c_str(), NULL) );
+	}
+
+	wxString	s;
+
+	if( wxGetEnv(Variable.c_str(), &s) )
+	{
+		*Value	= s.c_str();
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool			SG_Set_Environment(const CSG_String &Variable, const CSG_String &Value)
+{
+	return( wxSetEnv(Variable.c_str(), Value.c_str()) );
 }
 
 

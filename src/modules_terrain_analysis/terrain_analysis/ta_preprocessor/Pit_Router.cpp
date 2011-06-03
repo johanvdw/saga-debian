@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Pit_Router.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -247,7 +250,7 @@ int CPit_Router::Get_Routes(CSG_Grid *pDEM, CSG_Grid *pRoute, double Threshold)
 	{
 		if( nPits > 0 )
 		{
-			Message_Add(CSG_String::Format(_TL("%d sinks have been processed."), nPits));
+			Message_Add(CSG_String::Format(SG_T("%s: %d"), _TL("number of processed sinks"), nPits));
 
 			return( nPits );
 		}
@@ -1082,7 +1085,7 @@ int CPit_Router::Process_Threshold(void)
 	}
 
 	//-----------------------------------------------------
-	Message_Add(CSG_String::Format(_TL("%d pits above threshold level."), n));
+	Message_Add(CSG_String::Format(SG_T("%s: %d"), _TL("number of pits above threshold level"), n));
 
 	m_Route.Destroy();
 

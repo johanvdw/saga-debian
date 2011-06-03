@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: pc_thinning_simple.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -72,7 +75,7 @@ CPC_Thinning_Simple::CPC_Thinning_Simple(void)
 
 	Set_Name(_TL("Point Cloud Thinning (simple)"));
 
-	Set_Author(_TL("Volker Wichmann (c) 2010, LASERDATA GmbH"));
+	Set_Author(SG_T("Volker Wichmann (c) 2010, LASERDATA GmbH"));
 
 	Set_Description	(_TW(
 		"The module can be used to remove every i-th point from a point cloud. This thinning "

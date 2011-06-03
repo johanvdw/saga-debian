@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.10 2010/07/08 14:11:49 johanvdw Exp $
+# $Id: Makefile.am 939 2011-02-25 10:36:35Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -16,26 +16,34 @@ libshapes_points_la_SOURCES =\
 add_polygon_attributes.cpp\
 AddCoordinates.cpp\
 Clip_Points.cpp\
+convex_hull.cpp\
 CountPoints.cpp\
 CreatePointGrid.cpp\
 DistanceMatrix.cpp\
 FitNPointsToShape.cpp\
 MLB_Interface.cpp\
+points_filter.cpp\
 Points_From_Lines.cpp\
 Points_From_Table.cpp\
+points_thinning.cpp\
 remove_duplicates.cpp\
+select_points.cpp\
 separate_by_direction.cpp\
 add_polygon_attributes.h\
 AddCoordinates.h\
+convex_hull.h\
 CountPoints.h\
 Clip_Points.h\
 CreatePointGrid.h\
 DistanceMatrix.h\
 FitNPointsToShape.h\
 MLB_Interface.h\
+points_filter.h\
 Points_From_Lines.h\
 Points_From_Table.h\
+points_thinning.h\
 remove_duplicates.h\
+select_points.h\
 separate_by_direction.h
 
 libshapes_points_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

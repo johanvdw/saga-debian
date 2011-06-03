@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_layer.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -276,21 +279,63 @@ wxString CWKSP_Layer::Get_Name(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Layer::Create_Parameters(void)
+void CWKSP_Layer::On_Create_Parameters(void)
 {
-	m_Parameters.Create(this, LNG(""), LNG(""));
-	m_Parameters.Set_Callback_On_Parameter_Changed(&_On_Parameter_Changed);
+	CWKSP_Base_Item::On_Create_Parameters();
+
 
 	//-----------------------------------------------------
+	// Nodes...
+
 	m_Parameters.Add_Node(
 		NULL							, "NODE_GENERAL"		, LNG("[CAP] General"),
 		LNG("")
 	);
 
+	m_Parameters.Add_Node(
+		NULL							, "NODE_DISPLAY"		, LNG("[CAP] Display"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Node(
+		NULL							, "NODE_COLORS"			, LNG("[CAP] Colors"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Node(
+		NULL							, "NODE_SIZE"			, LNG("[CAP] Size"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Node(
+		NULL							, "NODE_LABEL"			, LNG("[CAP] Labels"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Node(
+		NULL							, "NODE_SELECTION"		, LNG("[CAP] Selection"),
+		LNG("")
+	);
+
+	m_Parameters.Add_Node(
+		NULL							, "NODE_EDIT"			, LNG("[CAP] Edit"),
+		LNG("")
+	);
+
+
+	//-----------------------------------------------------
+	// General...
+
 	m_Parameters.Add_String(
 		m_Parameters("NODE_GENERAL")	, "OBJECT_NAME"			, LNG("[CAP] Name"),
 		LNG(""),
 		m_pObject->Get_Name()
+	);
+
+	m_Parameters.Add_String(
+		m_Parameters("NODE_GENERAL")	, "OBJECT_DESC"			, LNG("[CAP] Description"),
+		LNG(""),
+		m_pObject->Get_Description(), true
 	);
 
 	m_Parameters.Add_Value(
@@ -306,40 +351,29 @@ void CWKSP_Layer::Create_Parameters(void)
 
 
 	//-----------------------------------------------------
-	m_Parameters.Add_Node(
-		NULL							, "NODE_DISPLAY"		, LNG("[CAP] Display"),
-		LNG("")
-	);
+	// Display...
 
-
-	//-----------------------------------------------------
-	// Visibility...
-
-	m_Parameters.Add_Node(
-		NULL							, "NODE_VISIBILITY"		, LNG("[CAP] Display: Visibility"),
-		LNG("")
+	m_Parameters.Add_Value(
+		m_Parameters("NODE_DISPLAY")	, "DISPLAY_TRANSPARENCY"	, LNG("[CAP] Transparency [%]"),
+		LNG(""),
+		PARAMETER_TYPE_Double, 0.0, 0.0, true, 100.0, true
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_VISIBILITY")	, "SHOW_ALWAYS"			, LNG("[CAP] Show Always"),
+		m_Parameters("NODE_DISPLAY")	, "SHOW_ALWAYS"			, LNG("[CAP] Show at all scales"),
 		LNG(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
 	m_Parameters.Add_Range(
-		m_Parameters("NODE_VISIBILITY")	, "SHOW_RANGE"			, LNG("[CAP] Scale Dependent"),
-		LNG(""),
-		0.0, 1000.0, 0.0, true
+		m_Parameters("SHOW_ALWAYS")		, "SHOW_RANGE"			, LNG("[CAP] Scale Range"),
+		LNG("only show within scale range; values are given as extent measured in map units"),
+		100.0, 1000.0, 0.0, true
 	);
 
 
 	//-----------------------------------------------------
 	// Classification...
-
-	m_Parameters.Add_Node(
-		NULL							, "NODE_COLORS"			, LNG("[CAP] Display: Color Classification"),
-		LNG("")
-	);
 
 	m_Parameters.Add_Choice(
 		m_Parameters("NODE_COLORS")		, "COLORS_TYPE"			, LNG("[CAP] Type"),
@@ -379,7 +413,7 @@ void CWKSP_Layer::Create_Parameters(void)
 	);
 
 	CSG_Table	LUT;
-	LUT.Add_Field(LNG("COLOR")		, SG_DATATYPE_Color);
+	LUT.Add_Field(LNG("COLOR")			, SG_DATATYPE_Color);
 	LUT.Add_Field(LNG("NAME")			, SG_DATATYPE_String);
 	LUT.Add_Field(LNG("DESCRIPTION")	, SG_DATATYPE_String);
 	LUT.Add_Field(LNG("MINIMUM")		, SG_DATATYPE_Double);
@@ -425,14 +459,37 @@ void CWKSP_Layer::Create_Parameters(void)
 		LNG(""),
 		PARAMETER_TYPE_Double, 1.0
 	);
+}
 
-
-	//-----------------------------------------------------
-	m_pClassify->Initialise(this, m_Parameters("LUT")->asTable(), m_Parameters("METRIC_COLORS")->asColors());
-
+//---------------------------------------------------------
+bool CWKSP_Layer::Initialise(void)
+{
 	On_Create_Parameters();
 
+	m_pClassify->Initialise(this, m_Parameters("LUT")->asTable(), m_Parameters("METRIC_COLORS")->asColors());
+
 	DataObject_Changed();
+
+	return( true );
+}
+
+//---------------------------------------------------------
+int CWKSP_Layer::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
+{
+	if( Flags & PARAMETER_CHECK_ENABLE )
+	{
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("SHOW_ALWAYS")) )
+		{
+			pParameters->Get_Parameter("SHOW_RANGE")->Set_Enabled(pParameter->asBool() == false);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("METRIC_SCALE_MODE")) )
+		{
+			pParameters->Get_Parameter("METRIC_SCALE_LOG")->Set_Enabled(pParameter->asInt() != 0);
+		}
+	}
+
+	return( CWKSP_Base_Item::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 
@@ -521,7 +578,7 @@ void CWKSP_Layer::DataObject_Changed(CSG_Parameters *pParameters)
 			double		m, s, min, max;
 			CSG_Grid	*pGrid	= (CSG_Grid *)m_pObject;
 
-			switch( g_pData->Get_Parameters()->Get_Parameter("GRID_DISPLAY_RANGEFIT")->asInt() )
+			switch( ((CWKSP_Base_Item *)g_pData)->Get_Parameters()->Get_Parameter("GRID_DISPLAY_RANGEFIT")->asInt() )
 			{
 			case 0:
 				min	= pGrid->Get_ZMin(true);
@@ -565,6 +622,7 @@ void CWKSP_Layer::DataObject_Changed(void)
 	m_Parameters.Set_Name(wxString::Format(wxT("%02d. %s"), 1 + Get_ID(), m_pObject->Get_Name()));
 
 	m_Parameters("OBJECT_NAME")->Set_Value(m_pObject->Get_Name());
+	m_Parameters("OBJECT_DESC")->Set_Value(m_pObject->Get_Description());
 
 	m_Parameters("GENERAL_NODATA")->asRange()->Set_Range(
 		m_pObject->Get_NoData_Value(),
@@ -589,7 +647,8 @@ void CWKSP_Layer::Parameters_Changed(void)
 	{
 		bUpdates	= true;
 
-		m_pObject->Set_Name(m_Parameters("OBJECT_NAME")->asString());
+		m_pObject->Set_Name       (m_Parameters("OBJECT_NAME")->asString());
+		m_pObject->Set_Description(m_Parameters("OBJECT_DESC")->asString());
 
 		m_pObject->Set_NoData_Value_Range(
 			m_Parameters("GENERAL_NODATA")->asRange()->Get_LoVal(),
@@ -622,37 +681,6 @@ void CWKSP_Layer::Parameters_Changed(void)
 
 		bUpdates	= false;
 	}
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-int CWKSP_Layer::_On_Parameter_Changed(CSG_Parameter *pParameter)
-{
-	if( pParameter && pParameter->Get_Owner() && pParameter->Get_Owner()->Get_Owner() )
-	{
-	//	return( ((CWKSP_Layer *)pParameter->Get_Owner()->Get_Owner())->
-	//		On_Parameter_Changed(pParameter->Get_Owner(), pParameter)
-	//	);
-
-		((CWKSP_Layer *)pParameter->Get_Owner()->Get_Owner())->
-			On_Parameter_Changed(pParameter->Get_Owner(), pParameter);
-
-		g_pACTIVE->Get_Parameters()->Update_Parameters(pParameter->Get_Owner(), false);
-	}
-
-	return( 0 );
-}
-
-//---------------------------------------------------------
-int CWKSP_Layer::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
-{
-	return( 1 );
 }
 
 

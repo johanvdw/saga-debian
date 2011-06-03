@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.8 2010/07/08 14:11:48 johanvdw Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -18,7 +18,9 @@ Filter_3x3.cpp\
 Filter_Gauss.cpp\
 Filter_LoG.cpp\
 Filter_Majority.cpp\
+Filter_Morphology.cpp\
 Filter_Multi_Dir_Lee.cpp\
+Filter_Rank.cpp\
 Filter_Terrain_SlopeBased.cpp\
 FilterClumps.cpp\
 MLB_Interface.cpp\
@@ -27,7 +29,9 @@ Filter_3x3.h\
 Filter_Gauss.h\
 Filter_LoG.h\
 Filter_Majority.h\
+Filter_Morphology.h\
 Filter_Multi_Dir_Lee.h\
+Filter_Rank.h\
 Filter_Terrain_SlopeBased.h\
 FilterClumps.h\
 MLB_Interface.h
