@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: line_polygon_intersection.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -216,7 +219,7 @@ bool CLine_Polygon_Intersection::Get_Intersection(CSG_Shape_Polygon *pPolygon, C
 		{
 			TSG_Point	B, A	= pLine->Get_Point(0, iPart);
 
-			if( pPolygon->is_Containing(A) )
+			if( pPolygon->Contains(A) )
 			{
 				pNew_Line	= New_Lines.Add_Shape(pLine, SHAPE_COPY_ATTR);
 				pNew_Line	->Add_Point(A);
@@ -233,7 +236,7 @@ bool CLine_Polygon_Intersection::Get_Intersection(CSG_Shape_Polygon *pPolygon, C
 
 				if( pNew_Line )
 				{
-					if( pPolygon->is_Containing(A) )
+					if( pPolygon->Contains(A) )
 					{
 						pNew_Line	->Add_Point(A);
 					}
@@ -243,7 +246,7 @@ bool CLine_Polygon_Intersection::Get_Intersection(CSG_Shape_Polygon *pPolygon, C
 						pNew_Line	= NULL;
 					}
 				}
-				else if( pPolygon->is_Containing(A) )
+				else if( pPolygon->Contains(A) )
 				{
 					pNew_Line	= New_Lines.Add_Shape(pLine, SHAPE_COPY_ATTR);
 					pNew_Line	->Add_Point(Get_Intersection(pPolygon, A, B));

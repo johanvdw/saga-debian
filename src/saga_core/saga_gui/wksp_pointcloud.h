@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_pointcloud.h 1035 2011-05-03 15:38:58Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -114,7 +117,7 @@ protected:
 	virtual void				On_Create_Parameters	(void);
 	virtual void				On_DataObject_Changed	(void);
 	virtual void				On_Parameters_Changed	(void);
-	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
 	virtual wxMenu *			On_Edit_Get_Menu		(void);
 	virtual bool				On_Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key);
@@ -126,6 +129,9 @@ protected:
 	void						_Draw_Point				(CWKSP_Map_DC &dc_Map, int x, int y, double z, int Color);
 	void						_Draw_Point				(CWKSP_Map_DC &dc_Map, int x, int y, double z, int Color, int Radius);
 	void						_Draw_Points			(CWKSP_Map_DC &dc_Map);
+
+	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description);
+	void						_AttributeList_Set		(CSG_Parameter *pFields, bool bAddNoField);
 
 };
 

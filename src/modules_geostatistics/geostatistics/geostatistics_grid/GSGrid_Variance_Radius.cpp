@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: GSGrid_Variance_Radius.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -146,7 +149,7 @@ bool CGSGrid_Variance_Radius::On_Execute(void)
 
 	pGrid			= Parameters("INPUT")	->asGrid();
 	pResult			= Parameters("RESULT")	->asGrid();
-	pResult->Set_Name(CSG_String::Format(_TL("Radius with Variance >= %f"), stopVariance));
+	pResult->Set_Name(CSG_String::Format(SG_T("%s >= %f"), _TL("Radius with Variance"), stopVariance));
 
 	//-----------------------------------------------------
 	Initialize();

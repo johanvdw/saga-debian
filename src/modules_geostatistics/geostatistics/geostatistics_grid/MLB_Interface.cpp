@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -74,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Geostatistics - Grids") );
 
 	case MLB_INFO_Author:
-		return( _TL("O.Conrad, V.Wichmann (c) 2002-10" ));
+		return( SG_T("O.Conrad, V.Wichmann (c) 2002-10" ));
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for (geo)statistical analyses.") );
@@ -99,6 +102,8 @@ const SG_Char * Get_Info(int i)
 #include "GSGrid_Zonal_Statistics.h"
 #include "GSGrid_Directional_Statistics.h"
 #include "grid_autocorrelation.h"
+#include "grid_pca.h"
+#include "multiband_variation.h"
 
 
 //---------------------------------------------------------
@@ -116,6 +121,8 @@ CSG_Module *		Create_Module(int i)
 	case  5:	return( new CGSGrid_Zonal_Statistics );
 	case  6:	return( new CGSGrid_Directional_Statistics );
 	case  7:	return( new CGrid_Autocorrelation );
+	case  8:	return( new CGrid_PCA );
+	case  9:	return( new CMultiBand_Variation );
 	}
 
 	return( NULL );

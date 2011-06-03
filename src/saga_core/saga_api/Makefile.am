@@ -1,12 +1,15 @@
 #
-# $Id: Makefile.am,v 1.24 2010/11/08 09:20:52 johanvdw Exp $
+# $Id: Makefile.am 942 2011-02-25 20:13:19Z johanvdw $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
+if SAGA_PYTHON
+SAGAPYTHONFLAGS= -D_SAGA_PYTHON
+endif
 if SAGA_UNICODE
-AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB)
+AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS)
+AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB) $(SAGAPYTHONFLAGS)
 else
 AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
 AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` $(HARU_LIB)
@@ -110,7 +113,7 @@ python_LTLIBRARIES = _saga_api.la
 python_PYTHON = saga_api.py
 
 saga_api_wrap.cxx:
-	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) ./saga_api.h 
+	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) $(SAGAPYTHONFLAGS) ./saga_api.h 
 endif
 
 CLEANFILES = saga_api_wrap.cxx

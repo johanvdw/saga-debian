@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Convergence.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -83,7 +86,6 @@ class ta_morphometry_EXPORT CConvergence : public CSG_Module_Grid
 {
 public:
 	CConvergence(void);
-	virtual ~CConvergence(void);
 
 
 protected:
@@ -93,11 +95,12 @@ protected:
 
 private:
 
-	CSG_Grid					*pDTM, *pConvergence;
+	CSG_Grid				*m_pDTM;
 
 
-	void					Do_Aspect		(void);
-	void					Do_Gradient		(void);
+	bool					Get_2x2_Gradient(int x, int y, int i, double &Slope, double &Aspect, double &Height);
+	double					Get_2x2			(int x, int y, bool bGradient);
+	double					Get_9x9			(int x, int y, bool bGradient);
 
 };
 

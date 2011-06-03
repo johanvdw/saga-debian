@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -74,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Filter") );
 
 	case MLB_INFO_Author:
-		return( _TL("SAGA User Group Associaton (c) 2002-2010") );
+		return( SG_T("SAGA User Group Associaton (c) 2002-10") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of gridded data.") );
@@ -99,6 +102,8 @@ const SG_Char * Get_Info(int i)
 #include "FilterClumps.h"
 #include "Filter_Majority.h"
 #include "Filter_Terrain_SlopeBased.h"
+#include "Filter_Morphology.h"
+#include "Filter_Rank.h"
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -115,6 +120,8 @@ CSG_Module *		Create_Module(int i)
 	case  5:	return( new CFilterClumps );
 	case  6:	return( new CFilter_Majority );
 	case  7:	return( new CFilter_Terrain_SlopeBased );
+	case  8:	return( new CFilter_Morphology );
+	case  9:	return( new CFilter_Rank );
 	}
 
 	return( NULL );

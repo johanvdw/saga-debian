@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: module_library_interface.cpp 1001 2011-04-19 09:55:33Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -123,12 +126,20 @@ int CSG_Module_Library_Interface::Get_Count(void)
 }
 
 //---------------------------------------------------------
-bool CSG_Module_Library_Interface::Add_Module(CSG_Module *pModule)
+bool CSG_Module_Library_Interface::Add_Module(CSG_Module *pModule, int ID)
 {
 	if( pModule )
 	{
-		pModule->Set_Managed(true);
-		pModule->Set_Translation(m_Translator);
+		if( pModule == MLB_INTERFACE_SKIP_MODULE )
+		{
+			pModule	= NULL;
+		}
+		else
+		{
+			pModule->m_ID	= ID;
+			pModule->Set_Managed(true);
+			pModule->Set_Translation(m_Translator);
+		}
 
 		m_Modules				= (CSG_Module **)SG_Realloc(m_Modules, (m_nModules + 1) * sizeof(CSG_Module *));
 		m_Modules[m_nModules++]	= pModule;

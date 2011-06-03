@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: crs_base.h 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -81,6 +84,7 @@ public:
 protected:
 
 	virtual int				On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	bool					Get_Projection			(CSG_Projection &Projection);
 

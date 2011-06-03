@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -72,7 +75,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Import GPS Data") );
 
 	case MLB_INFO_Author:
-		return( _TL("Victor Olaya (c) 2004") );
+		return( SG_T("Victor Olaya (c) 2004") );
 
 	case MLB_INFO_Description:
 		return( _TL("Modules for GPS data handling.") );

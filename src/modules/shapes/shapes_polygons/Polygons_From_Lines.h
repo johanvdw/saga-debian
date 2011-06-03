@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Polygons_From_Lines.h 915 2011-02-15 08:43:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -83,12 +86,13 @@ class CPolygons_From_Lines : public CSG_Module
 {
 public:
 	CPolygons_From_Lines(void);
-	virtual ~CPolygons_From_Lines(void);
+
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:
 
-	virtual bool			On_Execute(void);
+	virtual bool				On_Execute		(void);
 
 
 private:

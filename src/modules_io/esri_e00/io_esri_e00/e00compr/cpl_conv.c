@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: cpl_conv.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /******************************************************************************
  * Copyright (c) 1998, Frank Warmerdam
  *
@@ -22,10 +25,7 @@
  *
  * cpl_conv.c: Various CPL convenience functions (from cpl_conv.h).
  *
- * $Log: cpl_conv.c,v $
- * Revision 1.1.1.1  2006/06/26 15:38:25  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:00:59  oconrad
  * no message
  *

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: FitNPointsToShape.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /*******************************************************************************
     FitNPointsToShape.cpp
     Copyright (C) Victor Olaya
@@ -112,7 +115,7 @@ bool CFitNPointsToShape::On_Execute(void){
 			iRep++;	
 			for (x=Extent.xMin; x<Extent.xMax; x=x+dDist){
 				for (y=Extent.yMin; y<Extent.yMax; y=y+dDist){ 
-					if (((CSG_Shape_Polygon*)pShape)->is_Containing(x,y)){
+					if (((CSG_Shape_Polygon*)pShape)->Contains(x,y)){
 						pShape2 = pPoints->Add_Shape();
 						pShape2->Add_Point(x,y);
 						pShape2->Set_Value(0, x);

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_map.h 1039 2011-05-04 14:02:25Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -139,7 +142,6 @@ public:
 	virtual bool				On_Command				(int Cmd_ID);
 	virtual bool				On_Command_UI			(wxUpdateUIEvent &event);
 
-	virtual CSG_Parameters *	Get_Parameters			(void)		{	return( &m_Parameters );	}
 	virtual void				Parameters_Changed		(void);
 
 	const CSG_Rect &			Get_Extent				(void)		{	return( m_Extents.Get_Extent() );	}
@@ -183,6 +185,7 @@ public:
 	void						SaveAs_Image			(void);
 	void						SaveAs_Image_Clipboard	(int nx, int ny, int frame);
 	void						SaveAs_Image_Clipboard	(bool bLegend = false);
+	void						SaveAs_Image_To_Memory	(int nx, int ny);
 	void						SaveAs_Image_On_Change	(void);
 
 	void						Draw_Map				(wxDC &dc, double Zoom, const wxRect &rClient, bool bEdit, int Background = SG_COLOR_WHITE);
@@ -201,6 +204,13 @@ public:
 	int							Get_Print_Legend		(void);
 
 
+protected:
+
+	virtual void				On_Create_Parameters	(void);
+
+	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
+
+
 private:
 
 	bool						m_bSynchronise, m_Img_bSave;
@@ -211,7 +221,7 @@ private:
 
 	wxBitmap					m_Thumbnail;
 
-	CSG_Parameters				m_Parameters, m_Img_Parms;
+	CSG_Parameters				m_Img_Parms;
 
 	CWKSP_Map_Extents			m_Extents;
 
@@ -223,10 +233,6 @@ private:
 
 	class CVIEW_Layout_Info		*m_pLayout_Info;
 
-
-	void						_Create_Parameters		(void);
-	static int					_On_Parameter_Changed	(CSG_Parameter *pParameter);
-	int							On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	void						_Set_Extent				(const CSG_Rect &Extent);
 	void						_Synchronise_Extents	(void);

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Grid_Values_AddTo_Points.h 1025 2011-04-28 16:16:37Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -77,16 +80,23 @@ class CGrid_Values_AddTo_Points : public CSG_Module
 {
 public:
 	CGrid_Values_AddTo_Points(void);
-	virtual ~CGrid_Values_AddTo_Points(void);
+
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Grid Values") );	}
 
 
 protected:
 
-	virtual bool		On_Execute(void);
+	virtual bool			On_Execute		(void);
 
-
-private:
 
 };
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #endif // #ifndef HEADER_INCLUDED__Grid_Values_AddTo_Points_H

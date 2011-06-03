@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: shapes.cpp 996 2011-04-15 10:35:38Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -299,7 +302,7 @@ bool CSG_Shapes::Assign(CSG_Data_Object *pObject)
 	CSG_Shapes	*pShapes;
 
 	//-----------------------------------------------------
-	if(	pObject && pObject->is_Valid() && pObject->Get_ObjectType() == Get_ObjectType() )
+	if(	pObject && pObject->is_Valid() && (pObject->Get_ObjectType() == DATAOBJECT_TYPE_Shapes || pObject->Get_ObjectType() == DATAOBJECT_TYPE_PointCloud) )
 	{
 		pShapes	= (CSG_Shapes *)pObject;
 
@@ -542,25 +545,28 @@ bool CSG_Shapes::Make_Clean(void)
 		for(int iPart=0; iPart<pPolygon->Get_Part_Count(); iPart++)
 		{
 			//--------------------------------------------
+			// ring direction: outer rings > clockwise, inner rings (lakes) > counterclockwise !
+
+			if( (pPolygon->is_Lake(iPart) == pPolygon->is_Clockwise(iPart)) )
+			{
+				pPolygon->Revert_Points(iPart);
+			}
+
+			//--------------------------------------------
 			// last point == first point !
 
 			if( !CSG_Point(pPolygon->Get_Point(0, iPart)).is_Equal(pPolygon->Get_Point(pPolygon->Get_Point_Count(iPart) - 1, iPart)) )
 			{
 				((CSG_Shape *)pPolygon)->Add_Point(pPolygon->Get_Point(0, iPart), iPart);
-			}
 
-			//--------------------------------------------
-			// ring direction !
-
-			if( (pPolygon->is_Lake(iPart) == false && pPolygon->is_Clockwise(iPart) == false)
-			||	(pPolygon->is_Lake(iPart) ==  true && pPolygon->is_Clockwise(iPart) ==  true) )
-			{
-				for(int i=0, j=pPolygon->Get_Point_Count(iPart)-1; i<j; i++, j--)
+				if( m_Vertex_Type != SG_VERTEX_TYPE_XY )
 				{
-					TSG_Point	iPoint	= pPolygon->Get_Point(i, iPart);
-					TSG_Point	jPoint	= pPolygon->Get_Point(j, iPart);
-					pPolygon->Set_Point(iPoint.x, iPoint.y, j, iPart);
-					pPolygon->Set_Point(jPoint.x, jPoint.y, i, iPart);
+					pPolygon->Set_Z(pPolygon->Get_Z(0, iPart), pPolygon->Get_Point_Count(iPart) - 1, iPart);
+
+					if( m_Vertex_Type == SG_VERTEX_TYPE_XYZM )
+					{
+						pPolygon->Set_M(pPolygon->Get_M(0, iPart), pPolygon->Get_Point_Count(iPart) - 1, iPart);
+					}
 				}
 			}
 

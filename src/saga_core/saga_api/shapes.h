@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: shapes.h 997 2011-04-15 10:37:51Z oconrad $
+ *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
 //                         SAGA                          //
@@ -142,28 +145,33 @@ public:
 	virtual int					Get_Part_Count		(void)											= 0;
 	virtual int					Get_Point_Count		(void);
 	virtual int					Get_Point_Count		(int iPart)										= 0;
-	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0)						= 0;
+	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0, bool bAscending = true)	= 0;
 
-	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)	{		}
-	virtual double				Get_Z				(int iPoint, int iPart = 0)	{	return( 0.0 );	}
-	virtual double				Get_ZMin			(void)						{	return( 0.0 );	}
-	virtual double				Get_ZMax			(void)						{	return( 0.0 );	}
+	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)				{		}
+	virtual double				Get_Z				(int iPoint, int iPart = 0, bool bAscending = true)	{	return( 0.0 );	}
+	virtual double				Get_ZMin			(void)												{	return( 0.0 );	}
+	virtual double				Get_ZMax			(void)												{	return( 0.0 );	}
 
-	virtual void				Set_M				(double m, int iPoint, int iPart = 0)	{		}
-	virtual double				Get_M				(int iPoint, int iPart = 0)	{	return( 0.0 );	}
-	virtual double				Get_MMin			(void)						{	return( 0.0 );	}
-	virtual double				Get_MMax			(void)						{	return( 0.0 );	}
+	virtual void				Set_M				(double m, int iPoint, int iPart = 0)				{		}
+	virtual double				Get_M				(int iPoint, int iPart = 0, bool bAscending = true)	{	return( 0.0 );	}
+	virtual double				Get_MMin			(void)												{	return( 0.0 );	}
+	virtual double				Get_MMax			(void)												{	return( 0.0 );	}
 
 	//-----------------------------------------------------
 	virtual const CSG_Rect &	Get_Extent			(void)											= 0;
 	virtual const CSG_Rect &	Get_Extent			(int iPart)	{	return( Get_Extent() );		}
 
-	int							Intersects			(TSG_Rect Extent);
+	virtual TSG_Point			Get_Centroid		(void)											= 0;
+
+	TSG_Intersection			Intersects			(CSG_Shape *pShape);
+	TSG_Intersection			Intersects			(TSG_Rect Extent);
 
 	virtual double				Get_Distance		(TSG_Point Point)								= 0;
 	virtual double				Get_Distance		(TSG_Point Point, int iPart)					= 0;
 	virtual double				Get_Distance		(TSG_Point Point, TSG_Point &Next)				= 0;
 	virtual double				Get_Distance		(TSG_Point Point, TSG_Point &Next, int iPart)	= 0;
+
+	virtual bool				Revert_Points		(int iPart)	{	return( true );	}
 
 
 protected:
@@ -172,7 +180,8 @@ protected:
 	virtual ~CSG_Shape(void);
 
 	virtual bool				On_Assign			(CSG_Shape *pShape)								= 0;
-	virtual int					On_Intersects		(TSG_Rect Extent)								= 0;
+	virtual TSG_Intersection	On_Intersects		(CSG_Shape *pShape)								= 0;
+	virtual TSG_Intersection	On_Intersects		(TSG_Rect Extent)								= 0;
 
 	virtual void				_Invalidate			(void);
 
@@ -204,9 +213,11 @@ public:
 
 	virtual int					Get_Part_Count		(void)												{	return( 1 );				}
 	virtual int					Get_Point_Count		(int iPart)											{	return( 1 );				}
-	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0)							{	return( m_Point );			}
+	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0, bool bAscending = true)	{	return( m_Point );			}
 
 	virtual const CSG_Rect &	Get_Extent			(void);
+
+	virtual TSG_Point			Get_Centroid		(void)												{	return( m_Point );			}
 
 	virtual double				Get_Distance		(TSG_Point Point)									{	return( SG_Get_Distance(Point, m_Point) );	}
 	virtual double				Get_Distance		(TSG_Point Point, int iPart)						{	return( SG_Get_Distance(Point, m_Point) );	}
@@ -224,7 +235,8 @@ protected:
 
 
 	virtual bool				On_Assign			(CSG_Shape *pShape);
-	virtual int					On_Intersects		(TSG_Rect Region);
+	virtual TSG_Intersection	On_Intersects		(CSG_Shape *pShape);
+	virtual TSG_Intersection	On_Intersects		(TSG_Rect Region);
 
 };
 
@@ -235,12 +247,12 @@ class SAGA_API_DLL_EXPORT CSG_Shape_Point_Z : public CSG_Shape_Point
 
 public:
 
-	CSG_Shape_Point_Z(class CSG_Shapes *pOwner, int Index) : CSG_Shape_Point(pOwner, Index)		{	m_Z	= 0.0;	}
+	CSG_Shape_Point_Z(class CSG_Shapes *pOwner, int Index) : CSG_Shape_Point(pOwner, Index)				{	m_Z	= 0.0;	}
 
-	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)		{	m_Z	= z;	_Invalidate();	}
-	virtual double				Get_Z				(int iPoint, int iPart = 0)					{	return( m_Z );	}
-	virtual double				Get_ZMin			(void)										{	return( m_Z );	}
-	virtual double				Get_ZMax			(void)										{	return( m_Z );	}
+	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)				{	m_Z	= z;	_Invalidate();	}
+	virtual double				Get_Z				(int iPoint, int iPart = 0, bool bAscending = true)	{	return( m_Z );	}
+	virtual double				Get_ZMin			(void)												{	return( m_Z );	}
+	virtual double				Get_ZMax			(void)												{	return( m_Z );	}
 
 
 private:
@@ -256,12 +268,12 @@ class SAGA_API_DLL_EXPORT CSG_Shape_Point_ZM : public CSG_Shape_Point_Z
 
 public:
 
-	CSG_Shape_Point_ZM(class CSG_Shapes *pOwner, int Index) : CSG_Shape_Point_Z(pOwner, Index)	{	m_M	= 0.0;	}
+	CSG_Shape_Point_ZM(class CSG_Shapes *pOwner, int Index) : CSG_Shape_Point_Z(pOwner, Index)			{	m_M	= 0.0;	}
 
-	virtual void				Set_M				(double m, int iPoint, int iPart = 0)		{	m_M	= m;	_Invalidate();	}
-	virtual double				Get_M				(int iPoint, int iPart = 0)					{	return( m_M );	}
-	virtual double				Get_MMin			(void)										{	return( m_M );	}
-	virtual double				Get_MMax			(void)										{	return( m_M );	}
+	virtual void				Set_M				(double m, int iPoint, int iPart = 0)				{	m_M	= m;	_Invalidate();	}
+	virtual double				Get_M				(int iPoint, int iPart = 0, bool bAscending = true)	{	return( m_M );	}
+	virtual double				Get_MMin			(void)												{	return( m_M );	}
+	virtual double				Get_MMax			(void)												{	return( m_M );	}
 
 
 private:
@@ -295,34 +307,36 @@ public:
 
 	int							Get_Count			(void)	{	return( m_nPoints );	}
 
-	TSG_Point					Get_Point			(int iPoint)
+	TSG_Point					Get_Point			(int iPoint, bool bAscending = true)
 	{
 		if( iPoint >= 0 && iPoint < m_nPoints )
 		{
-			return( m_Points[iPoint] );
+			return( m_Points[bAscending ? iPoint : m_nPoints - 1 - iPoint] );
 		}
 
 		return( CSG_Point(0.0, 0.0) );
 	}
 
-	int							Add_Point			(TSG_Point Point               )	{	return( Add_Point(Point.x, Point.y)         );	}
-	int							Ins_Point			(TSG_Point Point,    int iPoint)	{	return( Ins_Point(Point.x, Point.y, iPoint) );	}
-	int							Set_Point			(TSG_Point Point,    int iPoint)	{	return( Set_Point(Point.x, Point.y, iPoint) );	}
+	int							Add_Point			(TSG_Point Point               )		{	return( Add_Point(Point.x, Point.y)         );	}
+	int							Ins_Point			(TSG_Point Point,    int iPoint)		{	return( Ins_Point(Point.x, Point.y, iPoint) );	}
+	int							Set_Point			(TSG_Point Point,    int iPoint)		{	return( Set_Point(Point.x, Point.y, iPoint) );	}
 
 	int							Add_Point			(double x, double y            );
 	int							Ins_Point			(double x, double y, int iPoint);
 	int							Set_Point			(double x, double y, int iPoint);
 	int							Del_Point			(                    int iPoint);
 
-	virtual void				Set_Z				(double z, int iPoint)	{			}
-	virtual double				Get_Z				(int iPoint)	{	return( 0.0 );	}
-	virtual double				Get_ZMin			(void)			{	return( 0.0 );	}
-	virtual double				Get_ZMax			(void)			{	return( 0.0 );	}
+	void						Set_Z				(double z, int iPoint)					{	if    ( m_Z && iPoint >= 0 && iPoint < m_nPoints ) { m_Z[iPoint] = z; _Invalidate(); }	}
+	double						Get_Z				(int iPoint, bool bAscending = true)	{	return( m_Z && iPoint >= 0 && iPoint < m_nPoints ?   m_Z[bAscending ? iPoint : m_nPoints - 1 - iPoint] : 0.0 );	}
+	double						Get_ZMin			(void)									{	_Update_Extent(); return( m_ZMin );	}
+	double						Get_ZMax			(void)									{	_Update_Extent(); return( m_ZMax );	}
 
-	virtual void				Set_M				(double m, int iPoint)	{			}
-	virtual double				Get_M				(int iPoint)	{	return( 0.0 );	}
-	virtual double				Get_MMin			(void)			{	return( 0.0 );	}
-	virtual double				Get_MMax			(void)			{	return( 0.0 );	}
+	void						Set_M				(double m, int iPoint)					{	if    ( m_M && iPoint >= 0 && iPoint < m_nPoints ) { m_M[iPoint] = m; _Invalidate(); }	}
+	double						Get_M				(int iPoint, bool bAscending = true)	{	return( m_M && iPoint >= 0 && iPoint < m_nPoints ?	 m_M[bAscending ? iPoint : m_nPoints - 1 - iPoint] : 0.0 );	}
+	double						Get_MMin			(void)									{	_Update_Extent(); return( m_MMin );	}
+	double						Get_MMax			(void)									{	_Update_Extent(); return( m_MMax );	}
+
+	bool						Revert_Points		(void);
 
 
 protected:
@@ -335,6 +349,8 @@ protected:
 
 	int							m_nPoints, m_nBuffer;
 
+	double						*m_Z, m_ZMin, m_ZMax, *m_M, m_MMin, m_MMax;
+
 	TSG_Point					*m_Points;
 
 	CSG_Rect					m_Extent;
@@ -344,70 +360,6 @@ protected:
 
 	virtual bool				_Alloc_Memory		(int nPoints);
 	virtual void				_Invalidate			(void);
-	virtual void				_Update_Extent		(void);
-
-};
-
-//---------------------------------------------------------
-class SAGA_API_DLL_EXPORT CSG_Shape_Part_Z : public CSG_Shape_Part
-{
-	friend class CSG_Shape_Points;
-	friend class CSG_Shape_Line;
-	friend class CSG_Shape_Polygon;
-
-public:
-
-	virtual bool				Destroy				(void);
-	virtual bool				Assign				(CSG_Shape_Part *pPart);
-
-	virtual void				Set_Z				(double z, int iPoint)	{	if( iPoint >= 0 && iPoint < m_nPoints )	{	m_Z[iPoint]	= z; _Invalidate();	}	}
-	virtual double				Get_Z				(int iPoint)			{	return( iPoint >= 0 && iPoint < m_nPoints ?	m_Z[iPoint]	: 0.0 );	}
-	virtual double				Get_ZMin			(void)					{	_Update_Extent(); return( m_ZMin );	}
-	virtual double				Get_ZMax			(void)					{	_Update_Extent(); return( m_ZMax );	}
-
-
-protected:
-
-	CSG_Shape_Part_Z(class CSG_Shape_Points *pOwner);
-	virtual ~CSG_Shape_Part_Z(void);
-
-
-	double						*m_Z, m_ZMin, m_ZMax;
-
-
-	virtual bool				_Alloc_Memory		(int nPoints);
-	virtual void				_Update_Extent		(void);
-
-};
-
-//---------------------------------------------------------
-class SAGA_API_DLL_EXPORT CSG_Shape_Part_ZM : public CSG_Shape_Part_Z
-{
-	friend class CSG_Shape_Points;
-	friend class CSG_Shape_Line;
-	friend class CSG_Shape_Polygon;
-
-public:
-
-	virtual bool				Destroy				(void);
-	virtual bool				Assign				(CSG_Shape_Part *pPart);
-
-	virtual void				Set_M				(double m, int iPoint)	{	if( iPoint >= 0 && iPoint < m_nPoints ) {	m_M[iPoint]	= m; _Invalidate();	}	}
-	virtual double				Get_M				(int iPoint)			{	return( iPoint >= 0 && iPoint < m_nPoints ?	m_M[iPoint]	: 0.0 );	}
-	virtual double				Get_MMin			(void)					{	_Update_Extent(); return( m_MMin );	}
-	virtual double				Get_MMax			(void)					{	_Update_Extent(); return( m_MMax );	}
-
-
-protected:
-
-	CSG_Shape_Part_ZM(class CSG_Shape_Points *pOwner);
-	virtual ~CSG_Shape_Part_ZM(void);
-
-
-	double						*m_M, m_MMin, m_MMax;
-
-
-	virtual bool				_Alloc_Memory		(int nPoints);
 	virtual void				_Update_Extent		(void);
 
 };
@@ -436,6 +388,10 @@ public:
 	virtual int					Set_Point			(double x, double y, int iPoint, int iPart = 0);
 	virtual int					Del_Point			(                    int iPoint, int iPart = 0);
 
+	int							Add_Point			(const TSG_Point &p,             int iPart = 0)	{	return( Add_Point(p.x, p.y        , iPart) );	}
+	int							Ins_Point			(const TSG_Point &p, int iPoint, int iPart = 0)	{	return( Ins_Point(p.x, p.y, iPoint, iPart) );	}
+	int							Set_Point			(const TSG_Point &p, int iPoint, int iPart = 0)	{	return( Set_Point(p.x, p.y, iPoint, iPart) );	}
+
 	virtual int					Del_Part			(int iPart);
 	virtual int					Del_Parts			(void);
 
@@ -443,32 +399,36 @@ public:
 	virtual CSG_Shape_Part *	Get_Part			(int iPart)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart] : NULL );	}
 	virtual int					Get_Point_Count		(int iPart)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Get_Count() : 0 );	}
 
-	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0)
+	virtual TSG_Point			Get_Point			(int iPoint, int iPart = 0, bool bAscending = true)
 	{
 		if( iPart >= 0 && iPart < m_nParts )
 		{
-			return( m_pParts[iPart]->Get_Point(iPoint) );
+			return( m_pParts[iPart]->Get_Point(iPoint, bAscending) );
 		}
 
 		return( CSG_Point(0.0, 0.0) );
 	}
 
-	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)	{	if( iPart >= 0 && iPart < m_nParts ) m_pParts[iPart]->Set_Z(z, iPoint);	}
-	virtual double				Get_Z				(          int iPoint, int iPart = 0)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Get_Z(iPoint) : 0.0 );	}
+	virtual void				Set_Z				(double z, int iPoint, int iPart = 0)							{	if    ( iPart >= 0 && iPart < m_nParts ) m_pParts[iPart]->Set_Z(z, iPoint);	}
+	virtual double				Get_Z				(          int iPoint, int iPart = 0, bool bAscending = true)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Get_Z(   iPoint, bAscending) : 0.0 );	}
 	virtual double				Get_ZMin			(void)		{	_Update_Extent();	return( m_ZMin );	}
 	virtual double				Get_ZMax			(void)		{	_Update_Extent();	return( m_ZMax );	}
 
-	virtual void				Set_M				(double m, int iPoint, int iPart = 0)	{	if( iPart >= 0 && iPart < m_nParts ) m_pParts[iPart]->Set_M(m, iPoint);	}
-	virtual double				Get_M				(          int iPoint, int iPart = 0)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Get_M(iPoint) : 0.0 );	}
+	virtual void				Set_M				(double m, int iPoint, int iPart = 0)							{	if    ( iPart >= 0 && iPart < m_nParts ) m_pParts[iPart]->Set_M(m, iPoint);	}
+	virtual double				Get_M				(          int iPoint, int iPart = 0, bool bAscending = true)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Get_M(   iPoint, bAscending) : 0.0 );	}
 	virtual double				Get_MMin			(void)		{	_Update_Extent();	return( m_MMin );	}
 	virtual double				Get_MMax			(void)		{	_Update_Extent();	return( m_MMax );	}
 
 	virtual const CSG_Rect &	Get_Extent			(void)		{	_Update_Extent();	return( m_Extent );	}
 
+	virtual TSG_Point			Get_Centroid		(void);
+
 	virtual double				Get_Distance		(TSG_Point Point);
 	virtual double				Get_Distance		(TSG_Point Point, int iPart);
 	virtual double				Get_Distance		(TSG_Point Point, TSG_Point &Next);
 	virtual double				Get_Distance		(TSG_Point Point, TSG_Point &Next, int iPart);
+
+	virtual bool				Revert_Points		(int iPart)	{	return( iPart >= 0 && iPart < m_nParts ? m_pParts[iPart]->Revert_Points() : false );	}
 
 
 protected:
@@ -490,7 +450,7 @@ protected:
 
 	int							_Add_Part			(void);
 
-	virtual CSG_Shape_Part *	_Get_Part			(void);
+	virtual CSG_Shape_Part *	_Get_Part			(void)	{	return( new CSG_Shape_Part(this) );	}
 
 	virtual void				_Invalidate			(void)
 	{
@@ -505,8 +465,8 @@ protected:
 	void						_Update_Extent		(void);
 
 	virtual bool				On_Assign			(CSG_Shape *pShape);
-
-	virtual int					On_Intersects		(TSG_Rect Region);
+	virtual TSG_Intersection	On_Intersects		(CSG_Shape *pShape);
+	virtual TSG_Intersection	On_Intersects		(TSG_Rect Region);
 
 };
 
@@ -526,6 +486,8 @@ public:
 
 	virtual bool				is_Valid			(void)	{	return( m_nParts > 0 && m_pParts[0]->Get_Count() > 1 );	}
 
+	virtual TSG_Point			Get_Centroid		(void);
+
 	double						Get_Length			(void);
 	double						Get_Length			(int iPart);
 
@@ -537,7 +499,8 @@ protected:
 	CSG_Shape_Line(class CSG_Shapes *pOwner, int Index);
 	virtual ~CSG_Shape_Line(void);
 
-	virtual int					On_Intersects		(TSG_Rect Region);
+	virtual TSG_Intersection	On_Intersects		(CSG_Shape *pShape);
+	virtual TSG_Intersection	On_Intersects		(TSG_Rect Region);
 
 };
 
@@ -563,8 +526,8 @@ public:
 
 	const TSG_Point &			Get_Centroid		(void)	{	_Update_Area();	return( m_Centroid );	}
 
-	bool						is_Containing		(const TSG_Point &Point);
-	bool						is_Containing		(double x, double y);
+	bool						Contains			(const TSG_Point &Point);
+	bool						Contains			(double x, double y);
 
 	double						Get_Distance		(TSG_Point Point, TSG_Point &Next);
 
@@ -613,10 +576,10 @@ public:
 	TSG_Point					Get_Centroid		(int iPart);
 	TSG_Point					Get_Centroid		(void);
 
-	bool						is_Containing		(const TSG_Point &Point, int iPart);
-	bool						is_Containing		(const TSG_Point &Point);
-	bool						is_Containing		(double x, double y, int iPart);
-	bool						is_Containing		(double x, double y);
+	bool						Contains			(const TSG_Point &Point, int iPart);
+	bool						Contains			(const TSG_Point &Point);
+	bool						Contains			(double x, double y, int iPart);
+	bool						Contains			(double x, double y);
 
 	virtual double				Get_Distance		(TSG_Point Point, TSG_Point &Next, int iPart);
 
@@ -634,7 +597,8 @@ protected:
 
 	virtual void				_Invalidate			(void);
 
-	virtual int					On_Intersects		(TSG_Rect Region);
+	virtual TSG_Intersection	On_Intersects		(CSG_Shape *pShape);
+	virtual TSG_Intersection	On_Intersects		(TSG_Rect Region);
 
 };
 
@@ -713,9 +677,10 @@ public:
 	virtual CSG_Shape *				Get_Selection			(int Index = 0)			{	return( (CSG_Shape *)CSG_Table::Get_Selection(Index) );	};
 	virtual const CSG_Rect &		Get_Selection_Extent	(void);
 
-	virtual bool					Select					(CSG_Shape *pShape = NULL, bool bInvert = false);
-	virtual bool					Select					(TSG_Rect Extent         , bool bInvert = false);
-	virtual bool					Select					(TSG_Point Point         , bool bInvert = false);
+	virtual bool					Select					(int Index					, bool bInvert = false);
+	virtual bool					Select					(CSG_Shape *pShape = NULL	, bool bInvert = false);
+	virtual bool					Select					(TSG_Rect Extent			, bool bInvert = false);
+	virtual bool					Select					(TSG_Point Point			, bool bInvert = false);
 
 
 protected:
@@ -780,6 +745,7 @@ public:
 
 	virtual bool			is_Leaf			(void)	const	{	return( false );	}
 	virtual bool			is_Node			(void)	const	{	return( false );	}
+	virtual bool			has_Statistics	(void)	const	{	return( false );	}
 
 	CSG_Rect				Get_Extent		(void)	const	{	return( CSG_Rect(m_xCenter - m_Size, m_yCenter - m_Size, m_xCenter + m_Size, m_yCenter + m_Size) );	}
 	double					Get_xMin		(void)	const	{	return( m_xCenter - m_Size );	}
@@ -847,6 +813,47 @@ protected:
 };
 
 //---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_PRQuadTree_Leaf_List : public CSG_PRQuadTree_Leaf
+{
+	friend class CSG_PRQuadTree_Node;
+
+public:
+
+	virtual bool			has_Statistics	(void)	const	{	return( true );	}
+
+	int						Get_Count		(void)	{	return( s_z.Get_Count   () );	}
+	double					Get_Value		(int i)	{	return( s_z.Get_Value  (i) );	}
+	double					Get_Minimum		(void)	{	return( s_z.Get_Minimum () );	}
+	double					Get_Maximum		(void)	{	return( s_z.Get_Maximum () );	}
+	double					Get_Range		(void)	{	return( s_z.Get_Range   () );	}
+	double					Get_Sum			(void)	{	return( s_z.Get_Sum     () );	}
+	double					Get_Mean		(void)	{	return( s_z.Get_Mean    () );	}
+	double					Get_Variance	(void)	{	return( s_z.Get_Variance() );	}
+	double					Get_StdDev		(void)	{	return( s_z.Get_StdDev  () );	}
+
+
+protected:
+
+	CSG_PRQuadTree_Leaf_List(double xCenter, double yCenter, double Size, double x, double y, double z)
+		: CSG_PRQuadTree_Leaf(xCenter, yCenter, Size, x, y, z)
+	{
+		s_z.Create(true);
+
+		s_z.Add_Value(z);
+	}
+
+	void					Add_Value		(double z)
+	{
+		s_z.Add_Value(z);
+
+		m_z	= s_z.Get_Mean();
+	}
+
+	CSG_Simple_Statistics	s_z;
+
+};
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_PRQuadTree_Node : public CSG_PRQuadTree_Item
 {
 	friend class CSG_PRQuadTree;
@@ -856,8 +863,13 @@ public:
 	virtual bool			is_Node			(void)	const	{	return( true );		}
 
 	CSG_PRQuadTree_Item *	Get_Child		(int i)	const	{	return( i >= 0 && i < 4 ? m_pChildren[i] : NULL );	}
+	CSG_PRQuadTree_Item *	Get_Child		(double x, double y);
 
 	bool					Add_Point		(double x, double y, double z);
+
+	virtual CSG_Simple_Statistics *	Get_X	(void)			{	return( NULL );	}
+	virtual CSG_Simple_Statistics *	Get_Y	(void)			{	return( NULL );	}
+	virtual CSG_Simple_Statistics *	Get_Z	(void)			{	return( NULL );	}
 
 
 protected:
@@ -872,38 +884,79 @@ protected:
 };
 
 //---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_PRQuadTree_Node_Statistics : public CSG_PRQuadTree_Node
+{
+	friend class CSG_PRQuadTree;
+	friend class CSG_PRQuadTree_Node;
+
+public:
+
+	virtual bool			has_Statistics	(void)	const	{	return( true );	}
+
+	virtual CSG_Simple_Statistics *	Get_X	(void)			{	return( &m_x );	}
+	virtual CSG_Simple_Statistics *	Get_Y	(void)			{	return( &m_y );	}
+	virtual CSG_Simple_Statistics *	Get_Z	(void)			{	return( &m_z );	}
+
+
+protected:
+
+	CSG_PRQuadTree_Node_Statistics(double xCenter, double yCenter, double Size)
+		: CSG_PRQuadTree_Node(xCenter, yCenter, Size)
+	{}
+
+	CSG_PRQuadTree_Node_Statistics(CSG_PRQuadTree_Leaf *pLeaf)
+		: CSG_PRQuadTree_Node(pLeaf)
+	{}
+
+
+	CSG_Simple_Statistics	m_x, m_y, m_z;
+
+};
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_PRQuadTree
 {
 public:
 	CSG_PRQuadTree(void);
-	CSG_PRQuadTree(const TSG_Rect &Extent);
-	CSG_PRQuadTree(CSG_Shapes *pShapes, int Attribute);
+	CSG_PRQuadTree(const TSG_Rect &Extent, bool bStatistics = false);
+	CSG_PRQuadTree(CSG_Shapes *pShapes, int Attribute, bool bStatistics = false);
 	virtual ~CSG_PRQuadTree(void);
 
-	bool						Create					(const CSG_Rect &Extent);
-	bool						Create					(CSG_Shapes *pShapes, int Attribute);
+	bool						Create					(const CSG_Rect &Extent, bool bStatistics = false);
+	bool						Create					(CSG_Shapes *pShapes, int Attribute, bool bStatistics = false);
 	void						Destroy					(void);
 
 	bool						Add_Point				(double x, double y, double z);
+	bool						Add_Point				(const TSG_Point &p, double z);
+
 	int							Get_Point_Count			(void)	const	{	return( m_nPoints );		}
 
 	const CSG_PRQuadTree_Node &	Get_Root				(void)	const	{	return( *m_pRoot );			}
+	CSG_PRQuadTree_Node *		Get_Root_Pointer		(void)	const	{	return(  m_pRoot );			}
 
 	bool						is_Okay					(void)	const	{	return( m_pRoot != NULL );	}
 
+	CSG_PRQuadTree_Leaf *		Get_Nearest_Leaf		(const TSG_Point &p, double &Distance);
+	CSG_PRQuadTree_Leaf *		Get_Nearest_Leaf		(double x, double y, double &Distance);
+	bool						Get_Nearest_Point		(const TSG_Point &p, TSG_Point &Point, double &Value, double &Distance);
 	bool						Get_Nearest_Point		(double x, double y, TSG_Point &Point, double &Value, double &Distance);
 
+	int							Select_Nearest_Points	(const TSG_Point &p, int maxPoints, double Radius = 0.0, int iQuadrant = -1);
 	int							Select_Nearest_Points	(double x, double y, int maxPoints, double Radius = 0.0, int iQuadrant = -1);
 
-	int							Get_Selected_Count		(void)	const	{	return( m_nSelected );		}
-
+	int							Get_Selected_Count		(void)	const	{	return( (int)m_Selected.Get_Size() );	}
+	CSG_PRQuadTree_Leaf *		Get_Selected_Leaf		(int i) const	{	TLeaf *pLeaf = _Get_Selected(i); return( pLeaf ? pLeaf->pLeaf          : NULL );	}
+	double						Get_Selected_Z			(int i) const	{	TLeaf *pLeaf = _Get_Selected(i); return( pLeaf ? pLeaf->pLeaf->Get_Z() :  0.0 );	}
+	double						Get_Selected_Distance	(int i) const	{	TLeaf *pLeaf = _Get_Selected(i); return( pLeaf ? pLeaf->Distance       : -1.0 );	}
 	bool						Get_Selected_Point		(int i, double &x, double &y, double &z) const
 	{
-		if( i >= 0 && i < m_nSelected )
+		CSG_PRQuadTree_Leaf	*pLeaf	= Get_Selected_Leaf(i);
+
+		if( pLeaf )
 		{
-			x	= m_Selected[i][0];
-			y	= m_Selected[i][1];
-			z	= m_Selected[i][2];
+			x	= pLeaf->Get_X();
+			y	= pLeaf->Get_Y();
+			z	= pLeaf->Get_Z();
 
 			return( true );
 		}
@@ -914,11 +967,28 @@ public:
 
 private:
 
-	int							m_nSelected, m_nPoints;
+	typedef struct SLeaf
+	{
+		CSG_PRQuadTree_Leaf		*pLeaf;
 
-	CSG_Matrix					m_Selected;
+		double					Distance;
+	}
+	TLeaf;
+
+
+private:
+
+	int							m_nPoints;
+
+	CSG_Array					m_Selected;
 
 	CSG_PRQuadTree_Node			*m_pRoot;
+
+	bool						_Check_Root				(double x, double y);
+
+	TLeaf *						_Get_Selected			(int i)	const	{	return( i >= 0 && i < (int)m_Selected.Get_Size() ? ((TLeaf *)m_Selected.Get_Array()) + i : NULL );	}
+	bool						_Add_Selected			(CSG_PRQuadTree_Leaf *pLeaf, double Distance);
+	bool						_Set_Selected			(int i, CSG_PRQuadTree_Leaf *pLeaf, double Distance);
 
 	bool						_Quadrant_Contains		(double x, double y, int iQuadrant, const TSG_Point &p);
 	bool						_Radius_Contains		(double x, double y, double r, const TSG_Point &p);
@@ -927,8 +997,8 @@ private:
 	bool						_Radius_Intersects		(double x, double y, double r, CSG_PRQuadTree_Item *pItem);
 	bool						_Radius_Intersects		(double x, double y, double r, int iQuadrant, CSG_PRQuadTree_Item *pItem);
 
-	void						_Get_Nearest_Point		(CSG_PRQuadTree_Item *pItem, double x, double y, double &maxDistance, double Point[4]);
-	void						_Get_Nearest_Points		(CSG_PRQuadTree_Item *pItem, double x, double y, double &maxDistance, double Radius, int iQuadrant);
+	CSG_PRQuadTree_Leaf	*		_Get_Nearest_Point		(CSG_PRQuadTree_Item *pItem, double x, double y, double &Distance);
+	void						_Get_Nearest_Points		(CSG_PRQuadTree_Item *pItem, double x, double y, double &Distance, double Radius, int maxPoints, int iQuadrant);
 
 };
 

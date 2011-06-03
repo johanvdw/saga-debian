@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: funktion_numerisch.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 #ifndef __FUNKTION_NUMERISCH_H 
 #define __FUNKTION_NUMERISCH_H 
 

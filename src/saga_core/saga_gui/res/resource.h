@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: resource.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 // Used by SAGA.rc

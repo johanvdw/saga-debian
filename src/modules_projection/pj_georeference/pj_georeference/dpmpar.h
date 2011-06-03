@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: dpmpar.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /* dpmpar.h -- IEEE double precision machine parameters. */
 #ifndef dpmparH
 #define dpmparH

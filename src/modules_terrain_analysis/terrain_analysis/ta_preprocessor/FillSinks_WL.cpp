@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: FillSinks_WL.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -142,6 +145,8 @@ bool CFillSinks_WL::On_Execute(void)
 	pFdir		= Parameters("FDIR")->asGrid();
 	pWshed		= Parameters("WSHED")->asGrid();
 	minslope	= Parameters("MINSLOPE")->asDouble();
+
+	pFilled->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pElev->Get_Name(), _TL("no sinks")));
 
 
 	if( minslope > 0.0 )

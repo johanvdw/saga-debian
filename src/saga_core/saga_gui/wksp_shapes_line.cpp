@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_shapes_line.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -73,13 +76,12 @@
 CWKSP_Shapes_Line::CWKSP_Shapes_Line(CSG_Shapes *pShapes)
 	: CWKSP_Shapes(pShapes)
 {
-	Create_Parameters();
+	Initialise();
 }
 
 //---------------------------------------------------------
 CWKSP_Shapes_Line::~CWKSP_Shapes_Line(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -128,18 +130,8 @@ void CWKSP_Shapes_Line::On_Create_Parameters(void)
 	//-----------------------------------------------------
 	// Size...
 
-	m_Parameters.Add_Node(
-		NULL						, "NODE_SIZE"		, LNG("[CAP] Display: Size"),
-		LNG("")
-	);
-
-	_AttributeList_Add(
-		m_Parameters("NODE_SIZE")	, "SIZE_ATTRIB"		, LNG("[CAP] Attribute"),
-		LNG("")
-	);
-
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_SIZE")	, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
+		m_Parameters("NODE_SIZE")		, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
 		LNG(""),
 		wxString::Format(wxT("%s|%s|"),
 			LNG("[VAL] Screen"),
@@ -147,16 +139,21 @@ void CWKSP_Shapes_Line::On_Create_Parameters(void)
 		), 0
 	);
 
-	m_Parameters.Add_Value(
-		m_Parameters("NODE_SIZE")	, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
-		LNG(""),
-		PARAMETER_TYPE_Int, 0, 0, true
+	_AttributeList_Add(
+		m_Parameters("NODE_SIZE")		, "SIZE_ATTRIB"		, LNG("[CAP] Attribute"),
+		LNG("")
 	);
 
 	m_Parameters.Add_Range(
-		m_Parameters("NODE_SIZE")	, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
 		LNG(""),
 		0, 10, 0, true
+	);
+
+	m_Parameters.Add_Value(
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
+		LNG(""),
+		PARAMETER_TYPE_Int, 0, 0, true
 	);
 }
 
@@ -209,11 +206,21 @@ void CWKSP_Shapes_Line::On_Parameters_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CWKSP_Shapes_Line::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+int CWKSP_Shapes_Line::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter);
+	//-----------------------------------------------------
+	if( Flags & PARAMETER_CHECK_ENABLE )
+	{
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("SIZE_ATTRIB")) )
+		{
+			bool	Value	= pParameter->asInt() < m_pShapes->Get_Field_Count();
 
-	return( 1 );
+			pParameters->Get_Parameter("SIZE_RANGE"  )->Set_Enabled(Value == true);
+			pParameters->Get_Parameter("SIZE_DEFAULT")->Set_Enabled(Value == false);
+		}
+	}
+
+	return( CWKSP_Shapes::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 
@@ -300,8 +307,10 @@ void CWKSP_Shapes_Line::_Draw_Initialize(CWKSP_Map_DC &dc_Map)
 //---------------------------------------------------------
 void CWKSP_Shapes_Line::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection)
 {
-	if( (m_iSize >= 0 && pShape->is_NoData(m_iSize)) || (m_iColor >= 0 && pShape->is_NoData(m_iColor)) )
+	if( m_iSize >= 0 && pShape->is_NoData(m_iSize) )
+	{
 		return;
+	}
 
 	//-----------------------------------------------------
 	if( bSelection )
@@ -389,7 +398,7 @@ void CWKSP_Shapes_Line::_Draw_Label(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 	double			d;
 	TSG_Point_Int	A, B;
 	wxCoord			sx, sy;
-	wxString		s(pShape->asString(m_iLabel, m_Label_Prec));
+	wxString		s(pShape->asString(m_iLabel, m_Label_Prec));	s.Trim(true).Trim(false);
 
 	m_Label_Freq	= 10;
 

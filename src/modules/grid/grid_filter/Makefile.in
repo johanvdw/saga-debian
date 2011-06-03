@@ -75,7 +75,8 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libgrid_filter_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libgrid_filter_la_OBJECTS = Filter.lo Filter_3x3.lo Filter_Gauss.lo \
-	Filter_LoG.lo Filter_Majority.lo Filter_Multi_Dir_Lee.lo \
+	Filter_LoG.lo Filter_Majority.lo Filter_Morphology.lo \
+	Filter_Multi_Dir_Lee.lo Filter_Rank.lo \
 	Filter_Terrain_SlopeBased.lo FilterClumps.lo MLB_Interface.lo
 libgrid_filter_la_OBJECTS = $(am_libgrid_filter_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -244,7 +245,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.8 2010/07/08 14:11:48 johanvdw Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -259,7 +260,9 @@ Filter_3x3.cpp\
 Filter_Gauss.cpp\
 Filter_LoG.cpp\
 Filter_Majority.cpp\
+Filter_Morphology.cpp\
 Filter_Multi_Dir_Lee.cpp\
+Filter_Rank.cpp\
 Filter_Terrain_SlopeBased.cpp\
 FilterClumps.cpp\
 MLB_Interface.cpp\
@@ -268,7 +271,9 @@ Filter_3x3.h\
 Filter_Gauss.h\
 Filter_LoG.h\
 Filter_Majority.h\
+Filter_Morphology.h\
 Filter_Multi_Dir_Lee.h\
+Filter_Rank.h\
 Filter_Terrain_SlopeBased.h\
 FilterClumps.h\
 MLB_Interface.h
@@ -354,7 +359,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Gauss.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_LoG.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Majority.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Morphology.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Multi_Dir_Lee.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Rank.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Filter_Terrain_SlopeBased.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: nncommon.c 968 2011-03-25 13:26:46Z oconrad $
+ *********************************************************/
 /******************************************************************************
  *
  * File:           nncommon.c
@@ -132,6 +135,10 @@ void points_thin(int* pn, point** ppoints, int nx, int ny)
         *pn = 0;
         if (nn_verbose)
             fprintf(stderr, "0 points");
+			free(sumx);
+			free(sumy);
+			free(sumz);
+			free(count);
         return;
     }
 

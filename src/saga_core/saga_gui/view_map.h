@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: view_map.h 1039 2011-05-04 14:02:25Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -98,6 +101,9 @@ public:
 	void							On_Map_Layout_Show			(wxCommandEvent  &event);
 	void							On_Map_Save_Image			(wxCommandEvent  &event);
 	void							On_Map_Save_Image_On_Change	(wxCommandEvent  &event);
+	void							On_Map_Save_Image_To_Memory	(wxCommandEvent  &event);
+	void							On_Map_Save_Image_Clipboard	(wxCommandEvent  &event);
+	void							On_Map_Save_Image_ClipboardL(wxCommandEvent  &event);
 
 	void							On_Map_Zoom_Full			(wxCommandEvent  &event);
 	void							On_Map_Zoom_Back			(wxCommandEvent  &event);

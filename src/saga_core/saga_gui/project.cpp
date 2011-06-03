@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: project.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -446,6 +449,8 @@ bool CWKSP_Project::_Save(const wxChar *FileName, bool bSaveModified, bool bUpda
 
 		_Set_Project_Name();
 
+		PROGRESSBAR_Set_Position(0);
+
 		return( true );
 	}
 
@@ -455,6 +460,8 @@ bool CWKSP_Project::_Save(const wxChar *FileName, bool bSaveModified, bool bUpda
 		g_pData->Get_FileMenus()->Recent_Del(DATAOBJECT_TYPE_Undefined, FileName);
 
 	MSG_General_Add(LNG("[MSG] Could not save project."), true, true, SG_UI_MSG_STYLE_FAILURE);
+
+	PROGRESSBAR_Set_Position(0);
 
 	return( false );
 }
@@ -766,7 +773,7 @@ bool CWKSP_Project::Save_Modified(CWKSP_Base_Item *pItem, bool bSelections)
 }
 
 //---------------------------------------------------------
-int CWKSP_Project::_Modified_Changed(CSG_Parameter *pParameter)
+int CWKSP_Project::_Modified_Changed(CSG_Parameter *pParameter, int Flags)
 {
 	if( pParameter && pParameter->Get_Owner() && pParameter->Get_Owner()->Get_Owner() )
 	{
@@ -907,7 +914,7 @@ bool CWKSP_Project::_Modified_Save(CSG_Parameters *pParameters)
 		pParameter	= pParameters->Get_Parameter(i);
 
 		if(	pParameter->Get_Type() == PARAMETER_TYPE_Bool && (bSaveAll || pParameter->asBool())
-		&&	SG_SSCANF(pParameter->Get_Identifier(), wxT("%d"), (int *)(&pObject)) == 1 && g_pData->Exists(pObject)	)
+		&&	SG_SSCANF(pParameter->Get_Identifier(), wxT("%lld"), (int *)(&pObject)) == 1 && g_pData->Exists(pObject)	)
 		{
 			CSG_String	fPath;
 

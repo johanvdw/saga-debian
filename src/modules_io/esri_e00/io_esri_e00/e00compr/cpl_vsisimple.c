@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: cpl_vsisimple.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /******************************************************************************
  * Copyright (c) 1998, Frank Warmerdam
  *
@@ -29,10 +32,7 @@
  *  - add some assertions to ensure that arguments are widely legal.  For
  *    instance validation of access strings to fopen().
  * 
- * $Log: cpl_vsisimple.c,v $
- * Revision 1.1.1.1  2006/06/26 15:38:26  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:01:00  oconrad
  * no message
  *

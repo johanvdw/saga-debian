@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: cminpak.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /**** NOTE: Modified 1-12-1999 to include parameter mask ****/
 #ifndef minpakH
 #define minpakH

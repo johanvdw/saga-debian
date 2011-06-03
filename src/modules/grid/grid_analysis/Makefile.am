@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.10 2010/09/11 00:07:46 reklov_w Exp $
+# $Id: Makefile.am 1027 2011-04-28 16:21:07Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -15,24 +15,17 @@ pkglib_LTLIBRARIES = libgrid_analysis.la
 libgrid_analysis_la_SOURCES =\
 Cost_Anisotropic.cpp\
 Cost_Isotropic.cpp\
-Cost_PolarToRect.cpp\
-Cost_RectToPolar.cpp\
 CoveredDistance.cpp\
 CrossClassification.cpp\
 fragmentation_base.cpp\
 fragmentation_classify.cpp\
 fragmentation_resampling.cpp\
 fragmentation_standard.cpp\
-Fuzzify.cpp\
-FuzzyAND.cpp\
-FuzzyOR.cpp\
 Grid_AggregationIndex.cpp\
 Grid_AHP.cpp\
 Grid_CVA.cpp\
 Grid_LayerOfMaximumValue.cpp\
 Grid_Pattern.cpp\
-Image_VI_Distance.cpp\
-Image_VI_Slope.cpp\
 LeastCostPathProfile.cpp\
 LeastCostPathProfile_Points.cpp\
 MLB_Interface.cpp\
@@ -41,24 +34,17 @@ PointsEx.cpp\
 Soil_Texture.cpp\
 Cost_Anisotropic.h\
 Cost_Isotropic.h\
-Cost_PolarToRect.h\
-Cost_RectToPolar.h\
 CoveredDistance.h\
 CrossClassification.h\
 fragmentation_base.h\
 fragmentation_classify.h\
 fragmentation_resampling.h\
 fragmentation_standard.h\
-Fuzzify.h\
-FuzzyAND.h\
-FuzzyOR.h\
 Grid_AggregationIndex.h\
 Grid_AHP.h\
 Grid_CVA.h\
 Grid_LayerOfMaximumValue.h\
 Grid_Pattern.h\
-Image_VI_Distance.h\
-Image_VI_Slope.h\
 LeastCostPathProfile.h\
 LeastCostPathProfile_Points.h\
 MLB_Interface.h\

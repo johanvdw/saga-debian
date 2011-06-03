@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 1028 2011-04-28 16:29:33Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -70,7 +73,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Terrain Analysis - Preprocessing" ));
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad (c) 2001, Volker Wichmann (c) 2003") );
+		return( SG_T("O. Conrad (c) 2001, V. Wichmann (c) 2003") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the preprocessing of digital terrain models." ));
@@ -92,6 +95,8 @@ const SG_Char * Get_Info(int i)
 #include "FillSinks.h"
 #include "FillSinks_WL.h"
 
+#include "burn_in_streams.h"
+
 
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
@@ -105,6 +110,8 @@ CSG_Module *		Create_Module(int i)
 	case  3:	return( new CFillSinks );
 	case  4:	return( new CFillSinks_WL );
 	case  5:	return( new CFillSinks_WL_XXL );
+
+	case  6:	return( new CBurnIn_Streams );
 	}
 
 	return( NULL );

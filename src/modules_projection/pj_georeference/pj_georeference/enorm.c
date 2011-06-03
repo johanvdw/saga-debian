@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: enorm.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /* enorm.c -- compute euclidean norm of vector */
 #include <math.h>
 #include "cminpak.h"

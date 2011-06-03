@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_shapes_points.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -80,14 +83,11 @@
 //---------------------------------------------------------
 CWKSP_Shapes_Points::CWKSP_Shapes_Points(CSG_Shapes *pShapes)
 	: CWKSP_Shapes_Point(pShapes)
-{
-	Create_Parameters();
-}
+{}
 
 //---------------------------------------------------------
 CWKSP_Shapes_Points::~CWKSP_Shapes_Points(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -129,11 +129,9 @@ void CWKSP_Shapes_Points::On_Parameters_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CWKSP_Shapes_Points::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+int CWKSP_Shapes_Points::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	CWKSP_Shapes_Point::On_Parameter_Changed(pParameters, pParameter);
-
-	return( 1 );
+	return( CWKSP_Shapes_Point::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 

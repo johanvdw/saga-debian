@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: api_core.h 1049 2011-05-09 07:55:38Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -95,10 +98,6 @@
 
 //---------------------------------------------------------
 #ifndef SWIG
-
-#if !defined(__APPLE__) && !defined(__BSD__)
-#include <malloc.h>
-#endif
 
 #include <math.h>
 #include <memory.h>
@@ -387,14 +386,20 @@ public:
 	CSG_Array(void);
 	~CSG_Array(void);
 
+						CSG_Array		(const CSG_Array &Array);
+	void *				Create			(const CSG_Array &Array);
+
 						CSG_Array		(size_t Value_Size, size_t nValues = 0, TSG_Array_Growth Growth = SG_ARRAY_GROWTH_0);
 	void *				Create			(size_t Value_Size, size_t nValues = 0, TSG_Array_Growth Growth = SG_ARRAY_GROWTH_0);
 
 	void				Destroy			(void);
 
+	CSG_Array &			operator =		(const CSG_Array &Array)	{	Create(Array);	return( *this );	}
+
 	bool				Set_Growth		(TSG_Array_Growth Growth);
 	int					Get_Growth		(void)	const			{	return( m_Growth );		}
 
+	size_t				Get_Value_Size	(void)	const			{	return( m_Value_Size );	}
 	size_t				Get_Size		(void)	const			{	return( m_nValues );	}
 
 	void *				Get_Entry		(size_t Index)	const	{	return( Index >= 0 && Index < m_nValues ? (char *)m_Values + Index * m_Value_Size : NULL );		}
@@ -888,6 +893,10 @@ SAGA_API_DLL_EXPORT bool			SG_File_Set_Extension	(CSG_String    &File_Name, cons
 
 SAGA_API_DLL_EXPORT bool			SG_Read_Line			(FILE *Stream, CSG_String &Line);
 
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT bool			SG_Get_Environment		(const CSG_String &Variable,       CSG_String *Value = NULL);
+SAGA_API_DLL_EXPORT bool			SG_Set_Environment		(const CSG_String &Variable, const CSG_String &Value);
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -1003,6 +1012,9 @@ public:
 
 	bool							Serialize			(CSG_File &Stream, bool bSave, bool bBinary);
 
+	bool							to_Text				(      CSG_String &String);
+	bool							from_Text			(const CSG_String &String);
+
 
 private:
 
@@ -1082,8 +1094,12 @@ SAGA_API_DLL_EXPORT const SG_Char *		SG_Translate		(const SG_Char *Text);
 
 #ifndef _SAGA_UNICODE
 	#define LNG(s)	SG_Translate(s)
+	#define _TL(s)	SG_Translate(s)
+	#define _TW(s)	SG_Translate(s)
 #else
 	#define LNG(s)	SG_Translate(SG_T(s))
+	#define _TL(s)	SG_Translate(SG_T(s))
+	#define _TW(s)	SG_Translate(CSG_String(s))
 #endif
 
 

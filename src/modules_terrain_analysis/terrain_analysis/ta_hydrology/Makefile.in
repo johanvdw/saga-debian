@@ -74,14 +74,14 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libta_hydrology_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libta_hydrology_la_OBJECTS = BasinGrid.lo CellBalance.lo \
-	EdgeContamination.lo Flow.lo Flow_AreaDownslope.lo \
-	Flow_AreaUpslope.lo Flow_Distance.lo Flow_Parallel.lo \
-	Flow_RecursiveDown.lo Flow_RecursiveUp.lo flow_massflux.lo \
-	flow_width.lo FlowDepth.lo Helper.lo IsochronesConst.lo \
-	IsochronesVar.lo LakeFlood.lo LakeFloodInteractive.lo \
-	MLB_Interface.lo SAGA_Wetness_Index.lo Sinuosity.lo \
-	SlopeLength.lo TopographicIndices.lo
+am_libta_hydrology_la_OBJECTS = CellBalance.lo EdgeContamination.lo \
+	Flow.lo Flow_AreaDownslope.lo Flow_AreaUpslope.lo \
+	Flow_Distance.lo Flow_Parallel.lo Flow_RecursiveDown.lo \
+	Flow_RecursiveUp.lo flow_massflux.lo flow_width.lo \
+	FlowDepth.lo Helper.lo IsochronesConst.lo IsochronesVar.lo \
+	LakeFlood.lo LakeFloodInteractive.lo MLB_Interface.lo \
+	SAGA_Wetness_Index.lo Sinuosity.lo SlopeLength.lo \
+	TopographicIndices.lo
 libta_hydrology_la_OBJECTS = $(am_libta_hydrology_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -249,7 +249,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.9 2010/07/08 14:11:48 johanvdw Exp $
+# $Id: Makefile.am 1016 2011-04-27 18:40:36Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -259,7 +259,6 @@ AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libta_hydrology.la
 libta_hydrology_la_SOURCES = \
-BasinGrid.cpp\
 CellBalance.cpp\
 EdgeContamination.cpp\
 Flow.cpp\
@@ -282,7 +281,6 @@ SAGA_Wetness_Index.cpp\
 Sinuosity.cpp\
 SlopeLength.cpp\
 TopographicIndices.cpp\
-BasinGrid.h\
 CellBalance.h\
 EdgeContamination.h\
 Flow.h\
@@ -381,7 +379,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BasinGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CellBalance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EdgeContamination.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Flow.Plo@am__quote@

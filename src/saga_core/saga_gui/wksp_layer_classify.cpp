@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_layer_classify.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -317,15 +320,21 @@ void CWKSP_Layer_Classify::Set_Metric(int Mode, double LogFactor, double zMin, d
 //---------------------------------------------------------
 inline int CWKSP_Layer_Classify::_LUT_Cmp_Class(double Value, int iClass)
 {
-	double				d;
 	CSG_Table_Record	*pClass	= m_pLUT->Get_Record_byIndex(iClass);
 
-	if( (d = pClass->asDouble(LUT_MIN)) <= Value && Value <= pClass->asDouble(LUT_MAX) )
+	double	min	= pClass->asDouble(LUT_MIN);
+
+	if( Value < min )
 	{
-		return( 0 );
+		return( 1 );
 	}
 
-	return( d < Value ? -1 : 1 );
+	double	max	= pClass->asDouble(LUT_MAX);
+
+	return( min < max
+		?	(Value < max ?  0 : -1)
+		:	(Value > min ? -1 :  0)
+	);
 }
 
 //---------------------------------------------------------
@@ -466,7 +475,7 @@ bool CWKSP_Layer_Classify::Histogram_Update(void)
 			break;
 
 		case WKSP_ITEM_Shapes:
-			_Histogram_Update(((CWKSP_Shapes *)m_pLayer)->Get_Shapes(), m_pLayer->Get_Parameters()->Get_Parameter("COLORS_ATTRIB")->asInt());
+			_Histogram_Update(((CWKSP_Shapes *)m_pLayer)->Get_Shapes(), ((CWKSP_Shapes *)m_pLayer)->Get_Color_Field());
 			break;
 		}
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: table.cpp 941 2011-02-25 15:17:11Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -320,7 +323,11 @@ bool CSG_Table::_Assign(CSG_Data_Object *pObject)
 	int			i;
 	CSG_Table	*pTable;
 
-	if( pObject && pObject->is_Valid() && pObject->Get_ObjectType() == Get_ObjectType() )
+	if( pObject && pObject->is_Valid()
+	&&	(	pObject->Get_ObjectType() == DATAOBJECT_TYPE_Table
+		||	pObject->Get_ObjectType() == DATAOBJECT_TYPE_Shapes
+		||	pObject->Get_ObjectType() == DATAOBJECT_TYPE_PointCloud
+		) )
 	{
 		_Destroy();
 
@@ -549,7 +556,7 @@ int CSG_Table::Get_Field_Length(int iField)	const
 
 			if( s && s[0] )
 			{
-				int		n	= SG_STR_LEN(s);
+				int		n	= (int)SG_STR_LEN(s);
 
 				if( Length < n )
 				{

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: LakeFlood.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -60,7 +63,7 @@ CLakeFlood::CLakeFlood(void)
 {
 
 	Set_Name		(_TL("Lake Flood"));
-	Set_Author		(_TL("Volker Wichmann (c) 2005-2010"));
+	Set_Author		(SG_T("Volker Wichmann (c) 2005-2010"));
 	Set_Description	(_TW("This module can be used to flood a digital elevation model from seed points. "
 						"Seed points have to be coded either with local water depth or absolute water level.\r\n"
 	));

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: auswert_zuweisung.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 #include "pars_all.h"
 #include "auswert_zuweisung.h"

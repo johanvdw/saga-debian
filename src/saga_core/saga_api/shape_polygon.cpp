@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: shape_polygon.cpp 952 2011-03-18 16:20:37Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -143,12 +146,12 @@ void CSG_Shape_Polygon_Part::_Update_Area(void)
 }
 
 //---------------------------------------------------------
-bool CSG_Shape_Polygon_Part::is_Containing(const TSG_Point &Point)
+bool CSG_Shape_Polygon_Part::Contains(const TSG_Point &Point)
 {
-	return( is_Containing(Point.x, Point.y) );
+	return( Contains(Point.x, Point.y) );
 }
 
-bool CSG_Shape_Polygon_Part::is_Containing(double x, double y)
+bool CSG_Shape_Polygon_Part::Contains(double x, double y)
 {
 	if(	m_nPoints > 2 && Get_Extent().Contains(x, y) )
 	{
@@ -198,7 +201,7 @@ bool CSG_Shape_Polygon_Part::is_Containing(double x, double y)
 //---------------------------------------------------------
 double CSG_Shape_Polygon_Part::Get_Distance(TSG_Point Point, TSG_Point &Next)
 {
-	if( m_nPoints > 2 && !is_Containing(Point) )
+	if( m_nPoints > 2 && !Contains(Point) )
 	{
 		double		Distance;
 		TSG_Point	*pA, *pB, C;
@@ -241,6 +244,7 @@ CSG_Shape_Polygon::CSG_Shape_Polygon(CSG_Shapes *pOwner, int Index)
 CSG_Shape_Polygon::~CSG_Shape_Polygon(void)
 {}
 
+
 ///////////////////////////////////////////////////////////
 //														 //
 //														 //
@@ -271,17 +275,100 @@ void CSG_Shape_Polygon::_Invalidate(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CSG_Shape_Polygon::On_Intersects(TSG_Rect Region)
+TSG_Intersection CSG_Shape_Polygon::On_Intersects(CSG_Shape *pShape)
 {
-	TSG_Point	*pa, *pb, r00, r10, r01, r11, c;
+	int		iPart, iPoint;
 
 	//-----------------------------------------------------
-	// 1. Line Intersection...
+	bool	bIn		= false;
+	bool	bOut	= false;
 
-	r00.x	= r01.x	= Region.xMin;
-	r11.x	= r10.x	= Region.xMax;
-	r00.y	= r10.y	= Region.yMin;
-	r11.y	= r01.y	= Region.yMax;
+	for(iPart=0; iPart<pShape->Get_Part_Count(); iPart++)
+	{
+		for(iPoint=0; iPoint<pShape->Get_Point_Count(iPart); iPoint++)
+		{
+			if( Contains(pShape->Get_Point(iPoint, iPart)) )
+			{
+				bIn		= true;
+			}
+			else
+			{
+				bOut	= true;
+			}
+
+			if( bIn && bOut )
+			{
+				return( INTERSECTION_Overlaps );
+			}
+		}
+	}
+
+	//-----------------------------------------------------
+	if( pShape->Get_Type() == SHAPE_TYPE_Point || pShape->Get_Type() == SHAPE_TYPE_Points )
+	{
+		return( bIn ? INTERSECTION_Contains : INTERSECTION_None );
+	}
+
+	//-----------------------------------------------------
+	TSG_Point	iA, iB, jA, jB, Crossing;
+
+	for(iPart=0; iPart<m_nParts; iPart++)
+	{
+		if( Get_Point_Count(iPart) > 2 )
+		{
+			iA	= Get_Point(Get_Point_Count(iPart) - 1, iPart);
+
+			for(iPoint=0; iPoint<Get_Point_Count(iPart); iPoint++)
+			{
+				iB	= iA;
+				iA	= Get_Point(iPoint, iPart);
+
+				for(int jPart=0; jPart<pShape->Get_Part_Count(); jPart++)
+				{
+					if( pShape->Get_Type() == SHAPE_TYPE_Line && pShape->Get_Point_Count(jPart) > 1 )
+					{
+						jA	= pShape->Get_Point(0, jPart);
+
+						for(int jPoint=1; jPoint<pShape->Get_Point_Count(jPart); jPoint++)
+						{
+							jB	= jA;
+							jA	= pShape->Get_Point(jPoint, jPart);
+
+							if( SG_Get_Crossing(Crossing, iA, iB, jA, jB) )
+							{
+								return( INTERSECTION_Overlaps );
+							}
+						}
+					}
+
+					if( pShape->Get_Type() == SHAPE_TYPE_Polygon && pShape->Get_Point_Count(jPart) > 2 )
+					{
+						jA	= pShape->Get_Point(pShape->Get_Point_Count(jPart) - 1, jPart);
+
+						for(int jPoint=0; jPoint<pShape->Get_Point_Count(jPart); jPoint++)
+						{
+							jB	= jA;
+							jA	= pShape->Get_Point(jPoint, jPart);
+
+							if( SG_Get_Crossing(Crossing, iA, iB, jA, jB) )
+							{
+								return( INTERSECTION_Overlaps );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return( bIn ? INTERSECTION_Contains : INTERSECTION_None );
+}
+
+//---------------------------------------------------------
+TSG_Intersection CSG_Shape_Polygon::On_Intersects(TSG_Rect Region)
+{
+	//-----------------------------------------------------
+	// 1. Line Intersection...
 
 	for(int iPart=0; iPart<m_nParts; iPart++)
 	{
@@ -289,17 +376,14 @@ int CSG_Shape_Polygon::On_Intersects(TSG_Rect Region)
 
 		if( pPart->Get_Extent().Intersects(Region) )
 		{
-			pb	= m_pParts[iPart]->m_Points + m_pParts[iPart]->m_nPoints - 1;
+			TSG_Point	*pa, *pb, c;
 
-			for(int iPoint=0; iPoint<m_pParts[iPart]->m_nPoints; iPoint++)
+			pa	= m_pParts[iPart]->m_Points;
+			pb	= pa + m_pParts[iPart]->m_nPoints - 1;
+
+			for(int iPoint=0; iPoint<m_pParts[iPart]->m_nPoints; iPoint++, pb=pa++)
 			{
-				pa	= pb;
-				pb	= m_pParts[iPart]->m_Points + iPoint;
-
-				if(	SG_Get_Crossing(c, *pa, *pb, r00, r10, true)
-				||	SG_Get_Crossing(c, *pa, *pb, r00, r01, true)
-				||	SG_Get_Crossing(c, *pa, *pb, r11, r10, true)
-				||	SG_Get_Crossing(c, *pa, *pb, r11, r01, true)	)
+				if(	SG_Get_Crossing_InRegion(c, *pa, *pb, Region) )
 				{
 					return( INTERSECTION_Overlaps );
 				}
@@ -311,10 +395,7 @@ int CSG_Shape_Polygon::On_Intersects(TSG_Rect Region)
 	//-----------------------------------------------------
 	// 2. Is region completly within polygon...
 
-	if(	is_Containing(r00)
-	||	is_Containing(r01)
-	||	is_Containing(r11)
-	||	is_Containing(r10)	)
+	if( Contains(Region.xMin, Region.yMin) )
 	{
 		return( INTERSECTION_Contains );
 	}
@@ -344,7 +425,7 @@ bool CSG_Shape_Polygon::is_Lake(int iPart)
 			{
 				if( pPart != m_pParts[iPart] && m_pParts[iPart]->m_nPoints > 2 )
 				{
-					if( is_Containing(pPart->Get_Point(0), iPart) )
+					if( Contains(pPart->Get_Point(0), iPart) )
 					{
 						nOuter++;
 					}
@@ -471,27 +552,27 @@ TSG_Point CSG_Shape_Polygon::Get_Centroid(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CSG_Shape_Polygon::is_Containing(const TSG_Point &Point, int iPart)
+bool CSG_Shape_Polygon::Contains(const TSG_Point &Point, int iPart)
 {
-	return( is_Containing(Point.x, Point.y, iPart) );
+	return( Contains(Point.x, Point.y, iPart) );
 }
 
 //---------------------------------------------------------
-bool CSG_Shape_Polygon::is_Containing(const TSG_Point &Point)
+bool CSG_Shape_Polygon::Contains(const TSG_Point &Point)
 {
-	return( is_Containing(Point.x, Point.y) );
+	return( Contains(Point.x, Point.y) );
 }
 
 //---------------------------------------------------------
-bool CSG_Shape_Polygon::is_Containing(double x, double y, int iPart)
+bool CSG_Shape_Polygon::Contains(double x, double y, int iPart)
 {
 	CSG_Shape_Polygon_Part	*pPart	= Get_Polygon_Part(iPart);
 
-	return(	pPart && pPart->is_Containing(x, y) );
+	return(	pPart && pPart->Contains(x, y) );
 }
 
 //---------------------------------------------------------
-bool CSG_Shape_Polygon::is_Containing(double x, double y)
+bool CSG_Shape_Polygon::Contains(double x, double y)
 {
 	if( Get_Extent().Contains(x, y) )
 	{
@@ -519,6 +600,11 @@ bool CSG_Shape_Polygon::is_Containing(double x, double y)
 					{
 						if( pA->y == y )
 						{
+							if( pA->x == x )
+							{
+								return( true );
+							}
+
 							goNext	= pA->y > pB->y ? 1 : -1;
 						}
 						else if( goNext )	// pB->y == y

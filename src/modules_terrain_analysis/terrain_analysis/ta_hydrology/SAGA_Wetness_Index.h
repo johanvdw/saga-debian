@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: SAGA_Wetness_Index.h 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -78,7 +81,7 @@ public:
 	CSAGA_Wetness_Index(void);
 	virtual ~CSAGA_Wetness_Index(void);
 
-	virtual const SG_Char *		Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
 
 
 protected:

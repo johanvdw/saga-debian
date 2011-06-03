@@ -1,5 +1,8 @@
+/**********************************************************
+ * Version $Id: e00read.c 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /**********************************************************************
- * $Id: e00read.c,v 1.1.1.1 2006/06/26 15:38:27 oconrad Exp $
+ * $Id: e00read.c 911 2011-02-14 16:38:15Z reklov_w $
  *
  * Name:     e00read.c
  * Project:  Compressed E00 Read/Write library
@@ -8,10 +11,7 @@
  *           of uncompressed lines.
  * Author:   Daniel Morissette, danmo@videotron.ca
  *
- * $Log: e00read.c,v $
- * Revision 1.1.1.1  2006/06/26 15:38:27  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:01:00  oconrad
  * no message
  *

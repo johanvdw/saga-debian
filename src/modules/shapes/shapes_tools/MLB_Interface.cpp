@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -74,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Shapes - Tools") );
 
 	case MLB_INFO_Author:
-		return( _TL("Olaf Conrad, Victor Olaya (c) 2002-2009") );
+		return( SG_T("O. Conrad, V. Olaya (c) 2002-2009") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of vector data.") );
@@ -98,10 +101,11 @@ const SG_Char * Get_Info(int i)
 #include "QueryBuilder.h"
 #include "SearchInTable.h"
 #include "SelectByTheme.h"
+#include "NewLayerFromSelectedShapes.h"
+
 #include "SeparateShapes.h"
 #include "TransformShapes.h"
 #include "CreateChartLayer.h"
-#include "NewLayerFromSelectedShapes.h"
 #include "GraticuleBuilder.h"
 
 #include "shapes_cut.h"
@@ -125,22 +129,27 @@ CSG_Module *		Create_Module(int i)
 	case  0:	return( new CShapes_Create_Empty );
 	case  1:	return( new CShapes_Assign_Table );
 	case  2:	return( new CShapes_Merge );
-	case  3:	return( new CNewLayerFromSelectedShapes );
-	case  4:	return( new CQueryBuilder );
-	case  5:	return( new CSearchInTable );
-	case  6:	return( new CSelectByTheme );
-	case  7:	return( new CSeparateShapes );
-	case  8:	return( new CTransformShapes );
-	case  9:	return( new CCreateChartLayer );
-	case 10:	return( new CGraticuleBuilder );
-	case 11:	return( new CShapes_Cut );
-	case 12:	return( new CShapes_Cut_Interactive );
-	case 13:	return( new CShapes_Split );
-	case 14:	return( new CShapes_Split_Randomly );
-	case 15:	return( new CShapes_Split_by_Attribute );
-	case 16:	return( new CShapes_Buffer );
-	case 17:	return( new CShapes_Extents );
-	case 18:	return( new CQuadTree_Structure );
+
+	case  3:	return( new CSelect_Numeric );
+	case  4:	return( new CSelect_String );
+	case  5:	return( new CSelect_Location );
+
+	case  6:	return( new CSelection_Copy );
+	case  7:	return( new CSelection_Delete );
+	case  8:	return( new CSelection_Invert );
+
+	case  9:	return( new CSeparateShapes );
+	case 10:	return( new CTransformShapes );
+	case 11:	return( new CCreateChartLayer );
+	case 12:	return( new CGraticuleBuilder );
+	case 13:	return( new CShapes_Cut );
+	case 14:	return( new CShapes_Cut_Interactive );
+	case 15:	return( new CShapes_Split );
+	case 16:	return( new CShapes_Split_Randomly );
+	case 17:	return( new CShapes_Split_by_Attribute );
+	case 18:	return( new CShapes_Buffer );
+	case 19:	return( new CShapes_Extents );
+	case 20:	return( new CQuadTree_Structure );
 	}
 
 	return( NULL );

@@ -74,7 +74,7 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libshapes_lines_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libshapes_lines_la_OBJECTS = Lines_From_Points.lo \
+am_libshapes_lines_la_OBJECTS = line_dissolve.lo Lines_From_Points.lo \
 	Lines_From_Polygons.lo line_polygon_intersection.lo \
 	line_properties.lo line_simplification.lo MLB_Interface.lo
 libshapes_lines_la_OBJECTS = $(am_libshapes_lines_la_OBJECTS)
@@ -244,7 +244,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.10 2010/10/27 09:27:31 oconrad Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -254,12 +254,14 @@ AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_lines.la
 libshapes_lines_la_SOURCES = \
+line_dissolve.cpp\
 Lines_From_Points.cpp\
 Lines_From_Polygons.cpp\
 line_polygon_intersection.cpp\
 line_properties.cpp\
 line_simplification.cpp\
 MLB_Interface.cpp\
+line_dissolve.h\
 Lines_From_Points.h\
 Lines_From_Polygons.h\
 line_polygon_intersection.h\
@@ -345,6 +347,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Lines_From_Points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Lines_From_Polygons.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_dissolve.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_polygon_intersection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_properties.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_simplification.Plo@am__quote@

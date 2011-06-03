@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: las_import.cpp 1032 2011-05-03 10:20:47Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -171,6 +174,15 @@ CLAS_Import::CLAS_Import(void)
 		_TL(""),
 		PARAMETER_TYPE_Bool, false
 	);
+
+	Parameters.Add_Choice(
+		NULL	, "RGB_RANGE", _TL("R,G,B value range"),
+		_TL("Range of R,G,B values in LAS file."),
+		CSG_String::Format(SG_T("%s|%s|"),
+		_TL("16 bit"),
+		_TL("8 bit")
+		), 0
+	);
 }
 
 
@@ -186,10 +198,12 @@ bool CLAS_Import::On_Execute(void)
 	bool			bValidity;
 	CSG_String		fName;
     std::ifstream   ifs;
+	int				RGBrange;
 	int				cntInvalid = 0;
 
 
 	bValidity		= Parameters("VALID")->asBool();
+	RGBrange		= Parameters("RGB_RANGE")->asInt();
 	fName			= Parameters("FILE")->asString();
 
     ifs.open(fName.b_str(), std::ios::in | std::ios::binary);
@@ -210,7 +224,6 @@ bool CLAS_Import::On_Execute(void)
 	CSG_PointCloud	*pPoints	= SG_Create_PointCloud();
 	pPoints->Set_Name(SG_File_Get_Name(fName, false));
 	Parameters("POINTS")->Set_Value(pPoints);
-	pPoints->Create();
 
 	nFields		= 3;
 
@@ -266,23 +279,15 @@ bool CLAS_Import::On_Execute(void)
 			r = point.GetColor().GetRed();
 			g = point.GetColor().GetGreen();
 			b = point.GetColor().GetBlue();
+
+			if (RGBrange == 0)		// 16 bit
+			{
+				r = r / 65535 * 255;
+				g = g / 65535 * 255;
+				b = b / 65535 * 255;
+			}
 			
-			if (r > 65025)
-				r = 65025;
-			else if (r < 0)
-				r = 0;
-
-			if (g > 65025)
-				g = 65025;
-			else if (g < 0)
-				g = 0;
-
-			if (b > 65025)
-				b = 65025;
-			else if (b < 0)
-				b = 0;
-
-			pPoints->Set_Value(iPoint, iField[VAR_C], SG_GET_RGB(r / 255, g / 255, b / 255));
+			pPoints->Set_Value(iPoint, iField[VAR_C], SG_GET_RGB(r, g, b));
 		}
 
 		iPoint++;
@@ -296,13 +301,13 @@ bool CLAS_Import::On_Execute(void)
 	DataObject_Update(pPoints);
 	DataObject_Get_Parameters(pPoints, sParms);
 
-	if (sParms("COLORS_ATTRIB")	&& sParms("COLORS_TYPE") && sParms("METRIC_COLORS")
+	if (sParms("METRIC_ATTRIB")	&& sParms("COLORS_TYPE") && sParms("METRIC_COLORS")
 		&& sParms("METRIC_ZRANGE") && sParms("COLORS_AGGREGATE"))
 	{
 		sParms("COLORS_AGGREGATE")->Set_Value(3);				// highest z
 		sParms("COLORS_TYPE")->Set_Value(2);                    // graduated color
 		sParms("METRIC_COLORS")->asColors()->Set_Count(255);    // number of colors
-		sParms("COLORS_ATTRIB")->Set_Value(2);					// z attrib
+		sParms("METRIC_ATTRIB")->Set_Value(2);					// z attrib
 		sParms("METRIC_ZRANGE")->asRange()->Set_Range(pPoints->Get_Minimum(2),pPoints->Get_Maximum(2));
 	}
 	DataObject_Set_Parameters(pPoints, sParms);

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: res_commands.h 1039 2011-05-04 14:02:25Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -136,6 +139,10 @@ enum ID_COMMANDS
 	ID_CMD_DATA_PROJECT_OPEN_ADD,
 	ID_CMD_DATA_PROJECT_SAVE,
 	ID_CMD_DATA_PROJECT_SAVE_AS,
+	ID_CMD_DATA_LEGEND_COPY,
+	ID_CMD_DATA_LEGEND_SIZE_INC,
+	ID_CMD_DATA_LEGEND_SIZE_DEC,
+	ID_CMD_DATA_HISTORY_CLEAR,
 	ID_CMD_DATA_LAST,
 
 	ID_CMD_GRIDS_FIRST,
@@ -216,6 +223,7 @@ enum ID_COMMANDS
 	ID_CMD_MAPS_SAVE_TO_CLIPBOARD,
 	ID_CMD_MAPS_SAVE_TO_CLIPBOARD_LEGEND,
 	ID_CMD_MAPS_SAVE_IMAGE_ON_CHANGE,
+	ID_CMD_MAPS_SAVE_IMAGE_TO_MEMORY,
 	ID_CMD_MAPS_SYNCHRONIZE,
 	ID_CMD_MAPS_LAYER_SHOW,
 	ID_CMD_MAPS_MOVE_TOP,

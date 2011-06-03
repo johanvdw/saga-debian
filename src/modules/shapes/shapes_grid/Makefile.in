@@ -75,11 +75,11 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libshapes_grid_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libshapes_grid_la_OBJECTS = Grid_Classes_To_Shapes.lo \
-	grid_local_extremes_to_points.lo Grid_Polygon_Clip.lo \
-	Grid_Statistics_AddTo_Polygon.lo Grid_To_Contour.lo \
-	Grid_To_Gradient.lo Grid_To_Points.lo Grid_To_Points_Random.lo \
-	Grid_Values_AddTo_Points.lo Grid_Values_AddTo_Shapes.lo \
-	MLB_Interface.lo
+	grid_extent.lo grid_local_extremes_to_points.lo \
+	Grid_Polygon_Clip.lo Grid_Statistics_AddTo_Polygon.lo \
+	Grid_To_Contour.lo Grid_To_Gradient.lo Grid_To_Points.lo \
+	Grid_To_Points_Random.lo Grid_Values_AddTo_Points.lo \
+	Grid_Values_AddTo_Shapes.lo MLB_Interface.lo
 libshapes_grid_la_OBJECTS = $(am_libshapes_grid_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -247,7 +247,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.8 2010/07/08 14:11:49 johanvdw Exp $
+# $Id: Makefile.am 980 2011-04-05 13:55:57Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -258,6 +258,7 @@ AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_grid.la
 libshapes_grid_la_SOURCES = \
 Grid_Classes_To_Shapes.cpp\
+grid_extent.cpp\
 grid_local_extremes_to_points.cpp\
 Grid_Polygon_Clip.cpp\
 Grid_Statistics_AddTo_Polygon.cpp\
@@ -269,6 +270,7 @@ Grid_Values_AddTo_Points.cpp\
 Grid_Values_AddTo_Shapes.cpp\
 MLB_Interface.cpp\
 Grid_Classes_To_Shapes.h\
+grid_extent.h\
 grid_local_extremes_to_points.h\
 Grid_Polygon_Clip.h\
 Grid_Statistics_AddTo_Polygon.h\
@@ -365,6 +367,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Values_AddTo_Points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Values_AddTo_Shapes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_extent.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_local_extremes_to_points.Plo@am__quote@
 
 .cpp.o:

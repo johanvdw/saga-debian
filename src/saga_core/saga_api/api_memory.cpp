@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: api_memory.cpp 923 2011-02-21 15:52:27Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -245,6 +248,29 @@ CSG_Array::CSG_Array(void)
 	m_nBuffer		= 0;
 	m_nValues		= 0;
 	m_Values		= NULL;
+}
+
+//---------------------------------------------------------
+CSG_Array::CSG_Array(const CSG_Array &Array)
+{
+	Create(Array);
+}
+
+void * CSG_Array::Create(const CSG_Array &Array)
+{
+	m_Value_Size	= Array.m_Value_Size;
+	m_Growth		= Array.m_Growth;
+
+	m_nBuffer		= 0;
+	m_nValues		= 0;
+	m_Values		= NULL;
+
+	if( Array.m_nValues > 0 && Get_Array(Array.m_nValues) )
+	{
+		memcpy(m_Values, Array.m_Values, Array.m_nValues * Array.m_Value_Size);
+	}
+
+	return( Get_Array() );
 }
 
 //---------------------------------------------------------
@@ -584,9 +610,9 @@ bool CSG_Bytes::Create(const SG_Char *Bytes)
 	}
 
 #ifndef _SAGA_UNICODE
-	int	nBytes	= SG_STR_LEN(Bytes);
+	int	nBytes	= (int)SG_STR_LEN(Bytes);
 #else
-	int	nBytes	= SG_STR_LEN(Bytes) * 2;
+	int	nBytes	= (int)SG_STR_LEN(Bytes) * 2;
 #endif
 
 	return( Add((void *)Bytes, nBytes, false) );
@@ -754,9 +780,9 @@ bool CSG_Bytes::fromHexString(const CSG_String &HexString)
 
 	const SG_Char	*s	= HexString.c_str();
 
-	for(size_t i=0; i<HexString.Length(); i+=2)
+	for(size_t i=0; i<HexString.Length(); i+=2, s+=2)
 	{
-		Add(SG_Hex_to_Byte(*(s++)) + 16 * SG_Hex_to_Byte(*(s++)));
+		Add(SG_Hex_to_Byte(s[1]) + 16 * SG_Hex_to_Byte(s[0]));
 	}
 
 	return( true );

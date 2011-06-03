@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_tin.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -89,7 +92,7 @@ CWKSP_TIN::CWKSP_TIN(CSG_TIN *pTIN)
 	m_Edit_Attributes.Add_Field(LNG("[CAP] Name") , SG_DATATYPE_String);
 	m_Edit_Attributes.Add_Field(LNG("[CAP] Value"), SG_DATATYPE_String);
 
-	Create_Parameters();
+	Initialise();
 }
 
 //---------------------------------------------------------
@@ -104,10 +107,6 @@ CWKSP_TIN::~CWKSP_TIN(void)
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-#define DESC_ADD_STR(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, value))
-#define DESC_ADD_INT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value))
 
 //---------------------------------------------------------
 wxString CWKSP_TIN::Get_Description(void)
@@ -220,11 +219,13 @@ bool CWKSP_TIN::On_Command_UI(wxUpdateUIEvent &event)
 //---------------------------------------------------------
 void CWKSP_TIN::On_Create_Parameters(void)
 {
+	CWKSP_Layer::On_Create_Parameters();
+
 	//-----------------------------------------------------
 	// General...
 
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_METRIC")		, "COLORS_ATTRIB"			, LNG("[CAP] Attribute"),
+		m_Parameters("NODE_METRIC")		, "METRIC_ATTRIB"			, LNG("[CAP] Attribute"),
 		LNG(""),
 		LNG("")
 	);
@@ -249,14 +250,6 @@ void CWKSP_TIN::On_Create_Parameters(void)
 		LNG(""),
 		PARAMETER_TYPE_Bool, true
 	);
-
-	//-----------------------------------------------------
-	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_TRANSPARENCY"	, LNG("[CAP] Transparency [%]"),
-		LNG(""),
-		PARAMETER_TYPE_Double, 0.0, 0.0, true, 100.0, true
-	);
-
 }
 
 
@@ -277,13 +270,13 @@ void CWKSP_TIN::On_DataObject_Changed(void)
 		sChoices.Append(wxString::Format(wxT("%s|"), m_pTIN->Get_Field_Name(i)));
 	}
 
-	m_Parameters("COLORS_ATTRIB")->asChoice()->Set_Items(sChoices);
+	m_Parameters("METRIC_ATTRIB")->asChoice()->Set_Items(sChoices);
 }
 
 //---------------------------------------------------------
 void CWKSP_TIN::On_Parameters_Changed(void)
 {
-	if( (m_Color_Field = m_Parameters("COLORS_ATTRIB")->asInt()) >= m_pTIN->Get_Field_Count() )
+	if( (m_Color_Field = m_Parameters("METRIC_ATTRIB")->asInt()) >= m_pTIN->Get_Field_Count() )
 	{
 		m_Color_Field	= -1;
 	}
@@ -300,19 +293,22 @@ void CWKSP_TIN::On_Parameters_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CWKSP_TIN::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+int CWKSP_TIN::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
 {
-	if(	!SG_STR_CMP(pParameter->Get_Identifier(), wxT("COLORS_ATTRIB")) )
+	if( Flags & PARAMETER_CHECK_VALUES )
 	{
-		int		zField	= pParameter->asInt();
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), wxT("METRIC_ATTRIB")) )
+		{
+			int		zField	= pParameter->asInt();
 
-		pParameters->Get_Parameter("METRIC_ZRANGE")->asRange()->Set_Range(
-			m_pTIN->Get_Minimum(zField),
-			m_pTIN->Get_Maximum(zField)
-		);
+			pParameters->Get_Parameter("METRIC_ZRANGE")->asRange()->Set_Range(
+				m_pTIN->Get_Minimum(zField),
+				m_pTIN->Get_Maximum(zField)
+			);
+		}
 	}
 
-	return( 1 );
+	return( CWKSP_Layer::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
 

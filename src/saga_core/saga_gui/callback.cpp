@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: callback.cpp 976 2011-04-02 17:23:42Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -145,6 +148,10 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	case CALLBACK_STOP_EXECUTION:
 
 		if( g_pModule && g_pModule->is_Executing() )
+		{
+			Result	= g_pModule->Execute(Param_1.True) ? 1 : 0;
+		}
+		else if( g_pModule && g_pModule->is_Interactive() )
 		{
 			Result	= g_pModule->Execute(Param_1.True) ? 1 : 0;
 		}

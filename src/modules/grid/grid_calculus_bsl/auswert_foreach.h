@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: auswert_foreach.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 #ifndef __AUSWERT_FOREACH_H 
 #define __AUSWERT_FOREACH_H 
 

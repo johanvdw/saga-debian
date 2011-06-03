@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: grid_difference.cpp 982 2011-04-06 15:30:05Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -89,7 +92,7 @@ CGrid_Difference::CGrid_Difference(void)
 	);
 
 	Parameters.Add_Grid(
-		NULL	, "C"	, _TL("Difference A - B"),
+		NULL	, "C"	, _TL("Difference (A - B)"),
 		_TL(""),
 		PARAMETER_OUTPUT
 	);
@@ -157,7 +160,7 @@ CGrids_Sum::CGrids_Sum(void)
 	);
 
 	Parameters.Add_Grid(
-		NULL	, "RESULT"	, _TL("Product"),
+		NULL	, "RESULT"	, _TL("Sum"),
 		_TL(""),
 		PARAMETER_OUTPUT
 	);

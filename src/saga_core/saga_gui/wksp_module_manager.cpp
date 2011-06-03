@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_module_manager.cpp 1004 2011-04-19 12:21:45Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -119,10 +122,29 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 		), 1
 	);
 
+	m_Parameters.Add_Choice(
+		NULL	, "HELP_SOURCE"	, LNG("Module Description Source"),
+		LNG(""),
+		CSG_String::Format(wxT("%s|%s|"),
+			LNG("built-in"),
+			LNG("online")
+		), 0
+	);
+
 	m_Parameters.Add_Value(
 		NULL	, "PROC_FREQ"	, LNG("Process Update Frequency [milliseconds]"),
 		LNG(""),
 		PARAMETER_TYPE_Int	, 0, 0, true
+	);
+
+	m_Parameters.Add_FilePath(
+		NULL	, "LNG_FILE_DIC", LNG("Language Translations"),
+		LNG("Dictionary for translations from built-in (English) to local language (editable text table)"),
+		CSG_String::Format(SG_T("%s|*.lng|%s|*.txt|%s|*.*"),
+			LNG("Dictionary Files (*.lng)"),
+			LNG("Text Table (*.txt)"),
+			LNG("All Files")
+		)
 	);
 
 	m_Parameters.Add_FilePath(
@@ -203,11 +225,34 @@ wxString CWKSP_Module_Manager::Get_Description(void)
 {
 	wxString	s;
 
-	s.Printf(wxT("<b>%s: %d</b><br><br>%s %d<br>"),
-		LNG("[CAP] Module Libraries")	, Get_Count(),
-		LNG("[CAP] Modules")			, Get_Items_Count()
-	);
+	//-----------------------------------------------------
+	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("Module Library"));
 
+	s	+= wxT("<table border=\"0\">");
+
+	DESC_ADD_INT(LNG("Loaded Libraries")	, Get_Count());
+	DESC_ADD_INT(LNG("Available Modules")	, Get_Items_Count());
+
+	s	+= wxT("</table>");
+
+	//-----------------------------------------------------
+	s	+= wxString::Format(wxT("<hr><b>%s:</b><table border=\"1\">"), LNG("Module Libraries"));
+
+	s	+= wxString::Format(wxT("<tr><th>%s</th><th>%s</th><th>%s</th></tr>"), LNG("Library"), LNG("Modules"), LNG("Name"), LNG("Location"));
+
+	for(int i=0; i<Get_Count(); i++)
+	{
+		s	+= wxString::Format(wxT("<tr><td>%s</td><td>%d</td><td>%s</td></tr>"),
+				SG_File_Get_Name(Get_Library(i)->Get_File_Name(), false).c_str(),
+				Get_Library(i)->Get_Count(),
+				Get_Library(i)->Get_Name().c_str(),
+				SG_File_Get_Path(Get_Library(i)->Get_File_Name()).c_str()
+			);
+	}
+
+	s	+= wxT("</table>");
+
+	//-----------------------------------------------------
 	return( s );
 }
 
@@ -361,9 +406,19 @@ void CWKSP_Module_Manager::_Config_Read(void)
 		m_Parameters("START_LOGO")	->Set_Value((int)lValue);
 	}
 
+	if( CONFIG_Read(wxT("/MODULES"), wxT("HELP_SOURCE")	, lValue) )
+	{
+		m_Parameters("HELP_SOURCE")	->Set_Value((int)lValue);
+	}
+
 	if( CONFIG_Read(wxT("/MODULES"), wxT("PROC_FREQ")	, lValue) )
 	{
 		m_Parameters("PROC_FREQ")	->Set_Value((int)lValue);
+	}
+
+	if( CONFIG_Read(wxT("/MODULES"), wxT("LNG_FILE_DIC"), sValue) )
+	{
+		m_Parameters("LNG_FILE_DIC")->Set_Value(sValue);
 	}
 
 	if( CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_SRS"), sValue) )
@@ -389,7 +444,9 @@ void CWKSP_Module_Manager::_Config_Write(void)
 {
 	CONFIG_Write(wxT("/MODULES"), wxT("BEEP")		 ,       m_Parameters("BEEP")        ->asBool());
 	CONFIG_Write(wxT("/MODULES"), wxT("START_LOGO")	 , (long)m_Parameters("START_LOGO")  ->asInt());
+	CONFIG_Write(wxT("/MODULES"), wxT("HELP_SOURCE") , (long)m_Parameters("HELP_SOURCE") ->asInt());
 	CONFIG_Write(wxT("/MODULES"), wxT("PROC_FREQ")	 , (long)m_Parameters("PROC_FREQ")   ->asInt());
+	CONFIG_Write(wxT("/MODULES"), wxT("LNG_FILE_DIC"),       m_Parameters("LNG_FILE_DIC")->asString());
 	CONFIG_Write(wxT("/MODULES"), wxT("CRS_FILE_SRS"),       m_Parameters("CRS_FILE_SRS")->asString());
 	CONFIG_Write(wxT("/MODULES"), wxT("CRS_FILE_DIC"),       m_Parameters("CRS_FILE_DIC")->asString());
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: dlg_parameters.h 1006 2011-04-20 11:57:39Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -90,11 +93,12 @@ public:
 	void						On_Ok			(wxCommandEvent &event);
 	void						On_Load			(wxCommandEvent &event);
 	void						On_Save			(wxCommandEvent &event);
+	void						On_Defaults		(wxCommandEvent &event);
 
 
 protected:
 
-	class CSG_Parameters			*m_pParameters;
+	class CSG_Parameters		*m_pParameters;
 
 	class CParameters_Control	*m_pControl;
 

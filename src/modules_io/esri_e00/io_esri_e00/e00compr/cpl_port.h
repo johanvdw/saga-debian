@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: cpl_port.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /******************************************************************************
  * Copyright (c) 1998, Frank Warmerdam
  *
@@ -37,10 +40,7 @@
  * o Ensures that core types such as GBool, GInt32, GInt16, GUInt32, 
  *   GUInt16, and GByte are defined.
  *
- * $Log: cpl_port.h,v $
- * Revision 1.1.1.1  2006/06/26 15:38:25  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:01:00  oconrad
  * no message
  *

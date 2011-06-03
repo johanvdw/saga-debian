@@ -1,5 +1,8 @@
+/**********************************************************
+ * Version $Id: cpl_error.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /**********************************************************************
- * $Id: cpl_error.h,v 1.1.1.1 2006/06/26 15:38:25 oconrad Exp $
+ * $Id: cpl_error.h 911 2011-02-14 16:38:15Z reklov_w $
  *
  * Name:     cpl_error.h
  * Project:  CPL - Common Portability Library
@@ -28,10 +31,7 @@
  * DEALINGS IN THE SOFTWARE.
  **********************************************************************
  *
- * $Log: cpl_error.h,v $
- * Revision 1.1.1.1  2006/06/26 15:38:25  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:00:59  oconrad
  * no message
  *

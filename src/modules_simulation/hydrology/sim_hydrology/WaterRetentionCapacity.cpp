@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: WaterRetentionCapacity.cpp 966 2011-03-25 00:40:53Z johanvdw $
+ *********************************************************/
 /*******************************************************************************
     WaterRetentionCapacity.cpp
     Copyright (C) Victor Olaya
@@ -179,6 +182,7 @@ void CWaterRetentionCapacity::CalculateWaterRetention(float **pData,
 	pRecord->Set_Value(iField - 1, fHe);
 	pRecord->Set_Value(iField, fWaterRetention);
 
+	delete[]pCRA;
 }//method
 
 void CWaterRetentionCapacity::CorrectWithSlope(){

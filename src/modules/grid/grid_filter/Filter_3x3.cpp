@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: Filter_3x3.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -219,6 +222,8 @@ bool CFilter_3x3::On_Execute(void)
 		pInput->Assign(pResult);
 
 		delete(pResult);
+
+		DataObject_Update(pInput);
 	}
 
 	return( true );

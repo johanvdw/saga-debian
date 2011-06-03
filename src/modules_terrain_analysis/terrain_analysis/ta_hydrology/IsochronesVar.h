@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: IsochronesVar.h 1016 2011-04-27 18:40:36Z oconrad $
+ *********************************************************/
 /*******************************************************************************
     IsochronesVar.h
     Copyright (C) Victor Olaya
@@ -23,7 +26,18 @@
 
 #include "MLB_Interface.h"
 
-class CIsochronesVar : public CSG_Module_Grid_Interactive {
+class CIsochronesVar : public CSG_Module_Grid_Interactive
+{
+public:
+	CIsochronesVar(void);
+	virtual ~CIsochronesVar(void);
+
+	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Dynamics" ));	}
+
+protected:
+	virtual bool On_Execute(void);
+	virtual bool On_Execute_Finish();
+	virtual bool On_Execute_Position(CSG_Point ptWorld, TSG_Module_Interactive_Mode Mode);
 
 private:
 	CSG_Grid *m_pDEM;
@@ -43,18 +57,6 @@ private:
 	void writeTimeOut(int,int,int,int);
 	void ZeroToNoData(void);
 	double Runoff(double, double);
-
-
-public:
-	CIsochronesVar(void);
-	virtual ~CIsochronesVar(void);
-
-
-protected:
-	virtual bool On_Execute(void);
-	virtual bool On_Execute_Finish();
-	virtual bool On_Execute_Position(CSG_Point ptWorld, TSG_Module_Interactive_Mode Mode);
-
 
 };
 

@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: wksp_map_manager.h 1015 2011-04-27 10:19:23Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -94,7 +97,6 @@ public:
 
 	virtual wxMenu *			Get_Menu		(void);
 
-	virtual CSG_Parameters *	Get_Parameters	(void)		{	return( &m_Parameters );	}
 	virtual bool				On_Command		(int Cmd_ID);
 
 	class CWKSP_Map *			Get_Map			(int i)		{	return( (class CWKSP_Map *)Get_Item(i) );	}
@@ -110,8 +112,6 @@ public:
 
 
 private:
-
-	CSG_Parameters				m_Parameters;
 
 };
 

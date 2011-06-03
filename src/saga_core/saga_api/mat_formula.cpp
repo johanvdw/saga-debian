@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: mat_formula.cpp 971 2011-03-28 10:37:56Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -251,8 +254,8 @@ CSG_String CSG_Formula::Get_Help_Operators(void)
 		SG_T("acos(x)         - arccosine\n")
 		SG_T("atan(x)         - arctangent\n")
 		SG_T("atan2(x, y)     - arctangent of x/y\n")
-		SG_T("gt(x, y)        - if x>y the result is 1.0, else 0.0\n")
-		SG_T("lt(x, y)        - if x<y the result is 1.0, else 0.0\n")
+		SG_T("gt(x, y)        - if x&gt;y the result is 1.0, else 0.0\n")
+		SG_T("lt(x, y)        - if x&lt;y the result is 1.0, else 0.0\n")
 		SG_T("eq(x, y)        - if x=y the result is 1.0, else 0.0\n")
 		SG_T("mod(x, y)       - returns the floating point remainder of x/y\n")
 		SG_T("ifelse(c, x, y) - if c=1 the result is x, else y\n")
@@ -287,6 +290,34 @@ bool CSG_Formula::Get_Error(int *pPosition, CSG_String *pMessage)
 	}
 
 	return( m_bError );
+}
+
+//---------------------------------------------------------
+bool CSG_Formula::Get_Error(CSG_String &Message)
+{
+	int			pos;
+	CSG_String	msg;
+
+	if( Get_Error(&pos, &msg) )
+	{
+		Message	+= LNG("Error in formula");
+		Message	+= SG_T("\n") + m_sFormula;
+
+		Message	+= SG_T("\n") + Message;
+		Message	+= CSG_String::Format(SG_T("\n%s: %d"), LNG("Position") , pos);
+
+		if( pos >= 0 && pos < (int)m_sFormula.Length() )
+		{
+			Message	+= SG_T("\n")
+					+  m_sFormula.Left(pos - 1) + SG_T("[")
+					+  m_sFormula[pos] + SG_T("]")
+					+  m_sFormula.Right(m_sFormula.Length() - (pos + 1));
+		}
+
+		return( true );
+	}
+
+	return( false );
 }
 
 //---------------------------------------------------------

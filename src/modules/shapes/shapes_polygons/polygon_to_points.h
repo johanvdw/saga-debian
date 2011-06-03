@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: polygon_to_points.h 915 2011-02-15 08:43:36Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -76,12 +79,13 @@ class CPolygon_To_Points : public CSG_Module
 {
 public:
 	CPolygon_To_Points(void);
-	virtual ~CPolygon_To_Points(void);
+
+	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:
 
-	virtual bool			On_Execute		(void);
+	virtual bool				On_Execute		(void);
 
 
 private:

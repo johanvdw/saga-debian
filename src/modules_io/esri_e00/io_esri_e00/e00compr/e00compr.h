@@ -1,5 +1,8 @@
+/**********************************************************
+ * Version $Id: e00compr.h 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 /**********************************************************************
- * $Id: e00compr.h,v 1.1.1.1 2006/06/26 15:38:26 oconrad Exp $
+ * $Id: e00compr.h 911 2011-02-14 16:38:15Z reklov_w $
  *
  * Name:     e00compr.h
  * Project:  Compressed E00 Read/Write library
@@ -7,10 +10,7 @@
  * Purpose:  Header file containing all definitions for the library.
  * Author:   Daniel Morissette, danmo@videotron.ca
  *
- * $Log: e00compr.h,v $
- * Revision 1.1.1.1  2006/06/26 15:38:26  oconrad
- * no message
- *
+ * $Log: not supported by cvs2svn $
  * Revision 1.1.1.1  2005/08/31 14:01:00  oconrad
  * no message
  *

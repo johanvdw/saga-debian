@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: shape_part.cpp 996 2011-04-15 10:35:38Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -60,8 +63,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <memory.h>
-
 #include "shapes.h"
 
 
@@ -77,6 +78,8 @@ CSG_Shape_Part::CSG_Shape_Part(CSG_Shape_Points *pOwner)
 	m_pOwner	= pOwner;
 
 	m_Points	= NULL;
+	m_Z			= NULL;
+	m_M			= NULL;
 	m_nPoints	= 0;
 	m_nBuffer	= 0;
 
@@ -102,29 +105,60 @@ CSG_Shape_Part::~CSG_Shape_Part(void)
 //---------------------------------------------------------
 bool CSG_Shape_Part::_Alloc_Memory(int nPoints)
 {
-	if( m_nPoints != nPoints )
+	if( m_nPoints == nPoints )
 	{
-		int		nGrow	= GET_GROW_SIZE(nPoints),
-				nBuffer = (nPoints / nGrow) * nGrow;
+		return( true );
+	}
 
-		while( nBuffer < nPoints )
+	int	nGrow	= GET_GROW_SIZE(nPoints);
+	int	nBuffer = (nPoints / nGrow) * nGrow;
+
+	while( nBuffer < nPoints )
+	{
+		nBuffer	+= nGrow;
+	}
+
+	if( m_nBuffer == nBuffer )
+	{
+		return( true );
+	}
+
+	m_nBuffer	= nBuffer;
+
+	//-----------------------------------------------------
+	TSG_Point	*Points	= (TSG_Point *)SG_Realloc(m_Points, m_nBuffer * sizeof(TSG_Point));
+
+	if( Points == NULL )
+	{
+		return( false );
+	}
+
+	m_Points	= Points;
+
+	//-----------------------------------------------------
+	if( m_Z || ((CSG_Shapes *)m_pOwner->Get_Table())->Get_Vertex_Type() != SG_VERTEX_TYPE_XY )
+	{
+		double	*Z	= (double *)SG_Realloc(m_Z, m_nBuffer * sizeof(double));
+
+		if( !Z )
 		{
-			nBuffer	+= nGrow;
+			return( false );
 		}
 
-		if( m_nBuffer != nBuffer )
+		m_Z	= Z;
+	}
+
+	//-----------------------------------------------------
+	if( m_M || ((CSG_Shapes *)m_pOwner->Get_Table())->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZM )
+	{
+		double	*M	= (double *)SG_Realloc(m_M, m_nBuffer * sizeof(double));
+
+		if( !M )
 		{
-			m_nBuffer	= nBuffer;
-
-			TSG_Point	*Points	= (TSG_Point *)SG_Realloc(m_Points, m_nBuffer * sizeof(TSG_Point));
-
-			if( Points == NULL )
-			{
-				return( false );
-			}
-
-			m_Points	= Points;
+			return( false );
 		}
+
+		m_M	= M;
 	}
 
 	return( true );
@@ -145,7 +179,19 @@ bool CSG_Shape_Part::Destroy(void)
 		SG_Free(m_Points);
 	}
 
+	if( m_Z != NULL )
+	{
+		SG_Free(m_Z);
+	}
+
+	if( m_M != NULL )
+	{
+		SG_Free(m_M);
+	}
+
 	m_Points	= NULL;
+	m_Z			= NULL;
+	m_M			= NULL;
 	m_nPoints	= 0;
 	m_nBuffer	= 0;
 
@@ -161,8 +207,18 @@ bool CSG_Shape_Part::Assign(CSG_Shape_Part *pPart)
 {
 	if( _Alloc_Memory(pPart->Get_Count()) )
 	{
-		memcpy(m_Points, pPart->m_Points, pPart->m_nPoints * sizeof(TSG_Point));
+		memcpy(m_Points, pPart->m_Points, m_nPoints * sizeof(TSG_Point));
  
+		if( m_Z && pPart->m_Z )
+		{
+			memcpy(m_Z, pPart->m_Z, m_nPoints * sizeof(double));
+		}
+
+		if( m_M && pPart->m_M )
+		{
+			memcpy(m_M, pPart->m_M, m_nPoints * sizeof(double));
+		}
+
 		m_Extent	= pPart->m_Extent;
 		m_bUpdate	= pPart->m_bUpdate;
 
@@ -198,12 +254,32 @@ int CSG_Shape_Part::Ins_Point(double x, double y, int iPoint)
 		for(int i=m_nPoints; i>iPoint; i--)
 		{
 			m_Points[i]	= m_Points[i - 1];
+
+			if( m_Z )
+			{
+				m_Z[i]	= m_Z[i - 1];
+
+				if( m_M )
+				{
+					m_M[i]	= m_M[i - 1];
+				}
+			}
 		}
 
 		m_nPoints++;
 
 		m_Points[iPoint].x	= x;
 		m_Points[iPoint].y	= y;
+
+		if( m_Z )
+		{
+			m_Z[iPoint]	= 0.0;
+
+			if( m_M )
+			{
+				m_M[iPoint]	= 0.0;
+			}
+		}
 
 		_Invalidate();
 
@@ -230,15 +306,25 @@ int CSG_Shape_Part::Set_Point(double x, double y, int iPoint)
 }
 
 //---------------------------------------------------------
-int CSG_Shape_Part::Del_Point(int del_Point)
+int CSG_Shape_Part::Del_Point(int iPoint)
 {
-	if( del_Point >= 0 && del_Point < m_nPoints )
+	if( iPoint >= 0 && iPoint < m_nPoints )
 	{
 		m_nPoints--;
 
-		for(int iPoint=del_Point; iPoint<m_nPoints; iPoint++)
+		for(int i=iPoint; i<m_nPoints; i++)
 		{
-			m_Points[iPoint]	= m_Points[iPoint + 1];
+			m_Points[i]	= m_Points[i + 1];
+
+			if( m_Z )
+			{
+				m_Z[i]	= m_Z[i + 1];
+
+				if( m_M )
+				{
+					m_M[i]	= m_M[i + 1];
+				}
+			}
 		}
 
 		_Alloc_Memory(m_nPoints);
@@ -249,6 +335,42 @@ int CSG_Shape_Part::Del_Point(int del_Point)
 	}
 
 	return( 0 );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Shape_Part::Revert_Points(void)
+{
+	for(int i=0, j=m_nPoints-1; i<j; i++, j--)
+	{
+		TSG_Point	p	= m_Points[i];
+		m_Points[i]		= m_Points[j];
+		m_Points[j]		= p;
+
+		if( m_Z )
+		{
+			double	d;
+					
+			d		= m_Z[i];
+			m_Z[i]	= m_Z[j];
+			m_Z[j]	= d;
+
+			if( m_M )
+			{
+				d		= m_M[i];
+				m_M[i]	= m_M[j];
+				m_M[j]	= d;
+			}
+		}
+	}
+
+	return( true );
 }
 
 
@@ -272,228 +394,41 @@ inline void CSG_Shape_Part::_Invalidate(void)
 //---------------------------------------------------------
 void CSG_Shape_Part::_Update_Extent(void)
 {
-	if( m_bUpdate )
+	if( !m_bUpdate )
 	{
-		if( m_nPoints > 0 )
+		return;
+	}
+
+	//-----------------------------------------------------
+	int						i;
+	TSG_Point				*p;
+	CSG_Simple_Statistics	x, y, z, m;
+
+	for(i=0, p=m_Points; i<m_nPoints; i++, p++)
+	{
+		x.Add_Value(p->x);
+		y.Add_Value(p->y);
+
+		if( m_Z )
 		{
-			int			i;
-			TSG_Point	*p	= m_Points;
-			TSG_Rect	*r	= &m_Extent.m_rect;
+			z.Add_Value(m_Z[i]);
 
-			r->xMin	= r->xMax	= p->x;
-			r->yMin	= r->yMax	= p->y;
-
-			for(i=1, p++; i<m_nPoints; i++, p++)
+			if( m_M )
 			{
-				if( r->xMin > p->x )
-				{
-					r->xMin	= p->x;
-				}
-				else if( r->xMax < p->x )
-				{
-					r->xMax	= p->x;
-				}
-
-				if( r->yMin > p->y )
-				{
-					r->yMin	= p->y;
-				}
-				else if( r->yMax < p->y )
-				{
-					r->yMax	= p->y;
-				}
+				m.Add_Value(m_M[i]);
 			}
 		}
-
-		m_bUpdate	= false;
-	}
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-CSG_Shape_Part_Z::CSG_Shape_Part_Z(CSG_Shape_Points *pOwner)
-	: CSG_Shape_Part(pOwner)
-{
-	m_Z	= NULL;
-}
-
-//---------------------------------------------------------
-CSG_Shape_Part_Z::~CSG_Shape_Part_Z(void)
-{
-	Destroy();
-}
-
-//---------------------------------------------------------
-bool CSG_Shape_Part_Z::Destroy(void)
-{
-	if( m_Z != NULL )
-	{
-		SG_Free(m_Z);
 	}
 
-	m_Z	= NULL;
+	m_Extent.Assign(x.Get_Minimum(), y.Get_Minimum(), x.Get_Maximum(), y.Get_Maximum());
 
-	return( CSG_Shape_Part::Destroy() );
-}
+	m_ZMin		= z.Get_Minimum();
+	m_ZMax		= z.Get_Maximum();
 
-//---------------------------------------------------------
-bool CSG_Shape_Part_Z::_Alloc_Memory(int nPoints)
-{
-	if( CSG_Shape_Part::_Alloc_Memory(nPoints) )
-	{
-		double	*Z	= (double *)SG_Realloc(m_Z, m_nBuffer * sizeof(double));
+	m_MMin		= m.Get_Minimum();
+	m_MMax		= m.Get_Maximum();
 
-		if( Z )
-		{
-			m_Z	= Z;
-
-			return( true );
-		}
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-bool CSG_Shape_Part_Z::Assign(CSG_Shape_Part *pPart)
-{
-	if( CSG_Shape_Part::Assign(pPart) )
-	{
-		if( ((CSG_Shapes *)pPart->Get_Owner()->Get_Table())->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZ
-		||	((CSG_Shapes *)pPart->Get_Owner()->Get_Table())->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZM )
-		{
-			memcpy(m_Z, ((CSG_Shape_Part_Z *)pPart)->m_Z, pPart->Get_Count() * sizeof(double));
-		}
-
-		return( true );
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-void CSG_Shape_Part_Z::_Update_Extent(void)
-{
-	if( m_bUpdate )
-	{
-		if( m_nPoints > 0 )
-		{
-			m_ZMin	= m_ZMax	= m_Z[0];
-
-			for(int i=1; i<m_nPoints; i++)
-			{
-				if( m_ZMin > m_Z[i] )
-				{
-					m_ZMin	= m_Z[i];
-				}
-				else if( m_ZMax < m_Z[i] )
-				{
-					m_ZMax	= m_Z[i];
-				}
-			}
-		}
-
-		CSG_Shape_Part::_Update_Extent();
-	}
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-CSG_Shape_Part_ZM::CSG_Shape_Part_ZM(CSG_Shape_Points *pOwner)
-	: CSG_Shape_Part_Z(pOwner)
-{
-	m_M	= NULL;
-}
-
-//---------------------------------------------------------
-CSG_Shape_Part_ZM::~CSG_Shape_Part_ZM(void)
-{
-	Destroy();
-}
-
-//---------------------------------------------------------
-bool CSG_Shape_Part_ZM::Destroy(void)
-{
-	if( m_M != NULL )
-	{
-		SG_Free(m_M);
-	}
-
-	m_M	= NULL;
-
-	return( CSG_Shape_Part_Z::Destroy() );
-}
-
-//---------------------------------------------------------
-bool CSG_Shape_Part_ZM::_Alloc_Memory(int nPoints)
-{
-	if( CSG_Shape_Part_Z::_Alloc_Memory(nPoints) )
-	{
-		double	*M	= (double *)SG_Realloc(m_M, m_nBuffer * sizeof(double));
-
-		if( M )
-		{
-			m_M	= M;
-
-			return( true );
-		}
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-bool CSG_Shape_Part_ZM::Assign(CSG_Shape_Part *pPart)
-{
-	if( CSG_Shape_Part_Z::Assign(pPart) )
-	{
-		if( ((CSG_Shapes *)pPart->Get_Owner()->Get_Table())->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZM )
-		{
-			memcpy(m_M, ((CSG_Shape_Part_ZM *)pPart)->m_M, pPart->Get_Count() * sizeof(double));
-		}
-
-		return( true );
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-void CSG_Shape_Part_ZM::_Update_Extent(void)
-{
-	if( m_bUpdate )
-	{
-		if( m_nPoints > 0 )
-		{
-			m_ZMin	= m_ZMax	= m_Z[0];
-
-			for(int i=1; i<m_nPoints; i++)
-			{
-				if( m_ZMin > m_Z[i] )
-				{
-					m_ZMin	= m_Z[i];
-				}
-				else if( m_ZMax < m_Z[i] )
-				{
-					m_ZMax	= m_Z[i];
-				}
-			}
-		}
-
-		CSG_Shape_Part_Z::_Update_Extent();
-	}
+	m_bUpdate	= false;
 }
 
 

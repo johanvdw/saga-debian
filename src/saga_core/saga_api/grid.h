@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: grid.h 1017 2011-04-27 18:42:58Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -307,7 +310,7 @@ public:
 		return( is_InGrid(xPos = Get_xTo(Direction, x), yPos = Get_yTo(Direction, y)) );
 	}
 
-	int							Get_xTo				(int Direction, int x = 0)	const
+	static int					Get_xTo				(int Direction, int x = 0)
 	{
 		static int	ix[8]	= { 0, 1, 1, 1, 0,-1,-1,-1 };
 
@@ -321,7 +324,7 @@ public:
 		return( x + ix[Direction] );
 	}
 
-	int							Get_yTo				(int Direction, int y = 0)	const
+	static int					Get_yTo				(int Direction, int y = 0)
 	{
 		static int	iy[8]	= { 1, 1, 0,-1,-1,-1, 0, 1 };
 
@@ -335,8 +338,9 @@ public:
 		return( y + iy[Direction] );
 	}
 
-	int							Get_xFrom			(int Direction, int x = 0)	const	{	return( Get_xTo(Direction + 4, x) );	}
-	int							Get_yFrom			(int Direction, int y = 0)	const	{	return( Get_yTo(Direction + 4, y) );	}
+	static int					Get_xFrom			(int Direction, int x = 0)			{	return( Get_xTo(Direction + 4, x) );	}
+	static int					Get_yFrom			(int Direction, int y = 0)			{	return( Get_yTo(Direction + 4, y) );	}
+
 	int							Get_xToSave			(int Direction, int x)		const	{	return( (x = Get_xTo  (Direction, x)) < 0 ? 0 : (x >= m_NX ? m_NX - 1 : x) );	}
 	int							Get_yToSave			(int Direction, int y)		const	{	return( (y = Get_yTo  (Direction, y)) < 0 ? 0 : (y >= m_NY ? m_NY - 1 : y) );	}
 	int							Get_xFromSave		(int Direction, int x)		const	{	return( (x = Get_xFrom(Direction, x)) < 0 ? 0 : (x >= m_NX ? m_NX - 1 : x) );	}
@@ -346,7 +350,7 @@ public:
 	bool						is_InGrid			(int x, int y, int Rand)	const	{	return(	x >= Rand && x < m_NX - Rand && y >= Rand && y < m_NY - Rand );	}
 
 	double						Get_Length			(int Direction)				const	{	return( Direction % 2 ? m_Diagonal : m_Cellsize );	}
-	double						Get_UnitLength		(int Direction)				const	{	return( Direction % 2 ? sqrt(2.0)  : 1.0 );			}
+	static double				Get_UnitLength		(int Direction)						{	return( Direction % 2 ? sqrt(2.0)  : 1.0 );			}
 
 
 private:	///////////////////////////////////////////////
@@ -416,9 +420,6 @@ public:		///////////////////////////////////////////////
 
 	int							Get_nValueBytes	(void)	const	{	return( (int)SG_Data_Type_Get_Size(m_Type) );	}
 	int							Get_nLineBytes	(void)	const	{	return( m_Type != SG_DATATYPE_Bit ? (int)SG_Data_Type_Get_Size(m_Type) * Get_NX() : 1 + Get_NX() / 8 );	}
-
-	void						Set_Description	(const SG_Char *String);
-	const SG_Char *				Get_Description	(void)	const;
 
 	void						Set_Unit		(const SG_Char *String);
 	const SG_Char *				Get_Unit		(void)	const;
@@ -504,8 +505,11 @@ public:		///////////////////////////////////////////////
 	void						Mirror						(void);
 	void						Invert						(void);
 
-	void						Normalise					(void);
-	void						DeNormalise					(double ArithMean, double Variance);
+	bool						Normalise					(void);
+	bool						DeNormalise					(double Minimum, double Maximum);
+
+	bool						Standardise					(void);
+	bool						DeStandardise				(double Mean, double StdDev);
 
 	int							Get_Gradient_NeighborDir	(int x, int y, bool bMustBeLower = true)			const;
 	bool						Get_Gradient				(int x, int y, double &Decline, double &Azimuth)	const;
@@ -752,7 +756,7 @@ private:	///////////////////////////////////////////////
 
 	CSG_Grid_System				m_System;
 
-	CSG_String					m_Description, m_Unit, Cache_Path;
+	CSG_String					m_Unit, Cache_Path;
 
 
 	//-----------------------------------------------------
@@ -951,8 +955,8 @@ public:
 
 	CSG_Distance_Weighting &	Get_Weighting		(void)								{	return( m_Weighting );		}
 
-	bool						Set_Radius			(int Radius);
-	bool						Set_Sector			(int Radius, double Direction, double Tolerance);
+	bool						Set_Radius			(double Radius);
+	bool						Set_Sector			(double Radius, double Direction, double Tolerance);
 
 	int							Get_Count			(void)	const						{	return( m_Cells.Get_Count() );	}
 

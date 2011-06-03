@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.8 2010/11/02 11:03:26 oconrad Exp $
+# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -17,9 +17,11 @@ pkglib_LTLIBRARIES = libio_shapes_las.la
 libio_shapes_las_la_SOURCES =\
 las_export.cpp\
 las_import.cpp\
+las_info.cpp\
 MLB_Interface.cpp\
 las_export.h\
 las_import.h\
+las_info.h\
 MLB_Interface.h
 
 libio_shapes_las_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la $(ADD_MLBS)

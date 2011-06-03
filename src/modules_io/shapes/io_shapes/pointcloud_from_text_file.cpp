@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: pointcloud_from_text_file.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -222,8 +225,10 @@ bool CPointCloud_From_Text_File::On_Execute(void)
 		if( Dlg_Parameters(&P, _TL("Field Properties")) )
 		{
 			pPoints	= SG_Create_PointCloud();
+			pPoints->Create();
 			pPoints->Set_Name(SG_File_Get_Name(fileName, false));
 			Parameters("POINTS")->Set_Value(pPoints);
+			DataObject_Add(pPoints);
 
 			for(iField=0; iField<nAttribs; iField++)
 			{
@@ -254,6 +259,7 @@ bool CPointCloud_From_Text_File::On_Execute(void)
 		pPoints->Create();
 		pPoints->Set_Name(SG_File_Get_Name(fileName, false));
 		Parameters("POINTS")->Set_Value(pPoints);
+		DataObject_Add(pPoints);
 	}
 
 	max_iField = M_GET_MAX(xField, yField);
@@ -337,22 +343,22 @@ bool CPointCloud_From_Text_File::On_Execute(void)
 
 	CSG_Parameters	sParms;
 	DataObject_Get_Parameters(pPoints, sParms);
-	if (sParms("COLORS_ATTRIB")	&& sParms("COLORS_TYPE") && sParms("METRIC_COLORS")
+	if (sParms("METRIC_ATTRIB")	&& sParms("COLORS_TYPE") && sParms("METRIC_COLORS")
 		&& sParms("METRIC_ZRANGE") && sParms("COLORS_AGGREGATE"))
 		{
 			sParms("COLORS_AGGREGATE")->Set_Value(3);				// highest z
 			sParms("COLORS_TYPE")->Set_Value(2);                    // graduated color
 			sParms("METRIC_COLORS")->asColors()->Set_Count(255);    // number of colors
-			sParms("COLORS_ATTRIB")->Set_Value(2);					// z attrib
+			sParms("METRIC_ATTRIB")->Set_Value(2);					// z attrib
 			sParms("METRIC_ZRANGE")->asRange()->Set_Range(pPoints->Get_Minimum(2),pPoints->Get_Maximum(2));
 			DataObject_Set_Parameters(pPoints, sParms);
 			DataObject_Update(pPoints);
 		}
 
 	if (cntInvalid > 0)
-        SG_UI_Msg_Add(CSG_String::Format(_TL("WARNING: Skipped %d invalid points!"), cntInvalid), true);
+        SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %d %s"), _TL("WARNING"), cntInvalid, _TL("invalid points have been skipped")), true);
 
-    SG_UI_Msg_Add(CSG_String::Format(_TL("%d points sucessfully imported."), (cntPt-cntInvalid)), true);
+    SG_UI_Msg_Add(CSG_String::Format(SG_T("%d %s"), (cntPt-cntInvalid), _TL("points have been imported with success")), true);
 
 	return( true );
 }

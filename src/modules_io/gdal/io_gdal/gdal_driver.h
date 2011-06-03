@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: gdal_driver.h 1050 2011-05-09 07:59:08Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -73,6 +76,8 @@ class io_gdal_EXPORT CSG_GDAL_Drivers
 public:
 	CSG_GDAL_Drivers(void);
 	virtual ~CSG_GDAL_Drivers(void);
+
+	CSG_String					Get_Version			(void)						const;
 
 	int							Get_Count			(void)						const;
 

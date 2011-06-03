@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: gdal_driver.cpp 1050 2011-05-09 07:59:08Z oconrad $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -98,6 +101,12 @@ CSG_GDAL_Drivers::~CSG_GDAL_Drivers(void)
 ///////////////////////////////////////////////////////////
 //														 //
 ///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CSG_String CSG_GDAL_Drivers::Get_Version(void) const
+{
+	return( SG_STR_MBTOSG(GDALVersionInfo("RELEASE_NAME")) );
+}
 
 //---------------------------------------------------------
 int CSG_GDAL_Drivers::Get_Count(void) const
@@ -499,19 +508,23 @@ bool CSG_GDAL_DataSet::Write(int i, CSG_Grid *pGrid)
 
 	GDALRasterBand	*pBand	= m_pDataSet->GetRasterBand(i + 1);
 
+	pBand->SetNoDataValue(pGrid->Get_NoData_Value());
+
 	double	*zLine	= (double *)SG_Malloc(Get_NX() * sizeof(double));
 
-	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
+	for(int y=0, yy=Get_NY()-1; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++, yy--)
 	{
 		for(int x=0; x<Get_NX(); x++)
 		{
-			zLine[x]	= pGrid->asDouble(x, Get_NY() - 1 - y);
+			zLine[x]	= pGrid->is_NoData(x, yy) ? pGrid->Get_NoData_Value() : pGrid->asDouble(x, yy);
 		}
 
 		pBand->RasterIO(GF_Write, 0, y, Get_NX(), 1, zLine, Get_NX(), 1, GDT_Float64, 0, 0);
 	}
 
 	SG_Free(zLine);
+
+	pBand->SetStatistics(pGrid->Get_ZMin(), pGrid->Get_ZMax(), pGrid->Get_ArithMean(), pGrid->Get_StdDev());
 
 	return( true );
 }

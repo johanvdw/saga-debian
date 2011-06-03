@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: model_tools.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 #include "model_tools.h"
 #include <math.h>
 #include <stdlib.h> // random numbers

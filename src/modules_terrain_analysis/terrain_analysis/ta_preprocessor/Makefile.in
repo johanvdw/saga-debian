@@ -75,9 +75,9 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libta_preprocessor_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libta_preprocessor_la_OBJECTS = FillSinks.lo FillSinks_WL.lo \
-	FillSinks_WL_XXL.lo MLB_Interface.lo Flat_Detection.lo \
-	Pit_Eliminator.lo Pit_Router.lo
+am_libta_preprocessor_la_OBJECTS = burn_in_streams.lo FillSinks.lo \
+	FillSinks_WL.lo FillSinks_WL_XXL.lo MLB_Interface.lo \
+	Flat_Detection.lo Pit_Eliminator.lo Pit_Router.lo
 libta_preprocessor_la_OBJECTS = $(am_libta_preprocessor_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -245,7 +245,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am,v 1.8 2010/07/08 14:11:48 johanvdw Exp $
+# $Id: Makefile.am 1029 2011-04-29 11:52:50Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -255,6 +255,7 @@ AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libta_preprocessor.la
 libta_preprocessor_la_SOURCES = \
+burn_in_streams.cpp\
 FillSinks.cpp\
 FillSinks_WL.cpp\
 FillSinks_WL_XXL.cpp\
@@ -262,6 +263,7 @@ MLB_Interface.cpp\
 Flat_Detection.cpp\
 Pit_Eliminator.cpp\
 Pit_Router.cpp\
+burn_in_streams.h\
 FillSinks.h\
 FillSinks_WL.h\
 MLB_Interface.h\
@@ -351,6 +353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pit_Eliminator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pit_Router.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/burn_in_streams.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

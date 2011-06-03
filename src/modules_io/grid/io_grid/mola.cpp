@@ -1,3 +1,6 @@
+/**********************************************************
+ * Version $Id: mola.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ *********************************************************/
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -231,9 +234,9 @@ bool CMOLA_Import::On_Execute(void)
 		D		= 1.0 /  64.0;
 		NX		=  64 * 180;
 		NY		=  64 *  90;
-		yMin	= (fName[6] == 'S' ? -1.0 :  1.0) * fName.Right(3).asInt();
-		yMin	= yMin - NY * D;
-		xMin	= fName.Right(6).asInt();
+		yMin	= (fName[6] == 'S' ? -1.0 :  1.0) * fName.Right(8).asInt();
+		yMin	= bDown ? yMin - NY * D : -yMin;
+		xMin	= fName.Right(5).asInt();
 		if( xMin >= 180.0 )
 		{
 			xMin	-= 360.0;
@@ -244,9 +247,9 @@ bool CMOLA_Import::On_Execute(void)
 		D		= 1.0 / 128.0;
 		NX		= 128 *  90;
 		NY		= 128 *  44;
-		yMin	= (fName[6] == 'S' ? -1.0 :  1.0) * fName.Right(3).asInt();
-		yMin	= yMin - NY * D;
-		xMin	= fName.Right(6).asInt();
+		yMin	= (fName[6] == 'S' ? -1.0 :  1.0) * fName.Right(8).asInt();
+		yMin	= bDown ? yMin - NY * D : -yMin;
+		xMin	= fName.Right(5).asInt();
 		if( xMin >= 180.0 )
 		{
 			xMin	-= 360.0;
@@ -261,6 +264,7 @@ bool CMOLA_Import::On_Execute(void)
 		{
 			pGrid->Set_Name(sName);
 			pGrid->Set_NoData_Value(-999999);
+			pGrid->Get_Projection().Create(SG_T("+proj=lonlat +units=m +a=3396200.000000 +b=3376200.000000"), SG_PROJ_FMT_Proj4);
 
 			//---------------------------------------------
 			sLine	= (short *)SG_Malloc(NX * sizeof(short));

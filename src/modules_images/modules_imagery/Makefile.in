@@ -228,7 +228,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = imagery_segmentation
+SUBDIRS = imagery_classification imagery_rga imagery_segmentation imagery_tools
 all: all-recursive
 
 .SUFFIXES:
