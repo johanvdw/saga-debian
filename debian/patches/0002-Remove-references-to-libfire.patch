@@ -1,18 +1,17 @@
 From: Johan Van de Wauw <johan.vandewauw@gmail.com>
-Date: Fri, 25 Mar 2011 23:04:49 +0100
-Subject: [PATCH] Remove libfire from configure.in/Makefile.am
+Date: Wed, 15 Jun 2011 14:30:14 -0400
+Subject: Remove references to libfire
 
-(libfire was removed to ensure dfsg compatibility)
 ---
  configure.in                       |    2 --
  src/modules_simulation/Makefile.am |    2 +-
  2 files changed, 1 insertions(+), 3 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index 07a4e16..aa2be59 100755
+index f4fa495..5b0a363 100755
 --- a/configure.in
 +++ b/configure.in
-@@ -200,8 +200,6 @@ AC_OUTPUT(Makefile \
+@@ -205,8 +205,6 @@ AC_OUTPUT(Makefile \
  	src/modules_simulation/cellular_automata/sim_cellular_automata/Makefile \
  	src/modules_simulation/ecosystems/Makefile \
  	src/modules_simulation/ecosystems/sim_ecosystems_hugget/Makefile \
