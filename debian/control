@@ -13,7 +13,7 @@ Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
 
 Package: saga
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
 Description: System for Automated Geoscientific Analyses
  SAGA GIS (System for Automated Geoscientific Analyses) is a free and
  open source geographic information system used for editing and 
@@ -43,9 +43,15 @@ Package: libsaga
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: libsaga-2.0.6
+Provides: libsaga-2.0.7
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
  . 
  This package contains the library files for developing with SAGA.
+
+Package: python-saga
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
+Description: SAGA GIS python bindings
