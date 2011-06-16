@@ -6,7 +6,7 @@ saga (2.0.7+dfsg-1) UNRELEASED; urgency=low
   * Fix previous patch
   * Imported Upstream version 2.0.7+dfsg
 
- -- Johan Van de Wauw <johan@debian.intern>  Wed, 15 Jun 2011 14:15:52 -0400
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 16 Jun 2011 14:18:35 -0400
 
 saga (2.0.6+dfsg-0) unstable; urgency=low
 
