@@ -1,0 +1,37 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Thu, 23 Jun 2011 18:51:07 -0400
+Subject: Fix for gcc 4.6
+
+(a bit dirty: passing -fpermissive to the compiler)
+---
+ src/modules_io/db/io_odbc/Makefile.am |    2 +-
+ src/modules_io/db/io_odbc/Makefile.in |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/modules_io/db/io_odbc/Makefile.am b/src/modules_io/db/io_odbc/Makefile.am
+index 58103fc..0a2ebc2 100644
+--- a/src/modules_io/db/io_odbc/Makefile.am
++++ b/src/modules_io/db/io_odbc/Makefile.am
+@@ -9,7 +9,7 @@ DEP_DEFS = -D_SAGA_UNICODE
+ endif
+ DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
+ CXX_INCS           = -I$(top_srcdir)/src/saga_core
+-AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
++AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) -fpermissive
+ AM_LDFLAGS         = $(DEP_LFLG) $(DEP_LIBS) -avoid-version
+ pkglib_LTLIBRARIES = libio_odbc.la
+ libio_odbc_la_SOURCES =\
+diff --git a/src/modules_io/db/io_odbc/Makefile.in b/src/modules_io/db/io_odbc/Makefile.in
+index 679bf54..452e91d 100644
+--- a/src/modules_io/db/io_odbc/Makefile.in
++++ b/src/modules_io/db/io_odbc/Makefile.in
+@@ -252,7 +252,7 @@ top_srcdir = @top_srcdir@
+ @SAGA_UNICODE_TRUE@DEP_DEFS = -D_SAGA_UNICODE
+ DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
+ CXX_INCS = -I$(top_srcdir)/src/saga_core
+-AM_CXXFLAGS = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
++AM_CXXFLAGS = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) -fpermissive
+ AM_LDFLAGS = $(DEP_LFLG) $(DEP_LIBS) -avoid-version
+ pkglib_LTLIBRARIES = libio_odbc.la
+ libio_odbc_la_SOURCES = \
+-- 
