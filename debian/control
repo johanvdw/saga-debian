@@ -6,7 +6,7 @@ Uploaders: Johan Van de Wauw <johan.vandewauw@gmail.com>, Francesco Paolo Loverg
 Build-Depends: libwxgtk2.8-dev, wx-common, libgdal-dev, libexpat-dev,
  libogdi3.2-dev, libproj-dev, libgrib2c-dev, debhelper (>=8), 
  libqhull-dev, libhpdf-dev, libvigraimpex-dev
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Homepage: http://www.saga-gis.org/
 Vcs-Git: git://git.debian.org/pkg-grass/saga.git
 Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
