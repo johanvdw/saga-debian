@@ -1,0 +1,2 @@
+usr/lib/python*/dist-packages/*.so
+usr/lib/python*/dist-packages/*.py
