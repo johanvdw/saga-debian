@@ -53,5 +53,5 @@ Description: SAGA GIS development files
 Package: python-saga
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
+Depends: ${python:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
 Description: SAGA GIS python bindings
