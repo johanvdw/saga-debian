@@ -9,9 +9,6 @@ VERSION := $(shell grep '^AC_INIT' configure.in | \
 	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
 UPSTREAM_URL ?=$(shell uscan --dehs | sed -n 's/.*<upstream-url>\(.*\)<\/upstream-url>.*/\1/p')
 UPSTREAM_VERSION ?=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\/upstream-version>.*/\1/p')
-# remove libtool helpers
-install/saga::
-	find debian/tmp/usr/lib ! -type d -a -name "*.la" -delete
 
 debian/% :: debian/%.in
 	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
