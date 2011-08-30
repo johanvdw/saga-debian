@@ -1,0 +1,30 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Wed, 15 Jun 2011 14:30:14 -0400
+Subject: Remove references to libfire
+
+---
+ configure.in                       |    2 --
+ src/modules_simulation/Makefile.am |    2 +-
+ 2 files changed, 1 insertions(+), 3 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index f4fa495..5b0a363 100755
+--- a/configure.in
++++ b/configure.in
+@@ -205,8 +205,6 @@ AC_OUTPUT(Makefile \
+ 	src/modules_simulation/cellular_automata/sim_cellular_automata/Makefile \
+ 	src/modules_simulation/ecosystems/Makefile \
+ 	src/modules_simulation/ecosystems/sim_ecosystems_hugget/Makefile \
+-	src/modules_simulation/fire/Makefile \
+-	src/modules_simulation/fire/sim_fire_spreading/Makefile \
+ 	src/modules_terrain_analysis/Makefile \
+ 	src/modules_terrain_analysis/terrain_analysis/Makefile \
+ 	src/modules_terrain_analysis/terrain_analysis/ta_channels/Makefile \
+diff --git a/src/modules_simulation/Makefile.am b/src/modules_simulation/Makefile.am
+index 71a438b..39e85c9 100644
+--- a/src/modules_simulation/Makefile.am
++++ b/src/modules_simulation/Makefile.am
+@@ -1 +1 @@
+-SUBDIRS = hydrology fire ecosystems cellular_automata
++SUBDIRS = hydrology ecosystems cellular_automata
+-- 

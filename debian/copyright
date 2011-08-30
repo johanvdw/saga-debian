@@ -12,11 +12,11 @@ On two places files were removed to adhere to the DFSG:
 
 ***Saga API and cli/gui - Copyright***
 src/saga_core/*:
-Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2001-2011 Olaf Conrad 
 Copyright: 2003-2006 Victor Olaya 
 Copyright: 2001-2004 Andre Ringeler 
 Copyright: 2007      Thomas Schorr
-Copyright: 2003-2009 Volker Wichmann
+Copyright: 2003-2011 Volker Wichmann
 
 src/saga_core/saga_gui/wx/propgrid/*
 Copyright: 2004-2007 Jaakko Salli
@@ -113,16 +113,17 @@ code and/or adjust the licensing conditions notice accordingly.
 *** SAGA modules: Copyright ***
 src/modules/*
 src/modules_*
-Copyright: 2001-2009 Olaf Conrad 
+Copyright: 2001-2011 Olaf Conrad 
+Copyright: 2002-2010 SAGA User Group Association
 Copyright: 2003-2006 Victor Olaya
-Copyright: 2001-2004 Andre Ringeler
+Copyright: 2001-2009 Andre Ringeler
 Copyright: 2007 Thomas Schorr
-Copyright: 2003-2009 Volker Wichmann
+Copyright: 2003-2011 Volker Wichmann
 Copyright: 2004 Antonio Boggia
 Copyright: 2004 Gianluca Massei
 Copyright: 2006 Stefan Liersch
 Copyright:      Alessandro Perego
-Copyright: 2007 Johan Van de Wauw
+Copyright: 2007-2011 Johan Van de Wauw
 License: GPL-2 available on debian at: /usr/share/common-licenses/GPL-2
 
 Some modules contain (parts of) previously published software:
@@ -218,8 +219,11 @@ EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
 POSSIBILITY OF SUCH LOSS OR DAMAGES.
 
 src/modules/grid/grid_gridding/nn/*.[c|h]
+saga/src/modules/grid/grid_spline/csa.[c|h]
 upstream URL: http://code.google.com/p/nn-c/source/browse/nn/LICENSE
-the files triangle.[c|h] are removed
+- the files triangle.[c|h] are removed
+and upstream URL: http://http://code.google.com/p/csa-c/
+
 Copyright (C) 2000-2008 Pavel Sakov and CSIRO
 
 Redistribution and use of material from the package `nn', with or without

@@ -1,0 +1,22 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Thu, 23 Jun 2011 17:31:11 -0400
+Subject: Use debian version of grib2
+
+---
+ src/modules_io/grid/io_grid_grib2/grib2_import.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/src/modules_io/grid/io_grid_grib2/grib2_import.h b/src/modules_io/grid/io_grid_grib2/grib2_import.h
+index ed9584e..fdcaecc 100644
+--- a/src/modules_io/grid/io_grid_grib2/grib2_import.h
++++ b/src/modules_io/grid/io_grid_grib2/grib2_import.h
+@@ -11,7 +11,7 @@
+ 
+ #include "MLB_Interface.h"
+ extern "C" {
+-#include "g2clib-1.0.4/grib2.h"
++#include <grib2.h>
+ }
+ 
+ 
+-- 

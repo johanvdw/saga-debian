@@ -1,17 +1,14 @@
 #!/usr/bin/make -f
 %:
-	dh $@
+	dh $@ --with-python2
 
 override_dh_auto_configure:
-	dh_auto_configure -- --enable-unicode --prefix=/usr
+	dh_auto_configure -- --enable-unicode --prefix=/usr --enable-python
 
 VERSION := $(shell grep '^AC_INIT' configure.in | \
 	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
 UPSTREAM_URL ?=$(shell uscan --dehs | sed -n 's/.*<upstream-url>\(.*\)<\/upstream-url>.*/\1/p')
 UPSTREAM_VERSION ?=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\/upstream-version>.*/\1/p')
-# remove libtool helpers
-install/saga::
-	find debian/tmp/usr/lib ! -type d -a -name "*.la" -delete
 
 debian/% :: debian/%.in
 	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
@@ -23,7 +20,6 @@ get-orig-source:
 	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.h
 	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules_simulation/fire
 	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules_io/grid/io_grid_grib2/g2clib-1.0.4
-	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/saga_core/saga_gui/res/xpm/.svn
 	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/saga_core/saga_gui/res/xpm/.svn
 	gzip -9n saga_$(UPSTREAM_VERSION).tar
 	mv saga_$(UPSTREAM_VERSION).tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
