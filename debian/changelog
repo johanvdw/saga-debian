@@ -3,13 +3,14 @@ saga (2.0.7+dfsg-1) unstable; urgency=low
   [ Johan Van de Wauw ]
   * Imported Upstream version 2.0.7
   * Delete .svn files prior when creating dfsg-free tarball
-  * Fix previous patch
-  * Imported Upstream version 2.0.7+dfsg
+  * Fix gcc 4.6 build issues
+  * Use debian version of grib2
+  * Bump standards version
+  * Enable building of python plugin
+  * Add support for opening *.las files
+  * Adjust grid_gridding to use qhull
 
-  [ Francesco Paolo Lovergine ]
-  * Ready for unstable.
-
- -- Francesco Paolo Lovergine <frankie@debian.org>  Tue, 30 Aug 2011 17:51:48 +0200
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Tue, 30 Aug 2011 15:39:35 -0400
 
 saga (2.0.6+dfsg-0) unstable; urgency=low
 
