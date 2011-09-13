@@ -51,7 +51,7 @@ Description: SAGA GIS development files
  This package contains the library files for developing with SAGA.
 
 Package: python-saga
-Section: science
+Section: python
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
 Suggests: saga (= ${binary:Version})
