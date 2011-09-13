@@ -4,3 +4,4 @@ debian/saga_gui.desktop  /usr/share/applications/
 src/saga_core/saga_gui/res/saga_tip.txt /usr/share/saga/
 usr/bin
 usr/lib/saga/*.so
+usr/share/man/man1/*
