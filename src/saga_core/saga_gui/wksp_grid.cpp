@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_grid.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: wksp_grid.cpp 1196 2011-10-17 12:34:49Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -141,8 +141,8 @@ wxString CWKSP_Grid::Get_Description(void)
 	DESC_ADD_FLT(LNG("[CAP] Cell Size")				, m_pGrid->Get_Cellsize());
 	DESC_ADD_INT(LNG("[CAP] Number of Columns")		, m_pGrid->Get_NX());
 	DESC_ADD_INT(LNG("[CAP] Number of Rows")		, m_pGrid->Get_NY());
-	DESC_ADD_INT(LNG("[CAP] Number of Cells")		, m_pGrid->Get_NCells());
-	DESC_ADD_INT(LNG("[CAP] No Data Cells")			, m_pGrid->Get_NoData_Count());
+	DESC_ADD_LONG(LNG("[CAP] Number of Cells")		, m_pGrid->Get_NCells());
+	DESC_ADD_LONG(LNG("[CAP] No Data Cells")		, m_pGrid->Get_NoData_Count());
 	DESC_ADD_STR(LNG("[CAP] Value Type")			, SG_Data_Type_Get_Name(m_pGrid->Get_Type()));
 	DESC_ADD_FLT(LNG("[CAP] Value Minimum")			, m_pGrid->Get_ZMin());
 	DESC_ADD_FLT(LNG("[CAP] Value Maximum")			, m_pGrid->Get_ZMax());
@@ -150,7 +150,7 @@ wxString CWKSP_Grid::Get_Description(void)
 	DESC_ADD_STR(LNG("[CAP] No Data Value")			, m_pGrid->Get_NoData_Value() < m_pGrid->Get_NoData_hiValue() ? CSG_String::Format(SG_T("%f - %f"), m_pGrid->Get_NoData_Value(), m_pGrid->Get_NoData_hiValue()).c_str() : SG_Get_String(m_pGrid->Get_NoData_Value(), -2).c_str());
 	DESC_ADD_FLT(LNG("[CAP] Arithmetic Mean")		, m_pGrid->Get_ArithMean(true));
 	DESC_ADD_FLT(LNG("[CAP] Standard Deviation")	, m_pGrid->Get_StdDev(true));
-	DESC_ADD_FLT(LNG("[CAP] Memory Size [MB]")		, (double)(m_pGrid->Get_NCells() * m_pGrid->Get_nValueBytes()) / N_MEGABYTE_BYTES);
+	DESC_ADD_STR(LNG("[CAP] Memory Size")			, Get_nBytes_asString(m_pGrid->Get_NCells() * m_pGrid->Get_nValueBytes(), 2).c_str());
 
 	if( m_pGrid->is_Compressed() )
 	{
@@ -400,7 +400,7 @@ void CWKSP_Grid::On_Create_Parameters(void)
 	m_Parameters.Add_Font(
 		m_Parameters("VALUES_SHOW")		, "VALUES_FONT"		, LNG("[CAP] Font"),
 		LNG("")
-	)->asFont()->SetFamily(wxDECORATIVE);
+	);
 
 	m_Parameters.Add_Value(
 		m_Parameters("VALUES_SHOW")		, "VALUES_SIZE"		, LNG("[CAP] Size"),
@@ -1301,12 +1301,12 @@ void CWKSP_Grid::_Draw_Values(CWKSP_Map_DC &dc_Map)
 	//-----------------------------------------------------
 	if(	m_Parameters("VALUES_SHOW")->asBool() && (dDC = m_pGrid->Get_Cellsize() * dc_Map.m_World2DC) > 40 )
 	{
-		zFactor		=  m_pGrid->Get_ZFactor();
-		Decimals	=  m_Parameters("VALUES_DECIMALS")	->asInt();
+		zFactor		= m_pGrid->Get_ZFactor();
+		Decimals	= m_Parameters("VALUES_DECIMALS")	->asInt();
 
-		xDC			=  m_Parameters("VALUES_SIZE")		->asDouble() / 100.0;
-		x			=  m_Parameters("VALUES_FONT")		->asColor();
-		Font		= *m_Parameters("VALUES_FONT")		->asFont();
+		xDC			= m_Parameters("VALUES_SIZE")		->asDouble() / 100.0;
+		x			= m_Parameters("VALUES_FONT")		->asColor();
+		Font		= Get_Font(m_Parameters("VALUES_FONT"));
 		Font.SetPointSize((int)(xDC * dDC));
 		dc_Map.dc.SetFont(Font);
 		dc_Map.dc.SetTextForeground(Get_Color_asWX(x));

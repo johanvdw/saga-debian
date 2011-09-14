@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: RealArea.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: RealArea.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 /*******************************************************************************
     RealArea.cpp
@@ -59,9 +59,9 @@ bool CRealArea::On_Execute(void){
 
 	CMorphometry	Morphometry;
 
-	if(	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("ELEVATION")	, PARAMETER_TYPE_Grid, pDEM)
-	||	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("SLOPE")		, PARAMETER_TYPE_Grid, &pSlope)
-	||	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("ASPECT")		, PARAMETER_TYPE_Grid, &pAspect)
+	if(	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("ELEVATION"), pDEM    , PARAMETER_TYPE_Grid)
+	||	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("SLOPE")    , &pSlope , PARAMETER_TYPE_Grid)
+	||	!Morphometry.Get_Parameters()->Set_Parameter(SG_T("ASPECT")   , &pAspect, PARAMETER_TYPE_Grid)
 	||	!Morphometry.Execute() )
 	{
 		return( false );

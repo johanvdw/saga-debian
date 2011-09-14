@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: res_images.h 1119 2011-06-29 12:13:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -91,6 +91,9 @@ enum ID_IMAGES
 	ID_IMG_NB_ACTIVE_LEGEND,
 	ID_IMG_NB_ACTIVE_PARAMETERS,	
 	ID_IMG_NB_ACTIVE_HTMLEXTRAINFO,
+	ID_IMG_NB_DATA_SOURCE_FILES,
+	ID_IMG_NB_DATA_SOURCE_DATABASE,
+	ID_IMG_NB_DATA_SOURCE_WEBSERVICE,
 	ID_IMG_NB_INFO_ERROR,
 	ID_IMG_NB_INFO_EXECUTION,
 	ID_IMG_NB_INFO_MESSAGES,

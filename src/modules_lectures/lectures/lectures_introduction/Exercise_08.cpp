@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Exercise_08.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Exercise_08.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -179,12 +179,12 @@ bool CExercise_08::On_Execute(void)
 //---------------------------------------------------------
 bool CExercise_08::Method_01(void)
 {
-	int		n, x, y, i, ix, iy, iMax;
+	int		x, y, i, ix, iy, iMax;
 	double	z, dz, dzMax,
 			Area_of_Cell	= Get_Cellsize() * Get_Cellsize();
 
 	//-----------------------------------------------------
-	for(n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		m_pDTM->Get_Sorted(n, x, y, true, false);
 
@@ -233,13 +233,13 @@ bool CExercise_08::Method_01(void)
 //---------------------------------------------------------
 bool CExercise_08::Method_02(void)
 {
-	int		n, x, y, i, ix, iy;
+	int		x, y, i, ix, iy;
 	double	z, d, dz[8], dzSum,
 			Area_of_Cell	= Get_Cellsize() * Get_Cellsize(),
 			MFD_Converge	= 1.1;
 
 	//-----------------------------------------------------
-	for(n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		m_pDTM->Get_Sorted(n, x, y, true, false);
 

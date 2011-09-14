@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Trend.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Table_Trend.h 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ protected:
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
-	bool						Get_Trend				(CSG_Table *pTable);
+	virtual bool				On_Execute				(void);
 
 
 private:
@@ -98,11 +98,6 @@ class CTable_Trend : public CTable_Trend_Base
 public:
 	CTable_Trend(void);
 
-
-protected:
-
-	virtual bool				On_Execute				(void);
-
 };
 
 //---------------------------------------------------------
@@ -111,10 +106,7 @@ class CTable_Trend_Shapes : public CTable_Trend_Base
 public:
 	CTable_Trend_Shapes(void);
 
-
-protected:
-
-	virtual bool				On_Execute				(void);
+	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Shapes|Table") );	}
 
 };
 

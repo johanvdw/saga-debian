@@ -1,11 +1,11 @@
-# $Id: configure.in 1045 2011-05-04 16:06:19Z oconrad $
+# $Id: configure.in 1236 2011-11-22 16:21:12Z oconrad $
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(saga, 2.0.7, BUG-REPORT-ADDRESS)
+AC_INIT(saga, 2.0.8, BUG-REPORT-ADDRESS)
 AC_CONFIG_SRCDIR([src/saga_core/saga_gui/wksp_data_menu_files.cpp])
-#AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h])
 #AM_INIT_AUTOMAKE(saga, 2.0beta)
 AM_INIT_AUTOMAKE(tar-ustar)
 
@@ -22,7 +22,7 @@ AC_CHECK_LIB([fftw3],[fftw_execute],FFTWFOUND=1,)
 AC_CHECK_LIB([jasper], [jas_calloc],JASPERFOUND=1,,)
 AC_CHECK_LIB([las], [LAS_GetVersion], LASFOUND=1,,)
 AC_CHECK_LIB(hpdf, HPDF_Pages_New, HARUFOUND=1,,)
-AC_CHECK_LIB([odbc], [SQLFetch], ODBCFOUND=1,,[ODBC \(libodbc\) library not found])
+AC_CHECK_LIB([odbc], [SQLFetch], ODBCFOUND=1,[ODBC \(libodbc\) library not found])
 AC_CHECK_LIB([proj], [pj_is_latlong], PROJFOUND=1,,)
 AC_CHECK_LIB([vigraimpex], [VIGRA_RGBE_ReadPixels_Raw],VIGRAFOUND=1,)
 
@@ -48,6 +48,30 @@ AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([floor memmove memset modf pow sqrt strchr strdup strerror strrchr strstr strtol])
 
+# add a local directory as base for libs and include files
+AC_MSG_CHECKING([for local include/lib path])
+
+AC_ARG_WITH(local,[  --with-local[=dir]        search /usr/local or other directory for includes and libs],,)
+
+if test "$with_local" != "no" -a "$with_local" != "" ; then
+  
+  if test "$with_local" = "yes" ; then
+    ADD_PREFIX=/usr/local
+  else
+    ADD_PREFIX=$with_local
+  fi
+
+  AC_MSG_RESULT(adding $ADD_PREFIX)
+
+  LOCAL_LIBS="-L$ADD_PREFIX/lib"
+  LOCAL_INCS="-I$ADD_PREFIX/include"
+
+  AC_SUBST(LOCAL_LIBS,$LOCAL_LIBS)
+  AC_SUBST(LOCAL_INCS,$LOCAL_INCS)
+else
+  AC_MSG_RESULT([none])
+fi
+
 # conditionals
 AC_ARG_ENABLE(debug,
      [  --enable-debug	  Turn on debugging],
@@ -67,6 +91,37 @@ AC_ARG_ENABLE(unicode,
       esac],[unicode=false])
       AM_CONDITIONAL(SAGA_UNICODE, test "`wx-config --list | grep unicode`" != "" -a x$unicode = xtrue )
 
+AC_ARG_ENABLE(gui,
+     [  --disable-gui		  Do not build GUI and interactive modules],
+     [case "${enableval}" in
+     	yes) gui=true ;;
+	no) gui=false ;;
+	*) AC_MSG_ERROR(bad value ${enableval} for --disable-gui) ;;
+      esac],[gui=true])
+      AM_CONDITIONAL(WITH_GUI, test x$gui = xtrue)
+
+  if test $gui = "false" ; then
+    AC_MSG_RESULT([        GUI and interactive modules will NOT be built])
+  else
+    AC_DEFINE([WITH_GUI], [1], ["built with GUI and interactive modules"])
+    AC_MSG_RESULT([        GUI and interactive modules will be built])    
+  fi
+
+AC_ARG_ENABLE(odbc,
+     [  --disable-odbc		  Build without ODBC support],
+     [case "${enableval}" in
+     	yes) odbc=true ;;
+	no) odbc=false ;;
+	*) AC_MSG_ERROR(bad value ${enableval} for --disable-odbc) ;;
+      esac],[odbc=true])
+      AM_CONDITIONAL(WITH_ODBC, test x$odbc = xtrue)
+
+  if test $odbc = "false" ; then
+    AC_MSG_RESULT([        ODBC support will NOT be built])
+  else
+    AC_DEFINE([WITH_ODBC], [1], ["built with ODBC support"])
+    AC_MSG_RESULT([        ODBC support will be built])    
+  fi
 
 #AM_CONDITIONAL(X86_64, test "`uname -m`" = "x86_64")
     AM_CONDITIONAL(HAVE_CV, test -n "$CVFOUND")
@@ -110,11 +165,11 @@ AC_OUTPUT(Makefile \
 	src/saga_core/Makefile \
 	src/saga_core/saga_api/Makefile \
 	src/saga_core/saga_gdi/Makefile \
+	src/saga_core/saga_gui/Makefile \
+	src/saga_core/saga_gui/man/Makefile \
 	src/saga_core/saga_odbc/Makefile \
 	src/saga_core/saga_cmd/Makefile \
 	src/saga_core/saga_cmd/man/Makefile \
-	src/saga_core/saga_gui/Makefile \
-	src/saga_core/saga_gui/man/Makefile \
 	src/modules/Makefile \
 	src/modules/grid/Makefile \
 	src/modules/grid/grid_analysis/Makefile \
@@ -148,22 +203,23 @@ AC_OUTPUT(Makefile \
 	src/modules_contrib/contrib_s_liersch/ihacres/Makefile \
 	src/modules_contrib/garden/Makefile \
 	src/modules_contrib/garden/garden_3d_viewer/Makefile \
+	src/modules_contrib/garden/garden_webservices/Makefile \
 	src/modules_geostatistics/Makefile \
 	src/modules_geostatistics/geostatistics/Makefile \
 	src/modules_geostatistics/geostatistics/geostatistics_points/Makefile \
 	src/modules_geostatistics/geostatistics/geostatistics_grid/Makefile \
 	src/modules_geostatistics/geostatistics/geostatistics_kriging/Makefile \
 	src/modules_geostatistics/geostatistics/geostatistics_regression/Makefile \
-    src/modules_images/Makefile \
-    src/modules_images/modules_imagery/Makefile \
-    src/modules_images/modules_imagery/imagery_classification/Makefile \
-    src/modules_images/modules_imagery/imagery_rga/Makefile \
-    src/modules_images/modules_imagery/imagery_segmentation/Makefile \
-    src/modules_images/modules_imagery/imagery_tools/Makefile \
-    src/modules_images/modules_opencv/Makefile \
-    src/modules_images/modules_opencv/opencv/Makefile \
-    src/modules_images/modules_vigra/Makefile \
-    src/modules_images/modules_vigra/vigra/Makefile \
+	src/modules_images/Makefile \
+	src/modules_images/modules_imagery/Makefile \
+	src/modules_images/modules_imagery/imagery_classification/Makefile \
+	src/modules_images/modules_imagery/imagery_rga/Makefile \
+	src/modules_images/modules_imagery/imagery_segmentation/Makefile \
+	src/modules_images/modules_imagery/imagery_tools/Makefile \
+	src/modules_images/modules_opencv/Makefile \
+	src/modules_images/modules_opencv/opencv/Makefile \
+	src/modules_images/modules_vigra/Makefile \
+	src/modules_images/modules_vigra/vigra/Makefile \
 	src/modules_io/Makefile \
 	src/modules_io/esri_e00/Makefile \
 	src/modules_io/esri_e00/io_esri_e00/Makefile \
@@ -210,6 +266,7 @@ AC_OUTPUT(Makefile \
 	src/modules_terrain_analysis/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/ta_channels/Makefile \
+	src/modules_terrain_analysis/terrain_analysis/ta_compound/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/ta_hydrology/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/ta_lighting/Makefile \
 	src/modules_terrain_analysis/terrain_analysis/ta_morphometry/Makefile \

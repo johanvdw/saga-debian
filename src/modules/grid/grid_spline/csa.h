@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: csa.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: csa.h 1082 2011-06-08 08:07:00Z reklov_w $
  *********************************************************/
 /******************************************************************************
  *
@@ -47,7 +47,7 @@ void csa_destroy(csa* a);
 void csa_addpoints(csa* a, int n, point points[]);
 void csa_calculatespline(csa* a);
 void csa_approximate_point(csa* a, point* p);
-void csa_approximate_points(csa* a, int n, point* points);
+void csa_approximate_points(csa* a, long n, point* points);
 
 void csa_setnpmin(csa* a, int npmin);
 void csa_setnpmax(csa* a, int npmax);

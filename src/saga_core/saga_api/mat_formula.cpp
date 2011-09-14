@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_formula.cpp 971 2011-03-28 10:37:56Z reklov_w $
+ * Version $Id: mat_formula.cpp 1195 2011-10-14 11:29:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -300,19 +300,20 @@ bool CSG_Formula::Get_Error(CSG_String &Message)
 
 	if( Get_Error(&pos, &msg) )
 	{
-		Message	+= LNG("Error in formula");
-		Message	+= SG_T("\n") + m_sFormula;
+		Message	 = CSG_String::Format(SG_T("%s %s %d\n"), LNG("Error in formula"), LNG("at position"), pos);
 
-		Message	+= SG_T("\n") + Message;
-		Message	+= CSG_String::Format(SG_T("\n%s: %d"), LNG("Position") , pos);
-
-		if( pos >= 0 && pos < (int)m_sFormula.Length() )
+		if( pos < 0 || pos >= (int)m_sFormula.Length() )
 		{
-			Message	+= SG_T("\n")
-					+  m_sFormula.Left(pos - 1) + SG_T("[")
-					+  m_sFormula[pos] + SG_T("]")
+			Message	+= m_sFormula;
+		}
+		else
+		{
+			Message	+= m_sFormula.Left (pos) + SG_T(" [")
+					+  m_sFormula      [pos] + SG_T("] ")
 					+  m_sFormula.Right(m_sFormula.Length() - (pos + 1));
 		}
+
+		Message	+= CSG_String::Format(SG_T("\n%s\n"), msg.c_str());
 
 		return( true );
 	}

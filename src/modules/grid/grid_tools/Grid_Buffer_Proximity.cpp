@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Buffer_Proximity.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Buffer_Proximity.cpp 1150 2011-08-29 12:32:40Z reklov_w $
  *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -153,7 +153,14 @@ bool CGrid_Proximity_Buffer::On_Execute(void){
 	ival		= Parameters("IVAL")->asInt();
 
 	cellSize = pSource->Get_Cellsize();
-	dBufDist = Parameters("DIST")->asDouble() / cellSize;
+	dBufDist = Parameters("DIST")->asDouble();
+	if (dBufDist < cellSize)
+	{
+		SG_UI_Msg_Add_Error(_TL("The buffer distance must be greater than or equal to the cell size!"));
+		return (false);
+	}
+
+	dBufDist = dBufDist / cellSize;
 	iBufDist = (int) (dBufDist + 2.0);
 	dBufDist = pow(dBufDist, 2);
 

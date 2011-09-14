@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SAGA_Wetness_Index.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: SAGA_Wetness_Index.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ bool CSAGA_Wetness_Index::Get_Area_Catchment(CSG_Grid *pDEM, CSG_Grid *pC, CSG_G
 {
 	const double	MFD_Converge	= 1.1;
 
-	int		n, x, y, i, ix, iy;
+	int		x, y, i, ix, iy;
 	double	z, d, dz[8], dzSum, c, s;
 
 	//-----------------------------------------------------
@@ -199,7 +199,7 @@ bool CSAGA_Wetness_Index::Get_Area_Catchment(CSG_Grid *pDEM, CSG_Grid *pC, CSG_G
 	pS->Assign(0.0);
 
 	//-----------------------------------------------------
-	for(n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		pDEM->Get_Sorted(n, x, y, true, false);
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_reclass_extract.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pc_reclass_extract.h 1164 2011-09-16 08:55:11Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,20 +94,24 @@ protected:
 
 	virtual bool				On_Execute				(void);
 
+	virtual int					On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
 
 private:
 
-	int							m_Single;
-	bool						m_bExtract;
-	int							m_AttrField;
+	int				m_Single;
+	bool			m_bExtract;
+	int				m_AttrField;
 
-	CSG_PointCloud				*m_pInput, *m_pResult;
+	CSG_PointCloud	*m_pInput, *m_pResult;
 
 
-	bool						Reclass_Single			(void);
-	bool						Reclass_Range			(void);
-	bool						Reclass_Table			(bool bUser);
-	void						Set_Value				(int i, double value);
+	void			Reclass_Single			(void);
+	void			Reclass_Range			(void);
+	bool			Reclass_Table			(bool bUser);
+	void			Set_Value				(int i, double value);
+
+	void			Set_Display_Attributes	(CSG_PointCloud *pPC, int iField, CSG_Parameters &sParms);
 
 };
 

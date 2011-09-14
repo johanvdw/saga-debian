@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid.h 1017 2011-04-27 18:42:58Z oconrad $
+ * Version $Id: grid.h 1105 2011-06-21 14:11:47Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -355,7 +355,8 @@ public:
 
 private:	///////////////////////////////////////////////
 
-	int							m_NX, m_NY, m_NCells;
+	int							m_NX, m_NY;
+	long						m_NCells;
 
 	double						m_Cellsize, m_Cellarea, m_Diagonal;
 
@@ -454,7 +455,7 @@ public:		///////////////////////////////////////////////
 	double						Get_StdDev		(bool bZFactor = false);
 	double						Get_Variance	(void);
 
-	int							Get_NoData_Count		(void);
+	long							Get_NoData_Count		(void);
 
 	virtual bool				Save	(const CSG_String &File_Name, int Format = GRID_FILE_FORMAT_Binary);
 	virtual bool				Save	(const CSG_String &File_Name, int Format, int xA, int yA, int xN, int yN);
@@ -896,7 +897,7 @@ SAGA_API_DLL_EXPORT int				SG_Grid_Cache_Get_Confirm		(void);
 
 SAGA_API_DLL_EXPORT void			SG_Grid_Cache_Set_Threshold		(int nBytes);
 SAGA_API_DLL_EXPORT void			SG_Grid_Cache_Set_Threshold_MB	(double nMegabytes);
-SAGA_API_DLL_EXPORT int				SG_Grid_Cache_Get_Threshold		(void);
+SAGA_API_DLL_EXPORT long			SG_Grid_Cache_Get_Threshold		(void);
 SAGA_API_DLL_EXPORT double			SG_Grid_Cache_Get_Threshold_MB	(void);
 
 
@@ -956,6 +957,7 @@ public:
 	CSG_Distance_Weighting &	Get_Weighting		(void)								{	return( m_Weighting );		}
 
 	bool						Set_Radius			(double Radius);
+	bool						Set_Annulus			(double inner_Radius, double outer_Radius);
 	bool						Set_Sector			(double Radius, double Direction, double Tolerance);
 
 	int							Get_Count			(void)	const						{	return( m_Cells.Get_Count() );	}

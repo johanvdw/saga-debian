@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_RGB_Composite.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_RGB_Composite.cpp 1228 2011-11-18 11:14:21Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -277,7 +277,9 @@ bool CGrid_RGB_Composite::On_Execute(void)
 
 	//-----------------------------------------------------
 	pRGB	= Parameters("GRID_RGB")->asGrid();
+	CSG_String n = pRGB->Get_Name();
 	pRGB->Create(pRGB->Get_System(), SG_DATATYPE_Int);
+	pRGB->Set_Name(n);
 	DataObject_Set_Colors(pRGB, 100, SG_COLORS_BLACK_WHITE);
 
 	CSG_Parameters	Parms;

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_to_shapes.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pc_to_shapes.cpp 1078 2011-06-07 11:12:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ bool CPC_To_Shapes::On_Execute(void)
 	pShapes	= Parameters("SHAPES")	->asShapes();
 
 	//-----------------------------------------------------
-	pShapes->Create(SHAPE_TYPE_Point, pPoints->Get_Name());
+	pShapes->Create(SHAPE_TYPE_Point, pPoints->Get_Name(), NULL, SG_VERTEX_TYPE_XYZ);
 
 	for(iField=2; iField<pPoints->Get_Field_Count(); iField++)
 	{
@@ -128,6 +128,7 @@ bool CPC_To_Shapes::On_Execute(void)
 		CSG_Shape	*pShape	= pShapes->Add_Shape();
 
 		pShape->Add_Point(pPoints->Get_X(), pPoints->Get_Y());
+		pShape->Set_Z(pPoints->Get_Z(), 0);
 
 		for(iField=2; iField<pPoints->Get_Field_Count(); iField++)
 		{

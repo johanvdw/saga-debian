@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Classes_To_Shapes.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: Grid_Classes_To_Shapes.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -160,7 +160,8 @@ bool CGrid_Classes_To_Shapes::On_Execute(void)
 //---------------------------------------------------------
 bool CGrid_Classes_To_Shapes::Get_Classes(void)
 {
-	int			i, id, x, y;
+	long		i;
+	int			id, x, y;
 	double		Value;
 	CSG_Grid	*pGrid;
 

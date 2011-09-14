@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: callback.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: callback.h 1220 2011-11-07 11:08:33Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,6 +87,9 @@ void					Set_Library		(class CModule_Library *pLibrary);
 //---------------------------------------------------------
 void					Set_Silent		(bool bOn);
 bool					Get_Silent		(void);
+
+void					Set_Quiet		(bool bOn);
+bool					Get_Quiet		(void);
 
 void					Set_Interactive	(bool bOn);
 bool					Get_Interactive	(void);

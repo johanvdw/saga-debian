@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1171 2011-09-23 14:37:31Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,12 +96,12 @@ const SG_Char * Get_Info(int i)
 
 #include "Fit.h"
 #include "Table_Calculator.h"
-#include "Table_CalculatorShapes.h"
 #include "Table_Trend.h"
-#include "table_running_average.h"
 #include "table_running_average.h"
 #include "table_cluster_analysis.h"
 #include "table_pca.h"
+#include "table_fill_record_gaps.h"
+#include "etp_hargreave.h"
 
 
 //---------------------------------------------------------
@@ -111,14 +111,22 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case 0:		return( new CFit );
-	case 1:		return( new CTableCalculator );
-	case 2:		return( new CTableCalculatorShapes );
-	case 3:		return( new CTable_Trend );
-	case 4:		return( new CTable_Trend_Shapes );
-	case 5:		return( new CTable_Running_Average );
-	case 6:		return( new CTable_Cluster_Analysis );
-	case 7:		return( new CTable_PCA );
+	case  0:	return( new CFit );
+
+	case  1:	return( new CTable_Calculator );
+	case  2:	return( new CTable_Calculator_Shapes );
+
+	case  3:	return( new CTable_Trend );
+	case  4:	return( new CTable_Trend_Shapes );
+
+	case  5:	return( new CTable_Running_Average );
+	case  6:	return( new CTable_Cluster_Analysis );
+	case  7:	return( new CTable_PCA );
+
+	case  8:	return( new CTable_Fill_Record_Gaps );
+
+	case  9:	return( new CETP_Hargreave );
+	case 10:	return( new CETP_Day_To_Hour );
 	}
 
 	return( NULL );

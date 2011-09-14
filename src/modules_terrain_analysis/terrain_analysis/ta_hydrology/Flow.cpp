@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Flow.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -363,7 +363,7 @@ void CFlow::Init_Cell(int x, int y)
 //---------------------------------------------------------
 void CFlow::Finalize(void)
 {
-	for(int n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		if( pDTM->is_NoData(n) )
 		{

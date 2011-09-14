@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: rga_basic.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: rga_basic.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -460,7 +460,8 @@ CRGA_Basic::CRGA_Basic(void)
 bool CRGA_Basic::On_Execute(void)
 {
 	bool		bRefresh;
-	int			x, y, i, n, Segment;
+	long		n;
+	int			x, y, i, Segment;
 	CSG_Grid	*pSeeds;
 
 	//-----------------------------------------------------

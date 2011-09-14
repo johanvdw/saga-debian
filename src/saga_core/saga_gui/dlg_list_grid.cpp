@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_grid.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: dlg_list_grid.cpp 1226 2011-11-16 09:23:47Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -123,6 +123,11 @@ CDLG_List_Grid::CDLG_List_Grid(CSG_Parameter_Grid_List *pList, wxString Caption)
 		}
 
 		_Set_Objects();
+	}
+	else
+	{
+		m_pSystem  = NULL;
+		m_pSystems = NULL;
 	}
 }
 

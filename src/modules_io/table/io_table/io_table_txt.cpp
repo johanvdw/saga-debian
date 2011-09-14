@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: io_table_txt.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: io_table_txt.cpp 1147 2011-08-29 09:40:19Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -183,9 +183,17 @@ bool CTable_Text_Export::On_Execute(void)
 
 				case SG_DATATYPE_Short:
 				case SG_DATATYPE_Int:
-				case SG_DATATYPE_Long:
 				case SG_DATATYPE_Color:
-					Stream.Printf(SG_T("%d")	, pRecord->asDouble(iField));
+					Stream.Printf(SG_T("%d")	, pRecord->asInt(iField));
+					break;
+
+				case SG_DATATYPE_Long:
+					Stream.Printf(SG_T("%ld")	, (long)pRecord->asDouble(iField));
+					break;
+
+				case SG_DATATYPE_ULong:
+					Stream.Printf(SG_T("%lu")	, (unsigned long)pRecord->asDouble(iField));
+					break;
 
 				case SG_DATATYPE_Float:
 				case SG_DATATYPE_Double:
@@ -528,7 +536,7 @@ bool CTable_Text_Import_Fixed_Cols::On_Execute(void)
 		return( false );
 	}
 
-	if( !Stream.Read_Line(sLine) || (nChars = sLine.Length()) <= 0 )
+	if( !Stream.Read_Line(sLine) || (nChars = (int)sLine.Length()) <= 0 )
 	{
 		Message_Add(_TL("empty or corrupted file"));
 
@@ -586,7 +594,7 @@ bool CTable_Text_Import_Fixed_Cols::On_Execute(void)
 		//-------------------------------------------------
 		for(iField=0; iField<nFields; iField++)
 		{
-			iLength[iField]	= (iField < nFields - 1 ? iFirst[iField + 1] : sLine.Length()) - iFirst[iField];
+			iLength[iField]	= (iField < nFields - 1 ? iFirst[iField + 1] : (int)sLine.Length()) - iFirst[iField];
 
 			pTable->Add_Field(bHeader ? sLine.Mid(iFirst[iField], iLength[iField]) : CSG_String::Format(SG_T("FIELD%03d"), iField + 1), SG_DATATYPE_String);
 		}

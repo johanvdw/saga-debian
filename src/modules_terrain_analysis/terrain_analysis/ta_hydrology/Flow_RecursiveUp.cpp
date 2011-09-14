@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow_RecursiveUp.cpp 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: Flow_RecursiveUp.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ void CFlow_RecursiveUp::On_Create(void)
 	On_Destroy();
 
 	Flow	= (double ***)SG_Malloc(    Get_NY()  * sizeof(double **));
-	p		= (double   *)SG_Malloc(8 * Get_NCells() * sizeof(double   ));
+	p		= (double   *)SG_Malloc((long) 8 * Get_NCells() * sizeof(double   ));
 
 	for(y=0; y<Get_NY(); y++)
 	{
@@ -199,7 +199,7 @@ void CFlow_RecursiveUp::On_Create(void)
 
 	Method	= Parameters("Method")->asInt();
 
-	memset(Flow[0][0], 0, 8 * Get_NCells() * sizeof(double) );
+	memset(Flow[0][0], 0, (long) 8 * Get_NCells() * sizeof(double) );
 
 	for(y=0; y<Get_NY(); y++)
 	{

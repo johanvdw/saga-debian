@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1116 2011-06-24 14:34:18Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Imagery - Classification") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad (c) 2002-10") );
+		return( SG_T("O. Conrad (c) 2002-11") );
 
 	case MLB_INFO_Description:
 		return( _TL("Classification tools for grids.") );
@@ -97,6 +97,7 @@ const SG_Char * Get_Info(int i)
 #include "classify_supervised.h"
 #include "classify_cluster_analysis.h"
 #include "change_detection.h"
+#include "decision_tree.h"
 
 
 //---------------------------------------------------------
@@ -109,6 +110,7 @@ CSG_Module *		Create_Module(int i)
 	case  0:	return( new CGrid_Classify_Supervised );
 	case  1:	return( new CGrid_Cluster_Analysis );
 	case  2:	return( new CChange_Detection );
+	case  3:	return( new CDecision_Tree );
 	}
 
 	return( NULL );

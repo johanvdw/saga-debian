@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1104 2011-06-20 20:50:18Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Tools") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad, V. Olaya, V. Wichmann (c) 2002-10") );
+		return( SG_T("O. Conrad, V. Olaya, V. Wichmann (c) 2002-11") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of gridded data.") );
@@ -129,6 +129,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_Gaps_Spline_Fill.h"
 #include "Grid_Proximity.h"
 #include "Grid_Tiling.h"
+#include "Grid_Shrink_Expand.h"
 
 
 //---------------------------------------------------------
@@ -166,6 +167,7 @@ CSG_Module *		Create_Module(int i)
 	case 25: 	return( new CGrid_Gaps_Spline_Fill );
 	case 26: 	return( new CGrid_Proximity );
 	case 27: 	return( new CGrid_Tiling );
+	case 28: 	return( new CGrid_Shrink_Expand );
 	}
 
 	return( NULL );

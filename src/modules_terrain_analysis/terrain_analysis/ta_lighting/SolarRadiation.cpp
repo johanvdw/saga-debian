@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SolarRadiation.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: SolarRadiation.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -507,7 +507,7 @@ bool CSolarRadiation::On_Execute(void)
 
 	m_Latitude		= Parameters("LATITUDE")	->asDouble() * M_DEG_TO_RAD;
 
-	m_bBending		= Parameters("BENDING")->asParameters()->Get_Parameter("BENDING")->asBool();
+	m_bBending		= Parameters("BENDING")->asParameters()->Get_Parameter("BENDING")->asBool() || Parameters("GRD_LAT")->asGrid() || Parameters("GRD_LON")->asGrid();
 
 	//-----------------------------------------------------
 	switch( m_Time )
@@ -618,12 +618,10 @@ bool CSolarRadiation::On_Execute(void)
 			int		Offset;
 			double	d, dx, dy, dxA, dyA, Radius, Reference;
 
-			Radius		= Parameters("BENDING")->asParameters()->Get_Parameter("RADIUS")->asDouble();
-
-			d	= M_DEG_TO_RAD / (Radius * M_PI / 180.0);
-
 			Offset		= Parameters("BENDING")->asParameters()->Get_Parameter("LON_OFFSET")  ->asInt();
 			Reference	= Parameters("BENDING")->asParameters()->Get_Parameter("LON_REF_USER")->asDouble();
+			Radius		= Parameters("BENDING")->asParameters()->Get_Parameter("RADIUS")      ->asDouble();
+			d			= 1.0 / Radius;
 
 			switch( Offset )
 			{
@@ -726,7 +724,7 @@ bool CSolarRadiation::Finalise(void)
 
 	if( m_pRatio )
 	{
-		for(int i=0; i<Get_NCells(); i++)
+		for(long i=0; i<Get_NCells(); i++)
 		{
 			if( m_pDEM->is_NoData(i) )
 			{
@@ -1187,12 +1185,12 @@ bool CSolarRadiation::Get_Shade(double Sol_Height, double Sol_Azimuth)
 
 	if( !m_bBending )
 	{
-		int		i, x, y;
+		int		x, y;
 		double	dx, dy, dz;
 
 		Get_Shade_Params(Sol_Height, Sol_Azimuth, dx, dy, dz);
 
-		for(i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
+		for(long i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
 		{
 			if( m_pDEM->Get_Sorted(i, x, y) && !Get_Shade_Complete(x, y) )
 			{
@@ -1204,7 +1202,8 @@ bool CSolarRadiation::Get_Shade(double Sol_Height, double Sol_Azimuth)
 	//-----------------------------------------------------
 	else
 	{
-		int		i, x, y, iLock;
+		int		x, y, iLock;
+		long	i;
 
 		for(i=0, iLock=1; i<Get_NCells() && Set_Progress_NCells(i); i++, iLock++)
 		{

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_dialogs.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: res_dialogs.h 1119 2011-06-29 12:13:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,6 +90,7 @@ enum ID_DIALOGS
 	ID_DLG_DELETE,
 
 	ID_DLG_WKSP_OPEN,
+	ID_DLG_ALLFILES_OPEN,
 	ID_DLG_MODULES_OPEN,
 	ID_DLG_PROJECT_OPEN,
 	ID_DLG_PROJECT_SAVE,
@@ -146,7 +147,7 @@ bool				DLG_Colors				(class CSG_Colors *pColors);
 bool				DLG_Colors				(int &Palette);
 bool				DLG_Color				(long &Colour);
 
-bool				DLG_Font				(class wxFont *pFont, long &Colour);
+bool				DLG_Font				(class CSG_Parameter *pFont);
 
 bool				DLG_Get_Number			(double &Number, const wxChar *Caption, const wxChar *Text);
 bool				DLG_Get_Number			(double &Number);

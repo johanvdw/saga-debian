@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: change_detection.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: change_detection.cpp 1128 2011-07-07 08:22:51Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -140,6 +140,31 @@ CChange_Detection::CChange_Detection(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+int CChange_Detection::On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+{
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("INI_LUT")) )
+	{
+		pParameters->Get_Parameter("INI_LUT_MIN")->Set_Enabled(pParameter->asTable() != NULL);
+		pParameters->Get_Parameter("INI_LUT_MAX")->Set_Enabled(pParameter->asTable() != NULL);
+		pParameters->Get_Parameter("INI_LUT_NAM")->Set_Enabled(pParameter->asTable() != NULL);
+	}
+
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("FIN_LUT")) )
+	{
+		pParameters->Get_Parameter("FIN_LUT_MIN")->Set_Enabled(pParameter->asTable() != NULL);
+		pParameters->Get_Parameter("FIN_LUT_MAX")->Set_Enabled(pParameter->asTable() != NULL);
+		pParameters->Get_Parameter("FIN_LUT_NAM")->Set_Enabled(pParameter->asTable() != NULL);
+	}
+
+	return( 1 );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 bool CChange_Detection::On_Execute(void)
 {
 	bool		bNoChange;
@@ -186,7 +211,7 @@ bool CChange_Detection::On_Execute(void)
 			{
 				pChanges->Get_Record(iInitial)->Add_Value(1 + iFinal, 1);
 
-				pChange->Set_Value(x, y, Final.Get_Count() * iInitial + iFinal);
+				pChange->Set_Value(x, y, (pChanges->Get_Field_Count() - 1) * iInitial + iFinal);
 			}
 			else
 			{
@@ -223,8 +248,8 @@ bool CChange_Detection::On_Execute(void)
 
 					pClass->Set_Value(0, cRamp.Get_Color(iFinal));
 					pClass->Set_Value(1, CSG_String::Format(SG_T("%s >> %s"), pChanges->Get_Record(iInitial)->asString(0), pChanges->Get_Field_Name(1 + iFinal)));
-					pClass->Set_Value(3, Final.Get_Count() * iInitial + iFinal);
-					pClass->Set_Value(4, Final.Get_Count() * iInitial + iFinal);
+					pClass->Set_Value(3, (pChanges->Get_Field_Count() - 1) * iInitial + iFinal);
+					pClass->Set_Value(4, (pChanges->Get_Field_Count() - 1) * iInitial + iFinal);
 				}
 			}
 		}
@@ -328,7 +353,7 @@ bool CChange_Detection::Get_Classes(CSG_Table &Classes, CSG_Grid *pGrid, bool bI
 	{
 		double	z;
 
-		for(int i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
+		for(long i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
 		{
 			double iz	= pGrid->asDouble(pGrid->Get_Sorted(i, false, false));
 

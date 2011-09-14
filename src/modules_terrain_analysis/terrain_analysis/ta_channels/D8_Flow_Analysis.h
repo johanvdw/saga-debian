@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: D8_Flow_Analysis.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: D8_Flow_Analysis.h 1213 2011-11-03 10:21:14Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,7 +86,6 @@ class ta_channels_EXPORT CD8_Flow_Analysis : public CSG_Module_Grid
 {
 public:
 	CD8_Flow_Analysis(void);
-	virtual ~CD8_Flow_Analysis(void);
 
 
 protected:
@@ -96,18 +95,26 @@ protected:
 
 private:
 
-	int							m_MinCon;
+	int							m_Threshold;
 
-	CSG_Grid						*m_pDEM, *m_pDir, *m_pCon;
+	CSG_Grid					*m_pDEM, *m_pDir, *m_pOrder, *m_pBasins, m_Nodes;
 
-	CSG_Shapes						*m_pNet;
+	CSG_Shapes					*m_pSegments;
 
 
-	bool						Set_Direction		(void);
-	bool						Set_Connectivity	(void);
+	void						Get_Direction		(void);
 
-	bool						Set_Network			(void);
-	bool						Set_Network			(int x, int y, CSG_Shape *pLine);
+	void						Get_Order			(void);
+	int							Get_Order			(int x, int y);
+
+	void						Get_Nodes			(void);
+	void						Set_Node			(int x, int y, int id, int type, CSG_Shape *pNode);
+
+	void						Get_Basins			(void);
+	int							Get_Basin			(int x, int y);
+
+	void						Get_Segments		(void);
+	void						Get_Segment			(int x, int y);
 
 };
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: topographic_correction.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: topographic_correction.h 1229 2011-11-18 15:52:06Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -85,17 +85,17 @@ protected:
 
 private:
 
-	int							m_Method;
+	int							m_Method, m_maxValue;
 
-	double						m_Minnaert, m_cosDec, m_sinDec, m_C;
+	double						m_cosTz, m_sinTz, m_Minnaert, m_C;
 
-	CSG_Grid					*m_pOriginal, *m_pCorrected, m_Slope, m_Incidence;
+	CSG_Grid					*m_pOriginal, *m_pCorrected, m_Slope, m_Illumination;
 
-
-	bool						Initialise				(void);
-	bool						Finalise				(void);
 
 	double						Get_Correction			(double Slope, double Incidence, double Value);
+
+	bool						Get_Illumination		(void);
+	bool						Get_Model				(void);
 
 };
 

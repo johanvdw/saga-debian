@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_from_shapes.cpp 963 2011-03-25 00:01:46Z johanvdw $
+ * Version $Id: pc_from_shapes.cpp 1093 2011-06-16 15:54:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,7 +90,8 @@ CPC_From_Shapes::CPC_From_Shapes(void)
 
 	Parameters.Add_Table_Field(
 		pNode	, "ZFIELD"		, _TL("Z Value"),
-		_TL("")
+		_TL(""),
+		true
 	);
 
 	Parameters.Add_PointCloud(
@@ -162,7 +163,7 @@ bool CPC_From_Shapes::On_Execute(void)
 			{
 				TSG_Point	p	= pShape->Get_Point(iPoint, iPart);
 
-				pPoints->Add_Point(p.x, p.y, pShape->asDouble(zField));
+				pPoints->Add_Point(p.x, p.y, zField < 0 ? pShape->Get_Z(iPoint, iPart) : pShape->asDouble(zField));
 
 				for(iField=0; iField<nFields; iField++)
 				{

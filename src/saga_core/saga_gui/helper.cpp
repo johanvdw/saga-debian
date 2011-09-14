@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: helper.cpp 1012 2011-04-26 12:53:19Z oconrad $
+ * Version $Id: helper.cpp 1194 2011-10-14 11:26:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -132,6 +132,40 @@ void		Decimal_To_Degree(double Value, double &Deg, double &Min, double &Sec)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+wxString	Get_nBytes_asString(int nBytes, int Precision)
+{
+	if( nBytes < 1024 )
+	{
+		return( wxString::Format(wxT("%d %s"), nBytes, wxT("bytes")) );
+	}
+
+	double	dSize	= nBytes / 1024.0;
+
+	if( dSize < 1024 )
+	{
+		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("kb")) );
+	}
+
+	dSize	/= 1024.0;
+
+	if( dSize < 1024 )
+	{
+		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("mb")) );
+	}
+
+	dSize	/= 1024.0;
+
+	return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("gb")) );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 double		Get_Random(double loValue, double hiValue)
 {
 	return( loValue + (hiValue - loValue) * (double)rand() / (double)RAND_MAX );
@@ -213,6 +247,57 @@ wxString		Get_TableInfo_asHTML(CSG_Table *pTable)
 	}
 
 	return( s );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool	Set_Font(CSG_Parameter *pFont, wxFont &Font, wxColour &Colour)
+{
+	if( !pFont )
+	{
+		return( false );
+	}
+
+	Colour.Set(
+		SG_GET_R(pFont->asColor()),
+		SG_GET_G(pFont->asColor()),
+		SG_GET_B(pFont->asColor())
+	);
+
+	Font.SetNativeFontInfo(pFont->asFont());
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool	Set_Font(const wxFont &Font, wxColour Colour, CSG_Parameter *pFont)
+{
+	if( !pFont )
+	{
+		return( false );
+	}
+
+	pFont->Set_Value((int)SG_GET_RGB(Colour.Red(), Colour.Green(), Colour.Blue()));
+	pFont->Set_Value(Font.GetNativeFontInfoDesc().c_str());
+
+	return( true );
+}
+
+//---------------------------------------------------------
+wxFont	Get_Font(CSG_Parameter *pFont)
+{
+	wxColour	Colour;
+	wxFont		Font;
+
+	Set_Font(pFont, Font, Colour);
+
+	return( Font );
 }
 
 
@@ -621,12 +706,16 @@ bool		Open_Application(const wxChar *Reference, const wxChar *Mime_Extension)
 
 	if( Reference && Reference[0] )
 	{
-		wxString	Extension;
+		wxString	Extension, sReference(Reference);
 		wxFileType	*pFileType;
 
 		if( Mime_Extension && Mime_Extension[0] )
 		{
 			Extension	= Mime_Extension;
+		}
+		else if( sReference.Find(SG_T("ftp:")) == 0 || sReference.Find(SG_T("http:")) == 0 || sReference.Find(SG_T("https:")) == 0 )
+		{
+			Extension	= wxT("html");
 		}
 		else
 		{

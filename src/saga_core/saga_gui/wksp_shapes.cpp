@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes.cpp 1039 2011-05-04 14:02:25Z oconrad $
+ * Version $Id: wksp_shapes.cpp 1209 2011-11-03 10:16:12Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -121,6 +121,12 @@ wxString CWKSP_Shapes::Get_Description(void)
 	DESC_ADD_STR(LNG("[CAP] Name")				, m_pShapes->Get_Name());
 	DESC_ADD_STR(LNG("[CAP] File")				, m_pShapes->Get_File_Name());
 	DESC_ADD_STR(LNG("[CAP] Projection")		, m_pShapes->Get_Projection().Get_Description().c_str());
+	DESC_ADD_FLT(LNG("[CAP] West")				, m_pShapes->Get_Extent().Get_XMin());
+	DESC_ADD_FLT(LNG("[CAP] East")				, m_pShapes->Get_Extent().Get_XMax());
+	DESC_ADD_FLT(LNG("[CAP] West-East")			, m_pShapes->Get_Extent().Get_XRange());
+	DESC_ADD_FLT(LNG("[CAP] South")				, m_pShapes->Get_Extent().Get_YMin());
+	DESC_ADD_FLT(LNG("[CAP] North")				, m_pShapes->Get_Extent().Get_YMax());
+	DESC_ADD_FLT(LNG("[CAP] South-North")		, m_pShapes->Get_Extent().Get_YRange());
 	DESC_ADD_STR(LNG("[CAP] Modified")			, m_pShapes->is_Modified() ? LNG("[VAL] yes") : LNG("[VAL] no"));
 	DESC_ADD_STR(LNG("[CAP] Type")				, SG_Get_ShapeType_Name(m_pShapes->Get_Type()));
 	DESC_ADD_STR(LNG("[CAP] Vertex Type")		, m_pShapes->Get_Vertex_Type() == 0 ? LNG("X, Y") : m_pShapes->Get_Vertex_Type() == 1 ? LNG("X, Y, Z") : LNG("X, Y, Z, M"));
@@ -603,17 +609,22 @@ void CWKSP_Shapes::_LUT_Create(void)
 	}
 
 	//-----------------------------------------------------
+	CSG_String	sFields;
+
+	for(iField=0; iField<pTable->Get_Field_Count(); iField++)
+	{
+		sFields	+= pTable->Get_Field_Name(iField);	sFields	+= SG_T("|");
+	}
+
+	//-----------------------------------------------------
 	static CSG_Parameters	Parameters;
 
-	if( Parameters.Get_Count() == 0 )
+	if( Parameters.Get_Count() != 0 )
 	{
-		CSG_String	sFields;
-
-		for(iField=0; iField<pTable->Get_Field_Count(); iField++)
-		{
-			sFields	+= pTable->Get_Field_Name(iField);	sFields	+= SG_T("|");
-		}
-
+		Parameters("FIELD")->asChoice()->Set_Items(sFields);
+	}
+	else
+	{
 		Parameters.Create(NULL, LNG("Create Lookup Table"), LNG(""));
 
 		Parameters.Add_Choice(
@@ -938,12 +949,12 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 		{
 			int		Size;
 			double	dSize;
-			wxFont	Font	= *m_Parameters("LABEL_ATTRIB_FONT")->asFont();
+			wxFont	Font	= Get_Font(m_Parameters("LABEL_ATTRIB_FONT"));
 
 			switch( m_Parameters("LABEL_ATTRIB_SIZE_TYPE")->asInt() )
 			{
 			case 0:	default:
-				dSize	= m_iLabel_Size < 0 ? m_Parameters("LABEL_ATTRIB_FONT")->asFont()->GetPointSize() : 1.0;
+				dSize	= m_iLabel_Size < 0 ? Font.GetPointSize() : 1.0;
 				break;
 
 			case 1:

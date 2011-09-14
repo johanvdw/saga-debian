@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Hugget_02.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Hugget_02.cpp 1142 2011-07-29 19:19:17Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -75,12 +75,12 @@ CHugget_02::CHugget_02(void)
 {
 	CSG_Parameter	*pNode;
 
-	Set_Name	(_TL("02: Carbon Cycle Simulation for Terrestrial Biomes"));
+	Set_Name	(_TL("02: Carbon Cycle Simulation for Terrestrial Biomass"));
 
 	Set_Author		(SG_T("(c) 2003 by O.Conrad"));
 
 	Set_Description	(_TW(
-		"Simulation of the Carbon Cycle in Terrestrial Biomes. "
+		"Simulation of the Carbon Cycle in Terrestrial Biomass. "
 
 		"\nReference:"
 		"\nHugget, R.J. (1993): 'Modelling the Human Impact on Nature', Oxford University Press.\n")

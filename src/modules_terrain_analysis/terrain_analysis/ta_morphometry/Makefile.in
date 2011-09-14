@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -79,9 +80,10 @@ am_libta_morphometry_la_OBJECTS = Convergence.lo Convergence_Radius.lo \
 	mass_balance_index.lo Morphometry.lo ProtectionIndex.lo \
 	RealArea.lo ruggedness.lo SurfaceSpecificPoints.lo mrvbf.lo \
 	distance_gradient.lo air_flow_height.lo anisotropic_heating.lo \
-	land_surface_temperature.lo relative_heights.lo wind_effect.lo
+	land_surface_temperature.lo relative_heights.lo tpi.lo \
+	wind_effect.lo
 libta_morphometry_la_OBJECTS = $(am_libta_morphometry_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -152,6 +154,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -247,7 +251,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1107 2011-06-21 14:21:10Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -274,6 +278,7 @@ air_flow_height.cpp\
 anisotropic_heating.cpp\
 land_surface_temperature.cpp\
 relative_heights.cpp\
+tpi.cpp\
 wind_effect.cpp\
 Convergence.h\
 Convergence_Radius.h\
@@ -292,6 +297,7 @@ air_flow_height.h\
 anisotropic_heating.h\
 land_surface_temperature.h\
 relative_heights.h\
+tpi.h\
 wind_effect.h
 
 libta_morphometry_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
@@ -386,6 +392,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrvbf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relative_heights.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ruggedness.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wind_effect.Plo@am__quote@
 
 .cpp.o:

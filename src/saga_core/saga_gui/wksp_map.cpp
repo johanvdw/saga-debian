@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map.cpp 1039 2011-05-04 14:02:25Z oconrad $
+ * Version $Id: wksp_map.cpp 1076 2011-06-01 13:26:06Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -1112,7 +1112,11 @@ void CWKSP_Map::SaveAs_Image_Clipboard(int nx, int ny, int frame)
 	dc.Clear();
 
 	Draw_Map(dc, 1.0, r, false);
-	Draw_Frame(dc, r, frame);
+
+	if( frame > 0 )
+	{
+		Draw_Frame(dc, r, frame);
+	}
 
 	dc.SelectObject(wxNullBitmap);
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters_properties.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: parameters_properties.cpp 1193 2011-10-14 10:51:31Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define GET_DATAOBJECT_LABEL(p)	(!p->is_DataObject() ? wxString::Format(p->Get_Name()) : wxString::Format(wxT("%s %s"), p->is_Input() ? (p->is_Optional() ? wxT(">") : wxT(">>")) : (p->is_Optional() ? wxT("<") : wxT("<<")), p->Get_Name()))
+#define GET_DATAOBJECT_LABEL(p)	(!p->is_DataObject() && !p->is_DataObject_List() ? wxString::Format(p->Get_Name()) : wxString::Format(wxT("%s %s"), p->is_Input() ? (p->is_Optional() ? wxT(">") : wxT(">>")) : (p->is_Optional() ? wxT("<") : wxT("<<")), p->Get_Name()))
 
 
 ///////////////////////////////////////////////////////////
@@ -334,17 +334,20 @@ int CParameters_PG_Choice::_Set_Grid_System(void)
 	{
 		int	index	= pSystems->Get_Count();
 
-		for(int i=0; i<pSystems->Get_Count(); i++)
+		if( m_choices.GetCount() == 0 )
 		{
-			_Append(pSystems->Get_System(i)->Get_Name(), pSystems->Get_System(i)->Get_System());
-
-			if( m_pParameter->asGrid_System()->is_Equal(*pSystems->Get_System(i)->Get_System()) )
+			for(int i=0; i<pSystems->Get_Count(); i++)
 			{
-				index	= i;
-			}
-		}
+				_Append(pSystems->Get_System(i)->Get_Name(), pSystems->Get_System(i)->Get_System());
 
-		_Append(LNG("[VAL] [not set]"));
+				if( m_pParameter->asGrid_System()->is_Equal(*pSystems->Get_System(i)->Get_System()) )
+				{
+					index	= i;
+				}
+			}
+
+			_Append(LNG("[VAL] [not set]"));
+		}
 
 		return( index );
 	}
@@ -581,7 +584,6 @@ bool CParameters_PG_Parameter_Value::Check(void) const
 bool CParameters_PG_Parameter_Value::Do_Dialog(void)
 {
 	bool		bModified	= false;
-	long		Color;
 	wxString	Text;
 
 	if( m_pParameter )
@@ -589,17 +591,6 @@ bool CParameters_PG_Parameter_Value::Do_Dialog(void)
 		switch( m_pParameter->Get_Type() )
 		{
 		default:
-			break;
-
-		case PARAMETER_TYPE_Font:
-			bModified	= DLG_Font			(m_pParameter->asFont(), Color = m_pParameter->asColor());
-
-			if( bModified )
-			{
-				m_pParameter->Set_Value((int)Color);
-
-				return( true );
-			}
 			break;
 
 		case PARAMETER_TYPE_Text:
@@ -672,6 +663,10 @@ bool CParameters_PG_Parameter_Value::Do_Dialog(void)
 		case PARAMETER_TYPE_TIN_List:
 		case PARAMETER_TYPE_PointCloud_List:
 			bModified	= DLG_List			(m_pParameter->Get_Name(), m_pParameter->asList());
+			break;
+
+		case PARAMETER_TYPE_Font:
+			bModified	= DLG_Font			(m_pParameter);
 			break;
 
 		case PARAMETER_TYPE_Colors:

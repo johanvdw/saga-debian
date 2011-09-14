@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1107 2011-06-21 14:21:10Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -105,6 +105,7 @@ const SG_Char * Get_Info(int i)
 #include "relative_heights.h"
 #include "wind_effect.h"
 #include "ruggedness.h"
+#include "tpi.h"
 
 
 //---------------------------------------------------------
@@ -130,6 +131,8 @@ CSG_Module *		Create_Module(int i)
 	case 15:	return( new CWind_Effect );
 	case 16:	return( new CRuggedness_TRI );
 	case 17:	return( new CRuggedness_VRM );
+	case 18:	return( new CTPI );
+	case 19:	return( new CTPI_Classification );
 	}
 
 	return( NULL );

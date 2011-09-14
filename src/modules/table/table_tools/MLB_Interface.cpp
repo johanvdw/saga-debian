@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1169 2011-09-21 16:56:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -97,6 +97,9 @@ const SG_Char * Get_Info(int i)
 #include "Table_Create_Empty.h"
 #include "Table_Rotate.h"
 #include "Table_Enumerate.h"
+#include "Join_Tables.h"
+#include "table_change_date_format.h"
+
 
 
 //---------------------------------------------------------
@@ -104,33 +107,18 @@ const SG_Char * Get_Info(int i)
 
 CSG_Module *		Create_Module(int i)
 {
-	// Don't forget to continuously enumerate the case switches
-	// when adding new modules! Also bear in mind that the
-	// enumeration always has to start with [case 0:] and
-	// that [default:] must return NULL!...
-
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CTable_Create_Empty;
-		break;
-
-	case 1:
-		pModule	= new CTable_Rotate;
-		break;
-
-	case 2:
-		pModule	= new CTable_Enumerate;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	case  0:	return( new CTable_Create_Empty );
+	case  1:	return( new CTable_Rotate );
+	case  2:	return( new CTable_Enumerate );
+	case  3:	return( new CJoin_Tables );
+	case  4:	return( new CJoin_Tables_Shapes );
+	case  5:	return( new CTable_Change_Date_Format );
+	case  6:	return( new CTable_Change_Time_Format );
 	}
 
-	return( pModule );
+	return( NULL );
 }
 
 

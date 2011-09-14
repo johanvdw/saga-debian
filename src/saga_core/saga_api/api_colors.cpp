@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_colors.cpp 1011 2011-04-26 11:53:55Z oconrad $
+ * Version $Id: api_colors.cpp 1189 2011-10-10 13:08:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,8 +77,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define COLORS_SERIAL_VERSION_BINARY	SG_T("SAGA_COLORPALETTE_VERSION_0.100_BINARY")
-#define COLORS_SERIAL_VERSION__ASCII	SG_T("SAGA_COLORPALETTE_VERSION_0.100__ASCII")
+#define COLORS_SERIAL_VERSION_BINARY	"SAGA_COLORPALETTE_VERSION_0.100_BINARY"
+#define COLORS_SERIAL_VERSION__ASCII	"SAGA_COLORPALETTE_VERSION_0.100__ASCII"
 
 
 ///////////////////////////////////////////////////////////
@@ -887,15 +887,19 @@ bool CSG_Colors::Serialize(CSG_File &Stream, bool bSave, bool bBinary)
 			}
 			else
 			{
-				SG_FILE_SCANF(Stream.Get_Stream(), SG_T("%d"), &i);
+				CSG_String	sLine;
 
-				if( i > 0 )
+				if( Stream.Read_Line(sLine) && (i = sLine.asInt()) > 0 )
 				{
 					Set_Count(i);
 
 					for(i=0; i<m_nColors; i++)
 					{
-						SG_FILE_SCANF(Stream.Get_Stream(), SG_T("%d %d %d"), &r, &g, &b);
+						Stream.Read_Line(sLine);
+
+						r	= sLine                      .asInt();
+						g	= sLine.AfterFirst(SG_T(' ')).asInt();
+						b	= sLine.AfterLast (SG_T(' ')).asInt();
 
 						m_Colors[i]	= SG_GET_RGB(r, g, b);
 					}

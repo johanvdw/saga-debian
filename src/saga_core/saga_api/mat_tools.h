@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_tools.h 924 2011-02-21 15:53:42Z oconrad $
+ * Version $Id: mat_tools.h 1238 2011-11-23 08:49:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -287,9 +287,28 @@ public:
 
 	bool						Add_Cols			(int nCols);
 	bool						Add_Rows			(int nRows);
+	bool						Add_Col				(          double *Data = NULL);
+	bool						Add_Col				(          const CSG_Vector &Data);
+	bool						Add_Row				(          double *Data = NULL);
+	bool						Add_Row				(          const CSG_Vector &Data);
+	bool						Ins_Col				(int iCol, double *Data = NULL);
+	bool						Ins_Col				(int iCol, const CSG_Vector &Data);
+	bool						Ins_Row				(int iRow, double *Data = NULL);
+	bool						Ins_Row				(int iRow, const CSG_Vector &Data);
+	bool						Set_Col				(int iCol, double *Data);
+	bool						Set_Col				(int iCol, const CSG_Vector &Data);
+	bool						Set_Row				(int iRow, double *Data);
+	bool						Set_Row				(int iRow, const CSG_Vector &Data);
+	bool						Del_Col				(int iCol);
+	bool						Del_Row				(int iRow);
+	CSG_Vector					Get_Col				(int iCol)		const;
+	CSG_Vector					Get_Row				(int iRow)		const;
 
 	int							Get_NX				(void)			const	{	return( m_nx );			}
+	int							Get_NCols			(void)			const	{	return( m_nx );			}
 	int							Get_NY				(void)			const	{	return( m_ny );			}
+	int							Get_NRows			(void)			const	{	return( m_ny );			}
+
 	double **					Get_Data			(void)			const	{	return( m_z );			}
 	double						operator ()			(int y, int x)	const	{	return( m_z[y][x] );	}
 	double *					operator []			(int y)			const	{	return( m_z[y] );		}
@@ -673,7 +692,7 @@ protected:
 
 	int							m_nValues, m_nBuffer;
 
-	TSG_Point_Z				*m_Values;
+	TSG_Point_Z					*m_Values;
 
 
 	bool						_Create				(double yA, double yB);
@@ -741,6 +760,85 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+typedef enum ESG_Test_Distribution_Type
+{
+	TESTDIST_TYPE_Left	= 0,
+	TESTDIST_TYPE_Right,
+	TESTDIST_TYPE_Middle,
+	TESTDIST_TYPE_TwoTail
+}
+TSG_Test_Distribution_Type;
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Test_Distribution
+{
+public:
+
+	static double			Get_F_Tail_from_R2	(double R2, int nPredictors, int nSamples, TSG_Test_Distribution_Type Type = TESTDIST_TYPE_Right);
+
+	static double			Get_F_Tail			(double F    , int dfn, int dfd, TSG_Test_Distribution_Type Type = TESTDIST_TYPE_Right);
+	static double			Get_F_Inverse		(double alpha, int dfn, int dfd, TSG_Test_Distribution_Type Type = TESTDIST_TYPE_Right);
+
+	static double			Get_T_Tail			(double T    , int df, TSG_Test_Distribution_Type Type = TESTDIST_TYPE_Right);
+	static double			Get_T_Inverse		(double alpha, int df, TSG_Test_Distribution_Type Type = TESTDIST_TYPE_Right);
+
+	static double			Get_Norm_P			(double Z);
+	static double			Get_Norm_Z			(double P);
+
+
+private:
+
+	static double			Get_Gamma			(double F, double dfn, double dfd);
+	static double			Get_Log_Gamma		(double a);
+
+	static double			Get_T_P				(double T, int df);
+	static double			Get_T_Z				(double T, int df);
+	static double			Get_T_Inv			(double p, int df);
+
+	static double			_Change_Tail_Type	(double p, TSG_Test_Distribution_Type from, TSG_Test_Distribution_Type to, bool bNegative);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+// Values: (matrix) array with number of variables = number of rows (x), number of samples = number of columns (y)
+SAGA_API_DLL_EXPORT CSG_Matrix	SG_Get_Correlation_Matrix		(const CSG_Matrix &Values, bool bCovariances = false);
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+typedef enum ESG_Regression_Correction
+{
+	REGRESSION_CORR_None	= 0,
+	REGRESSION_CORR_Smith,
+	REGRESSION_CORR_Wherry_1,
+	REGRESSION_CORR_Wherry_2,
+	REGRESSION_CORR_Olkin_Pratt,
+	REGRESSION_CORR_Pratt,
+	REGRESSION_CORR_Claudy_3
+}
+TSG_Regression_Correction;
+
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT double		SG_Regression_Get_Adjusted_R2	(double R2, int nSamples, int nPredictors, TSG_Regression_Correction Correction = REGRESSION_CORR_Wherry_1);
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 typedef enum ESG_Regression_Type
 {
 	REGRESSION_Linear	= 0,	// Y = a + b * X
@@ -764,11 +862,11 @@ public:
 	void						Set_Values			(int nValues, double *x, double *y);
 	void						Add_Values			(double x, double y);
 
-	int							Get_Count			(void)			{	return( m_nValues );	}
+	int							Get_Count			(void)			const	{	return( m_nValues );	}
 
-	double						Get_xValue			(int iValue)	{	return( iValue >= 0 && iValue < m_nValues ? m_x[iValue] : 0.0 );	}
-	double						Get_yValue			(int iValue)	{	return( iValue >= 0 && iValue < m_nValues ? m_y[iValue] : 0.0 );	}
-	bool						Get_Values			(int iValue, double &x, double &y)
+	double						Get_xValue			(int iValue)	const	{	return( iValue >= 0 && iValue < m_nValues ? m_x[iValue] : 0.0 );	}
+	double						Get_yValue			(int iValue)	const	{	return( iValue >= 0 && iValue < m_nValues ? m_y[iValue] : 0.0 );	}
+	bool						Get_Values			(int iValue, double &x, double &y)	const
 	{
 		if( iValue >= 0 && iValue < m_nValues )
 		{
@@ -781,26 +879,26 @@ public:
 		return( false );
 	}
 
-	double						Get_xMin			(void)			{	return( m_xMin );	}
-	double						Get_xMax			(void)			{	return( m_xMax );	}
-	double						Get_xMean			(void)			{	return( m_xMean );	}
-	double						Get_xVariance		(void)			{	return( m_xVar );	}
-	double						Get_x				(double y);	// returns INF on error, this can be checked using the _finite() function (libc, include <float.h>)...
+	double						Get_xMin			(void)		const	{	return( m_xMin );	}
+	double						Get_xMax			(void)		const	{	return( m_xMax );	}
+	double						Get_xMean			(void)		const	{	return( m_xMean );	}
+	double						Get_xVariance		(void)		const	{	return( m_xVar );	}
+	double						Get_x				(double y)	const;	// returns INF on error, this can be checked using the _finite() function (libc, include <float.h>)...
 
-	double						Get_yMin			(void)			{	return( m_yMin );	}
-	double						Get_yMax			(void)			{	return( m_yMax );	}
-	double						Get_yMean			(void)			{	return( m_yMean );	}
-	double						Get_yVariance		(void)			{	return( m_yVar );	}
-	double						Get_y				(double x);	// returns INF on error, this can be checked using the _finite() function (libc, include <float.h>)...
+	double						Get_yMin			(void)		const	{	return( m_yMin );	}
+	double						Get_yMax			(void)		const	{	return( m_yMax );	}
+	double						Get_yMean			(void)		const	{	return( m_yMean );	}
+	double						Get_yVariance		(void)		const	{	return( m_yVar );	}
+	double						Get_y				(double x)	const;	// returns INF on error, this can be checked using the _finite() function (libc, include <float.h>)...
 
-	double						Get_Constant		(void)			{	return( m_RConst );	}
-	double						Get_Coefficient		(void)			{	return( m_RCoeff );	}
-	double						Get_R				(void)			{	return( m_R );		}
-	double						Get_R2				(void)			{	return( m_R*m_R );	}
+	double						Get_Constant		(void)		const	{	return( m_RConst );	}
+	double						Get_Coefficient		(void)		const	{	return( m_RCoeff );	}
+	double						Get_R				(void)		const	{	return( m_R );		}
+	double						Get_R2				(void)		const	{	return( m_R*m_R );	}
 
 	const SG_Char *				asString			(void);
 
-	TSG_Regression_Type			Get_Type			(void)			{	return( m_Type );	}
+	TSG_Regression_Type			Get_Type			(void)		const	{	return( m_Type );	}
 
 	bool						Calculate			(TSG_Regression_Type Type = REGRESSION_Linear);
 	bool						Calculate			(int nValues, double *x, double *y, TSG_Regression_Type Type = REGRESSION_Linear);
@@ -826,6 +924,26 @@ protected:
 
 };
 
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+enum ESG_Multiple_Regression_Info_Vars
+{
+	MLR_VAR_ID	= 0,
+	MLR_VAR_NAME,
+	MLR_VAR_RCOEFF,
+	MLR_VAR_R,
+	MLR_VAR_R2,
+	MLR_VAR_R2_ADJ,
+	MLR_VAR_SE,
+	MLR_VAR_T,
+	MLR_VAR_SIG,
+	MLR_VAR_P
+};
+
 //---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Regression_Multiple
 {
@@ -835,33 +953,64 @@ public:
 
 	void						Destroy				(void);
 
-	bool						Calculate			(const class CSG_Table &Values);
+	bool						Calculate			(const CSG_Matrix &Samples                           , CSG_Strings *pNames = NULL);
+	bool						Calculate_Forward	(const CSG_Matrix &Samples, double P_in              , CSG_Strings *pNames = NULL);
+	bool						Calculate_Backward	(const CSG_Matrix &Samples, double P_out             , CSG_Strings *pNames = NULL);
+	bool						Calculate_Stepwise	(const CSG_Matrix &Samples, double P_in, double P_out, CSG_Strings *pNames = NULL);
 
-	class CSG_Table *			Get_Result			(void)	{	return( m_pResult );	}
+	CSG_String					Get_Info			(void)			const;
 
-	int							Get_Count			(void);
+	class CSG_Table *			Get_Regression		(void)			const	{	return( m_pRegression );	}
+	class CSG_Table *			Get_Model			(void)			const	{	return( m_pModel );			}
+	class CSG_Table *			Get_Steps			(void)			const	{	return( m_pSteps );			}
 
-	int							Get_Index			(int iOrder);
-	int							Get_Order			(int iVariable);
+	double						Get_R2				(void)			const;
+	double						Get_R2_Adj			(void)			const;
+	double						Get_StdError		(void)			const;
+	double						Get_F				(void)			const;
+	double						Get_P				(void)			const;
+	int							Get_DegFreedom		(void)			const;
+	int							Get_nSamples		(void)			const;
+	int							Get_nPredictors		(void)			const;
+	int							Get_Predictor		(int i)			const	{	return( i >= 0 && i < Get_nPredictors() ? m_Predictor[i] : -1 );	}
 
-	double						Get_RConst			(void);
-	double						Get_RCoeff			(int iVariable, bool bOrdered = false);
-	double						Get_R2				(int iVariable, bool bOrdered = false);
-	double						Get_R2_Change		(int iVariable, bool bOrdered = false);
-	const SG_Char *				Get_Name			(int iVariable, bool bOrdered = false);
+	double						Get_RConst			(void)			const;
+	const SG_Char *				Get_Name			(int iVariable)	const;
+	double						Get_ID				(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_ID    ) );	}
+	double						Get_RCoeff			(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_RCOEFF) );	}
+	double						Get_R2_Partial		(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_R2    ) );	}
+	double						Get_R2_Partial_Adj	(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_R2_ADJ) );	}
+	double						Get_StdError		(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_SE    ) );	}
+	double						Get_T				(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_T     ) );	}
+	double						Get_P				(int iVariable)	const	{	return( Get_Parameter(iVariable, MLR_VAR_SIG   ) );	}
+
+	double						Get_Parameter		(int iVariable, int Parameter)	const;
 
 
 protected:
 
-	class CSG_Table				*m_pResult;
+	int							*m_bIncluded, *m_Predictor, m_nPredictors;
+
+	CSG_Strings					m_Names;
+
+	class CSG_Table				*m_pRegression, *m_pModel, *m_pSteps;
 
 
-	bool						_Get_Regression		(const class CSG_Table &Values);
+	bool						_Initialize			(const CSG_Matrix &Samples, CSG_Strings *pNames, bool bInclude);
 
-	bool						_Get_Correlation	(const class CSG_Table &Values);
-	bool						_Get_Correlation	(int nValues, int nVariables, double **X, double *Y, int &iMax, double &rMax);
+	double						_Get_F				(int nPredictors, int nSamples, double r2_full, double r2_reduced);
+	double						_Get_P				(int nPredictors, int nSamples, double r2_full, double r2_reduced);
 
-	bool						_Eliminate			(int nValues, double *X, double *Y);
+	bool						_Get_Regression		(const class CSG_Matrix &Samples);
+
+	bool						_Set_Step_Info		(const CSG_Matrix &X);
+	bool						_Set_Step_Info		(const CSG_Matrix &X, double R2_prev, int iVariable, bool bIn);
+	int							_Get_Step_In		(CSG_Matrix &X, double P_in , double &R2, const CSG_Matrix &Samples);
+	int							_Get_Step_Out		(CSG_Matrix &X, double P_out, double &R2);
+
+	bool						__Get_Forward		(const class CSG_Matrix &Samples, double p_in);
+	bool						__Get_Forward		(int nSamples, int nPredictors, double **X, double *Y, int &iMax, double &rMax);
+	bool						__Eliminate			(int nSamples, double *X, double *Y);
 
 };
 

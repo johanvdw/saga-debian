@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -77,11 +78,12 @@ libshapes_points_la_DEPENDENCIES =  \
 am_libshapes_points_la_OBJECTS = add_polygon_attributes.lo \
 	AddCoordinates.lo Clip_Points.lo convex_hull.lo CountPoints.lo \
 	CreatePointGrid.lo DistanceMatrix.lo FitNPointsToShape.lo \
-	MLB_Interface.lo points_filter.lo Points_From_Lines.lo \
-	Points_From_Table.lo points_thinning.lo remove_duplicates.lo \
-	select_points.lo separate_by_direction.lo
+	gps_track_aggregation.lo MLB_Interface.lo points_filter.lo \
+	Points_From_Lines.lo Points_From_Table.lo points_thinning.lo \
+	remove_duplicates.lo select_points.lo separate_by_direction.lo \
+	thiessen_polygons.lo
 libshapes_points_la_OBJECTS = $(am_libshapes_points_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -152,6 +154,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -247,7 +251,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 939 2011-02-25 10:36:35Z oconrad $
+# $Id: Makefile.am 1170 2011-09-21 16:57:34Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -265,6 +269,7 @@ CountPoints.cpp\
 CreatePointGrid.cpp\
 DistanceMatrix.cpp\
 FitNPointsToShape.cpp\
+gps_track_aggregation.cpp\
 MLB_Interface.cpp\
 points_filter.cpp\
 Points_From_Lines.cpp\
@@ -273,6 +278,7 @@ points_thinning.cpp\
 remove_duplicates.cpp\
 select_points.cpp\
 separate_by_direction.cpp\
+thiessen_polygons.cpp\
 add_polygon_attributes.h\
 AddCoordinates.h\
 convex_hull.h\
@@ -281,6 +287,7 @@ Clip_Points.h\
 CreatePointGrid.h\
 DistanceMatrix.h\
 FitNPointsToShape.h\
+gps_track_aggregation.h\
 MLB_Interface.h\
 points_filter.h\
 Points_From_Lines.h\
@@ -288,7 +295,8 @@ Points_From_Table.h\
 points_thinning.h\
 remove_duplicates.h\
 select_points.h\
-separate_by_direction.h
+separate_by_direction.h\
+thiessen_polygons.h
 
 libshapes_points_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -376,11 +384,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Points_From_Table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/add_polygon_attributes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convex_hull.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gps_track_aggregation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/points_filter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/points_thinning.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remove_duplicates.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select_points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/separate_by_direction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thiessen_polygons.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

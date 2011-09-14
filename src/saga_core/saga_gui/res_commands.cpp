@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_commands.cpp 1046 2011-05-05 16:13:09Z oconrad $
+ * Version $Id: res_commands.cpp 1125 2011-07-06 09:29:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -99,8 +99,9 @@ const wxChar * CMD_Get_Name(int Cmd_ID)
 	case ID_CMD_FRAME_CLOSE_ALL:		return( LNG("[CMD] Close All") );
 
 	case ID_CMD_FRAME_INFO_SHOW:		return( LNG("[CMD] Show Message Window") );
-	case ID_CMD_FRAME_WKSP_SHOW:		return( LNG("[CMD] Show Workspace") );
+	case ID_CMD_FRAME_DATA_SOURCE_SHOW:	return( LNG("[CMD] Show Data Source Window") );
 	case ID_CMD_FRAME_ACTIVE_SHOW:		return( LNG("[CMD] Show Object Properties") );
+	case ID_CMD_FRAME_WKSP_SHOW:		return( LNG("[CMD] Show Workspace") );
 
 
 	//-----------------------------------------------------
@@ -116,6 +117,8 @@ const wxChar * CMD_Get_Name(int Cmd_ID)
 
 	case ID_CMD_INFO_CLEAR:				return( LNG("[CMD] Clear") );
 	case ID_CMD_INFO_COPY:				return( LNG("[CMD] Copy") );
+
+	case ID_CMD_DATASOURCE_REFRESH:		return( LNG("[CMD] Refresh") );
 
 	case ID_CMD_MODULES_OPEN:			return( LNG("[CMD] Load Module Library") );
 	case ID_CMD_MODULES_SAVE_HTML:		return( LNG("[CMD] Create HTML Documentation") );
@@ -308,8 +311,9 @@ int CMD_Get_ImageID(int Cmd_ID)
 	switch( Cmd_ID )
 	{
 	case ID_CMD_FRAME_WKSP_SHOW:		return( ID_IMG_TB_WKSP );
-	case ID_CMD_FRAME_INFO_SHOW:		return( ID_IMG_TB_INFO );
+	case ID_CMD_FRAME_DATA_SOURCE_SHOW:	return( ID_IMG_TB_ACTIVE );
 	case ID_CMD_FRAME_ACTIVE_SHOW:		return( ID_IMG_TB_ACTIVE );
+	case ID_CMD_FRAME_INFO_SHOW:		return( ID_IMG_TB_INFO );
 	case ID_CMD_FRAME_HELP:				return( ID_IMG_TB_HELP );
 	case ID_CMD_WKSP_OPEN:				return( ID_IMG_TB_OPEN );
 	case ID_CMD_MODULES_OPEN:			return( ID_IMG_TB_OPEN_MODULE );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_edit.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_shapes_edit.cpp 1133 2011-07-14 10:14:12Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ bool CWKSP_Shapes::_Edit_Shape_Start(void)
 //---------------------------------------------------------
 bool CWKSP_Shapes::_Edit_Shape_Stop(void)
 {
-	return( _Edit_Shape_Stop(DLG_Message_Confirm(LNG("[DLG] Save changes?"), LNG("[CAP] Edit Shapes"))) );
+	return( _Edit_Shape_Stop(DLG_Message_Confirm(LNG("[DLG] Apply changes?"), LNG("[CAP] Edit Shapes"))) );
 }
 
 bool CWKSP_Shapes::_Edit_Shape_Stop(bool bSave)

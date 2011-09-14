@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow_Distance.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Flow_Distance.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ CFlow_Distance::~CFlow_Distance(void)
 bool CFlow_Distance::On_Execute(void)
 {
 	bool		bSeeds;
-	int			x, y, n, Method;
+	int			x, y, Method;
 	CSG_Grid	*pSeed;
 
 	//-------------------------------------------------
@@ -187,7 +187,7 @@ bool CFlow_Distance::On_Execute(void)
 	m_pLength	->Assign(0.0);
 
 	//-------------------------------------------------
-	for(n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		m_pDTM->Get_Sorted(n, x, y, true, false);
 

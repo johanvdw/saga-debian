@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -78,7 +79,7 @@ am_libpj_proj4_la_OBJECTS = MLB_Interface.lo crs_assign.lo crs_base.lo \
 	crs_transform.lo crs_transform_grid.lo crs_transform_shapes.lo \
 	PROJ4_Base.lo PROJ4_Grid.lo PROJ4_Shapes.lo
 libpj_proj4_la_OBJECTS = $(am_libpj_proj4_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -149,6 +150,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -244,15 +247,15 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1136 2011-07-19 20:36:16Z reklov_w $
 #
 DEP_LIBS = -lproj
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@DEP_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
-CXX_INCS = -I$(top_srcdir)/src/saga_core
+CXX_INCS = -I$(top_srcdir)/src/saga_core $(LOCAL_INCS)
 AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LIBS)
+AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LIBS) $(LOCAL_LIBS)
 pkglib_LTLIBRARIES = libpj_proj4.la
 libpj_proj4_la_SOURCES = \
 MLB_Interface.cpp\

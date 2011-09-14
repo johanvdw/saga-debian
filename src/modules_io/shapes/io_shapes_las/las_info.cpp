@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: las_info.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: las_info.cpp 1166 2011-09-21 07:20:20Z reklov_w $
  *********************************************************/
 
 
@@ -139,6 +139,28 @@ bool CLAS_Info::On_Execute(void)
         SG_UI_Msg_Add_Error(CSG_String::Format(_TL("Unable to open LAS file!")));
         return (false);
     }
+
+	//-----------------------------------------------------
+	// Check if LAS version is supported
+	liblas::LASReader *pReader;
+	try {
+		pReader = new liblas::LASReader(ifs);
+	}
+	catch(std::exception &e) {
+		SG_UI_Msg_Add_Error(CSG_String::Format(_TL("LAS header exception: %s"), e.what()));
+		ifs.close();
+        return (false);
+	}
+	catch(...) {
+		SG_UI_Msg_Add_Error(CSG_String::Format(_TL("Unknown LAS header exception!")));
+		ifs.close();
+        return (false);
+	}
+	
+	delete (pReader);
+	ifs.clear();
+	//-----------------------------------------------------
+
 
     liblas::LASReader reader(ifs);
 

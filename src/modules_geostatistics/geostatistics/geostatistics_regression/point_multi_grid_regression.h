@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: point_multi_grid_regression.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: point_multi_grid_regression.h 1160 2011-09-14 15:11:54Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,17 +88,14 @@ protected:
 
 private:
 
-	bool						m_bCoords;
-
-	int							m_Interpolation;
-
 	CSG_Regression_Multiple		m_Regression;
 
 
-	bool						Get_Regression		(CSG_Parameter_Grid_List *pGrids, CSG_Shapes *pShapes, int iAttribute);
-	bool						Set_Regression		(CSG_Parameter_Grid_List *pGrids, CSG_Grid *pRegression);
-	bool						Set_Residuals		(CSG_Shapes *pShapes, int iAttribute, CSG_Shapes *pResiduals, CSG_Grid *pRegression);
-	void						Set_Message			(void);
+	bool						Get_Samples			(CSG_Parameter_Grid_List *pGrids, CSG_Shapes *pShapes, int iAttribute, CSG_Matrix &Samples, CSG_Strings &Names);
+
+	bool						Set_Regression		(CSG_Parameter_Grid_List *pGrids, CSG_Grid *pRegression, const CSG_String &Name);
+
+	bool						Set_Residuals		(CSG_Shapes *pShapes, int iAttribute, CSG_Grid *pRegression);
 
 };
 

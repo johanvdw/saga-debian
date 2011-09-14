@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: nn.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: nn.h 1082 2011-06-08 08:07:00Z reklov_w $
  *********************************************************/
 /******************************************************************************
  *
@@ -281,7 +281,7 @@ typedef struct nnai nnai;
  * @param d Delaunay triangulation
  * @return Natural Neighbours interpolation
  */
-nnai* nnai_build(delaunay* d, int n, double* x, double* y);
+nnai* nnai_build(delaunay* d, long n, double* x, double* y);
 
 /** Destroys Natural Neighbours array interpolator.
  *

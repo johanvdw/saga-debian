@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1169 2011-09-21 16:56:01Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -13,11 +13,15 @@ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libtable_tools.la
 libtable_tools_la_SOURCES =\
+Join_Tables.cpp\
 MLB_Interface.cpp\
+table_change_date_format.cpp\
 Table_Create_Empty.cpp\
 Table_Enumerate.cpp\
 Table_Rotate.cpp\
+Join_Tables.h\
 MLB_Interface.h\
+table_change_date_format.h\
 Table_Create_Empty.h\
 Table_Enumerate.h\
 Table_Rotate.h

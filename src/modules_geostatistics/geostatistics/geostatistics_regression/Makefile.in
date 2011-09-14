@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -74,14 +75,15 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libgeostatistics_regression_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libgeostatistics_regression_la_OBJECTS = gw_multi_regression.lo \
-	gw_multi_regression_grid.lo gw_regression.lo \
-	gw_regression_grid.lo MLB_Interface.lo \
+am_libgeostatistics_regression_la_OBJECTS =  \
+	grid_multi_grid_regression.lo gw_multi_regression.lo \
+	gw_multi_regression_grid.lo gw_multi_regression_points.lo \
+	gw_regression.lo gw_regression_grid.lo MLB_Interface.lo \
 	point_grid_regression.lo point_multi_grid_regression.lo \
 	point_trend_surface.lo
 libgeostatistics_regression_la_OBJECTS =  \
 	$(am_libgeostatistics_regression_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -152,6 +154,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -247,7 +251,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1179 2011-09-30 08:21:55Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -257,16 +261,20 @@ AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgeostatistics_regression.la
 libgeostatistics_regression_la_SOURCES = \
+grid_multi_grid_regression.cpp\
 gw_multi_regression.cpp\
 gw_multi_regression_grid.cpp\
+gw_multi_regression_points.cpp\
 gw_regression.cpp\
 gw_regression_grid.cpp\
 MLB_Interface.cpp\
 point_grid_regression.cpp\
 point_multi_grid_regression.cpp\
 point_trend_surface.cpp\
+grid_multi_grid_regression.h\
 gw_multi_regression.h\
 gw_multi_regression_grid.h\
+gw_multi_regression_points.h\
 gw_regression.h\
 gw_regression_grid.h\
 MLB_Interface.h\
@@ -350,8 +358,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_multi_grid_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression_grid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression_points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_regression_grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_grid_regression.Plo@am__quote@

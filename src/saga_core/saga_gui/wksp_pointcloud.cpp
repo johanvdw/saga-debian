@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_pointcloud.cpp 1035 2011-05-03 15:38:58Z oconrad $
+ * Version $Id: wksp_pointcloud.cpp 1168 2011-09-21 08:47:52Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -265,6 +265,17 @@ void CWKSP_PointCloud::On_Create_Parameters(void)
 		PARAMETER_TYPE_Int, 0, 0, true
 	);
 
+	m_Parameters.Add_Choice(
+		m_Parameters("NODE_DISPLAY")	, "DISPLAY_VALUE_AGGREGATE"		, LNG("[CAP] Value Aggregation"),
+		LNG(""),
+		CSG_String::Format(SG_T("%s|%s|%s|%s|"),
+			LNG("first value"),
+			LNG("last value"),
+			LNG("lowest z"),
+			LNG("highest z")
+		), 3
+	);
+
 	//-----------------------------------------------------
 	// Classification...
 
@@ -287,15 +298,14 @@ void CWKSP_PointCloud::On_Create_Parameters(void)
 		LNG("")
 	);
 
-	m_Parameters.Add_Choice(
-		m_Parameters("NODE_METRIC")		, "COLORS_AGGREGATE"		, LNG("[CAP] Value Aggregation"),
-		LNG(""),
-		CSG_String::Format(SG_T("%s|%s|%s|%s|"),
-			LNG("first value"),
-			LNG("last value"),
-			LNG("lowest z"),
-			LNG("highest z")
-		), 1
+	m_Parameters.Add_Node(
+		m_Parameters("NODE_COLORS")		, "NODE_RGB"				, LNG("[CAP] RGB"),
+		LNG("")
+	);
+
+	_AttributeList_Add(
+		m_Parameters("NODE_RGB")		, "RGB_ATTRIB"				, LNG("[CAP] Attribute"),
+		LNG("")
 	);
 
 	m_Parameters("COLORS_TYPE")->Set_Value(CLASSIFY_METRIC);
@@ -313,6 +323,7 @@ void CWKSP_PointCloud::On_DataObject_Changed(void)
 {
 	_AttributeList_Set(m_Parameters("LUT_ATTRIB")			, false);
 	_AttributeList_Set(m_Parameters("METRIC_ATTRIB")		, false);
+	_AttributeList_Set(m_Parameters("RGB_ATTRIB")			, false);
 }
 
 //---------------------------------------------------------
@@ -324,6 +335,7 @@ void CWKSP_PointCloud::On_Parameters_Changed(void)
 	default:	m_Color_Field	= -1;	break;
 	case 1:		m_Color_Field	= m_Parameters("LUT_ATTRIB")   ->asInt();	break;
 	case 2:		m_Color_Field	= m_Parameters("METRIC_ATTRIB")->asInt();	break;
+	case 3:		m_Color_Field	= m_Parameters("RGB_ATTRIB")   ->asInt();	break;
 	}
 
 	if( m_Color_Field >= m_pPointCloud->Get_Field_Count() )
@@ -381,6 +393,7 @@ int CWKSP_PointCloud::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Para
 			pParameters->Get_Parameter("NODE_UNISYMBOL")->Set_Enabled(Value == 0);
 			pParameters->Get_Parameter("NODE_LUT"      )->Set_Enabled(Value == 1);
 			pParameters->Get_Parameter("NODE_METRIC"   )->Set_Enabled(Value == 2);
+			pParameters->Get_Parameter("NODE_RGB"      )->Set_Enabled(Value == 3);
 
 			return( 0 );
 		}
@@ -670,7 +683,7 @@ void CWKSP_PointCloud::_Draw_Point(CWKSP_Map_DC &dc_Map, int x, int y, double z,
 //---------------------------------------------------------
 void CWKSP_PointCloud::_Draw_Points(CWKSP_Map_DC &dc_Map)
 {
-	m_Aggregation	= m_Parameters("COLORS_AGGREGATE")->asInt();
+	m_Aggregation	= m_Parameters("DISPLAY_VALUE_AGGREGATE")->asInt();
 
 	if( m_Aggregation != 1 )
 	{
@@ -681,25 +694,28 @@ void CWKSP_PointCloud::_Draw_Points(CWKSP_Map_DC &dc_Map)
 	//-----------------------------------------------------
 	for(int i=0; i<m_pPointCloud->Get_Count(); i++)
 	{
-		TSG_Point_Z	Point	= m_pPointCloud->Get_Point(i);
-
-		if( dc_Map.m_rWorld.Contains(Point.x, Point.y) )
+		if( !m_pPointCloud->is_NoData(i, m_Color_Field) )
 		{
-			int		x	= (int)dc_Map.xWorld2DC(Point.x);
-			int		y	= (int)dc_Map.yWorld2DC(Point.y);
+			TSG_Point_Z	Point	= m_pPointCloud->Get_Point(i);
 
-			if( m_pPointCloud->is_Selected(i) )
+			if( dc_Map.m_rWorld.Contains(Point.x, Point.y) )
 			{
-				_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_RED   , m_PointSize + 2);
-				_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_YELLOW, m_PointSize);
-			}
-			else
-			{
-				int		Color;
+				int		x	= (int)dc_Map.xWorld2DC(Point.x);
+				int		y	= (int)dc_Map.yWorld2DC(Point.y);
 
-				m_pClassify->Get_Class_Color_byValue(m_pPointCloud->Get_Value(i, m_Color_Field), Color);
+				if( m_pPointCloud->is_Selected(i) )
+				{
+					_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_RED   , m_PointSize + 2);
+					_Draw_Point(dc_Map, x, y, Point.z, SG_COLOR_YELLOW, m_PointSize);
+				}
+				else
+				{
+					int		Color;
 
-				_Draw_Point(dc_Map, x, y, Point.z, Color, m_PointSize);
+					m_pClassify->Get_Class_Color_byValue(m_pPointCloud->Get_Value(i, m_Color_Field), Color);
+
+					_Draw_Point(dc_Map, x, y, Point.z, Color, m_PointSize);
+				}
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -15,7 +15,6 @@ pkglib_LTLIBRARIES = libshapes_tools.la
 libshapes_tools_la_SOURCES =\
 CreateChartLayer.cpp\
 GraticuleBuilder.cpp\
-Polygon_Clipper.cpp\
 MLB_Interface.cpp\
 NewLayerFromSelectedShapes.cpp\
 quadtree_structure.cpp\
@@ -24,7 +23,6 @@ QueryParser.cpp\
 SearchInTable.cpp\
 SelectByTheme.cpp\
 SeparateShapes.cpp\
-Shapes_Assign_Table.cpp\
 Shapes_Create_Empty.cpp\
 Shapes_Merge.cpp\
 TransformShapes.cpp\
@@ -32,12 +30,12 @@ shapes_buffer.cpp\
 shapes_cut.cpp\
 shapes_cut_interactive.cpp\
 shapes_extents.cpp\
+shapes_polar_to_cartes.cpp\
 shapes_split.cpp\
 shapes_split_by_attribute.cpp\
 shapes_split_randomly.cpp\
 CreateChartLayer.h\
 GraticuleBuilder.h\
-Polygon_Clipper.h\
 MLB_Interface.h\
 NewLayerFromSelectedShapes.h\
 quadtree_structure.h\
@@ -46,7 +44,6 @@ QueryParser.h\
 SearchInTable.h\
 SelectByTheme.h\
 SeparateShapes.h\
-Shapes_Assign_Table.h\
 Shapes_Create_Empty.h\
 Shapes_Merge.h\
 TransformShapes.h\
@@ -54,6 +51,7 @@ shapes_buffer.h\
 shapes_cut.h\
 shapes_cut_interactive.h\
 shapes_extents.h\
+shapes_polar_to_cartes.h\
 shapes_split.h\
 shapes_split_by_attribute.h\
 shapes_split_randomly.h

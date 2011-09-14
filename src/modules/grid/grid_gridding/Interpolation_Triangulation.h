@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Interpolation_Triangulation.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Interpolation_Triangulation.h 1130 2011-07-14 07:42:46Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CInterpolation_Triangulation : public CInterpolation  
+class grid_gridding_EXPORT CInterpolation_Triangulation : public CInterpolation  
 {
 public:
 	CInterpolation_Triangulation(void);

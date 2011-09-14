@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: module.h 1225 2011-11-15 16:28:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ protected:
 	//-----------------------------------------------------
 	int							Get_NX					(void)						{	return( Get_System()->Get_NX() );				}
 	int							Get_NY					(void)						{	return( Get_System()->Get_NY() );				}
-	int							Get_NCells				(void)						{	return( Get_System()->Get_NCells() );			}
+	long						Get_NCells				(void)						{	return( Get_System()->Get_NCells() );			}
 	double						Get_Cellsize			(void)						{	return( Get_System()->Get_Cellsize() );			}
 	double						Get_XMin				(void)						{	return( Get_System()->Get_XMin() );				}
 	double						Get_YMin				(void)						{	return( Get_System()->Get_YMin() );				}
@@ -567,9 +567,9 @@ extern "C" _SAGA_DLL_EXPORT CSG_Module_Library_Interface *	MLB_Get_Interface   (
 	return( &MLB_Interface );\
 }\
 \
-extern "C" _SAGA_DLL_EXPORT const SG_Char *					Get_API_Version		(void)\
+extern "C" _SAGA_DLL_EXPORT const SG_Char *					Get_Version			(void)\
 {\
-	return( SAGA_API_VERSION );\
+	return( SAGA_VERSION );\
 }\
 
 //---------------------------------------------------------

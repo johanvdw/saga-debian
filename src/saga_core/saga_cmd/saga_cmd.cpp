@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_cmd.cpp 957 2011-03-24 17:20:37Z oconrad $
+ * Version $Id: saga_cmd.cpp 1225 2011-11-15 16:28:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -84,7 +84,8 @@
 
 #define SYS_ENV_PATH		SG_T("PATH")
 
-#define FLAG_SILENT		SG_T("s")
+#define FLAG_SILENT			SG_T("s")
+#define FLAG_QUIET			SG_T("q")
 #define FLAG_INTERACT		SG_T("i")
 #define FLAG_PROJ			SG_T("p")
 #define FLAG_LANGUAGE		SG_T("l")
@@ -105,6 +106,7 @@ void		Error_Module	(const SG_Char *MLB_Path, const SG_Char *FileName);
 void		Print_Logo		(void);
 void		Print_Execution	(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *ModuleName, const SG_Char *Author);
 void		Print_Help		(void);
+void		Print_Version	(void);
 
 void		Create_Example	(void);
 
@@ -126,7 +128,11 @@ _try
 #endif
 //---------------------------------------------------------
 
+#if wxCHECK_VERSION(2, 8, 11)
+	if( !wxInitialize( argc, argv ) )
+#else
 	if( !wxInitialize() )
+#endif
 	{
 		Print_Error(SG_T("initialisation failed"));
 
@@ -143,6 +149,13 @@ _try
 		if( !s.CmpNoCase(SG_T("-h")) || !s.CmpNoCase(SG_T("--help")) )
 		{
 			Print_Help();
+
+			return( 0 );
+		}
+
+		if( !s.CmpNoCase(SG_T("-v")) || !s.CmpNoCase(SG_T("--version")) )
+		{
+			Print_Version();
 
 			return( 0 );
 		}
@@ -190,6 +203,7 @@ _try
 	SG_Set_UI_Callback(Get_Callback());
 
 	Set_Silent		(Flags.Find(FLAG_SILENT  ) >= 0 ? true : false);
+	Set_Quiet		(Flags.Find(FLAG_QUIET   ) >= 0 ? true : false);
 	Set_Interactive	(Flags.Find(FLAG_INTERACT) >= 0 ? true : false);
 
 	Print_Logo();
@@ -409,7 +423,7 @@ void		Error_Module	(const SG_Char *MLB_Path, const SG_Char *FileName)
 //---------------------------------------------------------
 void		Print_Logo		(void)
 {
-	if( Get_Silent() )
+	if( Get_Quiet() || Get_Silent() )
 		return;
 
 	SG_PRINTF(SG_T("_____________________________________________\n"));
@@ -442,21 +456,23 @@ void		Print_Help		(void)
 	Print_Logo();
 
 	SG_PRINTF(
-		SG_T("SAGA API ") SAGA_API_VERSION SG_T("\n")
-		SG_T("SAGA CMD ") SAGA_CMD_VERSION SG_T("\n")
+		SG_T("Version ") SAGA_VERSION SG_T("\n")
 		SG_T("under GNU General Public License (GPL)\n")
-		SG_T("O.Conrad (C) 2005-10\n")
+		SG_T("O.Conrad (C) 2005-11\n")
 		SG_T("\n")
 		SG_T("Usage:\n")
 		SG_T("\n")
 		SG_T("saga_cmd [-h, --help]\n")
+		SG_T("saga_cmd [-v, --version]\n")
 		SG_T("saga_cmd [-b, --batch]\n")
-		SG_T("saga_cmd [-f, --flags][=silp] <LIBRARY> <MODULE> <module specific options...>\n")
+		SG_T("saga_cmd [-f, --flags][=qsilp] <LIBRARY> <MODULE> <module specific options...>\n")
 		SG_T("\n")
-		SG_T("[-h], [--help ]: help on usage\n")
+		SG_T("[-h], [--help]: help on usage\n")
+		SG_T("[-v], [--version]: print version information\n")
 		SG_T("[-b], [--batch]: create a batch file example\n")
 		SG_T("[-f], [--flags]: various flags for general usage\n")
-		SG_T("  s: silent mode\n")
+		SG_T("  q: quiet mode (no progress report)\n")
+		SG_T("  s: silent mode (no progress and no messages report)\n")
 		SG_T("  i: allow user interaction\n")
 		SG_T("  l: load translation dictionary\n")
 		SG_T("  p: load projections dictionary\n")
@@ -485,6 +501,15 @@ void		Print_Help		(void)
 		SG_T("creates a batch file example. You probably have to edit\n")
 		SG_T("the path definitions to make the batch file run on your\n")
 		SG_T("computer.\n")
+	);
+}
+
+
+//---------------------------------------------------------
+void		Print_Version	(void)
+{
+	SG_PRINTF(
+		SG_T("SAGA Version: ") SAGA_VERSION SG_T("\n")
 	);
 }
 

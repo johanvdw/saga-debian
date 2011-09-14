@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_manager.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_data_manager.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -665,6 +665,7 @@ bool CWKSP_Data_Manager::Open(const wxChar *File_Name)
 	}
 
 	if( SG_File_Cmp_Extension(File_Name, wxT("txt"))
+	||	SG_File_Cmp_Extension(File_Name, wxT("csv"))
 	||	SG_File_Cmp_Extension(File_Name, wxT("dbf")) )
 	{
 		return( Open(DATAOBJECT_TYPE_Table		, File_Name) != NULL );
@@ -770,51 +771,59 @@ CWKSP_Base_Item * CWKSP_Data_Manager::Open(int DataType, const wxChar *FileName)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include "wksp_module_manager.h"
-#include "wksp_module_library.h"
-#include "wksp_module.h"
-
-//---------------------------------------------------------
 bool CWKSP_Data_Manager::Open_GDAL(const wxChar *File_Name)
 {
-	int			i;
-	CSG_Module	*pGDAL	= NULL, *pOGR	= NULL;
+	CSG_Module	*pImport;
 
-	for(i=0; i<g_pModules->Get_Count() && !pGDAL && !pOGR; i++)
+	//-----------------------------------------------------
+	if(	SG_File_Cmp_Extension(File_Name, wxT("bmp"))
+	||	SG_File_Cmp_Extension(File_Name, wxT("gif"))
+	||	SG_File_Cmp_Extension(File_Name, wxT("jpg"))
+	||	SG_File_Cmp_Extension(File_Name, wxT("png"))
+	||	SG_File_Cmp_Extension(File_Name, wxT("pcx")) )
 	{
-		wxFileName	fName(g_pModules->Get_Library(i)->Get_File_Name());
+		pImport	= SG_Get_Module_Library_Manager().Get_Module(SG_T("io_grid_image"), 1);	// Import Image
 
-		if( !fName.GetName().Cmp(SG_T("io_gdal")) || !fName.GetName().Cmp(SG_T("libio_gdal")) )
+		if( pImport && pImport->Get_Parameters()->Set_Parameter(SG_T("FILE"), File_Name, PARAMETER_TYPE_FilePath) && pImport->Execute() )
 		{
-			pGDAL	= g_pModules->Get_Library(i)->Get_Module(0)->Get_Module();	// GDAL_Import
-			pOGR	= g_pModules->Get_Library(i)->Get_Module(3)->Get_Module();	// OGR_Import
+			SG_UI_DataObject_Add(pImport->Get_Parameters()->Get_Parameter(SG_T("OUT_GRID"))->asGrid(), SG_UI_DATAOBJECT_UPDATE_ONLY);
+
+			m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Grid, File_Name);
+
+			return( true );
 		}
 	}
 
-	if( pGDAL && pGDAL->Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) && pGDAL->Execute() )
-	{
-		CSG_Parameter_Grid_List	*pGrids	= pGDAL->Get_Parameters()->Get_Parameter(SG_T("GRIDS"))->asGridList();
+	//-----------------------------------------------------
+	pImport	= SG_Get_Module_Library_Manager().Get_Module(SG_T("io_gdal"), 0);	// GDAL_Import
 
-		for(i=0; i<pGrids->Get_Count(); i++)
+	if( pImport && pImport->Get_Parameters()->Set_Parameter(SG_T("FILES"), File_Name, PARAMETER_TYPE_FilePath) && pImport->Execute() )
+	{
+		CSG_Parameter_Grid_List	*pGrids	= pImport->Get_Parameters()->Get_Parameter(SG_T("GRIDS"))->asGridList();
+
+		for(int i=0; i<pGrids->Get_Count(); i++)
 		{
 			SG_UI_DataObject_Add(pGrids->asGrid(i), SG_UI_DATAOBJECT_UPDATE_ONLY);
-
-			m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Grid, File_Name);
 		}
+
+		m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Grid, File_Name);
 
 		return( true );
 	}
 
-	if( pOGR && pOGR->Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) && pOGR->Execute() )
-	{
-		CSG_Parameter_Shapes_List	*pShapes	= pOGR->Get_Parameters()->Get_Parameter(SG_T("SHAPES"))->asShapesList();
+	//-----------------------------------------------------
+	pImport	= SG_Get_Module_Library_Manager().Get_Module(SG_T("io_gdal"), 3);	// OGR_Import
 
-		for(i=0; i<pShapes->Get_Count(); i++)
+	if( pImport && pImport->Get_Parameters()->Set_Parameter(SG_T("FILES"), File_Name, PARAMETER_TYPE_FilePath) && pImport->Execute() )
+	{
+		CSG_Parameter_Shapes_List	*pShapes	= pImport->Get_Parameters()->Get_Parameter(SG_T("SHAPES"))->asShapesList();
+
+		for(int i=0; i<pShapes->Get_Count(); i++)
 		{
 			SG_UI_DataObject_Add(pShapes->asShapes(i), SG_UI_DATAOBJECT_UPDATE_ONLY);
-
-			m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Shapes, File_Name);
 		}
+
+		m_pMenu_Files->Recent_Add(DATAOBJECT_TYPE_Shapes, File_Name);
 
 		return( true );
 	}
@@ -1359,21 +1368,27 @@ bool CWKSP_Data_Manager::Get_DataObject_List(CSG_Parameters *pParameters)
 
 		pParameters->Destroy();
 
-		for(i=0; i<Get_Grids()->Get_Count(); i++)
+		if( Get_Grids() )
 		{
-			for(j=0; j<Get_Grids()->Get_System(i)->Get_Count(); j++)
+			for(i=0; i<Get_Grids()->Get_Count(); i++)
 			{
-				s.Printf(wxT("GRID_%03d_%03d"), i, j);
-				pParameters->Add_Grid(NULL, s, s, LNG(""), PARAMETER_INPUT)
-					->Set_Value(Get_Grids()->Get_System(i)->Get_Grid(j)->Get_Grid());
+				for(j=0; j<Get_Grids()->Get_System(i)->Get_Count(); j++)
+				{
+					s.Printf(wxT("GRID_%03d_%03d"), i, j);
+					pParameters->Add_Grid(NULL, s, s, LNG(""), PARAMETER_INPUT)
+						->Set_Value(Get_Grids()->Get_System(i)->Get_Grid(j)->Get_Grid());
+				}
 			}
 		}
 
-		for(i=0; i<Get_PointClouds()->Get_Count(); i++)
+		if( Get_PointClouds() )
 		{
-			s.Printf(wxT("POINTCLOUD_%03d"), i);
-			pParameters->Add_PointCloud(NULL, s, s, LNG(""), PARAMETER_INPUT)
-				->Set_Value(Get_PointClouds()->Get_PointCloud(i)->Get_PointCloud());
+			for(i=0; i<Get_PointClouds()->Get_Count(); i++)
+			{
+				s.Printf(wxT("POINTCLOUD_%03d"), i);
+				pParameters->Add_PointCloud(NULL, s, s, LNG(""), PARAMETER_INPUT)
+					->Set_Value(Get_PointClouds()->Get_PointCloud(i)->Get_PointCloud());
+			}
 		}
 
 		if( (pShapes = Get_Shapes()->Get_Shapes_Type(SHAPE_TYPE_Point)) != NULL )
@@ -1416,11 +1431,14 @@ bool CWKSP_Data_Manager::Get_DataObject_List(CSG_Parameters *pParameters)
 			}
 		}
 
-		for(i=0; i<Get_Tables()->Get_Count(); i++)
+		if( Get_Tables() )
 		{
-			s.Printf(wxT("TABLE_%03d"), i);
-			pParameters->Add_Table(NULL, s, s, LNG(""), PARAMETER_INPUT)
-				->Set_Value(Get_Tables()->Get_Table(i)->Get_Table());
+			for(i=0; i<Get_Tables()->Get_Count(); i++)
+			{
+				s.Printf(wxT("TABLE_%03d"), i);
+				pParameters->Add_Table(NULL, s, s, LNG(""), PARAMETER_INPUT)
+					->Set_Value(Get_Tables()->Get_Table(i)->Get_Table());
+			}
 		}
 
 		return( true );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_driver.h 1050 2011-05-09 07:59:08Z oconrad $
+ * Version $Id: gdal_driver.h 1108 2011-06-22 11:16:21Z johanvdw $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -141,8 +141,8 @@ public:
 	void						Get_Transform		(CSG_Vector &A, CSG_Matrix &B)	const	{	A	= m_TF_A;	B	= m_TF_B;	}
 
 	class GDALDriver *			Get_Driver			(void)	const;
-	const char *				Get_Name			(void)	const;
-	const char *				Get_Description		(void)	const;
+	const CSG_String			Get_Name			(void)	const;
+	const CSG_String			Get_Description		(void)	const;
 	const char *				Get_Projection		(void)	const;
 	const char **				Get_MetaData		(const char *pszDomain = "")	const;
 	const char *				Get_MetaData_Item	(const char *pszName, const char *pszDomain = "")	const;

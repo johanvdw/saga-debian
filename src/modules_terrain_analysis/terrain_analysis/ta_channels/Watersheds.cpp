@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Watersheds.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Watersheds.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -127,7 +127,8 @@ CWatersheds::~CWatersheds(void)
 //---------------------------------------------------------
 bool CWatersheds::On_Execute(void)
 {
-	int		x, y, n, nCells, nCells_Min, nBasins;
+	int		x, y, nCells, nCells_Min, nBasins;
+	long	n;
 	CSG_Grid	*pDTM, *pSeed, *pRoute;
 
 	//-----------------------------------------------------

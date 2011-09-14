@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_memory.cpp 923 2011-02-21 15:52:27Z oconrad $
+ * Version $Id: api_memory.cpp 1159 2011-09-14 15:09:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -782,7 +782,7 @@ bool CSG_Bytes::fromHexString(const CSG_String &HexString)
 
 	for(size_t i=0; i<HexString.Length(); i+=2, s+=2)
 	{
-		Add(SG_Hex_to_Byte(s[1]) + 16 * SG_Hex_to_Byte(s[0]));
+		Add((BYTE)(SG_Hex_to_Byte(s[1]) + 16 * SG_Hex_to_Byte(s[0])));
 	}
 
 	return( true );

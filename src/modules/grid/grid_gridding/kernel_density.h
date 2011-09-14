@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: kernel_density.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: kernel_density.h 1130 2011-07-14 07:42:46Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CKernel_Density : public CSG_Module  
+class grid_gridding_EXPORT CKernel_Density : public CSG_Module  
 {
 public:
 	CKernel_Density(void);

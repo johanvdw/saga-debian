@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 939 2011-02-25 10:36:35Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1170 2011-09-21 16:57:34Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -106,6 +106,8 @@ const SG_Char * Get_Info(int i)
 #include "convex_hull.h"
 #include "select_points.h"
 #include "points_thinning.h"
+#include "thiessen_polygons.h"
+#include "gps_track_aggregation.h"
 
 
 //---------------------------------------------------------
@@ -130,6 +132,9 @@ CSG_Module *		Create_Module(int i)
 	case 12:	return( new CConvex_Hull );
 	case 13:	return( new CSelect_Points );
 	case 14:	return( new CPoints_Thinning );
+	case 15:	return( new CPoints_From_MultiPoints );
+	case 16:	return( new CThiessen_Polygons );
+	case 17:	return( new CGPS_Track_Aggregation );
 	}
 
 	return( NULL );

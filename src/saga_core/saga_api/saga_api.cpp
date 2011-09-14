@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_api.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: saga_api.cpp 1225 2011-11-15 16:28:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@
 //---------------------------------------------------------
 const SG_Char *	SAGA_API_Get_Version(void)
 {
-	return( SG_T("SAGA Application Programming Interface - Version: ") SAGA_API_VERSION );
+	return( SG_T("SAGA Application Programming Interface - Version: ") SAGA_VERSION );
 }
 
 

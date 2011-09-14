@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: topmodel.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: topmodel.h 1174 2011-09-23 14:40:37Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,16 +96,18 @@ protected:
 
 private:
 
+	int					m_fP, m_fET, m_fTime;
+
 	double				dTime, inf_cumf, inf_bPonding;
 
-	CSG_Table				*pClimate;
+	CSG_Table			*m_pWeather;
 
 	CTOPMODEL_Values	Vals;
 
 
 	void				Run(double Evaporation, double Infiltration, double Infiltration_Excess);
 
-	bool				Get_Climate(int iTimeStep, double &Precipitation, double &Evaporation);
+	bool				Get_Weather(int iTimeStep, double &Precipitation, double &Evaporation, CSG_String &Date);
 	double				Get_Infiltration(double t, double R);
 
 };

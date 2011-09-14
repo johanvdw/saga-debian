@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_drop_attribute.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pc_drop_attribute.h 1163 2011-09-16 07:38:07Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,6 +96,9 @@ protected:
 
 
 private:
+
+	void						Set_Display_Attributes(CSG_PointCloud *pPC, CSG_Parameters &sParms);
+
 
 };
 
