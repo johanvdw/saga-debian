@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: KinWav_D8.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: KinWav_D8.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -198,7 +198,7 @@ bool CKinWav_D8::On_Execute(void)
 	//-----------------------------------------------------
 	if( Initialize(Roughness) )
 	{
-		int		x, y, n;
+		int		x, y;
 		double	Time, Time_Span;
 
 		Gauges_Initialise();
@@ -216,7 +216,7 @@ bool CKinWav_D8::On_Execute(void)
 
 			m_pFlow->Assign(0.0);
 
-			for(n=0; n<m_pDEM->Get_NCells() && Process_Get_Okay(false); n++)
+			for(long n=0; n<m_pDEM->Get_NCells() && Process_Get_Okay(false); n++)
 			{
 				if( m_pDEM->Get_Sorted(n, x, y) )
 				{

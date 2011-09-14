@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_dialogs.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: res_dialogs.cpp 1169 2011-09-21 16:56:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -186,18 +186,36 @@ const wxString DLG_Get_FILE_Filter(int ID_DLG)
 {
 	switch( ID_DLG )
 	{
+	case ID_DLG_ALLFILES_OPEN:
+		return( wxString::Format(
+			wxT("%s|*.sprj;*.mlb;*.dll;*.so;*sgrd;*.dgm;*.grd;*.shp;*.spc;*.txt;*.csv;*.dbf;*.bmp;*.gif;*.jpg;*.png;*.pcx;*.tif;*.img;*.asc;*.flt;*.bil|")
+			wxT("%s (*.sprj)|*.sprj|")
+			wxT("%s (*.sgrd)|*.sgrd;*.dgm;*.grd|")
+			wxT("%s (*.shp)|*.shp|")
+			wxT("%s (*.txt, *.csv, *.dbf)|*.txt;*.csv;*.dbf|")
+			wxT("%s (*.spc)|*.spc|")
+			wxT("%s|*.*"),
+			LNG("Recognised Files"),
+			LNG("SAGA Projects"),
+			LNG("Grids"),
+			LNG("ESRI Shape Files"),
+			LNG("Tables"),
+			LNG("Point Clouds"),
+			LNG("All Files")
+		));
+
 	case ID_DLG_WKSP_OPEN:
 		return( wxString::Format(
-			wxT("%s|*.sprj;*.mlb;*.dll;*.so;*sgrd;*.dgm;*.grd;*.shp;*.spc;*.txt;*.dbf|")
+			wxT("%s|*.sprj;*.mlb;*.dll;*.so;*sgrd;*.dgm;*.grd;*.shp;*.spc;*.txt;*.csv;*.dbf|")
 			wxT("%s (*.sprj)|*.sprj|")
 			wxT("%s (*.dll, *.so)|*.dll;*.so;*.mlb|")
 			wxT("%s (*.sgrd)|*.sgrd;*.dgm;*.grd|")
 			wxT("%s (*.shp)|*.shp|")
-			wxT("%s (*.txt, *.dbf)|*.txt;*.dbf|")
+			wxT("%s (*.txt, *.csv, *.dbf)|*.txt;*.csv;*.dbf|")
 			wxT("%s (*.spc)|*.spc|")
 			wxT("%s|*.*"),
 			LNG("All Recognised Files"),
-			LNG("SAGA Project"),
+			LNG("SAGA Projects"),
 			LNG("SAGA Module Libraries"),
 			LNG("Grids"),
 			LNG("ESRI Shape Files"),
@@ -250,7 +268,7 @@ const wxString DLG_Get_FILE_Filter(int ID_DLG)
 
 	case ID_DLG_TABLES_OPEN:
 		return( wxString::Format(
-			wxT("%s (*.txt, *.dbf)|*.txt;*.dbf|")
+			wxT("%s (*.txt, *.csv, *.dbf)|*.txt;*.csv;*.dbf|")
 			wxT("%s|*.*"),
 			LNG("Tables"),
 			LNG("All Files")
@@ -259,9 +277,11 @@ const wxString DLG_Get_FILE_Filter(int ID_DLG)
 	case ID_DLG_TABLES_SAVE:
 		return( wxString::Format(
 			wxT("%s (*.txt)|*.txt|")
+			wxT("%s (*.csv)|*.csv|")
 			wxT("%s (*.dbf)|*.dbf|")
 			wxT("%s|*.*"),
 			LNG("Text"),
+			LNG("Comma Separated Values"),
 			LNG("DBase"),
 			LNG("All Files")
 		));
@@ -534,21 +554,25 @@ bool		DLG_Color(long &_Colour)
 }
 
 //---------------------------------------------------------
-bool		DLG_Font(wxFont *pFont, long &_Colour)
+bool		DLG_Font(CSG_Parameter *pFont)
 {
-	wxColour		Colour(SG_GET_R(_Colour), SG_GET_G(_Colour), SG_GET_B(_Colour));
-	wxFontDialog	dlg(MDI_Get_Top_Window());
+	wxFont		Font;
+	wxColour	Colour;
 
-	dlg.GetFontData().SetInitialFont(*pFont);
-	dlg.GetFontData().SetColour(Colour);
-
-	if( dlg.ShowModal() == wxID_OK )
+	if( Set_Font(pFont, Font, Colour) )
 	{
-		*pFont	= dlg.GetFontData().GetChosenFont();
-		Colour	= dlg.GetFontData().GetColour();
-		_Colour	= Get_Color_asInt(Colour);
+		wxFontDialog	dlg(MDI_Get_Top_Window());
 
-		return( true );
+		dlg.GetFontData().SetInitialFont(Font);
+		dlg.GetFontData().SetColour     (Colour);
+
+		if( dlg.ShowModal() == wxID_OK )
+		{
+			Font	= dlg.GetFontData().GetChosenFont();
+			Colour	= dlg.GetFontData().GetColour();
+
+			return( Set_Font(Font, Colour, pFont) );
+		}
 	}
 
 	return( false );

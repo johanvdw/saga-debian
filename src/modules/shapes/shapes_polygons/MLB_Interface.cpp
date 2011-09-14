@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 955 2011-03-22 17:05:16Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1064 2011-05-18 12:47:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ const SG_Char * Get_Info(int i)
 #include "shape_index.h"
 #include "polygon_line_intersection.h"
 #include "polygon_to_edges_nodes.h"
+#include "polygon_split_parts.h"
 
 
 //---------------------------------------------------------
@@ -113,16 +114,17 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case 0:		return( new CPolygon_Intersection );
-	case 1:		return( new CPolygon_Centroids );
-	case 2:		return( new CPolygon_Geometrics );
-	case 3:		return( new CPolygons_From_Lines );
-	case 4:		return( new CPolygonStatisticsFromPoints );
-	case 5:		return( new CPolygon_Dissolve );
-	case 6:		return( new CPolygon_To_Points );
-	case 7:		return( new CShape_Index );
-	case 8:		return( new CPolygon_Line_Intersection );
-	case 9:		return( new CPolygon_to_Edges_Nodes );
+	case  0:	return( new CPolygon_Intersection );
+	case  1:	return( new CPolygon_Centroids );
+	case  2:	return( new CPolygon_Geometrics );
+	case  3:	return( new CPolygons_From_Lines );
+	case  4:	return( new CPolygonStatisticsFromPoints );
+	case  5:	return( new CPolygon_Dissolve );
+	case  6:	return( new CPolygon_To_Points );
+	case  7:	return( new CShape_Index );
+	case  8:	return( new CPolygon_Line_Intersection );
+	case  9:	return( new CPolygon_to_Edges_Nodes );
+	case 10:	return( new CPolygon_Split_Parts );
 	}
 
 	return( NULL );

@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -75,16 +76,16 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libshapes_tools_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libshapes_tools_la_OBJECTS = CreateChartLayer.lo \
-	GraticuleBuilder.lo Polygon_Clipper.lo MLB_Interface.lo \
+	GraticuleBuilder.lo MLB_Interface.lo \
 	NewLayerFromSelectedShapes.lo quadtree_structure.lo \
 	QueryBuilder.lo QueryParser.lo SearchInTable.lo \
-	SelectByTheme.lo SeparateShapes.lo Shapes_Assign_Table.lo \
-	Shapes_Create_Empty.lo Shapes_Merge.lo TransformShapes.lo \
-	shapes_buffer.lo shapes_cut.lo shapes_cut_interactive.lo \
-	shapes_extents.lo shapes_split.lo shapes_split_by_attribute.lo \
-	shapes_split_randomly.lo
+	SelectByTheme.lo SeparateShapes.lo Shapes_Create_Empty.lo \
+	Shapes_Merge.lo TransformShapes.lo shapes_buffer.lo \
+	shapes_cut.lo shapes_cut_interactive.lo shapes_extents.lo \
+	shapes_polar_to_cartes.lo shapes_split.lo \
+	shapes_split_by_attribute.lo shapes_split_randomly.lo
 libshapes_tools_la_OBJECTS = $(am_libshapes_tools_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -155,6 +156,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -250,7 +253,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -262,7 +265,6 @@ pkglib_LTLIBRARIES = libshapes_tools.la
 libshapes_tools_la_SOURCES = \
 CreateChartLayer.cpp\
 GraticuleBuilder.cpp\
-Polygon_Clipper.cpp\
 MLB_Interface.cpp\
 NewLayerFromSelectedShapes.cpp\
 quadtree_structure.cpp\
@@ -271,7 +273,6 @@ QueryParser.cpp\
 SearchInTable.cpp\
 SelectByTheme.cpp\
 SeparateShapes.cpp\
-Shapes_Assign_Table.cpp\
 Shapes_Create_Empty.cpp\
 Shapes_Merge.cpp\
 TransformShapes.cpp\
@@ -279,12 +280,12 @@ shapes_buffer.cpp\
 shapes_cut.cpp\
 shapes_cut_interactive.cpp\
 shapes_extents.cpp\
+shapes_polar_to_cartes.cpp\
 shapes_split.cpp\
 shapes_split_by_attribute.cpp\
 shapes_split_randomly.cpp\
 CreateChartLayer.h\
 GraticuleBuilder.h\
-Polygon_Clipper.h\
 MLB_Interface.h\
 NewLayerFromSelectedShapes.h\
 quadtree_structure.h\
@@ -293,7 +294,6 @@ QueryParser.h\
 SearchInTable.h\
 SelectByTheme.h\
 SeparateShapes.h\
-Shapes_Assign_Table.h\
 Shapes_Create_Empty.h\
 Shapes_Merge.h\
 TransformShapes.h\
@@ -301,6 +301,7 @@ shapes_buffer.h\
 shapes_cut.h\
 shapes_cut_interactive.h\
 shapes_extents.h\
+shapes_polar_to_cartes.h\
 shapes_split.h\
 shapes_split_by_attribute.h\
 shapes_split_randomly.h
@@ -384,13 +385,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GraticuleBuilder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NewLayerFromSelectedShapes.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Clipper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QueryBuilder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QueryParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SearchInTable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SelectByTheme.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SeparateShapes.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes_Assign_Table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes_Create_Empty.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes_Merge.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransformShapes.Plo@am__quote@
@@ -399,6 +398,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_cut_interactive.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_extents.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_polar_to_cartes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_split.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_split_by_attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_split_randomly.Plo@am__quote@

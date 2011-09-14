@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Hypsometry.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Hypsometry.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -294,7 +294,8 @@ bool CHypsometry::Calculate_A(CSG_Grid *pDEM, CSG_Table *pTable, bool bDown, int
 //---------------------------------------------------------
 bool CHypsometry::Calculate_B(CSG_Grid *pDEM, CSG_Table *pTable, bool bDown, int nClasses, double zMin, double zMax)
 {
-	int		x, y, i, n, nStep, nMin, nMax, nRange;
+	int		x, y, i;
+	long	n, nMin, nMax, nStep, nRange;
 	double	z, zRange;
 
 	//-----------------------------------------------------

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SurfaceSpecificPoints.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: SurfaceSpecificPoints.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -396,7 +396,7 @@ void CSurfaceSpecificPoints::Do_FlowDirection2(CSG_Grid *pGrid, CSG_Grid *pResul
 
 	Do_FlowDirection(&Grid, pResult);
 
-	for(int n=0; n<Get_NCells(); n++)
+	for(long n=0; n<Get_NCells(); n++)
 	{
 		pResult->Add_Value(n, -Result.asInt(n));
 	}

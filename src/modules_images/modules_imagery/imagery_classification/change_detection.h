@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: change_detection.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: change_detection.h 1128 2011-07-07 08:22:51Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,7 +88,9 @@ public:
 
 protected:
 
-	virtual bool			On_Execute		(void);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool			On_Execute				(void);
 
 
 private:

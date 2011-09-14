@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: otlv4.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: otlv4.h 1100 2011-06-17 00:47:16Z johanvdw $
  *********************************************************/
 // =================================================================================
 // ORACLE, ODBC and DB2/CLI Template Library, Version 4.0.210,
@@ -47,6 +47,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 
 //======================= CONFIGURATION #DEFINEs ===========================
 

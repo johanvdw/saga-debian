@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Enumerate.cpp 941 2011-02-25 15:17:11Z oconrad $
+ * Version $Id: Table_Enumerate.cpp 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ CTable_Enumerate::CTable_Enumerate(void)
 {
 	CSG_Parameter	*pNode;
 
-	Set_Name(_TL("Enumerate a Table"));
+	Set_Name(_TL("Enumerate Table Field"));
 
 	Set_Description(_TW(
 		"Enumerate attribute of a table, i.e. assign to identical values of choosen attribute field unique identifiers."

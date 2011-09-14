@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1153 2011-09-01 13:20:33Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ const SG_Char * Get_Info(int i)
 #include "bmp_export.h"
 #include "erdas_lan.h"
 #include "grid_table.h"
+#include "wrf.h"
 
 
 //---------------------------------------------------------
@@ -126,6 +127,8 @@ CSG_Module *		Create_Module(int i)
 	case 10:	return( new CBMP_Export );
 	case 11:	return( new CErdas_LAN_Import );
 	case 12:	return( new CGrid_Table_Import );
+	case 13:	return( new CWRF_Import );
+	case 14:	return( new CWRF_Export );
 	}
 
 	return( NULL );

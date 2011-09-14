@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid.cpp 1017 2011-04-27 18:42:58Z oconrad $
+ * Version $Id: grid.cpp 1231 2011-11-22 11:14:49Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -343,7 +343,7 @@ void CSG_Grid::_Set_Properties(TSG_Data_Type Type, int NX, int NY, double Cellsi
 	switch( m_Type )
 	{
 	case SG_DATATYPE_Bit:		Set_NoData_Value(          0.0);	break;
-	case SG_DATATYPE_Byte:		Set_NoData_Value(        255.0);	break;
+	case SG_DATATYPE_Byte:		Set_NoData_Value(       -127.0);	break;
 	case SG_DATATYPE_Char:		Set_NoData_Value(       -127.0);	break;
 	case SG_DATATYPE_Word:		Set_NoData_Value(      65535.0);	break;
 	case SG_DATATYPE_Short:		Set_NoData_Value(     -32767.0);	break;
@@ -1043,7 +1043,7 @@ double CSG_Grid::Get_Variance(void)
 	Update();	return( m_zStats.Get_Variance() );
 }
 
-int CSG_Grid::Get_NoData_Count(void)
+long CSG_Grid::Get_NoData_Count(void)
 {
 	Update();	return( Get_NCells() - m_zStats.Get_Count() );
 }
@@ -1207,9 +1207,9 @@ bool CSG_Grid::Set_Index(bool bOn)
 
 bool CSG_Grid::_Set_Index(void)
 {
-	const int	M	= 7;
+	const long	M	= 7;
 
-	int		i, j, k, l, ir, n, nCells, *istack, jstack, nstack, indxt, itemp;
+	long	i, j, k, l, ir, n, nCells, *istack, jstack, nstack, indxt, itemp;
 	double	a;
 
 	//-----------------------------------------------------
@@ -1260,7 +1260,7 @@ bool CSG_Grid::_Set_Index(void)
 	ir		= Get_NCells() - 1;
 
 	nstack	= 64;
-	istack	= (int *)SG_Malloc(nstack * sizeof(int));
+	istack	= (long *)SG_Malloc(nstack * sizeof(long));
 	jstack	= 0;
 
 	for(;;)
@@ -1342,7 +1342,7 @@ bool CSG_Grid::_Set_Index(void)
 			if( jstack >= nstack )
 			{
 				nstack	+= 64;
-				istack	= (int *)SG_Realloc(istack, nstack * sizeof(int));
+				istack	= (long *)SG_Realloc(istack, nstack * sizeof(int));
 			}
 
 			if( ir - i + 1 >= j - l )

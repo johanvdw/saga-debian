@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Calculator.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Calculator.h 1195 2011-10-14 11:29:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,6 +86,11 @@ protected:
 	virtual int		On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	virtual bool	On_Execute				(void);
+
+
+private:
+
+	CSG_String		Get_Formula				(CSG_String sFormula, int nGrids, int nXGrids);
 
 };
 

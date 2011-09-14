@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 955 2011-03-22 17:05:16Z oconrad $
+# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -17,11 +17,11 @@ MLB_Interface.cpp\
 Polygon_Centroids.cpp\
 Polygon_Geometrics.cpp\
 Polygon_Intersection.cpp\
-Polygon_Clipper.cpp\
 Polygon_StatisticsFromPoints.cpp\
 Polygon_Union.cpp\
 Polygons_From_Lines.cpp\
 polygon_line_intersection.cpp\
+polygon_split_parts.cpp\
 polygon_to_edges_nodes.cpp\
 polygon_to_points.cpp\
 shape_index.cpp\
@@ -29,11 +29,11 @@ MLB_Interface.h\
 Polygon_Centroids.h\
 Polygon_Geometrics.h\
 Polygon_Intersection.h\
-Polygon_Clipper.h\
 Polygon_StatisticsFromPoints.h\
 Polygon_Union.h\
 Polygons_From_Lines.h\
 polygon_line_intersection.h\
+polygon_split_parts.h\
 polygon_to_edges_nodes.h\
 polygon_to_points.h\
 shape_index.h

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 985 2011-04-07 14:42:47Z oconrad $
+ * Version $Id: module_library.h 1198 2011-10-21 12:21:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ private:
 
 
 	void						_Set_CMD				(class CSG_Parameters *pParameters, bool bExtra);
-	bool						_Get_CMD				(class CSG_Parameters *pParameters);
+	bool						_Get_CMD				(class CSG_Parameters *pParameters, bool bNoDataObjects);
 
 	bool						_Create_DataObjects		(class CSG_Parameters *pParameters);
 	bool						_Create_DataObject		(class CSG_Parameter *pParameter, const wxChar *FileName);

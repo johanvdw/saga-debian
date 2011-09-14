@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: nnai.c 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: nnai.c 1082 2011-06-08 08:07:00Z reklov_w $
  *********************************************************/
 /******************************************************************************
  *
@@ -62,7 +62,7 @@ void nnpi_set_point(nnpi* nn, point* p);
  * @param d Delaunay triangulation
  * @return Natural Neighbours interpolation
  */
-nnai* nnai_build(delaunay* d, int n, double* x, double* y)
+nnai* nnai_build(delaunay* d, long n, double* x, double* y)
 {
     nnai* nn = (nnai *)malloc(sizeof(nnai));
     nnpi* nnpi = nnpi_create(d);

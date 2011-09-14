@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: fast_representativeness.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: fast_representativeness.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -254,8 +254,8 @@ void CFast_Representativeness::FastRep_Initialize(void)
 	double logNx2,logNy2;
 	int pow2y, pow2x;
 	int x,y;
-	int i;
-	int size;
+	long i;
+	long size;
 
 	logNx2	= log((double)pOrgInput->Get_NX())/log(2.0f);
 	

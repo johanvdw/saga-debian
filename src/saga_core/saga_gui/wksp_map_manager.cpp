@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_manager.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_map_manager.cpp 1076 2011-06-01 13:26:06Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ CWKSP_Map_Manager::CWKSP_Map_Manager(void)
 		LNG(""),
 		PARAMETER_TYPE_Int,
 		CONFIG_Read(wxT("/MAPS"), wxT("CLIP_FRAME"), lValue) ? lValue : 17,
-		5, true
+		0, true
 	);
 
 	m_Parameters.Add_Value(

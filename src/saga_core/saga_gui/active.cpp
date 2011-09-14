@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: active.cpp 1119 2011-06-29 12:13:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -71,6 +71,8 @@
 #include "res_images.h"
 
 #include "helper.h"
+
+#include "data_source.h"
 
 #include "active.h"
 #include "active_parameters.h"
@@ -210,6 +212,11 @@ bool CACTIVE::Set_Active(CWKSP_Base_Item *pItem)
 	if( pItem == m_pItem )
 	{
 		return( true );
+	}
+
+	if( g_pData_Source )
+	{
+		g_pData_Source->Set_Data_Source(pItem);
 	}
 
 	//-----------------------------------------------------

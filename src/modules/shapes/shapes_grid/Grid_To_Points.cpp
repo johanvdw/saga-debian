@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_To_Points.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_To_Points.cpp 1096 2011-06-16 16:01:39Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@
 CGrid_To_Points::CGrid_To_Points(void)
 {
 	//-----------------------------------------------------
-	Set_Name		(_TL("Grid Values to Shapes"));
+	Set_Name		(_TL("Grid Values to Points"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2001"));
 

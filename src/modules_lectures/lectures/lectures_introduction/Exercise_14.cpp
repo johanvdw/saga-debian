@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Exercise_14.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Exercise_14.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -258,9 +258,9 @@ bool CExercise_14::Initialise(int Threshold)
 //---------------------------------------------------------
 void CExercise_14::Find_Channels(void)
 {
-	int		n, x, y;
+	int		x, y;
 
-	for(n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
+	for(long n=0; n<Get_NCells() && Set_Progress_NCells(n); n++)
 	{
 		if( m_pDTM->Get_Sorted(n, x, y, true) && m_pChnl->asInt(x, y) == SPRING )
 		{

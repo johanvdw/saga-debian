@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_scatterplot.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_scatterplot.cpp 1101 2011-06-17 12:52:42Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -481,8 +481,8 @@ void CVIEW_ScatterPlot::Draw(wxDC &dc, wxRect r)
 
 	r	= _Draw_Get_rDiagram(r);
 
-	dc.SetFont				(*m_Parameters("FONT")->asFont());
-	dc.SetTextForeground	( m_Parameters("FONT")->asColor());
+	dc.SetFont				(Get_Font(m_Parameters("FONT")));
+	dc.SetTextForeground	(m_Parameters("FONT")->asColor());
 
 	if( m_Regression.Get_Count() > 1 )
 	{

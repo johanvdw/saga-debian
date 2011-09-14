@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_split_by_attribute.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: shapes_split_by_attribute.cpp 1068 2011-05-25 14:21:19Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ bool CShapes_Split_by_Attribute::On_Execute(void)
 
 		for(int iRecord=0; iRecord<pTable->Get_Count() && Set_Progress(iRecord, pTable->Get_Count()); iRecord++)
 		{
-			CSG_Table_Record	*pRecord	= pTable->Get_Record(iRecord);
+			CSG_Table_Record	*pRecord	= pTable->Get_Record_byIndex(iRecord);
 
 			if( !pCut || sValue.Cmp(pRecord->asString(iField)) )
 			{

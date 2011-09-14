@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Trend.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Table_Trend.cpp 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -61,8 +61,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <string.h>
-
 #include "Table_Trend.h"
 
 
@@ -76,7 +74,7 @@
 void CTable_Trend_Base::Initialise(void)
 {
 	//-----------------------------------------------------
-	Set_Author		(SG_T("(c) 2006 by O.Conrad"));
+	Set_Author		(SG_T("O.Conrad (c) 2006"));
 
 	Set_Description	(_TW(
 		""
@@ -161,18 +159,20 @@ int CTable_Trend_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Par
 }
 
 //---------------------------------------------------------
-bool CTable_Trend_Base::Get_Trend(CSG_Table *pTable)
+bool CTable_Trend_Base::On_Execute(void)
 {
-	int				i, j, xField, yField;
-	CSG_String		Name;
+	int					i, j, xField, yField;
+	CSG_String			Name;
 	CSG_Table_Record	*pRecord;
+	CSG_Table			*pTable;
+
+	pTable	= Parameters("TABLE")	->asTable();
+	xField	= Parameters("FIELD_X")	->asInt();
+	yField	= Parameters("FIELD_Y")	->asInt();
 
 	//-----------------------------------------------------
 	if( m_Trend.Set_Formula(Parameters("FORMULA")->asString()) )
 	{
-		xField	= Parameters("FIELD_X")	->asInt();
-		yField	= Parameters("FIELD_Y")	->asInt();
-
 		m_Trend.Clr_Data();
 
 		for(i=0; i<pTable->Get_Record_Count(); i++)
@@ -237,7 +237,7 @@ bool CTable_Trend_Base::Get_Trend(CSG_Table *pTable)
 CTable_Trend::CTable_Trend(void)
 	: CTable_Trend_Base()
 {
-	Set_Name		(_TL("Trend for Table Data"));
+	Set_Name		(_TL("Trend Analysis"));
 
 	Parameters.Add_Table(
 		NULL	, "TABLE"	, _TL("Table"),
@@ -246,12 +246,6 @@ CTable_Trend::CTable_Trend(void)
 	);
 
 	Initialise();
-}
-
-//---------------------------------------------------------
-bool CTable_Trend::On_Execute(void)
-{
-	return( Get_Trend(Parameters("TABLE")->asTable()) );
 }
 
 
@@ -265,7 +259,7 @@ bool CTable_Trend::On_Execute(void)
 CTable_Trend_Shapes::CTable_Trend_Shapes(void)
 	: CTable_Trend_Base()
 {
-	Set_Name		(_TL("Trend for Shapes Data"));
+	Set_Name		(_TL("Trend (Analysis) Shapes"));
 
 	Parameters.Add_Shapes(
 		NULL	, "TABLE"	, _TL("Shapes"),
@@ -274,12 +268,6 @@ CTable_Trend_Shapes::CTable_Trend_Shapes(void)
 	);
 
 	Initialise();
-}
-
-//---------------------------------------------------------
-bool CTable_Trend_Shapes::On_Execute(void)
-{
-	return( Get_Trend(Parameters("TABLE")->asShapes()) );
 }
 
 

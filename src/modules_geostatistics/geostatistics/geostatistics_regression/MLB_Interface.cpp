@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1179 2011-09-30 08:21:55Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -99,6 +99,8 @@ const SG_Char * Get_Info(int i)
 #include "gw_regression_grid.h"
 #include "gw_multi_regression.h"
 #include "gw_multi_regression_grid.h"
+#include "gw_multi_regression_points.h"
+#include "grid_multi_grid_regression.h"
 
 
 //---------------------------------------------------------
@@ -115,6 +117,8 @@ CSG_Module *		Create_Module(int i)
 	case  4:	return( new CGW_Regression_Grid );
 	case  5:	return( new CGW_Multi_Regression );
 	case  6:	return( new CGW_Multi_Regression_Grid );
+	case  7:	return( new CGW_Multi_Regression_Points );
+	case  8:	return( new CGrid_Multi_Grid_Regression );
 	}
 
 	return( NULL );

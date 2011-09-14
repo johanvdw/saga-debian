@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: kriging_ordinary_global.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: kriging_ordinary_global.cpp 1206 2011-10-28 11:54:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ bool CKriging_Ordinary_Global::Get_Weights(void)
 			m_Points.Add(
 				pPoint->Get_Point(0).x,
 				pPoint->Get_Point(0).y,
-				pPoint->asDouble(m_zField)
+				m_bLog ? log(pPoint->asDouble(m_zField)) : pPoint->asDouble(m_zField)
 			);
 		}
 	}

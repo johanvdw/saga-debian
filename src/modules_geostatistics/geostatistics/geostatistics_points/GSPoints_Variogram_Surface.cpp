@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: GSPoints_Variogram_Surface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: GSPoints_Variogram_Surface.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -133,7 +133,8 @@ CGSPoints_Variogram_Surface::CGSPoints_Variogram_Surface(void)
 //---------------------------------------------------------
 bool CGSPoints_Variogram_Surface::On_Execute(void)
 {
-	int					i, j, x, y, n, nx, ny, nSkip, Attribute, nDistances;
+	long				i;
+	int					j, x, y, n, nx, ny, nSkip, Attribute, nDistances;
 	double				zi, zj, zMean, v, c, lagDistance;
 	TSG_Point			Pt_i, Pt_j;
 	CSG_Shape			*pPoint;

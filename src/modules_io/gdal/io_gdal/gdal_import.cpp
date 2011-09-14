@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_import.cpp 1050 2011-05-09 07:59:08Z oconrad $
+ * Version $Id: gdal_import.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -279,14 +279,13 @@ bool CGDAL_Import::Load(CSG_GDAL_DataSet &DataSet, const CSG_String &Name)
 	CSG_Matrix	B;
 
 	DataSet.Get_Transform(A, B);
-
 	//-----------------------------------------------------
-	Message_Add(CSG_String::Format(
-		SG_T("\n%s: %s/%s\n"),
-		_TL("Driver"),
-		DataSet.Get_Description(), 
-		DataSet.Get_Name()
-	), false);
+	Message_Add( 
+		SG_T("Driver: ") 
+		+ DataSet.Get_Description()
+		+ SG_T("/")
+		+ DataSet.Get_Name(),
+		 false);
 
 	if( DataSet.Get_Count() > 1 )
 	{
@@ -407,7 +406,7 @@ bool	SG_GDAL_Import	(const CSG_String &File_Name)
 {
 	CGDAL_Import	Import;
 
-	if(	!Import.Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) )
+	if(	!Import.Get_Parameters()->Set_Parameter(SG_T("FILES"), File_Name, PARAMETER_TYPE_FilePath) )
 	{
 		return( false );
 	}

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_trend.cpp 922 2011-02-21 15:51:00Z oconrad $
+ * Version $Id: mat_trend.cpp 1199 2011-10-21 12:22:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -419,22 +419,20 @@ bool CSG_Trend::Get_Trend(void)
 //---------------------------------------------------------
 CSG_String CSG_Trend::Get_Error(void)
 {
-	int				Position;
-	CSG_String		s, Message;
+	CSG_String		Message;
 
 	if( m_bOkay )
 	{
 	}
-	else if( m_Formula.Get_Error(&Position, &Message) )
+	else if( m_Formula.Get_Error(Message) )
 	{
-		s.Printf(SG_T("%s [%s] %s: %d. \"%s\""), LNG("Error in formula"), m_Formula.Get_Formula().c_str(), LNG("Position"), Position + 1, Message.c_str());
 	}
 	else
 	{
-		s.Printf(SG_T("%s"), LNG("Error in Trend Calculation"));
+		Message.Printf(SG_T("%s"), LNG("Error in Trend Calculation"));
 	}
 
-	return( s );
+	return( Message );
 }
 
 //---------------------------------------------------------

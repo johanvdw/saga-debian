@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_TPS_Global.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Gridding_Spline_TPS_Global.cpp 1143 2011-07-29 19:33:09Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ CGridding_Spline_TPS_Global::CGridding_Spline_TPS_Global(void)
 		"- Donato G., Belongie S. (2002):"
 		" 'Approximation Methods for Thin Plate Spline Mappings and Principal Warps',"
 		" In Heyden, A., Sparr, G., Nielsen, M., Johansen, P. (Eds.):"
-		" 'Computer Vision – ECCV 2002: 7th European Conference on Computer Vision, Copenhagen, Denmark, May 28–31, 2002',"
+		" 'Computer Vision - ECCV 2002: 7th European Conference on Computer Vision, Copenhagen, Denmark, May 28-31, 2002',"
 		" Proceedings, Part III, Lecture Notes in Computer Science."
 		" Springer-Verlag Heidelberg; pp.21-31."
 		"\n"

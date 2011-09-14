@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 942 2011-02-25 20:13:19Z johanvdw $
+# $Id: Makefile.am 1242 2011-11-23 18:33:52Z johanvdw $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -26,6 +26,7 @@ api_file.cpp\
 api_memory.cpp\
 api_string.cpp\
 api_translator.cpp\
+clipper.cpp\
 dataobject.cpp\
 geo_classes.cpp\
 geo_functions.cpp\
@@ -68,6 +69,7 @@ shape_polygon.cpp\
 shapes.cpp\
 shapes_io.cpp\
 shapes_ogis.cpp\
+shapes_polygons.cpp\
 shapes_search.cpp\
 shapes_selection.cpp\
 table.cpp\
@@ -79,6 +81,7 @@ tin.cpp\
 tin_elements.cpp\
 tin_triangulation.cpp\
 api_core.h\
+clipper.hpp\
 dataobject.h\
 geo_tools.h\
 grid.h\
@@ -106,11 +109,11 @@ endif
 if SAGA_PYTHON
 _saga_api_la_CPPFLAGS = $(PYTHON_CPPFLAGS) $(SWIGUNICODEFLAGS) $(DISABLELIBHARU)
 _saga_api_la_LDFLAGS = -module -release $(VERSION) $(SWIG_LIB)
-_saga_api_la_SOURCES = saga_api_wrap.cxx
-_saga_api_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
+nodist__saga_api_la_SOURCES = saga_api_wrap.cxx
+_saga_api_la_LIBADD = libsaga_api.la
 
-python_LTLIBRARIES = _saga_api.la
-python_PYTHON = saga_api.py
+pyexec_LTLIBRARIES = _saga_api.la
+nodist_pyexec_PYTHON = saga_api.py
 
 saga_api_wrap.cxx:
 	$(SWIG) -includeall -python $(SWIGUNICODEFLAGS) $(DISABLELIBHARU) $(SAGAPYTHONFLAGS) ./saga_api.h 

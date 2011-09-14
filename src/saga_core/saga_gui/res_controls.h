@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_controls.h 1006 2011-04-20 11:57:39Z oconrad $
+ * Version $Id: res_controls.h 1119 2011-06-29 12:13:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -118,6 +118,11 @@ enum ID_CONTROLS
 	ID_WND_ACTIVE_ATTRIBUTES,
 	ID_WND_ACTIVE_LEGEND,
 	ID_WND_ACTIVE_HTMLEXTRAINFO,
+
+	ID_WND_DATA_SOURCE,
+	ID_WND_DATA_SOURCE_FILES,
+	ID_WND_DATA_SOURCE_DATABASE,
+	ID_WND_DATA_SOURCE_WEBSERVICE,
 
 	ID_WND_PARM,
 	ID_WND_PARM_PG_ACTIVE,

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Pit_Router.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Pit_Router.cpp 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -1023,7 +1023,8 @@ void CPit_Router::Mark_Flat(int x, int y, TGEO_iRect *pFlat, int Flat_ID, int Pi
 //---------------------------------------------------------
 int CPit_Router::Process_Threshold(void)
 {
-	int		x, y, i, n;
+	int		x, y, n;
+	long	i;
 
 	m_Route.Create(*Get_System(), SG_DATATYPE_Char);
 

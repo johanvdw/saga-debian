@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1136 2011-07-19 20:36:16Z reklov_w $
 #
 DEP_LIBS = -lproj
 if DEBUG
@@ -9,9 +9,9 @@ if SAGA_UNICODE
 DEP_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
-CXX_INCS           = -I$(top_srcdir)/src/saga_core
+CXX_INCS           = -I$(top_srcdir)/src/saga_core $(LOCAL_INCS)
 AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
-AM_LDFLAGS         = -fPIC -shared -avoid-version $(DEP_LIBS)
+AM_LDFLAGS         = -fPIC -shared -avoid-version $(DEP_LIBS) $(LOCAL_LIBS)
 pkglib_LTLIBRARIES = libpj_proj4.la
 libpj_proj4_la_SOURCES =\
 MLB_Interface.cpp\
@@ -34,4 +34,3 @@ PROJ4_Grid.h\
 PROJ4_Shapes.h
 
 libpj_proj4_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-

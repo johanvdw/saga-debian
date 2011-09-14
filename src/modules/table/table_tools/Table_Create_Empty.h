@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Create_Empty.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Table_Create_Empty.h 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,12 +86,20 @@ class CTable_Create_Empty : public CSG_Module
 {
 public:
 	CTable_Create_Empty(void);
-	virtual ~CTable_Create_Empty(void);
+
+	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Table|Construction") );	}
 
 
 protected:
 
-	virtual bool			On_Execute	(void);
+	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool				On_Execute				(void);
+
+
+private:
+
+	void						_Set_Field_Count		(CSG_Parameters *pAttributes, int nAttributes);
 
 };
 

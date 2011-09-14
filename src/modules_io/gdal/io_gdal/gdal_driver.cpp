@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_driver.cpp 1050 2011-05-09 07:59:08Z oconrad $
+ * Version $Id: gdal_driver.cpp 1108 2011-06-22 11:16:21Z johanvdw $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -381,13 +381,13 @@ const char * CSG_GDAL_DataSet::Get_Projection(void)	const
 }
 
 //---------------------------------------------------------
-const char * CSG_GDAL_DataSet::Get_Name(void)	const
+const CSG_String CSG_GDAL_DataSet::Get_Name(void)	const
 {
 	return( m_pDataSet ? m_pDataSet->GetMetadataItem(GDAL_DMD_LONGNAME) : "" );
 }
 
 //---------------------------------------------------------
-const char * CSG_GDAL_DataSet::Get_Description(void)	const
+const CSG_String CSG_GDAL_DataSet::Get_Description(void)	const
 {
 	return( m_pDataSet ? m_pDataSet->GetDescription() : "" );
 }

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Interpolation.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Interpolation.h 1130 2011-07-14 07:42:46Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CInterpolation : public CSG_Module
+class grid_gridding_EXPORT CInterpolation : public CSG_Module
 {
 public:
 	CInterpolation(void);

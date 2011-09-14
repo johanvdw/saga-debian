@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_commands.h 1039 2011-05-04 14:02:25Z oconrad $
+ * Version $Id: res_commands.h 1125 2011-07-06 09:29:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -107,8 +107,9 @@ enum ID_COMMANDS
 	ID_CMD_FRAME_TIPS,
 
 	ID_CMD_FRAME_INFO_SHOW,
-	ID_CMD_FRAME_WKSP_SHOW,
+	ID_CMD_FRAME_DATA_SOURCE_SHOW,
 	ID_CMD_FRAME_ACTIVE_SHOW,
+	ID_CMD_FRAME_WKSP_SHOW,
 
 	//-----------------------------------------------------
 	ID_CMD_WKSP_FIRST,
@@ -122,6 +123,8 @@ enum ID_COMMANDS
 
 	ID_CMD_INFO_CLEAR,
 	ID_CMD_INFO_COPY,
+
+	ID_CMD_DATASOURCE_REFRESH,
 
 	ID_CMD_MODULES_FIRST,
 	ID_CMD_MODULES_RECENT_FIRST,

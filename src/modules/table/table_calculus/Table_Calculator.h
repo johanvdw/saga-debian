@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Calculator.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Table_Calculator.h 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 /*******************************************************************************
     TableCalculator.h
@@ -20,20 +20,60 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #include "MLB_Interface.h"
 
-class CTableCalculator : public CSG_Module  
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CTable_Calculator_Base : public CSG_Module  
 {
 public:
-	CTableCalculator(void);
-	virtual ~CTableCalculator(void);
+	CTable_Calculator_Base(void);
 
 
 protected:
 
-	virtual bool			On_Execute(void);
+	virtual bool			On_Execute			(void);
 
-private:
+	CSG_String				Get_Formula			(CSG_String sFormula, CSG_Table *pTable, int *Fields, int &nFields);
 
 };
 
+//---------------------------------------------------------
+class CTable_Calculator : public CTable_Calculator_Base  
+{
+public:
+	CTable_Calculator(void);
+
+};
+
+//---------------------------------------------------------
+class CTable_Calculator_Shapes : public CTable_Calculator_Base  
+{
+public:
+	CTable_Calculator_Shapes(void);
+
+	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("A:Shapes|Table") );	}
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

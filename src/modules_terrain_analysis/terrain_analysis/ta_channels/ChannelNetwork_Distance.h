@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: ChannelNetwork_Distance.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: ChannelNetwork_Distance.h 1207 2011-10-28 14:30:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,15 +96,13 @@ protected:
 
 private:
 
-	CSG_Grid					*pDTM, *pFlow, *pMFDSum, *pDistance, *pDistVert, *pDistHorz;
+	CSG_Grid				*m_pDTM, *m_pDistance, *m_pDistVert, *m_pDistHorz, m_Dir, m_Flow[9];
 
 
 	void					Initialize_D8	(void);
-	void					Finalize_D8		(void);
 	void					Execute_D8		(int x, int y);
 
 	void					Initialize_MFD	(void);
-	void					Finalize_MFD	(void);
 	void					Execute_MFD		(int x, int y);
 
 };

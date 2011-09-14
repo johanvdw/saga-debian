@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1153 2011-09-01 13:20:33Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -23,6 +23,7 @@ raw.cpp\
 srtm30.cpp\
 surfer.cpp\
 usgs_srtm.cpp\
+wrf.cpp\
 xyz.cpp\
 bmp_export.h\
 erdas_lan.h\
@@ -34,6 +35,7 @@ raw.h\
 srtm30.h\
 surfer.h\
 usgs_srtm.h\
+wrf.h\
 xyz.h
 
 libio_grid_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -76,10 +77,10 @@ libio_shapes_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libio_shapes_la_OBJECTS = atlas_bna.lo generate.lo gpx.lo gstat.lo \
 	MLB_Interface.lo pointcloud_from_file.lo \
-	pointcloud_from_text_file.lo stl.lo surfer_bln.lo svg.lo \
-	xyz.lo wasp_map.lo
+	pointcloud_from_text_file.lo pointcloud_to_text_file.lo stl.lo \
+	surfer_bln.lo svg.lo xyz.lo wasp_map.lo
 libio_shapes_la_OBJECTS = $(am_libio_shapes_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -150,6 +151,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -245,14 +248,18 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1224 2011-11-11 09:23:11Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
+@SAGA_UNICODE_FALSE@DEP_DEFS = -fPIC `wx-config --unicode=no --static=no --cxxflags` $(DBGFLAGS)
+@SAGA_UNICODE_TRUE@DEP_DEFS = -fPIC `wx-config --unicode=yes --static=no --cxxflags` -D_SAGA_UNICODE $(DBGFLAGS)
+@SAGA_UNICODE_FALSE@DEP_LFLG = -fPIC -shared `wx-config --unicode=no --static=no --libs`
+@SAGA_UNICODE_TRUE@DEP_LFLG = -fPIC -shared `wx-config --unicode=yes --static=no --libs`
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
-AM_LDFLAGS = -fPIC -shared -avoid-version 
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS)
+AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LFLG)
 pkglib_LTLIBRARIES = libio_shapes.la
 libio_shapes_la_SOURCES = \
 atlas_bna.cpp\
@@ -262,6 +269,7 @@ gstat.cpp\
 MLB_Interface.cpp\
 pointcloud_from_file.cpp\
 pointcloud_from_text_file.cpp\
+pointcloud_to_text_file.cpp\
 stl.cpp\
 surfer_bln.cpp\
 svg.cpp\
@@ -274,6 +282,7 @@ gstat.h\
 MLB_Interface.h\
 pointcloud_from_file.h\
 pointcloud_from_text_file.h\
+pointcloud_to_text_file.h\
 stl.h\
 surfer_bln.h\
 svg.h\
@@ -362,6 +371,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gstat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pointcloud_from_file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pointcloud_from_text_file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pointcloud_to_text_file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/surfer_bln.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg.Plo@am__quote@

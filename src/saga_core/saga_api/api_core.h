@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_core.h 1049 2011-05-09 07:55:38Z oconrad $
+ * Version $Id: api_core.h 1085 2011-06-08 08:11:35Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -832,13 +832,13 @@ public:
 	bool							is_Open				(void)	const	{	return( m_pStream != NULL );	}
 	bool							is_EOF				(void)	const;
 
-	int								Length				(void)	const;
+	long								Length				(void)	const;
 
-	bool							Seek				(int Offset, int Origin = SG_FILE_START)	const;
+	bool							Seek				(long Offset, int Origin = SG_FILE_START)	const;
 	bool							Seek_Start			(void)	const;
 	bool							Seek_End			(void)	const;
 
-	int								Tell				(void)	const;
+	long								Tell				(void)	const;
 
 	bool							Flush				(void)	const;
 

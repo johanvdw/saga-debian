@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_system.cpp 972 2011-04-01 10:34:01Z oconrad $
+ * Version $Id: grid_system.cpp 1105 2011-06-21 14:11:47Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ bool CSG_Grid_System::Assign(double Cellsize, double xMin, double yMin, int NX, 
 	{
 		m_NX		= NX;
 		m_NY		= NY;
-		m_NCells	= NY * NX;
+		m_NCells	= (long) NY * NX;
 
 		m_Cellsize	= Cellsize;
 		m_Cellarea	= Cellsize * Cellsize;
@@ -332,6 +332,47 @@ bool CSG_Grid_Cell_Addressor::Set_Radius(double Radius)
 				double	d	= SG_Get_Length(x, y);
 
 				if( d <= Radius )
+				{
+					ADD_CELL( x,  y, d);
+					ADD_CELL( y, -x, d);
+					ADD_CELL(-x, -y, d);
+					ADD_CELL(-y,  x, d);
+				}
+			}
+		}
+
+		//-------------------------------------------------
+		if( m_Cells.Get_Count() > 0 )
+		{
+			m_Cells.Set_Index(2, TABLE_INDEX_Ascending);
+
+			return( true );
+		}
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Grid_Cell_Addressor::Set_Annulus(double inner_Radius, double outer_Radius)
+{
+	Destroy();
+
+	//-----------------------------------------------------
+	if( inner_Radius <= outer_Radius )
+	{
+		if( inner_Radius <= 0.0 )
+		{
+			ADD_CELL(0.0, 0.0, 0.0);
+		}
+
+		for(double y=1.0; y<=outer_Radius; y++)
+		{
+			for(double x=0.0; x<=outer_Radius; x++)
+			{
+				double	d	= SG_Get_Length(x, y);
+
+				if( inner_Radius <= d && d <= outer_Radius )
 				{
 					ADD_CELL( x,  y, d);
 					ADD_CELL( y, -x, d);

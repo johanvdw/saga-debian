@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_control.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_base_control.cpp 1074 2011-05-31 15:04:56Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -797,24 +797,28 @@ bool CWKSP_Base_Control::_Copy_Settings(CSG_Parameters *pParameters, CWKSP_Base_
 {
 	if( pParameters && pItem && pParameters != pItem->Get_Parameters() )
 	{
-		CSG_String	sName;
-
-		if( pParameters->Get_Parameter("OBJECT_NAME") && pItem->Get_Parameters()->Get_Parameter("OBJECT_NAME") )
+		for(int i=0; i<pParameters->Get_Count(); i++)
 		{
-			sName	= pItem->Get_Parameters()->Get_Parameter("OBJECT_NAME")->asString();
-		}
+			CSG_Parameter	*pSource	= pParameters->Get_Parameter(i);
 
-		if( pItem->Get_Parameters()->Assign_Values(pParameters) )
-		{
-			if( sName.Length() > 0 && pItem->Get_Parameters()->Get_Parameter("OBJECT_NAME") )
+			if(	SG_STR_CMP(pSource->Get_Identifier(), SG_T("OBJECT_NAME")) )
+		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("LUT_ATTRIB"))
+		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("METRIC_ATTRIB"))
+		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("LABEL_ATTRIB"))
+		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("LABEL_ATTRIB_SIZE_BY"))	)
 			{
-				pItem->Get_Parameters()->Get_Parameter("OBJECT_NAME")->Set_Value(sName);
+				CSG_Parameter	*pTarget	= pItem->Get_Parameters()->Get_Parameter(pSource->Get_Identifier());
+
+				if( pTarget && pTarget->Get_Type() == pSource->Get_Type() )
+				{
+					pTarget->Set_Value(pSource);
+				}
 			}
-
-			pItem->Parameters_Changed();
-
-			return( true );
 		}
+
+		pItem->Parameters_Changed();
+
+		return( true );
 	}
 
 	return( false );

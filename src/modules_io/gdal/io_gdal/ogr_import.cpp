@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: ogr_import.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: ogr_import.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ bool	SG_OGR_Import	(const CSG_String &File_Name)
 {
 	COGR_Import	Import;
 
-	if(	!Import.Get_Parameters()->Set_Parameter(SG_T("FILES"), PARAMETER_TYPE_FilePath, File_Name) )
+	if(	!Import.Get_Parameters()->Set_Parameter(SG_T("FILES"), File_Name, PARAMETER_TYPE_FilePath) )
 	{
 		return( false );
 	}

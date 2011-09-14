@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1171 2011-09-23 14:37:31Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -13,21 +13,23 @@ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libtable_calculus.la
 libtable_calculus_la_SOURCES =\
+etp_hargreave.cpp\
 Fit.cpp\
 LMFit.cpp\
 MLB_Interface.cpp\
 Table_Calculator.cpp\
-Table_CalculatorShapes.cpp\
 table_cluster_analysis.cpp\
+table_fill_record_gaps.cpp\
 table_pca.cpp\
 table_running_average.cpp\
 Table_Trend.cpp\
+etp_hargreave.h\
 Fit.h\
 LMFit.h\
 MLB_Interface.h\
 Table_Calculator.h\
-Table_CalculatorShapes.h\
 table_cluster_analysis.h\
+table_fill_record_gaps.h\
 table_pca.h\
 table_running_average.h\
 Table_Trend.h

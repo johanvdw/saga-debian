@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Rotate.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Table_Rotate.cpp 1098 2011-06-16 16:06:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -73,11 +73,11 @@
 //---------------------------------------------------------
 CTable_Rotate::CTable_Rotate(void)
 {
-	Set_Name(_TL("Rotate Table"));
+	Set_Name		(_TL("Transpose Table"));
 
-	Set_Description(
-		_TL("Rotate a table, i.e. swap rows and columns.\n")
-	);
+	Set_Description	(_TW(
+		"Transposes a table, i.e. to swap rows and columns."
+	));
 
 	Parameters.Add_Table(
 		NULL	, "INPUT"	, _TL("Input"),
@@ -108,9 +108,9 @@ bool CTable_Rotate::On_Execute(void)
 {
 	bool				bCopy;
 	int					x, y;
-	TSG_Data_Type	FieldType;
-	CSG_Table				*pInput, *pOutput;
-	CSG_Table_Record		*pRec_In, *pRec_Out;
+	TSG_Data_Type		FieldType;
+	CSG_Table			*pInput, *pOutput;
+	CSG_Table_Record	*pRec_In, *pRec_Out;
 
 	//-----------------------------------------------------
 	pInput	= Parameters("INPUT")	->asTable();

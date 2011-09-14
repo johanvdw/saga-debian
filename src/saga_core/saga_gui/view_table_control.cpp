@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table_control.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_table_control.cpp 1077 2011-06-06 15:46:35Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -607,6 +607,8 @@ void CVIEW_Table_Control::On_Field_Add(wxCommandEvent &event)
 		m_pTable->Add_Field(P("NAME")->asString(), Type, Position);
 
 		Update_Table();
+
+		g_pData->Update(m_pTable, NULL);
 	}
 }
 
@@ -645,6 +647,8 @@ void CVIEW_Table_Control::On_Field_Del(wxCommandEvent &event)
 		}
 
 		Update_Table();
+
+		g_pData->Update(m_pTable, NULL);
 	}
 }
 
@@ -729,6 +733,8 @@ void CVIEW_Table_Control::On_Field_Rename(wxCommandEvent &event)
 				SetColLabelValue(i, s.c_str());
 			}
 		}
+
+		g_pData->Update(m_pTable, NULL);
 	}
 }
 

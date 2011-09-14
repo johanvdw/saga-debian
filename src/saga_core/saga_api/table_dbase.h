@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_dbase.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: table_dbase.h 1085 2011-06-08 08:11:35Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -182,7 +182,8 @@ protected:
 
 	short						nHeaderBytes, nRecordBytes;
 
-	int							nFields, nRecords, *FieldOffset, nFileBytes;
+	int							nFields, nRecords, *FieldOffset;
+	long						nFileBytes;
 
 	FILE						*hFile;
 

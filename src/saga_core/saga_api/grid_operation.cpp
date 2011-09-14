@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_operation.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: grid_operation.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ bool CSG_Grid::Assign(double Value)
 		}
 		else
 		{
-			for(int n=0; n<Get_NCells(); n++)
+			for(long n=0; n<Get_NCells(); n++)
 			{
 				Set_Value(n, Value);
 			}

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: callback.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: callback.cpp 1220 2011-11-07 11:08:33Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -100,6 +100,13 @@ void			Set_Silent		(bool bOn)	{	g_bSilent		= bOn;		}
 bool			Get_Silent		(void)		{	return( g_bSilent );		}
 
 //---------------------------------------------------------
+static bool		g_bQuiet		= false;
+
+void			Set_Quiet		(bool bOn)	{	g_bQuiet		= bOn;		}
+
+bool			Get_Quiet		(void)		{	return( g_bQuiet );			}
+
+//---------------------------------------------------------
 static bool		g_bInteractive	= false;
 
 void			Set_Interactive	(bool bOn)	{	g_bInteractive	= bOn;		}
@@ -190,6 +197,7 @@ bool			Get_YesNo		(const SG_Char *caption, const SG_Char *message)
 int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter &Param_2)
 {
 	static int		iBuisy		= 0;
+	static int		iPercent	= -1;
 	const SG_Char	Buisy[4]	= {	'|', '/', '-', '\\'	};
 
 	int		Result	= 1;
@@ -211,7 +219,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_GET_OKAY:
 
-		if( !g_bSilent && Param_1.True )
+		if( !g_bQuiet || (!g_bSilent && Param_1.True) )
 		{
 			SG_PRINTF(SG_T("\r%c   "), Buisy[iBuisy++]);
 
@@ -230,9 +238,14 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_PROGRESS:
 
-		if( !g_bSilent )
+		if( !g_bQuiet || !g_bSilent )
 		{
-			SG_PRINTF(SG_T("\r%3d%%"), Param_2.Number != 0.0 ? 1 + (int)(100.0 * Param_1.Number / Param_2.Number) : 100);
+			int	i	= Param_2.Number != 0.0 ? 1 + (int)(100.0 * Param_1.Number / Param_2.Number) : 100;
+
+			if( i != iPercent )
+			{
+				SG_PRINTF(SG_T("\r%3d%%"), iPercent = i);
+			}
 		}
 
 		break;

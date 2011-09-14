@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_pca.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: grid_pca.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -211,7 +211,8 @@ inline double CGrid_PCA::Get_Value(int iFeature, int iElement)
 //---------------------------------------------------------
 bool CGrid_PCA::Get_Matrix(CSG_Matrix &Matrix)
 {
-	int		i, j1, j2;
+	int		j1, j2;
+	long	i;
 
 	Matrix.Create(Get_NGrids(), Get_NGrids());
 	Matrix.Set_Zero();
@@ -334,7 +335,7 @@ bool CGrid_PCA::Get_Components(CSG_Matrix &Eigen_Vectors, CSG_Vector &Eigen_Valu
 	}
 
 	//-----------------------------------------------------
-	for(int iCell=0; iCell<Get_NCells() && Set_Progress_NCells(iCell); iCell++)
+	for(long iCell=0; iCell<Get_NCells() && Set_Progress_NCells(iCell); iCell++)
 	{
 		if( is_NoData(iCell) )
 		{

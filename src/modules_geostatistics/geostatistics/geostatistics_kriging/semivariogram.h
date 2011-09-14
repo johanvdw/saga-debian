@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: semivariogram.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: semivariogram.h 1199 2011-10-21 12:22:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,15 +86,6 @@ protected:
 
 	virtual bool			On_Execute			(void);
 
-
-private:
-
-	CSG_Table				m_Variances;
-
-	CSG_Trend				m_Variogram;
-
-
-	bool					Get_Variances		(CSG_Table *pTable, CSG_Shapes *pPoints, int Attribute);
 
 };
 

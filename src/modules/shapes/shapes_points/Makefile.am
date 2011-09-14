@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 939 2011-02-25 10:36:35Z oconrad $
+# $Id: Makefile.am 1170 2011-09-21 16:57:34Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -21,6 +21,7 @@ CountPoints.cpp\
 CreatePointGrid.cpp\
 DistanceMatrix.cpp\
 FitNPointsToShape.cpp\
+gps_track_aggregation.cpp\
 MLB_Interface.cpp\
 points_filter.cpp\
 Points_From_Lines.cpp\
@@ -29,6 +30,7 @@ points_thinning.cpp\
 remove_duplicates.cpp\
 select_points.cpp\
 separate_by_direction.cpp\
+thiessen_polygons.cpp\
 add_polygon_attributes.h\
 AddCoordinates.h\
 convex_hull.h\
@@ -37,6 +39,7 @@ Clip_Points.h\
 CreatePointGrid.h\
 DistanceMatrix.h\
 FitNPointsToShape.h\
+gps_track_aggregation.h\
 MLB_Interface.h\
 points_filter.h\
 Points_From_Lines.h\
@@ -44,7 +47,8 @@ Points_From_Table.h\
 points_thinning.h\
 remove_duplicates.h\
 select_points.h\
-separate_by_direction.h
+separate_by_direction.h\
+thiessen_polygons.h
 
 libshapes_points_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 

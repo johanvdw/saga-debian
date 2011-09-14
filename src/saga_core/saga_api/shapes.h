@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes.h 997 2011-04-15 10:37:51Z oconrad $
+ * Version $Id: shapes.h 1230 2011-11-22 11:12:10Z oconrad $
  *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -1068,6 +1068,20 @@ protected:
 	void						_Select_Add			(CSG_Shape *pPoint, double Distance);
 
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//					Polygon Tools						 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT bool		SG_Polygon_Intersection	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult = NULL);
+SAGA_API_DLL_EXPORT bool		SG_Polygon_Difference	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult = NULL);
+SAGA_API_DLL_EXPORT bool		SG_Polygon_ExclusiveOr	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult = NULL);
+SAGA_API_DLL_EXPORT bool		SG_Polygon_Union		(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult = NULL);
+SAGA_API_DLL_EXPORT bool		SG_Polygon_Dissolve		(CSG_Shape *pPolygon, CSG_Shape *pResult = NULL);
 
 
 ///////////////////////////////////////////////////////////

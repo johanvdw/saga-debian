@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_morphology.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: vigra_morphology.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ bool CViGrA_Morphology::On_Execute(void)
 	{
 		Rescaled.Create(*Get_System(), SG_DATATYPE_Byte);
 
-		for(int i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
+		for(long i=0; i<Get_NCells() && Set_Progress_NCells(i); i++)
 		{
 			Rescaled.Set_Value(i, 0.5 + (pInput->asDouble(i) - pInput->Get_ZMin()) * 255.0 / pInput->Get_ZRange());
 		}

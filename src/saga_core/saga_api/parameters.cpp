@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: parameters.cpp 1200 2011-10-25 15:23:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -305,15 +305,16 @@ CSG_Parameter * CSG_Parameters::Add_FilePath(CSG_Parameter *pParent, const SG_Ch
 }
 
 //---------------------------------------------------------
-CSG_Parameter * CSG_Parameters::Add_Font(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description, wxFont *pInit)
+CSG_Parameter * CSG_Parameters::Add_Font(CSG_Parameter *pParent, const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description, const SG_Char *pInit)
 {
 	CSG_Parameter	*pParameter;
 
 	pParameter	= _Add(pParent, Identifier, Name, Description, PARAMETER_TYPE_Font, 0);
 
-	if( pInit )
+	if( pInit && *pInit )
 	{
-		pParameter->Set_Value(pInit);
+		pParameter->Set_Value  (pInit);
+		pParameter->Set_Default(pInit);
 	}
 
 	return( pParameter );
@@ -931,11 +932,11 @@ bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, CSG_Parameter *pSo
 }
 
 //---------------------------------------------------------
-bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, int Value)
+bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Value, int Type)
 {
-	CSG_Parameter	*pTarget;
+	CSG_Parameter	*pTarget	= Get_Parameter(Identifier);
 
-	if( (pTarget = Get_Parameter(Identifier)) != NULL && Type == pTarget->Get_Type() )
+	if( pTarget && (Type == PARAMETER_TYPE_Undefined || Type == pTarget->Get_Type()) )
 	{
 		pTarget->Set_Value(Value);
 
@@ -946,11 +947,11 @@ bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, int Valu
 }
 
 //---------------------------------------------------------
-bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, double Value)
+bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, double Value, int Type)
 {
-	CSG_Parameter	*pTarget;
+	CSG_Parameter	*pTarget	= Get_Parameter(Identifier);
 
-	if( (pTarget = Get_Parameter(Identifier)) != NULL && Type == pTarget->Get_Type() )
+	if( pTarget && (Type == PARAMETER_TYPE_Undefined || Type == pTarget->Get_Type()) )
 	{
 		pTarget->Set_Value(Value);
 
@@ -961,11 +962,11 @@ bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, double V
 }
 
 //---------------------------------------------------------
-bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, void *Value)
+bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, void *Value, int Type)
 {
-	CSG_Parameter	*pTarget;
+	CSG_Parameter	*pTarget	= Get_Parameter(Identifier);
 
-	if( (pTarget = Get_Parameter(Identifier)) != NULL && Type == pTarget->Get_Type() )
+	if( pTarget && (Type == PARAMETER_TYPE_Undefined || Type == pTarget->Get_Type()) )
 	{
 		pTarget->Set_Value(Value);
 
@@ -976,11 +977,11 @@ bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, void *Va
 }
 
 //---------------------------------------------------------
-bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, int Type, const SG_Char *Value)
+bool CSG_Parameters::Set_Parameter(const SG_Char *Identifier, const SG_Char *Value, int Type)
 {
-	CSG_Parameter	*pTarget;
+	CSG_Parameter	*pTarget	= Get_Parameter(Identifier);
 
-	if( (pTarget = Get_Parameter(Identifier)) != NULL && Type == pTarget->Get_Type() )
+	if( pTarget && (Type == PARAMETER_TYPE_Undefined || Type == pTarget->Get_Type()) )
 	{
 		pTarget->Set_Value(Value);
 
@@ -1612,7 +1613,10 @@ bool CSG_Parameters::Serialize(CSG_MetaData &MetaData, bool bSave)
 			if(	MetaData.Get_Child(i)->Get_Property(SG_T("id"), Identifier)
 			&&	(pParameter	= Get_Parameter(Identifier)) != NULL )
 			{
-				pParameter->Serialize(*MetaData.Get_Child(i), false);
+				if( pParameter->Serialize(*MetaData.Get_Child(i), false) )
+				{
+					pParameter->has_Changed();
+				}
 			}
 		}
 	}
@@ -1798,14 +1802,14 @@ CSG_Parameter * CSG_Parameters::Add_Info_String			(CSG_Parameter *pParent, const
 CSG_Parameter * CSG_Parameters::Add_FilePath			(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, const SG_Char *Filter, const SG_Char *Default, bool bSave, bool bDirectory, bool bMultiple)
 {	return( Add_FilePath			(pParent, SG_STR_MBTOSG(Identifier), Name, Description, Filter, Default, bSave, bDirectory, bMultiple) );	}
 
-CSG_Parameter * CSG_Parameters::Add_Font				(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, class wxFont *pInit)
-{	return( Add_Font				(pParent, SG_STR_MBTOSG(Identifier), Name, Description, pInit) );	}
+CSG_Parameter * CSG_Parameters::Add_Font				(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, const SG_Char *pInit)
+{	return( Add_Font				(pParent, SG_STR_MBTOSG(Identifier), Name, Description) );	}
 
 CSG_Parameter * CSG_Parameters::Add_Colors				(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, CSG_Colors      *pInit)
 {	return( Add_Colors				(pParent, SG_STR_MBTOSG(Identifier), Name, Description, pInit) );	}
 
-CSG_Parameter * CSG_Parameters::Add_FixedTable			(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, CSG_Table   *pTemplate)
-{	return( Add_FixedTable			(pParent, SG_STR_MBTOSG(Identifier), Name, Description, pTemplate) );	}
+CSG_Parameter * CSG_Parameters::Add_FixedTable			(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, CSG_Table       *pInit)
+{	return( Add_FixedTable			(pParent, SG_STR_MBTOSG(Identifier), Name, Description, pInit) );	}
 
 CSG_Parameter * CSG_Parameters::Add_Grid_System			(CSG_Parameter *pParent, const char *Identifier, const SG_Char *Name, const SG_Char *Description, CSG_Grid_System *pInit)
 {	return( Add_Grid_System			(pParent, SG_STR_MBTOSG(Identifier), Name, Description, pInit) );	}

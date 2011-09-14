@@ -47,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -74,17 +75,15 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 @HAVE_HARU_TRUE@libdocs_pdf_la_DEPENDENCIES = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am__libdocs_pdf_la_SOURCES_DIST = doc_pdf.cpp MLB_Interface.cpp \
-	Polygon_Clipper.cpp Profile_Cross_Sections.cpp \
-	Shapes_Report.cpp Shapes_Summary.cpp doc_pdf.h MLB_Interface.h \
-	Polygon_Clipper.h Profile_Cross_Sections.h Shapes_Report.h \
-	Shapes_Summary.h
+	Profile_Cross_Sections.cpp Shapes_Report.cpp \
+	Shapes_Summary.cpp doc_pdf.h MLB_Interface.h \
+	Profile_Cross_Sections.h Shapes_Report.h Shapes_Summary.h
 @HAVE_HARU_TRUE@am_libdocs_pdf_la_OBJECTS = doc_pdf.lo \
-@HAVE_HARU_TRUE@	MLB_Interface.lo Polygon_Clipper.lo \
-@HAVE_HARU_TRUE@	Profile_Cross_Sections.lo Shapes_Report.lo \
-@HAVE_HARU_TRUE@	Shapes_Summary.lo
+@HAVE_HARU_TRUE@	MLB_Interface.lo Profile_Cross_Sections.lo \
+@HAVE_HARU_TRUE@	Shapes_Report.lo Shapes_Summary.lo
 libdocs_pdf_la_OBJECTS = $(am_libdocs_pdf_la_OBJECTS)
 @HAVE_HARU_TRUE@am_libdocs_pdf_la_rpath = -rpath $(pkglibdir)
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -155,6 +154,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -250,7 +251,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -262,13 +263,11 @@ top_srcdir = @top_srcdir@
 @HAVE_HARU_TRUE@libdocs_pdf_la_SOURCES = \
 @HAVE_HARU_TRUE@doc_pdf.cpp\
 @HAVE_HARU_TRUE@MLB_Interface.cpp\
-@HAVE_HARU_TRUE@Polygon_Clipper.cpp\
 @HAVE_HARU_TRUE@Profile_Cross_Sections.cpp\
 @HAVE_HARU_TRUE@Shapes_Report.cpp\
 @HAVE_HARU_TRUE@Shapes_Summary.cpp\
 @HAVE_HARU_TRUE@doc_pdf.h\
 @HAVE_HARU_TRUE@MLB_Interface.h\
-@HAVE_HARU_TRUE@Polygon_Clipper.h\
 @HAVE_HARU_TRUE@Profile_Cross_Sections.h\
 @HAVE_HARU_TRUE@Shapes_Report.h\
 @HAVE_HARU_TRUE@Shapes_Summary.h
@@ -349,7 +348,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Clipper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Profile_Cross_Sections.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes_Report.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Shapes_Summary.Plo@am__quote@

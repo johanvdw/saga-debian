@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: TIN_From_Grid_Specific_Points.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: TIN_From_Grid_Specific_Points.cpp 1081 2011-06-08 08:05:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ bool CTIN_From_Grid_Specific_Points::Get_FlowDirection2(CSG_Grid *pResult, CSG_G
 	Grid.Invert();
 	Get_FlowDirection(&Result, &Grid, -1, Threshold);
 
-	for(int n=0; n<Get_NCells(); n++)
+	for(long n=0; n<Get_NCells(); n++)
 	{
 		if( Result.asInt(n) > 0 )
 		{

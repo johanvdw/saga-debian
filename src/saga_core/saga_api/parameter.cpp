@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameter.cpp 1036 2011-05-03 15:40:06Z oconrad $
+ * Version $Id: parameter.cpp 1234 2011-11-22 15:14:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ CSG_Parameter::CSG_Parameter(CSG_Parameters *pOwner, CSG_Parameter *pParent, con
 	//-----------------------------------------------------
 	switch( Type )
 	{
-	default:								m_pData	= NULL;													break;
+	default:								m_pData	= NULL;														break;
 
 	case PARAMETER_TYPE_Node:				m_pData	= new CSG_Parameter_Node				(this, Constraint);	break;
 
@@ -511,6 +511,22 @@ bool CSG_Parameter::Set_Value(const SG_Char *Value)
 }
 
 //---------------------------------------------------------
+bool CSG_Parameter::Set_Value(CSG_Parameter *Value)
+{
+	if( Value )
+	{
+		switch( Value->Get_Type() )
+		{
+		default:								return( Assign(Value) );
+
+		case PARAMETER_TYPE_Choice:				return( Set_Value(Value->asInt()) );
+		}
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
 bool CSG_Parameter::has_Changed(int Check_Flags)
 {
 	if( m_pOwner )
@@ -705,16 +721,8 @@ bool CSG_Parameters_Grid_Target::On_User_Changed(CSG_Parameters *pParameters, CS
 		yMin->Set_Value(yMax->asDouble() - ((int)((yMax->asDouble() - yMin->asDouble()) / Size->asDouble())) * Size->asDouble());
 	}
 
-	CSG_Grid_System	System(
-		Size->asDouble(),
-		xMin->asDouble(),
-		yMin->asDouble(),
-		xMax->asDouble(),
-		yMax->asDouble()
-	);
-
-	Cols->Set_Value(System.Get_NX());
-	Rows->Set_Value(System.Get_NY());
+	Cols->Set_Value(1 + (int)((xMax->asDouble() - xMin->asDouble()) / Size->asDouble()));
+	Rows->Set_Value(1 + (int)((yMax->asDouble() - yMin->asDouble()) / Size->asDouble()));
 
 	return( true );
 }
@@ -727,15 +735,15 @@ bool CSG_Parameters_Grid_Target::Init_User(const TSG_Rect &Extent, int Rows)
 		return( false );
 	}
 
-	CSG_Grid_System	System((Extent.yMax - Extent.yMin) / (double)Rows, Extent);
+	double	Size	= (Extent.yMax - Extent.yMin) / (double)Rows;
 
-	m_pUser->Get_Parameter("XMIN")->Set_Value(System.Get_XMin());
-	m_pUser->Get_Parameter("XMAX")->Set_Value(System.Get_XMax());
-	m_pUser->Get_Parameter("YMIN")->Set_Value(System.Get_YMin());
-	m_pUser->Get_Parameter("YMAX")->Set_Value(System.Get_YMax());
-	m_pUser->Get_Parameter("SIZE")->Set_Value(System.Get_Cellsize());
-	m_pUser->Get_Parameter("COLS")->Set_Value(System.Get_NX());
-	m_pUser->Get_Parameter("ROWS")->Set_Value(System.Get_NY());
+	m_pUser->Get_Parameter("XMIN")->Set_Value(Extent.xMin);
+	m_pUser->Get_Parameter("XMAX")->Set_Value(Extent.xMax);
+	m_pUser->Get_Parameter("YMIN")->Set_Value(Extent.yMin);
+	m_pUser->Get_Parameter("YMAX")->Set_Value(Extent.yMax);
+	m_pUser->Get_Parameter("SIZE")->Set_Value(Size);
+	m_pUser->Get_Parameter("COLS")->Set_Value(1 + (int)((Extent.xMax - Extent.xMin) / Size));
+	m_pUser->Get_Parameter("ROWS")->Set_Value(1 + (int)((Extent.yMax - Extent.yMin) / Size));
 
 	return( true );
 }

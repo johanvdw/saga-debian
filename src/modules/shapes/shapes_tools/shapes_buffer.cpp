@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_buffer.cpp 936 2011-02-24 13:56:34Z oconrad $
+ * Version $Id: shapes_buffer.cpp 1230 2011-11-22 11:12:10Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -59,8 +59,6 @@
 
 //---------------------------------------------------------
 #include "shapes_buffer.h"
-
-#include "Polygon_Clipper.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -192,7 +190,7 @@ bool CShapes_Buffer::On_Execute(void)
 
 				if( iZone > 0 )
 				{
-					GPC_Difference(pBuffer, Buffers.Get_Shape(0));
+					SG_Polygon_Difference(pBuffer, Buffers.Get_Shape(0));
 				}
 
 				pBuffer	= pBuffers->Add_Shape(Buffers.Get_Shape(0));
@@ -698,12 +696,12 @@ void CShapes_Buffer::Add_Buffer(bool bLake)
 
 				if( m_pUnion->Get_Part_Count() > 0 )
 				{
-					GPC_Difference(m_pBuffer, m_pUnion);
+					SG_Polygon_Difference(m_pBuffer, m_pUnion);
 				}
 			}
 			else
 			{
-				GPC_Union(m_pBuffer, m_pUnion);
+				SG_Polygon_Union(m_pBuffer, m_pUnion);
 			}
 		}
 		else

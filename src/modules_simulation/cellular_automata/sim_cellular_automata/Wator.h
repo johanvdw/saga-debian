@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Wator.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Wator.h 1084 2011-06-08 08:10:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,7 +96,8 @@ protected:
 
 private:
 
-	int						Fish_Birth, Shark_Birth, Shark_Starve, nFishes, nSharks;
+	int						Fish_Birth, Shark_Birth, Shark_Starve;
+	long					nFishes, nSharks;
 
 	CSG_Grid					*pWator, *pNext, *pAge, *pStarve;
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1137 2011-07-21 13:18:03Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -105,6 +105,7 @@ const SG_Char * Get_Info(int i)
 #include "pointcloud_from_file.h"
 #include "pointcloud_from_text_file.h"
 #include "svg.h"
+#include "pointcloud_to_text_file.h"
 
 
 //---------------------------------------------------------
@@ -132,6 +133,7 @@ CSG_Module *		Create_Module(int i)
 	case 15:	return( new CPointCloud_From_File );
 	case 16:	return( new CPointCloud_From_Text_File );
 	case 17:	return( new CSVG_Export );
+	case 18:	return( new CPointcloud_To_Text_File );
 	}
 
 	return( NULL );

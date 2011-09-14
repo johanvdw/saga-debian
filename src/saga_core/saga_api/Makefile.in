@@ -35,8 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/saga_core/saga_api
-DIST_COMMON = $(am__python_PYTHON_DIST) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 	$(top_srcdir)/m4/ax_python_devel.m4 \
@@ -48,6 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -71,42 +71,41 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pythondir)" \
-	"$(DESTDIR)$(pythondir)"
-LTLIBRARIES = $(lib_LTLIBRARIES) $(python_LTLIBRARIES)
-@SAGA_PYTHON_TRUE@_saga_api_la_DEPENDENCIES = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am___saga_api_la_SOURCES_DIST = saga_api_wrap.cxx
-@SAGA_PYTHON_TRUE@am__saga_api_la_OBJECTS =  \
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pyexecdir)" \
+	"$(DESTDIR)$(pyexecdir)"
+LTLIBRARIES = $(lib_LTLIBRARIES) $(pyexec_LTLIBRARIES)
+@SAGA_PYTHON_TRUE@_saga_api_la_DEPENDENCIES = libsaga_api.la
+@SAGA_PYTHON_TRUE@nodist__saga_api_la_OBJECTS =  \
 @SAGA_PYTHON_TRUE@	_saga_api_la-saga_api_wrap.lo
-_saga_api_la_OBJECTS = $(am__saga_api_la_OBJECTS)
+_saga_api_la_OBJECTS = $(nodist__saga_api_la_OBJECTS)
 _saga_api_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(_saga_api_la_LDFLAGS) $(LDFLAGS) -o $@
-@SAGA_PYTHON_TRUE@am__saga_api_la_rpath = -rpath $(pythondir)
+@SAGA_PYTHON_TRUE@am__saga_api_la_rpath = -rpath $(pyexecdir)
 libsaga_api_la_LIBADD =
 am_libsaga_api_la_OBJECTS = api_callback.lo api_colors.lo api_core.lo \
 	api_file.lo api_memory.lo api_string.lo api_translator.lo \
-	dataobject.lo geo_classes.lo geo_functions.lo grid.lo \
-	grid_io.lo grid_memory.lo grid_operation.lo grid_pyramid.lo \
-	grid_system.lo mat_formula.lo mat_grid_radius.lo \
-	mat_indexing.lo mat_matrix.lo mat_regression.lo \
-	mat_regression_multiple.lo mat_spline.lo mat_tools.lo \
-	mat_trend.lo metadata.lo module.lo module_grid.lo \
+	clipper.lo dataobject.lo geo_classes.lo geo_functions.lo \
+	grid.lo grid_io.lo grid_memory.lo grid_operation.lo \
+	grid_pyramid.lo grid_system.lo mat_formula.lo \
+	mat_grid_radius.lo mat_indexing.lo mat_matrix.lo \
+	mat_regression.lo mat_regression_multiple.lo mat_spline.lo \
+	mat_tools.lo mat_trend.lo metadata.lo module.lo module_grid.lo \
 	module_grid_interactive.lo module_interactive.lo \
 	module_interactive_base.lo module_library.lo \
 	module_library_interface.lo parameter.lo parameter_data.lo \
 	parameters.lo pointcloud.lo projections.lo quadtree.lo \
 	saga_api.lo shape.lo shape_line.lo shape_part.lo \
 	shape_point.lo shape_points.lo shape_polygon.lo shapes.lo \
-	shapes_io.lo shapes_ogis.lo shapes_search.lo \
-	shapes_selection.lo table.lo table_dbase.lo table_io.lo \
-	table_record.lo table_selection.lo tin.lo tin_elements.lo \
-	tin_triangulation.lo
+	shapes_io.lo shapes_ogis.lo shapes_polygons.lo \
+	shapes_search.lo shapes_selection.lo table.lo table_dbase.lo \
+	table_io.lo table_record.lo table_selection.lo tin.lo \
+	tin_elements.lo tin_triangulation.lo
 libsaga_api_la_OBJECTS = $(am_libsaga_api_la_OBJECTS)
 libsaga_api_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libsaga_api_la_LDFLAGS) $(LDFLAGS) -o $@
-DEFAULT_INCLUDES = -I.@am__isrc@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -128,10 +127,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(_saga_api_la_SOURCES) $(libsaga_api_la_SOURCES)
-DIST_SOURCES = $(am___saga_api_la_SOURCES_DIST) \
-	$(libsaga_api_la_SOURCES)
-am__python_PYTHON_DIST = saga_api.py
+SOURCES = $(nodist__saga_api_la_SOURCES) $(libsaga_api_la_SOURCES)
+DIST_SOURCES = $(libsaga_api_la_SOURCES)
 py_compile = $(top_srcdir)/py-compile
 ETAGS = etags
 CTAGS = ctags
@@ -180,6 +177,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LOCAL_INCS = @LOCAL_INCS@
+LOCAL_LIBS = @LOCAL_LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -275,7 +274,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 942 2011-02-25 20:13:19Z johanvdw $
+# $Id: Makefile.am 1242 2011-11-23 18:33:52Z johanvdw $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_PYTHON_TRUE@SAGAPYTHONFLAGS = -D_SAGA_PYTHON
@@ -293,6 +292,7 @@ api_file.cpp\
 api_memory.cpp\
 api_string.cpp\
 api_translator.cpp\
+clipper.cpp\
 dataobject.cpp\
 geo_classes.cpp\
 geo_functions.cpp\
@@ -335,6 +335,7 @@ shape_polygon.cpp\
 shapes.cpp\
 shapes_io.cpp\
 shapes_ogis.cpp\
+shapes_polygons.cpp\
 shapes_search.cpp\
 shapes_selection.cpp\
 table.cpp\
@@ -346,6 +347,7 @@ tin.cpp\
 tin_elements.cpp\
 tin_triangulation.cpp\
 api_core.h\
+clipper.hpp\
 dataobject.h\
 geo_tools.h\
 grid.h\
@@ -366,10 +368,10 @@ tin.h
 @SAGA_UNICODE_TRUE@SWIGUNICODEFLAGS = -D_SWIG_WCHAR -D_SAGA_UNICODE
 @SAGA_PYTHON_TRUE@_saga_api_la_CPPFLAGS = $(PYTHON_CPPFLAGS) $(SWIGUNICODEFLAGS) $(DISABLELIBHARU)
 @SAGA_PYTHON_TRUE@_saga_api_la_LDFLAGS = -module -release $(VERSION) $(SWIG_LIB)
-@SAGA_PYTHON_TRUE@_saga_api_la_SOURCES = saga_api_wrap.cxx
-@SAGA_PYTHON_TRUE@_saga_api_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-@SAGA_PYTHON_TRUE@python_LTLIBRARIES = _saga_api.la
-@SAGA_PYTHON_TRUE@python_PYTHON = saga_api.py
+@SAGA_PYTHON_TRUE@nodist__saga_api_la_SOURCES = saga_api_wrap.cxx
+@SAGA_PYTHON_TRUE@_saga_api_la_LIBADD = libsaga_api.la
+@SAGA_PYTHON_TRUE@pyexec_LTLIBRARIES = _saga_api.la
+@SAGA_PYTHON_TRUE@nodist_pyexec_PYTHON = saga_api.py
 CLEANFILES = saga_api_wrap.cxx
 all: all-am
 
@@ -436,32 +438,32 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-install-pythonLTLIBRARIES: $(python_LTLIBRARIES)
+install-pyexecLTLIBRARIES: $(pyexec_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(pythondir)" || $(MKDIR_P) "$(DESTDIR)$(pythondir)"
-	@list='$(python_LTLIBRARIES)'; test -n "$(pythondir)" || list=; \
+	test -z "$(pyexecdir)" || $(MKDIR_P) "$(DESTDIR)$(pyexecdir)"
+	@list='$(pyexec_LTLIBRARIES)'; test -n "$(pyexecdir)" || list=; \
 	list2=; for p in $$list; do \
 	  if test -f $$p; then \
 	    list2="$$list2 $$p"; \
 	  else :; fi; \
 	done; \
 	test -z "$$list2" || { \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(pythondir)'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(pythondir)"; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(pyexecdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(pyexecdir)"; \
 	}
 
-uninstall-pythonLTLIBRARIES:
+uninstall-pyexecLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(python_LTLIBRARIES)'; test -n "$(pythondir)" || list=; \
+	@list='$(pyexec_LTLIBRARIES)'; test -n "$(pyexecdir)" || list=; \
 	for p in $$list; do \
 	  $(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(pythondir)/$$f'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(pythondir)/$$f"; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(pyexecdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(pyexecdir)/$$f"; \
 	done
 
-clean-pythonLTLIBRARIES:
-	-test -z "$(python_LTLIBRARIES)" || rm -f $(python_LTLIBRARIES)
-	@list='$(python_LTLIBRARIES)'; for p in $$list; do \
+clean-pyexecLTLIBRARIES:
+	-test -z "$(pyexec_LTLIBRARIES)" || rm -f $(pyexec_LTLIBRARIES)
+	@list='$(pyexec_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
@@ -486,6 +488,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api_memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api_translator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clipper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dataobject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geo_classes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geo_functions.Plo@am__quote@
@@ -528,6 +531,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_ogis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_polygons.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_search.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_selection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table.Plo@am__quote@
@@ -593,10 +597,10 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-pythonPYTHON: $(python_PYTHON)
+install-nodist_pyexecPYTHON: $(nodist_pyexec_PYTHON)
 	@$(NORMAL_INSTALL)
-	test -z "$(pythondir)" || $(MKDIR_P) "$(DESTDIR)$(pythondir)"
-	@list='$(python_PYTHON)'; dlist=; list2=; test -n "$(pythondir)" || list=; \
+	test -z "$(pyexecdir)" || $(MKDIR_P) "$(DESTDIR)$(pyexecdir)"
+	@list='$(nodist_pyexec_PYTHON)'; dlist=; list2=; test -n "$(pyexecdir)" || list=; \
 	for p in $$list; do \
 	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
 	  if test -f $$b$$p; then \
@@ -607,30 +611,30 @@ install-pythonPYTHON: $(python_PYTHON)
 	done; \
 	for file in $$list2; do echo $$file; done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pythondir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pythondir)" || exit $$?; \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pyexecdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pyexecdir)" || exit $$?; \
 	done || exit $$?; \
 	if test -n "$$dlist"; then \
 	  if test -z "$(DESTDIR)"; then \
-	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pythondir)" $$dlist; \
+	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pyexecdir)" $$dlist; \
 	  else \
-	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pythondir)" $$dlist; \
+	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pyexecdir)" $$dlist; \
 	  fi; \
 	else :; fi
 
-uninstall-pythonPYTHON:
+uninstall-nodist_pyexecPYTHON:
 	@$(NORMAL_UNINSTALL)
-	@list='$(python_PYTHON)'; test -n "$(pythondir)" || list=; \
+	@list='$(nodist_pyexec_PYTHON)'; test -n "$(pyexecdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	test -n "$$files" || exit 0; \
 	filesc=`echo "$$files" | sed 's|$$|c|'`; \
 	fileso=`echo "$$files" | sed 's|$$|o|'`; \
-	echo " ( cd '$(DESTDIR)$(pythondir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(pythondir)" && rm -f $$files || exit $$?; \
-	echo " ( cd '$(DESTDIR)$(pythondir)' && rm -f" $$filesc ")"; \
-	cd "$(DESTDIR)$(pythondir)" && rm -f $$filesc || exit $$?; \
-	echo " ( cd '$(DESTDIR)$(pythondir)' && rm -f" $$fileso ")"; \
-	cd "$(DESTDIR)$(pythondir)" && rm -f $$fileso
+	echo " ( cd '$(DESTDIR)$(pyexecdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(pyexecdir)" && rm -f $$files || exit $$?; \
+	echo " ( cd '$(DESTDIR)$(pyexecdir)' && rm -f" $$filesc ")"; \
+	cd "$(DESTDIR)$(pyexecdir)" && rm -f $$filesc || exit $$?; \
+	echo " ( cd '$(DESTDIR)$(pyexecdir)' && rm -f" $$fileso ")"; \
+	cd "$(DESTDIR)$(pyexecdir)" && rm -f $$fileso
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -718,7 +722,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(pythondir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(pyexecdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -750,7 +754,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	clean-pythonLTLIBRARIES mostlyclean-am
+	clean-pyexecLTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -770,13 +774,14 @@ info: info-am
 
 info-am:
 
-install-data-am: install-pythonLTLIBRARIES install-pythonPYTHON
+install-data-am:
 
 install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-libLTLIBRARIES install-nodist_pyexecPYTHON \
+	install-pyexecLTLIBRARIES
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 install-html: install-html-am
@@ -817,27 +822,27 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libLTLIBRARIES uninstall-pythonLTLIBRARIES \
-	uninstall-pythonPYTHON
+uninstall-am: uninstall-libLTLIBRARIES uninstall-nodist_pyexecPYTHON \
+	uninstall-pyexecLTLIBRARIES
 
 .MAKE: install-am install-exec-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool clean-pythonLTLIBRARIES \
+	clean-libLTLIBRARIES clean-libtool clean-pyexecLTLIBRARIES \
 	ctags distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-exec-hook install-html install-html-am \
 	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-pythonLTLIBRARIES install-pythonPYTHON \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-libLTLIBRARIES uninstall-pythonLTLIBRARIES \
-	uninstall-pythonPYTHON
+	install-man install-nodist_pyexecPYTHON install-pdf \
+	install-pdf-am install-ps install-ps-am \
+	install-pyexecLTLIBRARIES install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-libLTLIBRARIES \
+	uninstall-nodist_pyexecPYTHON uninstall-pyexecLTLIBRARIES
 
 
 install-exec-hook:

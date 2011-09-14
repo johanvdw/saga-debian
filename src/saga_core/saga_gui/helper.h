@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: helper.h 1003 2011-04-19 10:21:49Z oconrad $
+ * Version $Id: helper.h 1196 2011-10-17 12:34:49Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -95,6 +95,9 @@ double				Degree_To_Decimal				(double Deg, double Min, double Sec);
 void				Decimal_To_Degree				(double Value, double &Deg, double &Min, double &Sec);
 
 //---------------------------------------------------------
+wxString			Get_nBytes_asString				(int nBytes, int Precision = -1);
+
+//---------------------------------------------------------
 double				Get_Random						(double loValue, double hiValue);
 
 //---------------------------------------------------------
@@ -103,6 +106,11 @@ wxString			Get_FilePath_Absolute			(const wxChar *Directory, const wxChar *FileN
 
 //---------------------------------------------------------
 wxString			Get_TableInfo_asHTML			(class CSG_Table *pTable);
+
+//---------------------------------------------------------
+bool				Set_Font						(CSG_Parameter *pFont, wxFont &Font, wxColour &Colour);
+bool				Set_Font						(const wxFont &Font, wxColour Colour, CSG_Parameter *pFont);
+wxFont				Get_Font						(CSG_Parameter *pFont);
 
 //---------------------------------------------------------
 wxColour			Get_Color_asWX					(int Color);
@@ -188,7 +196,8 @@ void				STATUSBAR_Set_Text				(const wxChar *Text, int iPane = 0);
 //---------------------------------------------------------
 #define DESC_ADD_STR(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, value))
 #define DESC_ADD_INT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value))
-#define DESC_ADD_FLT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, SG_Get_String(value, -2).c_str()))
+#define DESC_ADD_LONG(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%ld</td></tr>"), label, value))
+#define DESC_ADD_FLT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, SG_Get_String(value, -20).c_str()))
 
 
 ///////////////////////////////////////////////////////////

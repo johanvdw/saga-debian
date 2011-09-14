@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: las_import.cpp 1032 2011-05-03 10:20:47Z oconrad $
+ * Version $Id: las_import.cpp 1166 2011-09-21 07:20:20Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -213,6 +213,28 @@ bool CLAS_Import::On_Execute(void)
         return (false);
     }
 
+	//-----------------------------------------------------
+	// Check if LAS version is supported
+	liblas::LASReader *pReader;
+	try {
+		pReader = new liblas::LASReader(ifs);
+	}
+	catch(std::exception &e) {
+		SG_UI_Msg_Add_Error(CSG_String::Format(_TL("LAS header exception: %s"), e.what()));
+		ifs.close();
+        return (false);
+	}
+	catch(...) {
+		SG_UI_Msg_Add_Error(CSG_String::Format(_TL("Unknown LAS header exception!")));
+		ifs.close();
+        return (false);
+	}
+	
+	delete (pReader);
+	ifs.clear();
+	//-----------------------------------------------------
+
+
     liblas::LASReader reader(ifs);
 
     liblas::LASHeader const& header = reader.GetHeader();
@@ -240,7 +262,7 @@ bool CLAS_Import::On_Execute(void)
 	ADD_FIELD("e", VAR_e, _TL("edge of flight line flag")			, SG_DATATYPE_Char);
 	ADD_FIELD("d", VAR_d, _TL("direction of scan flag")				, SG_DATATYPE_Char);
 	ADD_FIELD("p", VAR_p, _TL("point source ID")					, SG_DATATYPE_Int);		// SG_DATATYPE_Word
-	ADD_FIELD("C", VAR_C, _TL("rgb color")							, SG_DATATYPE_Long);
+	ADD_FIELD("C", VAR_C, _TL("rgb color")							, SG_DATATYPE_Int);
 
 	//-----------------------------------------------------
 	int		iPoint	= 0;
@@ -302,9 +324,9 @@ bool CLAS_Import::On_Execute(void)
 	DataObject_Get_Parameters(pPoints, sParms);
 
 	if (sParms("METRIC_ATTRIB")	&& sParms("COLORS_TYPE") && sParms("METRIC_COLORS")
-		&& sParms("METRIC_ZRANGE") && sParms("COLORS_AGGREGATE"))
+		&& sParms("METRIC_ZRANGE") && sParms("DISPLAY_VALUE_AGGREGATE"))
 	{
-		sParms("COLORS_AGGREGATE")->Set_Value(3);				// highest z
+		sParms("DISPLAY_VALUE_AGGREGATE")->Set_Value(3);		// highest z
 		sParms("COLORS_TYPE")->Set_Value(2);                    // graduated color
 		sParms("METRIC_COLORS")->asColors()->Set_Count(255);    // number of colors
 		sParms("METRIC_ATTRIB")->Set_Value(2);					// z attrib

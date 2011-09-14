@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gw_multi_regression_grid.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: gw_multi_regression_grid.cpp 1177 2011-09-28 08:06:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -484,6 +484,14 @@ bool CGW_Multi_Regression_Grid::Get_Regression(int x, int y)
 		tss	+= m_w[i] * SG_Get_Square(m_z[i] - zMean);
 	}
 
+	m_pQuality  ->Set_Value(x, y, tss > 0.0 ? (tss - rss) / tss : 0.0);
+
+	for(i=0; i<m_pSlopes->Get_Count(); i++)
+	{
+		m_pSlopes->asGrid(i)->Set_Value(x, y, b[i]);
+	}
+
+	//-----------------------------------------------------
 	zr	= b[0];
 
 	for(i=0; i<m_pPredictors->Get_Count(); i++)
@@ -492,12 +500,6 @@ bool CGW_Multi_Regression_Grid::Get_Regression(int x, int y)
 	}
 
 	m_pRegression->Set_Value(x, y, zr);
-	m_pQuality   ->Set_Value(x, y, tss > 0.0 ? (tss - rss) / tss : 0.0);
-
-	for(i=0; i<m_pSlopes->Get_Count(); i++)
-	{
-		m_pSlopes->asGrid(i)->Set_Value(x, y, b[i]);
-	}
 
 	//-----------------------------------------------------
 	return( true );

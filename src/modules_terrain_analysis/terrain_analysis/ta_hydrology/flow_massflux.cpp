@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: flow_massflux.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: flow_massflux.cpp 1091 2011-06-16 15:50:52Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ const int	yDir[4]	= {	1, 0, 0, 1	};
 //---------------------------------------------------------
 CFlow_MassFlux::CFlow_MassFlux(void)
 {
-	Set_Name		(_TL("Flow Accumulation, Mass-Flux Method"));
+	Set_Name		(_TL("Catchment Area (Mass-Flux Method)"));
 
 	Set_Author		(SG_T("O. Conrad (c) 2009"));
 
