@@ -13,6 +13,9 @@ UPSTREAM_VERSION ?=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\
 debian/% :: debian/%.in
 	sed -e 's/@VERSION@/$(VERSION)/' $< >$@
 
+override_dh_python2:
+	dh_python2 --no-guessing-versions
+
 get-orig-source:
 	wget $(UPSTREAM_URL)
 	gunzip *.tar.gz

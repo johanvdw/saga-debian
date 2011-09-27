@@ -1,3 +1,16 @@
+saga (2.0.7+dfsg-2) unstable; urgency=low
+
+  [ Francesco Paolo Lovergine ]
+  * Added missing ${python:Depends} in python-saga and remove autodetection
+    of python versions. Thanks Jakub Wilk.
+    (closes: #642566)
+
+  [ Johan Van de Wauw ]
+  * Install man-files correctly.
+  * Add python-saga to the right section.
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Tue, 27 Sep 2011 15:27:31 +0200
+
 saga (2.0.7+dfsg-1) unstable; urgency=low
 
   [ Johan Van de Wauw ]

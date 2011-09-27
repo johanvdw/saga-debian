@@ -53,7 +53,7 @@ Description: SAGA GIS development files
 Package: python-saga
 Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, libsaga (= ${binary:Version})
 Suggests: saga (= ${binary:Version})
 Description: SAGA GIS python bindings
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
