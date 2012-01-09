@@ -7,11 +7,11 @@ Subject: Adjust grid_gridding to use qhull
  src/modules/grid/grid_gridding/nn/delaunay.c |    2 +-
  2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/src/modules/grid/grid_gridding/Makefile.am b/src/modules/grid/grid_gridding/Makefile.am
-index e622419..470a189 100644
---- a/src/modules/grid/grid_gridding/Makefile.am
-+++ b/src/modules/grid/grid_gridding/Makefile.am
-@@ -13,7 +13,7 @@ endif
+Index: saga/src/modules/grid/grid_gridding/Makefile.am
+===================================================================
+--- saga.orig/src/modules/grid/grid_gridding/Makefile.am	2012-01-09 14:32:56.000000000 +0100
++++ saga/src/modules/grid/grid_gridding/Makefile.am	2012-01-09 14:38:35.000000000 +0100
+@@ -13,7 +13,7 @@
  DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
  CXX_INCS           = -I$(top_srcdir)/src/saga_core
  AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
@@ -20,7 +20,7 @@ index e622419..470a189 100644
  pkglib_LTLIBRARIES = libgrid_gridding.la
  libgrid_gridding_la_SOURCES =\
  Interpolation.cpp\
-@@ -33,7 +33,6 @@ Shepard.cpp\
+@@ -33,7 +33,6 @@
  ./nn/nnai.c\
  ./nn/nncommon.c\
  ./nn/nnpi.c\
@@ -28,7 +28,7 @@ index e622419..470a189 100644
  Interpolation.h\
  Interpolation_InverseDistance.h\
  Interpolation_NaturalNeighbour.h\
-@@ -49,7 +48,6 @@ Shepard.h\
+@@ -49,7 +48,6 @@
  ./nn/istack.h\
  ./nn/nan.h\
  ./nn/nn.h\
@@ -36,10 +36,10 @@ index e622419..470a189 100644
  ./nn/version.h
  
  libgrid_gridding_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-diff --git a/src/modules/grid/grid_gridding/nn/delaunay.c b/src/modules/grid/grid_gridding/nn/delaunay.c
-index dc98875..e2952fa 100644
---- a/src/modules/grid/grid_gridding/nn/delaunay.c
-+++ b/src/modules/grid/grid_gridding/nn/delaunay.c
+Index: saga/src/modules/grid/grid_gridding/nn/delaunay.c
+===================================================================
+--- saga.orig/src/modules/grid/grid_gridding/nn/delaunay.c	2012-01-09 14:32:56.000000000 +0100
++++ saga/src/modules/grid/grid_gridding/nn/delaunay.c	2012-01-09 14:36:48.000000000 +0100
 @@ -24,7 +24,7 @@
   *
   *****************************************************************************/
@@ -49,4 +49,3 @@ index dc98875..e2952fa 100644
  
  #include <stdlib.h>
  #include <stdio.h>
--- 
