@@ -2,8 +2,9 @@ saga (2.0.7+dfsg-3) unstable; urgency=low
 
   * Fixed python support in debian/rules for dh call.
     (closes: #642566)
+  * Fixed a bit of mess in patchset.
 
- -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 09 Jan 2012 13:59:44 +0100
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 09 Jan 2012 14:07:44 +0100
 
 saga (2.0.7+dfsg-2) unstable; urgency=low
 
