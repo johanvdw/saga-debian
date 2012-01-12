@@ -8,8 +8,8 @@ Subject: Use debian version of grib2
 
 Index: saga/src/modules_io/grid/io_grid_grib2/Makefile.am
 ===================================================================
---- saga.orig/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:10:56.000000000 +0100
-+++ saga/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:13:43.000000000 +0100
+--- saga.orig/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:32:56.000000000 +0100
++++ saga/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:41:05.000000000 +0100
 @@ -14,54 +14,6 @@
  AM_LDFLAGS         = -fPIC -shared -avoid-version $(LOCAL_LIBS) -ljasper
  pkglib_LTLIBRARIES = libio_grid_grib2.la
