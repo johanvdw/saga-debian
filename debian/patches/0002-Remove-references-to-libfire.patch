@@ -27,4 +27,3 @@ index 71a438b..39e85c9 100644
 @@ -1 +1 @@
 -SUBDIRS = hydrology fire ecosystems cellular_automata
 +SUBDIRS = hydrology ecosystems cellular_automata
--- 
