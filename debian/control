@@ -6,7 +6,7 @@ Uploaders: Johan Van de Wauw <johan.vandewauw@gmail.com>, Francesco Paolo Loverg
 Build-Depends: libwxgtk2.8-dev, wx-common, libgdal-dev, libexpat-dev,
  libogdi3.2-dev, libproj-dev, libgrib2c-dev, debhelper (>=8), swig,
  libqhull-dev, libhpdf-dev, libvigraimpex-dev, python-dev, liblas-dev
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 Homepage: http://www.saga-gis.org/
 Vcs-Git: git://git.debian.org/pkg-grass/saga.git
 Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
@@ -43,7 +43,7 @@ Package: libsaga
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: libsaga-2.0.7
+Provides: libsaga-2.0.8
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.

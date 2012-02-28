@@ -1,3 +1,13 @@
+saga (2.0.8+dfsg-2) unstable; urgency=low
+
+  [ Johan Van de Wauw ]
+  * Run autoreconf after last grib2 fix + more logical patches.
+
+  [ Francesco Paolo Lovergine ]
+  * Policy bumped to 3.9.3, no changes required.
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Tue, 28 Feb 2012 23:46:51 +0100
+
 saga (2.0.8+dfsg-1) unstable; urgency=low
 
   [ Francesco Paolo Lovergine ]
