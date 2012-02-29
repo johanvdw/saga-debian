@@ -2,16 +2,24 @@ From: Johan Van de Wauw <johan.vandewauw@gmail.com>
 Date: Wed, 15 Jun 2011 14:31:19 -0400
 Subject: Use debian version of grib2
 
----
- src/modules_io/grid/io_grid_grib2/Makefile.am |   48 -------------------------
- 1 files changed, 0 insertions(+), 48 deletions(-)
+Update GRIB2
 
-Index: saga/src/modules_io/grid/io_grid_grib2/Makefile.am
-===================================================================
---- saga.orig/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:32:56.000000000 +0100
-+++ saga/src/modules_io/grid/io_grid_grib2/Makefile.am	2012-01-09 14:41:05.000000000 +0100
-@@ -14,54 +14,6 @@
- AM_LDFLAGS         = -fPIC -shared -avoid-version $(LOCAL_LIBS) -ljasper
+Use debian version of grib2
+---
+ src/modules_io/grid/io_grid_grib2/Makefile.am    |   50 +---------------------
+ src/modules_io/grid/io_grid_grib2/grib2_import.h |    2 +-
+ 2 files changed, 2 insertions(+), 50 deletions(-)
+
+diff --git a/src/modules_io/grid/io_grid_grib2/Makefile.am b/src/modules_io/grid/io_grid_grib2/Makefile.am
+index 7a2c840..a022282 100644
+--- a/src/modules_io/grid/io_grid_grib2/Makefile.am
++++ b/src/modules_io/grid/io_grid_grib2/Makefile.am
+@@ -11,57 +11,9 @@ DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -DUSE_JPEG200
+ CXX_INCS           = -I$(top_srcdir)/src/saga_core $(LOCAL_INCS)
+ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+ #AM_LDFLAGS         = -fPIC -shared -avoid-version -lpq -ljasper
+-AM_LDFLAGS         = -fPIC -shared -avoid-version $(LOCAL_LIBS) -ljasper
++AM_LDFLAGS         = -fPIC -shared -avoid-version $(LOCAL_LIBS) -ljasper -lgrib2c
  pkglib_LTLIBRARIES = libio_grid_grib2.la
  libio_grid_grib2_la_SOURCES =\
 -./g2clib-1.0.4/cmplxpack.c\
@@ -65,3 +73,16 @@ Index: saga/src/modules_io/grid/io_grid_grib2/Makefile.am
  grib2_import.cpp\
  MLB_Interface.cpp\
  grib2_import.h\
+diff --git a/src/modules_io/grid/io_grid_grib2/grib2_import.h b/src/modules_io/grid/io_grid_grib2/grib2_import.h
+index ed9584e..fdcaecc 100644
+--- a/src/modules_io/grid/io_grid_grib2/grib2_import.h
++++ b/src/modules_io/grid/io_grid_grib2/grib2_import.h
+@@ -11,7 +11,7 @@
+ 
+ #include "MLB_Interface.h"
+ extern "C" {
+-#include "g2clib-1.0.4/grib2.h"
++#include <grib2.h>
+ }
+ 
+ 
