@@ -1,3 +1,10 @@
+saga (2.0.8+dfsg-3) unstable; urgency=low
+
+  * Removed libvigraimpex-dev b-d.
+    (closes: #669468)
+
+ -- Francesco Paolo Lovergine <frankie@debian.org>  Mon, 18 Jun 2012 14:28:12 +0200
+
 saga (2.0.8+dfsg-2) unstable; urgency=low
 
   [ Johan Van de Wauw ]
