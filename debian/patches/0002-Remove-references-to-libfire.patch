@@ -8,10 +8,10 @@ Subject: Remove references to libfire
  2 files changed, 1 insertions(+), 3 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index f4fa495..5b0a363 100755
+index 39bb709..bfab6be 100755
 --- a/configure.in
 +++ b/configure.in
-@@ -205,8 +205,6 @@ AC_OUTPUT(Makefile \
+@@ -261,8 +261,6 @@ AC_OUTPUT(Makefile \
  	src/modules_simulation/cellular_automata/sim_cellular_automata/Makefile \
  	src/modules_simulation/ecosystems/Makefile \
  	src/modules_simulation/ecosystems/sim_ecosystems_hugget/Makefile \

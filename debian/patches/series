@@ -1,7 +1,5 @@
 0001-Adjust-grid_gridding-to-use-qhull.patch
 0002-Remove-references-to-libfire.patch
 0003-Use-debian-version-of-grib2.patch
-0004-Run-autoreconf-fi.patch
-0005-Fix-GCC-build-issue.patch
-0006-Use-debian-version-of-grib2.patch
-0007-Fix-for-gcc-4.6.patch
+0004-Use-debian-version-of-grib2.patch
+0005-autoreconf-fi.patch
