@@ -1,3 +1,10 @@
+saga (2.0.8+dfsg-4) UNRELEASED; urgency=low
+
+  * Correct saga-depends
+  * Add Missing Depends to libsaga-dev. Fixes #715109
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Wed, 17 Jul 2013 13:58:31 -0400
+
 saga (2.0.8+dfsg-3) unstable; urgency=low
 
   * Removed libvigraimpex-dev b-d.
