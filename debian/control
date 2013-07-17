@@ -29,7 +29,7 @@ Package: libsaga-dev
 Section: libdevel
 Architecture: any
 Suggests: saga (= ${binary:Version})
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
 Replaces: libsaga (<< 2.0.4+dfsg-3~)
 Breaks: libsaga (<< 2.0.4+dfsg-3~)
 Description: SAGA GIS development files
