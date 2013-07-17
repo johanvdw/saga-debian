@@ -1,4 +1,4 @@
-saga (2.0.8+dfsg-4) UNRELEASED; urgency=low
+saga (2.0.8+dfsg-4) unstable; urgency=low
 
   * Correct saga-depends
   * Add Missing Depends to libsaga-dev. Fixes #715109
