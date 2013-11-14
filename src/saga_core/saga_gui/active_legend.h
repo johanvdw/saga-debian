@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_legend.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: active_legend.h 1357 2012-03-27 16:41:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ public:
 
 private:
 
-	int							m_xScroll, m_yScroll, m_Layout;
+	int							m_xScroll, m_yScroll;
 
 	static double				m_Zoom;
 

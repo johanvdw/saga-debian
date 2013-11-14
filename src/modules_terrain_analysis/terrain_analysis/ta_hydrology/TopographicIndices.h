@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: TopographicIndices.h 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: TopographicIndices.h 1524 2012-11-09 15:08:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ class ta_hydrology_EXPORT CTWI : public CSG_Module_Grid
 public:
 	CTWI(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
 
 
 protected:
@@ -110,7 +110,7 @@ class ta_hydrology_EXPORT CStream_Power : public CSG_Module_Grid
 public:
 	CStream_Power(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
 
 
 protected:
@@ -133,7 +133,7 @@ class ta_hydrology_EXPORT CLS_Factor : public CSG_Module_Grid
 public:
 	CLS_Factor(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
 
 
 protected:
@@ -149,6 +149,29 @@ private:
 
 
 	double					Get_LS			(double Slope, double Area);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class ta_hydrology_EXPORT CTCI_Low : public CSG_Module_Grid
+{
+public:
+	CTCI_Low(void);
+
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
+
+
+protected:
+
+	virtual bool			On_Execute		(void);
+
+
+private:
 
 };
 

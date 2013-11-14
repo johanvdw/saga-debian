@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Interpolation.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Interpolation.cpp 1731 2013-06-18 09:35:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ CInterpolation::CInterpolation(void)
 	CSG_Parameter	*pNode	= Parameters.Add_Shapes(
 		NULL	, "SHAPES"		, _TL("Points"),
 		_TL(""),
-		PARAMETER_INPUT
+		PARAMETER_INPUT, SHAPE_TYPE_Point
 	);
 
 	Parameters.Add_Table_Field(
@@ -150,7 +150,7 @@ bool CInterpolation::On_Execute(void)
 	//-----------------------------------------------------
 	if( m_pGrid )
 	{
-		m_pGrid->Set_Name(CSG_String::Format(SG_T("%s (%s)"), m_pShapes->Get_Name(), Get_Name()));
+		m_pGrid->Set_Name(CSG_String::Format(SG_T("%s [%s]"), Parameters("FIELD")->asString(), Get_Name().c_str()));
 
 		bResult	= Interpolate();
 	}

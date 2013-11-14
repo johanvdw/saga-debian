@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_export.cpp 1048 2011-05-06 10:20:38Z reklov_w $
+ * Version $Id: grid_export.cpp 1472 2012-09-12 14:01:55Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,8 +82,10 @@ CGrid_Export::CGrid_Export(void)
 
 	Set_Description	(_TW(
 		"Saves a grid as image using display properties as used by the graphical user interface.\n\n"
-		"On the command line there are further parameters available to either use one of the default "
-		"palettes, to use a Lookup Table for coloring or to interpret the grid as RGB coded.\n")
+		"On the command line there are further parameters available: It is possible to either use one "
+		"of the default palettes, to use a Lookup Table for coloring or to interpret the grid as RGB coded. "
+		"In case a shade grid is specified, it's minimum and maximum brightness values can be specified in "
+		"percent (0 - 100\%).\n")
 	);
 
 	Parameters.Add_Grid(
@@ -171,6 +173,12 @@ CGrid_Export::CGrid_Export(void)
 			_TL(""),
 			PARAMETER_TYPE_Bool, false
 		);
+
+		Parameters.Add_Range(
+            NULL, "SHADE_BRIGHTNESS"    , _TL("Shade Brightness"),
+            _TL("Allows to scale shade brightness, [percent]"),
+            0.0, 100.0, 0.0, true, 100.0, true
+        );
 	}
 }
 
@@ -184,10 +192,9 @@ CGrid_Export::CGrid_Export(void)
 //---------------------------------------------------------
 bool CGrid_Export::On_Execute(void)
 {
-	wxInitAllImageHandlers();
 
 	int			x, y, c, r, g, b;
-	double		d;
+	double		d, dMinBright = 0.0, dMaxBright = 100.0;
 	CSG_Grid	*pGrid, *pShade, Grid, Shade;
 	CSG_File	Stream;
 	CSG_String	fName, fExt;
@@ -197,6 +204,19 @@ bool CGrid_Export::On_Execute(void)
 	pGrid	= Parameters("GRID")	->asGrid();
 	pShade	= Parameters("SHADE")	->asGrid();
 	fName	= Parameters("FILE")	->asString();
+
+    //-----------------------------------------------------
+    if( !SG_UI_Get_Window_Main() && pShade != NULL)
+    {
+        dMinBright  = Parameters("SHADE_BRIGHTNESS")->asRange()->Get_LoVal() / 100.0;
+        dMaxBright  = Parameters("SHADE_BRIGHTNESS")->asRange()->Get_HiVal() / 100.0;
+
+        if( dMinBright >= dMaxBright )
+        {
+            SG_UI_Msg_Add_Error(_TL("Minimum shade brightness must be lower than maximum shade brightness!"));
+            return( false );
+        }
+    }
 
 	//-----------------------------------------------------
 	if(      SG_File_Cmp_Extension(fName, SG_T("bmp")) )
@@ -256,7 +276,7 @@ bool CGrid_Export::On_Execute(void)
 					bool	bFound = false;
 
 					d = pGrid->asDouble(x, y);
-					
+
 					for(int i=0; i<pLUT->Get_Record_Count(); i++)
 					{
 						if( d >= pLUT->Get_Record(i)->asDouble(3) && d < pLUT->Get_Record(i)->asDouble(4) )
@@ -266,7 +286,7 @@ bool CGrid_Export::On_Execute(void)
 							break;
 						}
 					}
-					
+
 					if( !bFound )
 						Grid.Set_NoData(x, Get_NY() - 1 - y);
 					else
@@ -297,7 +317,7 @@ bool CGrid_Export::On_Execute(void)
 	else if( !SG_UI_DataObject_asImage(pShade, &Shade) )
 	{
 		int			nColors	= 100;
-		CSG_Colors	Colors(nColors, SG_COLORS_BLACK_WHITE);
+		CSG_Colors	Colors(nColors, SG_COLORS_BLACK_WHITE, true);
 
 		Shade.Create(*Get_System(), SG_DATATYPE_Int);
 
@@ -309,7 +329,7 @@ bool CGrid_Export::On_Execute(void)
 					Shade.Set_NoData(x, Get_NY() - 1 - y);
 				else
 					Shade.Set_Value(x, Get_NY() - 1 - y, Colors[(int)(
-						nColors * (pShade->asDouble(x, y) - pShade->Get_ZMin()) / pShade->Get_ZRange()
+						nColors * (dMaxBright - dMinBright) * (pShade->asDouble(x, y) - pShade->Get_ZMin()) / pShade->Get_ZRange() + dMinBright
 					)]);
 			}
 		}
@@ -350,7 +370,7 @@ bool CGrid_Export::On_Execute(void)
 
 		if( Stream.Open(SG_File_Make_Path(NULL, fName, fExt), SG_FILE_W, false) )
 		{
-			Stream.Printf(SG_T("%f\n%f\n%f\n%f\n%f\n%f\n"),
+			Stream.Printf(SG_T("%.10f\n%f\n%f\n%.10f\n%.10f\n%.10f\n"),
 				 pGrid->Get_Cellsize(),
 				 0.0, 0.0,
 				-pGrid->Get_Cellsize(),
@@ -373,10 +393,10 @@ bool CGrid_Export::On_Execute(void)
 			Stream.Printf(SG_T("        <href>%s</href>\n")				, SG_File_Get_Name(fName, true).c_str());
 			Stream.Printf(SG_T("      </Icon>\n"));
 			Stream.Printf(SG_T("      <LatLonBox>\n"));
-			Stream.Printf(SG_T("        <north>%f</north>\n")			, pGrid->Get_YMax());
-			Stream.Printf(SG_T("        <south>%f</south>\n")			, pGrid->Get_YMin());
-			Stream.Printf(SG_T("        <east>%f</east>\n")				, pGrid->Get_XMax());
-			Stream.Printf(SG_T("        <west>%f</west>\n")				, pGrid->Get_XMin());
+			Stream.Printf(SG_T("        <north>%.10f</north>\n")			, pGrid->Get_YMax());
+			Stream.Printf(SG_T("        <south>%.10f</south>\n")			, pGrid->Get_YMin());
+			Stream.Printf(SG_T("        <east>%.10f</east>\n")				, pGrid->Get_XMax());
+			Stream.Printf(SG_T("        <west>%.10f</west>\n")				, pGrid->Get_XMin());
 			Stream.Printf(SG_T("        <rotation>0.0</rotation>\n"));
 			Stream.Printf(SG_T("      </LatLonBox>\n"));
 			Stream.Printf(SG_T("    </GroundOverlay>\n"));

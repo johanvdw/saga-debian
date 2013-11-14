@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_distance.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: vigra_distance.cpp 1282 2011-12-29 17:13:26Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ bool CViGrA_Distance::On_Execute(void)
 	//-----------------------------------------------------
 	pOutput->Multiply(pOutput->Get_Cellsize());
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s - %s]"), pInput->Get_Name(), Get_Name(), Parameters("NORM")->asString()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s - %s]"), pInput->Get_Name(), Get_Name().c_str(), Parameters("NORM")->asString()));
 
 	return( true );
 }

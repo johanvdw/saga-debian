@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_manager.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_shapes_manager.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,36 +86,24 @@ class CWKSP_Shapes_Manager : public CWKSP_Base_Manager
 {
 public:
 	CWKSP_Shapes_Manager(void);
-	virtual ~CWKSP_Shapes_Manager(void);
 
-	virtual TWKSP_Item			Get_Type		(void)	{	return( WKSP_ITEM_Shapes_Manager );	}
+	virtual TWKSP_Item			Get_Type			(void)	{	return( WKSP_ITEM_Shapes_Manager );	}
 
-	virtual wxString			Get_Name		(void);
-	virtual wxString			Get_Description	(void);
+	virtual wxString			Get_Name			(void);
+	virtual wxString			Get_Description		(void);
 
-	virtual wxMenu *			Get_Menu		(void);
+	virtual wxMenu *			Get_Menu			(void);
 
-	virtual bool				On_Command		(int Cmd_ID);
+	class CWKSP_Shapes_Type *	Get_Shapes_Type		(int i)	{	return( (class CWKSP_Shapes_Type *)Get_Item(i) );	}
+	class CWKSP_Shapes_Type *	Get_Shapes_Type		(TSG_Shape_Type Type);
 
-	class CWKSP_Shapes_Type *	Get_Shapes_Type	(int Shape_Type);
-	class CWKSP_Shapes *		Get_Shapes		(class CSG_Shapes *pShapes);
-
-	bool						Exists			(class CSG_Shapes *pShapes);
-	class CWKSP_Shapes *		Add				(class CSG_Shapes *pShapes);
-	class CSG_Shapes *			Get_byFileName	(const wxChar *File_Name);
-
-	bool						Update			(class CSG_Shapes *pShapes, class CSG_Parameters *pParameters);
-	bool						Update_Views	(class CSG_Shapes *pShapes);
-	bool						Show			(class CSG_Shapes *pShapes, int Map_Mode);
-	bool						asImage			(class CSG_Shapes *pShapes, class CSG_Grid *pImage);
-
-	bool						Get_Colors		(class CSG_Shapes *pShapes, class CSG_Colors *pColors);
-	bool						Set_Colors		(class CSG_Shapes *pShapes, class CSG_Colors *pColors);
+	class CWKSP_Shapes *		Get_Data			(class CSG_Shapes *pShapes);
+	class CWKSP_Shapes *		Add_Data			(class CSG_Shapes *pShapes);
 
 
 private:
 
-	class CWKSP_Shapes_Type *	_Get_Shapes_Type(int Shape_Type);
+	class CWKSP_Shapes_Type *	_Get_Shapes_Type	(TSG_Shape_Type Type);
 
 };
 

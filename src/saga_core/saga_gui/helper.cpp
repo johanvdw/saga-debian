@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: helper.cpp 1194 2011-10-14 11:26:50Z oconrad $
+ * Version $Id: helper.cpp 1504 2012-10-27 17:43:15Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -132,30 +132,30 @@ void		Decimal_To_Degree(double Value, double &Deg, double &Min, double &Sec)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxString	Get_nBytes_asString(int nBytes, int Precision)
+wxString	Get_nBytes_asString(long nBytes, int Precision)
 {
 	if( nBytes < 1024 )
 	{
-		return( wxString::Format(wxT("%d %s"), nBytes, wxT("bytes")) );
+		return( wxString::Format(wxT("%ld %s"), nBytes, wxT("bytes")) );
 	}
 
 	double	dSize	= nBytes / 1024.0;
 
 	if( dSize < 1024 )
 	{
-		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("kb")) );
+		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("kB")) );
 	}
 
 	dSize	/= 1024.0;
 
 	if( dSize < 1024 )
 	{
-		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("mb")) );
+		return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("MB")) );
 	}
 
 	dSize	/= 1024.0;
 
-	return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("gb")) );
+	return( wxString::Format(wxT("%.*f %s"), Precision < 0 ? SG_Get_Significant_Decimals(dSize, 20) : Precision, dSize, wxT("GB")) );
 }
 
 
@@ -179,28 +179,17 @@ double		Get_Random(double loValue, double hiValue)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxString	Get_FilePath_Relative(const wxChar *Directory, const wxChar *FileName)
+wxString	Get_FilePath_Relative(const wxString &Directory, const wxString &FileName)
 {
-	int		i, n;
+	wxFileName	fn(FileName);
 
-	if( Directory && FileName && (n = SG_STR_LEN(Directory)) < (int)SG_STR_LEN(FileName) )
-	{
-		for(i=0; i<n; i++)
-		{
-			if( Directory[i] != FileName[i] )
-			{
-				return( FileName );
-			}
-		}
+	fn.MakeRelativeTo(Directory);
 
-		return( FileName + n );
-	}
-
-	return( FileName );
+	return( fn.GetFullPath() );
 }
 
 //---------------------------------------------------------
-wxString	Get_FilePath_Absolute(const wxChar *Directory, const wxChar *FileName)
+wxString	Get_FilePath_Absolute(const wxString &Directory, const wxString &FileName)
 {
 	if( wxIsAbsolutePath(FileName) )
 	{
@@ -218,29 +207,39 @@ wxString		Get_TableInfo_asHTML(CSG_Table *pTable)
 
 	if( pTable && pTable->is_Valid() )
 	{
-		s	+= wxString::Format(wxT("<hr><b>%s</b>"), LNG("[CAP] Table Description"));
+		s	+= wxString::Format(wxT("<hr><b>%s</b>"), _TL("Table Description"));
 
 		s	+= wxString::Format(wxT("<table border=\"1\"><tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th>"),
-			LNG("[CAP] Field"),
-			LNG("[CAP] Name"),
-			LNG("[CAP] Type"),
-			LNG("[CAP] Minimum"),
-			LNG("[CAP] Maximum"),
-			LNG("[CAP] Mean"),
-			LNG("[CAP] Standard Deviation")
+			_TL("Field"),
+			_TL("Name"),
+			_TL("Type"),
+			_TL("Minimum"),
+			_TL("Maximum"),
+			_TL("Mean"),
+			_TL("Standard Deviation")
 		);
 
 		for(int i=0; i<pTable->Get_Field_Count(); i++)
 		{
-			s	+= wxString::Format(wxT("<tr><td>%d</td><td>%s</td><td>%s</td><td>%f</td><td>%f</td><td>%f</td><td>%f</td></tr>"),
+			s	+= wxString::Format(wxT("<tr><td>%d</td><td>%s</td><td>%s</td>"),
 				i + 1,
 				pTable->Get_Field_Name(i),
-				SG_Data_Type_Get_Name(pTable->Get_Field_Type(i)),
-				pTable->Get_Minimum(i),
-				pTable->Get_Maximum(i),
-				pTable->Get_Mean(i),
-				pTable->Get_StdDev(i)
+				SG_Data_Type_Get_Name(pTable->Get_Field_Type(i)).c_str()
 			);
+
+			if( SG_Data_Type_is_Numeric(pTable->Get_Field_Type(i)) )
+			{
+				s	+= wxString::Format(wxT("<td align=\"right\">%s</td><td align=\"right\">%s</td><td align=\"right\">%s</td><td align=\"right\">%s</td></tr>"),
+					SG_Get_String(pTable->Get_Minimum(i), -6).c_str(),
+					SG_Get_String(pTable->Get_Maximum(i), -6).c_str(),
+					SG_Get_String(pTable->Get_Mean   (i), -6).c_str(),
+					SG_Get_String(pTable->Get_StdDev (i), -6).c_str()
+				);
+			}
+			else
+			{
+				s	+= wxString::Format(wxT("<td></td><td></td><td></td><td></td></tr>"));
+			}
 		}
 
 		s	+= wxT("</table>");
@@ -284,7 +283,7 @@ bool	Set_Font(const wxFont &Font, wxColour Colour, CSG_Parameter *pFont)
 	}
 
 	pFont->Set_Value((int)SG_GET_RGB(Colour.Red(), Colour.Green(), Colour.Blue()));
-	pFont->Set_Value(Font.GetNativeFontInfoDesc().c_str());
+	pFont->Set_Value(Font.GetNativeFontInfoDesc().wx_str());
 
 	return( true );
 }
@@ -467,7 +466,7 @@ void		MSG_General_Add_Line(void)
 }
 
 //---------------------------------------------------------
-void		MSG_General_Add(const wxChar *Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
+void		MSG_General_Add(const wxString &Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
 {
 	if( g_pINFO )
 	{
@@ -485,7 +484,7 @@ void		MSG_Error_Add_Line(void)
 }
 
 //---------------------------------------------------------
-void		MSG_Error_Add(const wxChar *Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
+void		MSG_Error_Add(const wxString &Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
 {
 	if( g_pINFO )
 	{
@@ -503,7 +502,7 @@ void		MSG_Execution_Add_Line(void)
 }
 
 //---------------------------------------------------------
-void		MSG_Execution_Add(const wxChar *Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
+void		MSG_Execution_Add(const wxString &Message, bool bNewLine, bool bTime, TSG_UI_MSG_STYLE Style)
 {
 	if( g_pINFO )
 	{
@@ -519,7 +518,7 @@ void		MSG_Execution_Add(const wxChar *Message, bool bNewLine, bool bTime, TSG_UI
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, wxString &Value)
+bool		CONFIG_Read(const wxString &Group, const wxString &Entry, wxString &Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -529,7 +528,7 @@ bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, wxString &Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, long &Value)
+bool		CONFIG_Read(const wxString &Group, const wxString &Entry, long &Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -539,7 +538,7 @@ bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, long &Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, double &Value)
+bool		CONFIG_Read(const wxString &Group, const wxString &Entry, double &Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -549,7 +548,7 @@ bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, double &Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, bool &Value)
+bool		CONFIG_Read(const wxString &Group, const wxString &Entry, bool &Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -559,7 +558,27 @@ bool		CONFIG_Read(const wxChar *Group, const wxChar *Entry, bool &Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, const wxChar *Value)
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, const wxString &Value)
+{
+	wxConfigBase	*pConfig	= wxConfigBase::Get();
+
+	pConfig->SetPath(wxString::Format(wxT("/%s"), Group));
+
+	return( pConfig->Write(Entry, Value) ? pConfig->Flush() : false );
+}
+
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, const char *Value)
+{
+	return( CONFIG_Write(Group, Entry, wxString(Value)) );
+}
+
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, const wchar_t *Value)
+{
+	return( CONFIG_Write(Group, Entry, wxString(Value)) );
+}
+
+//---------------------------------------------------------
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, long Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -569,7 +588,7 @@ bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, const wxChar *Value
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, long Value)
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, double Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -579,7 +598,7 @@ bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, long Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, double Value)
+bool		CONFIG_Write(const wxString &Group, const wxString &Entry, bool Value)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -589,24 +608,14 @@ bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, double Value)
 }
 
 //---------------------------------------------------------
-bool		CONFIG_Write(const wxChar *Group, const wxChar *Entry, bool Value)
-{
-	wxConfigBase	*pConfig	= wxConfigBase::Get();
-
-	pConfig->SetPath(wxString::Format(wxT("/%s"), Group));
-
-	return( pConfig->Write(Entry, Value) ? pConfig->Flush() : false );
-}
-
-//---------------------------------------------------------
-bool		CONFIG_Delete(const wxChar *Group)
+bool		CONFIG_Delete(const wxString &Group)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
 	return( pConfig->DeleteGroup(Group) ? pConfig->Flush() : false );
 }
 
-bool		CONFIG_Delete(const wxChar *Group, const wxChar *Entry)
+bool		CONFIG_Delete(const wxString &Group, const wxString &Entry)
 {
 	wxConfigBase	*pConfig	= wxConfigBase::Get();
 
@@ -684,7 +693,7 @@ bool		PROGRESSBAR_Set_Position(double Position, double Range)
 }
 
 //---------------------------------------------------------
-void		STATUSBAR_Set_Text(const wxChar *Text, int iPane)
+void		STATUSBAR_Set_Text(const wxString &Text, int iPane)
 {
 	if( g_pSAGA_Frame )
 	{
@@ -700,16 +709,16 @@ void		STATUSBAR_Set_Text(const wxChar *Text, int iPane)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		Open_Application(const wxChar *Reference, const wxChar *Mime_Extension)
+bool		Open_Application(const wxString &Reference, const wxString &Mime_Extension)
 {
 	bool		bResult		= false;
 
-	if( Reference && Reference[0] )
+	if( Reference.Length() )
 	{
 		wxString	Extension, sReference(Reference);
 		wxFileType	*pFileType;
 
-		if( Mime_Extension && Mime_Extension[0] )
+		if( Mime_Extension.Length() )
 		{
 			Extension	= Mime_Extension;
 		}
@@ -744,7 +753,7 @@ bool		Open_Application(const wxChar *Reference, const wxChar *Mime_Extension)
 }
 
 //---------------------------------------------------------
-bool		Open_WebBrowser(const wxChar *Reference)
+bool		Open_WebBrowser(const wxString &Reference)
 {
 	return( Open_Application(Reference, wxT("html")) );
 }
@@ -774,7 +783,7 @@ wxString Get_Online_Module_Description(const wxString &Library, int ID)
 		wxString	sPath	= wxT("/apps/trac/saga-gis/wiki/");
 		wxString	sRoot	= wxT("/apps/trac/saga-gis/");
 
-		wxString	sPage	= SG_File_Get_Name(Library, false).c_str();
+		wxString	sPage	= SG_File_Get_Name(Library, false).w_str();
 
 		if( sPage.Length() > 3 && sPage[0] == wxT('l') && sPage[1] == wxT('i') && sPage[2] == wxT('b') )	// remove linux prefix 'lib'
 		{

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1744 2013-06-21 10:42:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -92,6 +92,13 @@ const SG_Char * Get_Info(int i)
 
 #include "Image_VI_Distance.h"
 #include "Image_VI_Slope.h"
+#include "evi.h"
+#include "tasseled_cap.h"
+
+#include "pansharpening.h"
+
+#include "landsat_toar.h"
+#include "landsat_acca.h"
 
 
 //---------------------------------------------------------
@@ -103,9 +110,21 @@ CSG_Module *		Create_Module(int i)
 	{
 	case  0:	return( new CImage_VI_Distance );
 	case  1:	return( new CImage_VI_Slope );
-	}
+	case  2:	return( new CEnhanced_VI );
+	case  3:	return( new CTasseled_Cap );
 
-	return( NULL );
+	case  4:	return( new CPanSharp_IHS );
+	case  5:	return( new CPanSharp_Brovey );
+	case  6:	return( new CPanSharp_CN );
+	case  7:	return( new CPanSharp_PCA );
+
+	case  8:	return( new CLandsat_TOAR );
+	case  9:	return( new CLandsat_ACCA );
+
+	//-----------------------------------------------------
+	case 10:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
+	}
 }
 
 

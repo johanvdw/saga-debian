@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.h 1225 2011-11-15 16:28:38Z oconrad $
+ * Version $Id: module.h 1705 2013-05-29 10:59:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,6 +78,61 @@
 
 ///////////////////////////////////////////////////////////
 //														 //
+//		XML tags for mark-up of module synopsis	 		 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+#define SG_XML_SYSTEM				SG_T("system")
+#define SG_XML_SYSTEM_VER			SG_T("version")
+#define SG_XML_SYSTEM_MLP			SG_T("library-path")
+#define SG_XML_LIBRARY				SG_T("library")
+#define SG_XML_LIBRARY_PATH			SG_T("path")
+#define SG_XML_LIBRARY_NAME			SG_T("name")
+#define SG_XML_MODULE				SG_T("module")
+#define SG_XML_MODULE_ATT_NAME		SG_T("name")
+#define SG_XML_MODULE_ATT_ID		SG_T("id")
+#define SG_XML_MODULE_ATT_AUTHOR	SG_T("author")
+#define SG_XML_SPECIFICATION		SG_T("specification")
+#define SG_XML_SPEC_ATT_GRID		SG_T("grid")
+#define SG_XML_SPEC_ATT_INTERA		SG_T("interactive")
+#define SG_XML_MENU					SG_T("menu")
+#define SG_XML_DESCRIPTION			SG_T("description")
+#define SG_XML_PARAM				SG_T("parameter")
+#define SG_XML_PARAM_ATT_NAME		SG_T("name")
+#define SG_XML_PARAM_ATT_CLASS		SG_T("class")
+#define SG_XML_PARAM_MAND			SG_T("mandatory")
+#define SG_XML_PARAM_TYPE			SG_T("type")
+#define SG_XML_PARAM_IDENT			SG_T("identifier")
+#define SG_XML_PARAM_DESC			SG_T("description")
+#define SG_XML_PARAM_PROP			SG_T("properties")
+#define SG_XML_PARAM_LIST			SG_T("list")
+#define SG_XML_PARAM_ITEM			SG_T("item")
+#define SG_XML_PARAM_TABLE			SG_T("table")
+#define SG_XML_PARAM_FIELD			SG_T("field")
+#define SG_XML_PARAM_FIELD_ATT_NAME	SG_T("name")
+#define SG_XML_PARAM_FIELD_ATT_TYPE	SG_T("type")
+#define SG_XML_PARAM_MIN			SG_T("min")
+#define SG_XML_PARAM_MAX			SG_T("max")
+
+//---------------------------------------------------------
+#define SG_XML_ERROR				SG_T("error")
+#define SG_XML_ERROR_ATT_MSG		SG_T("message")
+#define SG_XML_ERROR_ATT_DESC		SG_T("description")
+#define SG_XML_WARNING				SG_T("warning")
+#define SG_XML_MESSAGE				SG_T("message")
+#define SG_XML_MESSAGE_PROC			SG_T("message-proc")
+#define SG_XML_MESSAGE_EXEC			SG_T("message-exec")
+#define SG_XML_PROGRESS				SG_T("progress")
+
+//---------------------------------------------------------
+#define SG_GET_XML_TAGGED_STR(value, tag)	CSG_String::Format(SG_T("<%s>%s</%s>"), tag, value, tag)
+#define SG_GET_XML_TAGGED_INT(value, tag)	CSG_String::Format(SG_T("<%s>%d</%s>"), tag, value, tag)
+#define SG_GET_XML_TAGGED_FLT(value, tag)	CSG_String::Format(SG_T("<%s>%f</%s>"), tag, value, tag)
+
+
+///////////////////////////////////////////////////////////
+//														 //
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
@@ -139,25 +194,18 @@ public:
 
 	int							Get_ID						(void)	{	return( m_ID );	}
 
-	const SG_Char *				Get_Name					(void);
-	const SG_Char *				Get_Description				(void);
-	const SG_Char *				Get_Author					(void);
+	const CSG_String &			Get_Name					(void);
+	const CSG_String &			Get_Description				(void);
+	const CSG_String &			Get_Author					(void);
 	const SG_Char *				Get_Icon					(void)	{	return( NULL );	}
+	CSG_String					Get_Summary					(bool bParameters = true, const CSG_String &Menu = "", const CSG_String &Description = "", bool bXML = false);
 
-	virtual const SG_Char *		Get_MenuPath				(void)	{	return( NULL );	}
+	virtual CSG_String			Get_MenuPath				(void)	{	return( SG_T("") );	}
 
 	int							Get_Parameters_Count		(void)	{	return( m_npParameters );	}
 	CSG_Parameters *			Get_Parameters				(void)	{	return( &Parameters );	}
 	CSG_Parameters *			Get_Parameters				(int i)	{	return( i >= 0 && i < m_npParameters ? m_pParameters[i] : NULL );	}
-	CSG_Parameters *			Get_Parameters				(const SG_Char *Identifier);
-#ifdef _SAGA_UNICODE
-	CSG_Parameters *			Get_Parameters				(const char    *Identifier);
-#endif
-
-	int							Garbage_Get_Count			(void)	{	return( m_nGarbage );		}
-	CSG_Data_Object *			Garbage_Get_Item			(int i)	{	return( i >= 0 && i < m_nGarbage ? m_Garbage[i] : NULL );	}
-	CSG_Data_Object *			Garbage_Del_Item			(int i, bool bFromListOnly = true);
-	void						Garbage_Clear				(void);
+	CSG_Parameters *			Get_Parameters				(const CSG_String &Identifier);
 
 	virtual bool				do_Sync_Projections			(void)	{	return( true  );	}
 
@@ -166,8 +214,8 @@ public:
 	bool						is_Progress					(void)	{	return( SG_UI_Process_Get_Okay(false) );	}
 	bool						is_Executing				(void)	{	return( m_bExecutes );	}
 
-	void						Set_Translation				(CSG_Translator &Translator);
-	void						Set_Managed					(bool bOn = true);
+	void						Set_Manager					(class CSG_Data_Manager *pManager);
+
 	void						Set_Show_Progress			(bool bOn = true);
 
 	virtual bool				On_Before_Execution			(void)	{	return( true );	}
@@ -184,9 +232,9 @@ protected:
 
 
 	//-----------------------------------------------------
-	void						Set_Name					(const SG_Char *String);
-	void						Set_Description				(const SG_Char *String);
-	void						Set_Author					(const SG_Char *String);
+	void						Set_Name					(const CSG_String &String);
+	void						Set_Description				(const CSG_String &String);
+	void						Set_Author					(const CSG_String &String);
 
 	//-----------------------------------------------------
 	virtual bool				On_Execute					(void)	= 0;
@@ -194,32 +242,29 @@ protected:
 	virtual int					On_Parameter_Changed		(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 	virtual int					On_Parameters_Enable		(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
+	TSG_PFNC_Parameter_Changed	Get_Parameter_Changed		(void)	{	return( _On_Parameter_Changed );	}
 
 	//-----------------------------------------------------
-	CSG_Parameters *			Add_Parameters				(const SG_Char *Identifier, const SG_Char *Name, const SG_Char *Description);
-	bool						Dlg_Parameters				(const SG_Char *Identifier);
-	bool						Dlg_Parameters				(CSG_Parameters *pParameters, const SG_Char *Caption);
-#ifdef _SAGA_UNICODE
-	CSG_Parameters *			Add_Parameters				(const char    *Identifier, const SG_Char *Name, const SG_Char *Description);
-	bool						Dlg_Parameters				(const char    *Identifier);
-#endif
+	CSG_Parameters *			Add_Parameters				(const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
+	bool						Dlg_Parameters				(const CSG_String &Identifier);
+	bool						Dlg_Parameters				(CSG_Parameters *pParameters, const CSG_String &Caption);
 
 
 	//-----------------------------------------------------
 	virtual bool				Process_Get_Okay			(bool bBlink = false);
-	virtual void				Process_Set_Text			(const SG_Char *Text);
+	virtual void				Process_Set_Text			(const CSG_String &Text);
 
 	virtual bool				Set_Progress				(int Position);
 	virtual bool				Set_Progress				(double Position, double Range);
 
 	bool						Stop_Execution				(bool bDialog = true);
 
-	void						Message_Add					(const SG_Char *Text, bool bNewLine = true);
-	void						Message_Dlg					(const SG_Char *Text, const SG_Char *Caption = NULL);
-	bool						Message_Dlg_Confirm			(const SG_Char *Text, const SG_Char *Caption = NULL);
+	void						Message_Add					(const CSG_String &Text, bool bNewLine = true);
+	void						Message_Dlg					(const CSG_String &Text, const SG_Char *Caption = NULL);
+	bool						Message_Dlg_Confirm			(const CSG_String &Text, const SG_Char *Caption = NULL);
 
 	bool						Error_Set					(TSG_Module_Error Error_ID = MODULE_ERROR_Unknown);
-	bool						Error_Set					(const SG_Char *Error_Text);
+	bool						Error_Set					(const CSG_String &Error_Text);
 
 
 	//-----------------------------------------------------
@@ -249,18 +294,14 @@ protected:
 
 private:
 
-	bool						m_bExecutes, m_bError_Ignore, m_bManaged, m_bShow_Progress;
+	bool						m_bExecutes, m_bError_Ignore, m_bShow_Progress;
 
-	int							m_ID, m_npParameters, m_nGarbage;
-
-	CSG_Data_Object				**m_Garbage;
+	int							m_ID, m_npParameters;
 
 	CSG_Parameters				**m_pParameters;
 
 	CSG_String					m_Author;
 
-
-	bool						_Garbage_Add_Item			(CSG_Data_Object *pDataObject);
 
 	bool						_Synchronize_DataObjects	(void);
 
@@ -306,8 +347,11 @@ protected:
 	int							Get_NY					(void)						{	return( Get_System()->Get_NY() );				}
 	long						Get_NCells				(void)						{	return( Get_System()->Get_NCells() );			}
 	double						Get_Cellsize			(void)						{	return( Get_System()->Get_Cellsize() );			}
+	double						Get_Cellarea			(void)						{	return( Get_System()->Get_Cellarea() );			}
 	double						Get_XMin				(void)						{	return( Get_System()->Get_XMin() );				}
 	double						Get_YMin				(void)						{	return( Get_System()->Get_YMin() );				}
+	double						Get_XMax				(void)						{	return( Get_System()->Get_XMax() );				}
+	double						Get_YMax				(void)						{	return( Get_System()->Get_YMax() );				}
 	int							Get_xTo					(int Dir, int x = 0)		{	return( Get_System()->Get_xTo(Dir, x) );		}
 	int							Get_yTo					(int Dir, int y = 0)		{	return( Get_System()->Get_yTo(Dir, y) );		}
 	int							Get_xFrom				(int Dir, int x = 0)		{	return( Get_System()->Get_xFrom(Dir, x) );		}
@@ -519,30 +563,24 @@ public:
 	CSG_Module_Library_Interface(void);
 	virtual ~CSG_Module_Library_Interface(void);
 
-	void						Set_Info				(int ID, const SG_Char *Info);
-	const SG_Char *				Get_Info				(int ID);
+	void						Set_Info				(int ID, const CSG_String &Info);
+	const CSG_String &			Get_Info				(int ID);
 
 	int							Get_Count				(void);
 	bool						Add_Module				(CSG_Module *pModule, int ID);
 	CSG_Module *				Get_Module				(int iModule);
 
 	void						Set_File_Name			(const CSG_String &File_Name);
-	const SG_Char *				Get_File_Name			(void);
-
-	const SG_Char *				Get_Translation			(const SG_Char *Text);
+	const CSG_String &			Get_File_Name			(void)	{	return( m_File_Name );	}
 
 
 private:
 
-	const SG_Char				*m_Info[MLB_INFO_Count];
+	CSG_String					m_File_Name, m_Info[MLB_INFO_Count];
 
 	int							m_nModules;
 
 	CSG_Module					**m_Modules;
-
-	CSG_String					m_File_Name;
-
-	CSG_Translator				m_Translator;
 
 };
 

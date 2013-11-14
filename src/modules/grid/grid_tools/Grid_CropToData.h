@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_CropToData.h 1149 2011-08-29 12:26:13Z oconrad $
+ * Version $Id: Grid_CropToData.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*******************************************************************************
     CropToData.h
@@ -42,7 +42,7 @@ class CCropToData : public CSG_Module_Grid
 public:
 	CCropToData(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("A:Grid|Construction") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Grid|Construction") );	}
 
 
 protected:

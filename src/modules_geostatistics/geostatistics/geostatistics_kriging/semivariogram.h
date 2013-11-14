@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: semivariogram.h 1199 2011-10-21 12:22:20Z oconrad $
+ * Version $Id: semivariogram.h 1366 2012-04-05 08:36:05Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ class CSemiVariogram : public CSG_Module
 public:
 	CSemiVariogram(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("A:Geostatistics|Points") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("A:Spatial and Geostatistics|Points") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: opencv_svd.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: opencv_svd.cpp 1575 2012-12-19 15:21:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ bool COpenCV_SVD::On_Execute(void)
     cvReleaseImage(&cv_pInput);
     cvReleaseImage(&cv_pOutput);
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name().c_str()));
 
 	return( true );
 }

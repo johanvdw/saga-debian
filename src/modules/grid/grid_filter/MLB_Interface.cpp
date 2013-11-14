@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1535 2012-11-15 12:18:45Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -104,6 +104,9 @@ const SG_Char * Get_Info(int i)
 #include "Filter_Terrain_SlopeBased.h"
 #include "Filter_Morphology.h"
 #include "Filter_Rank.h"
+#include "mesh_denoise.h"
+#include "Filter_Resample.h"
+
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -122,6 +125,8 @@ CSG_Module *		Create_Module(int i)
 	case  7:	return( new CFilter_Terrain_SlopeBased );
 	case  8:	return( new CFilter_Morphology );
 	case  9:	return( new CFilter_Rank );
+	case 10:	return( new CMesh_Denoise_Grid );
+	case 11:	return( new CFilter_Resample );
 	}
 
 	return( NULL );

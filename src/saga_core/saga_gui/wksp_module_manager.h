@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_manager.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_module_manager.h 1493 2012-10-19 11:31:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -110,12 +110,12 @@ public:
 
 	class CWKSP_Module_Library *	Get_Library			(int i)		{	return( (class CWKSP_Module_Library *)Get_Item(i) );	}
 
-	class CWKSP_Module_Menu *		Get_Modules_Menu	(void)		{	return( m_pMenu );	}
+	class CWKSP_Menu_Modules *		Get_Menu_Modules	(void)		{	return( m_pMenu_Modules );	}
 
 	bool							Do_Beep				(void);
 
 	void							Open				(void);
-	bool							Open				(const wxChar *File_Name);
+	bool							Open				(const wxString &File_Name);
 
 	bool							Exists				(class CWKSP_Module *pModule);
 
@@ -124,15 +124,13 @@ public:
 
 private:
 
-	class CWKSP_Module_Menu			*m_pMenu;
+	class CWKSP_Menu_Modules		*m_pMenu_Modules;
 
 
 	void							_Config_Read		(void);
 	void							_Config_Write		(void);
 
-	int								_Open_Directory		(const wxChar *sDirectory, bool bOnlySubDirectories = false);
-
-	void							_Make_HTML_Docs		(void);
+	int								_Open_Directory		(const wxString &sDirectory, bool bOnlySubDirectories = false);
 
 };
 

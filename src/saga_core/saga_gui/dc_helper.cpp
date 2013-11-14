@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dc_helper.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: dc_helper.cpp 1742 2013-06-20 16:13:27Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -251,11 +251,19 @@ void		Draw_Text(wxDC &dc, int Align, int x, int y, const wxString &Text)
 //---------------------------------------------------------
 void		Draw_Text(wxDC &dc, int Align, int x, int y, double Angle, const wxString &Text)
 {
-	double	d;
+	if( Angle == 0.0 )
+	{
+		Draw_Text(dc, Align, x, y, Text);
+
+		return;
+	}
+
 	wxCoord	xSize, ySize;
 
 	if( Align != TEXTALIGN_TOPLEFT )
 	{
+		double	d;
+
 		dc.GetTextExtent(Text, &xSize, &ySize);
 
 		//-------------------------------------------------
@@ -290,6 +298,34 @@ void		Draw_Text(wxDC &dc, int Align, int x, int y, double Angle, const wxString 
 	dc.DrawRotatedText(Text, x, y, Angle);
 }
 
+//---------------------------------------------------------
+void			Draw_Text			(wxDC &dc, int Align, int x, int y, const wxString &Text, int Effect, wxColour Color)
+{
+	Draw_Text(dc, Align, x, y, 0.0, Text, Effect, Color);
+}
+
+void			Draw_Text			(wxDC &dc, int Align, int x, int y, double Angle, const wxString &Text, int Effect, wxColour Color)
+{
+	if( Effect != TEXTEFFECT_NONE )
+	{
+		int			d			= 1;
+		wxColour	oldColor	= dc.GetTextForeground();	dc.SetTextForeground(Color);
+
+		if( Effect & TEXTEFFECT_TOP         )	Draw_Text(dc, Align, x    , y - d, Angle, Text);
+		if( Effect & TEXTEFFECT_TOPLEFT     )	Draw_Text(dc, Align, x - d, y - d, Angle, Text);
+		if( Effect & TEXTEFFECT_LEFT        )	Draw_Text(dc, Align, x - d, y    , Angle, Text);
+		if( Effect & TEXTEFFECT_BOTTOMLEFT  )	Draw_Text(dc, Align, x - d, y + d, Angle, Text);
+		if( Effect & TEXTEFFECT_BOTTOM      )	Draw_Text(dc, Align, x    , y + d, Angle, Text);
+		if( Effect & TEXTEFFECT_BOTTOMRIGHT )	Draw_Text(dc, Align, x + d, y + d, Angle, Text);
+		if( Effect & TEXTEFFECT_RIGHT       )	Draw_Text(dc, Align, x + d, y    , Angle, Text);
+		if( Effect & TEXTEFFECT_TOPRIGHT    )	Draw_Text(dc, Align, x + d, y - d, Angle, Text);
+
+		dc.SetTextForeground(oldColor);
+	}
+
+	Draw_Text(dc, Align, x, y, Angle, Text);
+}
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -301,7 +337,7 @@ void		Draw_Text(wxDC &dc, int Align, int x, int y, double Angle, const wxString 
 #define TEXTSPACE	6
 
 //---------------------------------------------------------
-void		Draw_Scale(wxDC &dc, wxRect r, double zMin, double zMax, bool bHorizontal, bool bAscendent, bool bTickAtTop)
+void		Draw_Scale(wxDC &dc, wxRect r, double zMin, double zMax, bool bHorizontal, bool bAscendent, bool bTickAtTop, bool bLineConnector)
 {
 	int			xOff, yOff, Width, Height, Height_Tick, Decimals, zDC, yDC, Style, x, y, n;
 	double		z, dz, zToDC;
@@ -321,7 +357,7 @@ void		Draw_Scale(wxDC &dc, wxRect r, double zMin, double zMax, bool bHorizontal,
 
 		oldFont		= dc.GetFont();
 		yDC			= (int)((Style == 0 ? 0.60 : 0.45) * (double)Height);
-		Font.Create(yDC, wxSWISS, wxNORMAL, wxNORMAL);
+		Font.Create(yDC, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		dc.SetFont(Font);
 
 		Height_Tick	= (int)((Style == 0 ? 1.00 : 0.30) * (double)Height);
@@ -406,6 +442,17 @@ void		Draw_Scale(wxDC &dc, wxRect r, double zMin, double zMax, bool bHorizontal,
 					Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, n - Height_Tick, y, 90.0, s);
 					break;
 				}
+			}
+		}
+
+		if( bLineConnector )
+		{
+			if( bHorizontal )
+			{
+				dc.DrawLine(xOff, yOff, xOff + zDC, yOff);
+			}
+			else
+			{
 			}
 		}
 

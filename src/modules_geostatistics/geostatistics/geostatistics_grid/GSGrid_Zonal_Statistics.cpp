@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: GSGrid_Zonal_Statistics.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: GSGrid_Zonal_Statistics.cpp 1584 2013-01-03 18:33:38Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,46 +76,50 @@ CGSGrid_Zonal_Statistics::CGSGrid_Zonal_Statistics(void)
 	Set_Description	(_TW("{STATZONAL_DESC} "
 		"The module calculates zonal statistics and reports these in a table. "
 		"The module can be used to create a contingency table of unique condition units (UCUs). These "
-		"units are delineated from a zonal grid (e.g. sub catchments) and optional categorial grids (e.g. "
-		"landcover, soil, ...). It is possible to calculate simple statistics (min, max, mean, standard "
+		"units are delineated from a zonal grid (e.g. sub catchments) and optional categorical grids (e.g. "
+		"landcover, soil, ...). It is possible to calculate descriptive statistics (n, min, max, mean, standard "
 		"deviation and sum) for each UCU from optional grids with continious data (e.g. slope; aspect must be "
 		"handled specially, please use the \"Aspect\" input parameter for such a grid). The number "
-		"of input grids is only limited by available memory. The module has four different modes of "
-		"application: (1) only a zonal grid is used as input. This results in a simple contingency table with "
-		"the number of grid cells in each zone. (2) a zonal grid and additional categorial grids are used as "
-		"input. This results in a contingency table with the number of cells in each UCU. (3) a zonal grid "
+		"of input grids is only limited by available memory.\n\n"
+		"The module has four different modes of operation:\n"
+		"(1) only a zonal grid is used as input. This results in a simple contingency table with "
+		"the number of grid cells in each zone.\n"
+		"(2) a zonal grid and additional categorical grids are used as "
+		"input. This results in a contingency table with the number of cells in each UCU.\n"
+		"(3) a zonal grid "
 		"and additional grids with continuous data are used as input. This results in a contingency table "
 		"with the number of cells in each zone and some simple statistics for each zone. The statistics are "
-		"calculated for each continuous grid. (4) a zonal grid, additional categorial grids and additional "
+		"calculated for each continuous grid.\n"
+		"(4) a zonal grid, additional categorical grids and additional "
 		"grids with continuous data are used as input. This results in a contingency table with the number "
 		"of cells in each UCU and the corresponding statistics for each continuous grid.\n"
 		"\n"
-		"Depending on the mode of application, the output table contains information about the category "
+		"Depending on the mode of operation, the output table contains information about the categorical "
 		"combination of each UCU, the number of cells in each UCU and the statistics for each UCU. A "
 		"typical output table may look like this:\n"
 		"<table border=\"1\">"
-		"<tr><td>ID Zone</td><td>ID 1stCat</td><td>ID 2ndCat</td><td>Count UCU</td><td>MIN 1stCont</td><td>MAX 1stCont</td><td>MEAN 1stCont</td><td>STDDEV 1stCont</td><td>SUM 1stCont</td></tr>"
-		"<tr><td>0      </td><td>2        </td><td>6        </td><td>6        </td><td>708.5      </td><td>862.0      </td><td>734.5       </td><td>62.5          </td><td>4406.8     </td></tr>"
-		"<tr><td>0      </td><td>3        </td><td>4        </td><td>106      </td><td>829.1      </td><td>910.1      </td><td>848.8       </td><td>28.5          </td><td>89969.0    </td></tr>"
+		"<tr><td>ID Zone</td><td>ID 1stCat</td><td>ID 2ndCat</td><td>Count UCU</td><td>N 1stCont</td><td>MIN 1stCont</td><td>MAX 1stCont</td><td>MEAN 1stCont</td><td>STDDEV 1stCont</td><td>SUM 1stCont</td></tr>"
+		"<tr><td>0      </td><td>2        </td><td>6        </td><td>6        </td><td>6        </td><td>708.5      </td><td>862.0      </td><td>734.5       </td><td>62.5          </td><td>4406.8     </td></tr>"
+		"<tr><td>0      </td><td>3        </td><td>4        </td><td>106      </td><td>106      </td><td>829.1      </td><td>910.1      </td><td>848.8       </td><td>28.5          </td><td>89969.0    </td></tr>"
 		"</table>"
 	));
 
 
 	Parameters.Add_Grid(
 		NULL, "ZONES"		, _TL("Zone Grid"),
-		_TL("Grid defining the zones to analyse. This grid also acts as a mask. Coding: no-data / categorial values."),
+		_TL("Grid defining the zones to analyse. This grid also acts as a mask. Coding: NoData / categorial values."),
 		PARAMETER_INPUT
 	);
 
 	Parameters.Add_Grid_List(
-		NULL, "CATLIST"		, _TL("Categorial Grids"),
-		_TL("Grids used to delineate the UCUs. Coding: no-data / categorial values."),
+		NULL, "CATLIST"		, _TL("Categorical Grids"),
+		_TL("Grids used to delineate the UCUs. Coding: NoData / categorical values."),
 		PARAMETER_INPUT_OPTIONAL
 	);
 
 	Parameters.Add_Grid_List(
 		NULL, "STATLIST"	, _TL("Grids to analyse"),
-		_TL("Grids with continuous data, statistics are calculated for each grid. Coding: no-data / continuous values."),
+		_TL("Grids with continuous data, statistics are calculated for each grid. Coding: NoData / continuous values."),
 		PARAMETER_INPUT_OPTIONAL
 	);
 
@@ -176,12 +180,16 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 
 	nCatGrids	= pCatList	->Get_Count();
 	nStatGrids	= pStatList	->Get_Count();
-	
+
 	NDcount		= 0;						// NoData Counter (ZoneGrid)
 	NDcountStat	= 0;						// NoData Counter (StatGrids)
 
+	CSG_String	sTabName = Parameters("OUTTAB")->asString();
 	if (pOutTab != NULL)
+	{
 		pOutTab->Destroy();
+		pOutTab->Set_Name(sTabName);
+	}
 
 	newZone		= new CList_Conti();								// create first list entry (dummy)
 	startList	= newZone;
@@ -189,7 +197,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 	for(y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
 		for(x=0; x<Get_NX(); x++)
-		{	
+		{
 			runList		= startList;
 			zoneID		= pZones->asInt(x, y);								// get zone ID
 
@@ -204,14 +212,14 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 				runList->dummy = false;										// setup
 			}
 			else if( runList->cat == zoneID )
-				runList = runList;											// zoneID found				
+				runList = runList;											// zoneID found
 			else if( runList->next == NULL && runList->cat < zoneID )		// append zoneID
 			{
 				newZone = new CList_Conti();
 				newZone->previous	= runList;
 				runList->next		= newZone;
 
-				newZone->cat	= zoneID;									// ... and write info		
+				newZone->cat	= zoneID;									// ... and write info
 				newZone->dummy	= false;
 				runList			= newZone;
 			}
@@ -226,7 +234,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 					runList->previous->next = newZone;
 				}
 				runList->previous = newZone;
-					
+
 				if( runList == startList )
 					startList = newZone;									// if new entry is first element, update startList pointer
 
@@ -291,7 +299,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 					}
 					else
 						parent->sub	 = newSub;
-							
+
 					runList->previous = newSub;
 					runList	= newSub;
 				}
@@ -304,7 +312,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 				{
 					if( runList->stats == NULL )
 						runList->stats = new CList_Stat();
-						
+
 					runStats = runList->stats;
 				}
 				else
@@ -317,25 +325,26 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 				if( !pStatList->asGrid(iGrid)->is_NoData(x, y) )
 				{
 					statID		= pStatList->asGrid(iGrid)->asDouble(x, y);
-						
+
 					if( runStats->dummy == true )
 					{
 						runStats->min = statID;
 						runStats->max = statID;
 						runStats->dummy = false;
 					}
-					if( runStats->min > statID )	
+					if( runStats->min > statID )
 						runStats->min = statID;
 					if( runStats->max < statID )
 						runStats->max = statID;
 
+					runStats->n	  += 1;
 					runStats->sum += statID;
 					runStats->dev += pow(statID, 2);
 				}
 				else
 					NDcountStat += 1;
 			}
-			
+
 			if( pAspect != NULL )
 			{
 				for( int i=0; i<2; i++ )
@@ -344,7 +353,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 					{
 						if( runList->stats == NULL )
 							runList->stats = new CList_Stat();
-							
+
 						runStats = runList->stats;
 					}
 					else
@@ -366,7 +375,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 								runStats->max = statID;
 								runStats->dummy = false;
 							}
-							if( runStats->min > statID )	
+							if( runStats->min > statID )
 								runStats->min = statID;
 							if( runStats->max < statID )
 								runStats->max = statID;
@@ -376,6 +385,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 						else
 							statID	= cos(statID);
 
+						runStats->n	  += 1;
 						runStats->sum += statID;
 					}
 					else
@@ -402,11 +412,16 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 		pOutTab->Add_Field(fieldName, SG_DATATYPE_Int);
 	}
 
-	pOutTab->Add_Field("Count", SG_DATATYPE_Int);
-	
+	pOutTab->Add_Field("Count UCU", SG_DATATYPE_Int);
+
 	for( iGrid=0; iGrid<nStatGrids; iGrid++ )
 	{
 		tmpName		= CSG_String::Format(SG_T("%s"),pStatList->asGrid(iGrid)->Get_Name()).BeforeFirst(SG_Char('.'));
+
+		fieldName	= tmpName;
+		if (bShortNames && fieldName.Length()+1 > 10)
+			fieldName.Remove(9, fieldName.Length()-9);
+		pOutTab->Add_Field(CSG_String::Format(SG_T("%sN")     , fieldName.c_str()), SG_DATATYPE_Int);
 		fieldName	= tmpName;
 		if (bShortNames && fieldName.Length()+3 > 10)
 			fieldName.Remove(7, fieldName.Length()-7);
@@ -430,6 +445,10 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 	{
 		tmpName		= CSG_String::Format(SG_T("%s"),pAspect->Get_Name()).BeforeFirst(SG_Char('.'));
 		fieldName	= tmpName;
+		if (bShortNames && fieldName.Length()+1 > 10)
+			fieldName.Remove(9, fieldName.Length()-9);
+		pOutTab->Add_Field(CSG_String::Format(SG_T("%sN")     , fieldName.c_str()), SG_DATATYPE_Int);
+		fieldName	= tmpName;
 		if (bShortNames && fieldName.Length()+3 > 10)
 			fieldName.Remove(7, fieldName.Length()-7);
 		pOutTab->Add_Field(CSG_String::Format(SG_T("%sMIN")   , fieldName.c_str()), SG_DATATYPE_Double);
@@ -440,12 +459,14 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 		pOutTab->Add_Field(CSG_String::Format(SG_T("%sMEAN")  , fieldName.c_str()), SG_DATATYPE_Double);
 	}
 
+	int	iStatFields = 6;	// number of table fields: n, min, max, mean, stddev, sum
+
 	while( startList != NULL )												// scan zone layer list and write cat values in table
 	{
 		runList = startList;
 		while( runList->sub != NULL )										// fall down to lowest layer
 			runList = runList->sub;
-		
+
 		subList = runList;													// use pointer to scan horizontal
 
 		while( subList != NULL )											// move forward and read all categories of this layer (including the parent layers)
@@ -453,7 +474,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 			runSub = subList;
 			catLevel = nCatGrids;
 			pRecord	= pOutTab->Add_Record();								// create new record in table
-			pRecord->Set_Value((catLevel+1), runSub->count);				// read/write field count			
+			pRecord->Set_Value((catLevel+1), runSub->count);				// read/write field count
 
 			for(iGrid=0; iGrid<nStatGrids; iGrid++)							// read/write statistics
 			{
@@ -462,48 +483,44 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 				else
 					runStats = runStats->next;
 
-				pRecord->Set_Value(catLevel+2+iGrid*5, runStats->min);
-				pRecord->Set_Value(catLevel+3+iGrid*5, runStats->max);
-				pRecord->Set_Value(catLevel+4+iGrid*5, runStats->sum/runSub->count);
-				pRecord->Set_Value(catLevel+5+iGrid*5, sqrt((runStats->dev - runSub->count*pow(runStats->sum/runSub->count, 2)) / (runSub->count - 1))); // sample
-				//pRecord->Set_Value(catLevel+5+iGrid*5, sqrt((runStats->dev - pow(runStats->sum/runSub->count, 2)) / runSub->count)); // population
-				pRecord->Set_Value(catLevel+6+iGrid*5, runStats->sum);
+				pRecord->Set_Value(catLevel+2+iGrid*iStatFields, runStats->n);
+				pRecord->Set_Value(catLevel+3+iGrid*iStatFields, runStats->min);
+				pRecord->Set_Value(catLevel+4+iGrid*iStatFields, runStats->max);
+				pRecord->Set_Value(catLevel+5+iGrid*iStatFields, runStats->sum/runStats->n);
+				pRecord->Set_Value(catLevel+6+iGrid*iStatFields, sqrt((runStats->dev - runStats->n*pow(runStats->sum/runStats->n, 2)) / (runStats->n - 1))); // sample
+				//pRecord->Set_Value(catLevel+6+iGrid*iStatFields, sqrt((runStats->dev - pow(runStats->sum/runStats->n, 2)) / runStats->n)); // population
+				pRecord->Set_Value(catLevel+7+iGrid*iStatFields, runStats->sum);
 			}
 
 			if( pAspect != NULL )
 			{
-				iGrid		= nStatGrids * 5;
+				iGrid		= nStatGrids * iStatFields;
 
-				if( runSub->cat == pAspect->Get_NoData_Value() )
-				{
-					for( int i=2; i<5; i++ )
-						pRecord->Set_Value(catLevel+i+iGrid, 0.0);
-				}
+				int			n;
+				double		min, max, sumYcomp, sumXcomp, val, valYcomp, valXcomp;
+
+				if( nStatGrids == 0 )
+					runStats	= runSub->stats;
 				else
-				{
-					double		min, max, sumYcomp, sumXcomp, val, valYcomp, valXcomp;
-
-					if( nStatGrids == 0 )
-						runStats	= runSub->stats;
-					else
-						runStats	= runStats->next;
-					min			= runStats->min;
-					max			= runStats->max;
-					sumXcomp	= runStats->sum;
-
 					runStats	= runStats->next;
-					sumYcomp	= runStats->sum;
+				n			= runStats->n;
+				min			= runStats->min;
+				max			= runStats->max;
+				sumXcomp	= runStats->sum;
 
-					pRecord		->Set_Value(catLevel+2+iGrid, min*M_RAD_TO_DEG);
-					pRecord		->Set_Value(catLevel+3+iGrid, max*M_RAD_TO_DEG);
-					valXcomp	= sumXcomp / runSub->count;
-					valYcomp	= sumYcomp / runSub->count;
-					val			= valXcomp ? fmod(M_PI_270 + atan2(valYcomp, valXcomp), M_PI_360) : (valYcomp > 0 ? M_PI_270 : (valYcomp < 0 ? M_PI_090 : -1));
-					val			= fmod(M_PI_360 - val, M_PI_360);
-					pRecord		->Set_Value(catLevel+4+iGrid, val*M_RAD_TO_DEG);
-				}
+				runStats	= runStats->next;
+				sumYcomp	= runStats->sum;
+
+				pRecord		->Set_Value(catLevel+2+iGrid, n);
+				pRecord		->Set_Value(catLevel+3+iGrid, min*M_RAD_TO_DEG);
+				pRecord		->Set_Value(catLevel+4+iGrid, max*M_RAD_TO_DEG);
+				valXcomp	= sumXcomp / n;
+				valYcomp	= sumYcomp / n;
+				val			= valXcomp ? fmod(M_PI_270 + atan2(valYcomp, valXcomp), M_PI_360) : (valYcomp > 0 ? M_PI_270 : (valYcomp < 0 ? M_PI_090 : -1));
+				val			= fmod(M_PI_360 - val, M_PI_360);
+				pRecord		->Set_Value(catLevel+5+iGrid, val*M_RAD_TO_DEG);
 			}
-			
+
 			while( runSub != NULL )											// read/write categories
 			{
 				pRecord->Set_Value(catLevel, runSub->cat);
@@ -517,15 +534,15 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 			runList = runList->parent;
 
 		if( runList->parent != NULL )										// if not upper layer (zones)
-		{	
+		{
 			runList = runList->parent;										// move to parent of next 'Caterory with -> next'
 			if( runList->next != NULL && runList->parent != NULL )
 				runList->parent->sub = runList->next;						// redirect pointer to category which is next 'Categora with -> next' next
-			else if (runList->parent == NULL && runList->next != NULL )				
+			else if (runList->parent == NULL && runList->next != NULL )
 				startList = runList->next;									// when upper layer (zones) is reached, move to next zone
 			else
 				startList = NULL;											// reading finished
-			
+
 			if( runList->parent == NULL )
 				startList = runList->next;									// ?? when upper layer is reached, move to next zone
 			else
@@ -540,7 +557,7 @@ bool CGSGrid_Zonal_Statistics::On_Execute(void)
 		}
 
 
-		runList->next = NULL;					
+		runList->next = NULL;
 		delete (runList);													// delete disconneted part of the list
 
 	}

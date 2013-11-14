@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1456 2012-08-15 10:31:10Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -77,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Grid - Visualisation") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad (c) 2002") );
+		return( SG_T("O. Conrad, V. Wichmann (c) 2002-2012") );
 
 	case MLB_INFO_Description:
 		return( _TL("Special visualisation functions for grids.") );
@@ -101,7 +101,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_3D_Image.h"
 #include "Grid_Color_Triangle.h"
 #include "Grid_Histogram_Surface.h"
-
+#include "Grid_Aspect_Slope_Map.h"
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -117,6 +117,7 @@ CSG_Module *		Create_Module(int i)
 	case 4:		return( new CGrid_3D_Image );
 	case 5:		return( new CGrid_Color_Triangle );
 	case 6:		return( new CGrid_Histogram_Surface );
+	case 7:		return( new CGrid_Aspect_Slope_Map );
 	}
 
 	return( NULL );

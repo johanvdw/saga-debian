@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_control.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_map_control.cpp 1247 2011-12-02 16:02:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -63,6 +63,7 @@
 //---------------------------------------------------------
 #include <wx/window.h>
 #include <wx/image.h>
+#include <wx/dcclient.h>
 
 #include "res_images.h"
 
@@ -505,7 +506,7 @@ void CVIEW_Map_Control::On_Size(wxSizeEvent &event)
 {
 	wxRect	r(_Get_Client());
 
-	if( m_Bitmap.GetWidth() != r.GetWidth() || m_Bitmap.GetHeight() != r.GetHeight() )
+	if( !m_Bitmap.Ok() || m_Bitmap.GetWidth() != r.GetWidth() || m_Bitmap.GetHeight() != r.GetHeight() )
 	{
 		m_Bitmap.Create(r.GetWidth(), r.GetHeight());
 
@@ -551,11 +552,11 @@ void CVIEW_Map_Control::On_Key_Down(wxKeyEvent &event)
 		event.Skip();
 		break;
 
-	case WXK_PRIOR:
+	case WXK_PAGEUP:
 		_Zoom(m_pMap->Get_Extent().Get_Center(), true);
 		break;
 		
-	case WXK_NEXT:
+	case WXK_PAGEDOWN:
 		_Zoom(m_pMap->Get_Extent().Get_Center(), false);
 		break;
 		

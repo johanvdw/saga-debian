@@ -76,11 +76,12 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libshapes_polygons_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libshapes_polygons_la_OBJECTS = MLB_Interface.lo \
-	Polygon_Centroids.lo Polygon_Geometrics.lo \
-	Polygon_Intersection.lo Polygon_StatisticsFromPoints.lo \
-	Polygon_Union.lo Polygons_From_Lines.lo \
-	polygon_line_intersection.lo polygon_split_parts.lo \
-	polygon_to_edges_nodes.lo polygon_to_points.lo shape_index.lo
+	Polygon_Centroids.lo Polygon_Clip.lo Polygon_Geometrics.lo \
+	Polygon_Intersection.lo Polygon_SelfIntersection.lo \
+	Polygon_StatisticsFromPoints.lo Polygon_Union.lo \
+	Polygons_From_Lines.lo polygon_line_intersection.lo \
+	polygon_split_parts.lo polygon_to_edges_nodes.lo \
+	polygon_to_points.lo shape_index.lo
 libshapes_polygons_la_OBJECTS = $(am_libshapes_polygons_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -139,6 +140,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -169,7 +171,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -250,20 +251,22 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
+# $Id: Makefile.am 1352 2012-03-14 10:03:01Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_polygons.la
 libshapes_polygons_la_SOURCES = \
 MLB_Interface.cpp\
 Polygon_Centroids.cpp\
+Polygon_Clip.cpp\
 Polygon_Geometrics.cpp\
 Polygon_Intersection.cpp\
+Polygon_SelfIntersection.cpp\
 Polygon_StatisticsFromPoints.cpp\
 Polygon_Union.cpp\
 Polygons_From_Lines.cpp\
@@ -274,8 +277,10 @@ polygon_to_points.cpp\
 shape_index.cpp\
 MLB_Interface.h\
 Polygon_Centroids.h\
+Polygon_Clip.h\
 Polygon_Geometrics.h\
 Polygon_Intersection.h\
+Polygon_SelfIntersection.h\
 Polygon_StatisticsFromPoints.h\
 Polygon_Union.h\
 Polygons_From_Lines.h\
@@ -362,8 +367,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Centroids.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Clip.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Geometrics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Intersection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_SelfIntersection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_StatisticsFromPoints.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygon_Union.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Polygons_From_Lines.Plo@am__quote@

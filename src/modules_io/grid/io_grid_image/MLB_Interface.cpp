@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1313 2012-01-18 11:08:03Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char *	Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -112,17 +112,9 @@ CSG_Module *		Create_Module(int i)
 	}
 
 	//------------------------------------------------------
-	wxInitAllImageHandlers();
+	if( !SG_UI_Get_Window_Main() )
+		wxInitAllImageHandlers();
 
-//	wxImage::AddHandler(new wxBMPHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxICOHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxJPEGHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxPCXHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxPNGHandler);	// For loading (including alpha support) and saving.
-//	wxImage::AddHandler(new wxPNMHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxTIFFHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxXPMHandler);	// For loading and saving.
-//	wxImage::AddHandler(new wxGIFHandler);	// Only for loading, due to legal issues.
 
 	return( NULL );
 }

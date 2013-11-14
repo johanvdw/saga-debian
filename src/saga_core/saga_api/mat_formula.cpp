@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_formula.cpp 1195 2011-10-14 11:29:50Z oconrad $
+ * Version $Id: mat_formula.cpp 1468 2012-08-29 11:58:37Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -201,29 +201,30 @@ static CSG_Formula::TSG_Formula_Item gSG_Functions[MAX_CTABLE]	=
 //---------------------------------------------------------
 CSG_Formula::CSG_Formula(void)
 {
-	i_ctable	= NULL;
-	i_error		= NULL;
-
-	m_bError	= false;
-
 	m_Formula.code		= NULL;
 	m_Formula.ctable	= NULL;
+
+	m_bError			= false;
+
+	i_ctable			= NULL;
+	i_error				= NULL;
 }
 
 //---------------------------------------------------------
 CSG_Formula::~CSG_Formula(void)
 {
-	if( m_Formula.code )
-	{
-		SG_Free(m_Formula.code);
-		m_Formula.code		= NULL;
-	}
+	Destroy();
+}
 
-	if( m_Formula.ctable )
-	{
-		SG_Free(m_Formula.ctable);
-		m_Formula.ctable	= NULL;
-	}
+//---------------------------------------------------------
+bool CSG_Formula::Destroy(void)
+{
+	SG_FREE_SAFE(m_Formula.code);
+	SG_FREE_SAFE(m_Formula.ctable);
+
+	m_bError			= false;
+
+	return( true );
 }
 
 
@@ -265,55 +266,26 @@ CSG_String CSG_Formula::Get_Help_Operators(void)
 }
 
 //---------------------------------------------------------
-CSG_String CSG_Formula::Get_Help_Usage(void)
-{
-	return( SG_Translate(
-		SG_T("Use single characters to define the parameters of your function f(x)\n")
-		SG_T("Example: 'a + b * x'\n")
-	));
-}
-
-//---------------------------------------------------------
-bool CSG_Formula::Get_Error(int *pPosition, CSG_String *pMessage)
+bool CSG_Formula::Get_Error(CSG_String &Message)
 {
 	if( m_bError )
 	{
-		if( pPosition )
-		{
-			*pPosition	= m_Error_Position;
-		}
+		Message	 = CSG_String::Format(SG_T("%s %s %d\n"), _TL("Error in formula"), _TL("at position"), m_Error_Position);
 
-		if( pMessage )
-		{
-			*pMessage	= m_sError;
-		}
-	}
-
-	return( m_bError );
-}
-
-//---------------------------------------------------------
-bool CSG_Formula::Get_Error(CSG_String &Message)
-{
-	int			pos;
-	CSG_String	msg;
-
-	if( Get_Error(&pos, &msg) )
-	{
-		Message	 = CSG_String::Format(SG_T("%s %s %d\n"), LNG("Error in formula"), LNG("at position"), pos);
-
-		if( pos < 0 || pos >= (int)m_sFormula.Length() )
+		if( m_Error_Position < 0 || m_Error_Position >= (int)m_sFormula.Length() )
 		{
 			Message	+= m_sFormula;
 		}
 		else
 		{
-			Message	+= m_sFormula.Left (pos) + SG_T(" [")
-					+  m_sFormula      [pos] + SG_T("] ")
-					+  m_sFormula.Right(m_sFormula.Length() - (pos + 1));
+			Message	+= m_sFormula.Left (m_Error_Position) + SG_T(" [")
+					+  m_sFormula      [m_Error_Position] + SG_T("] ")
+					+  m_sFormula.Right(m_sFormula.Length() - (m_Error_Position + 1));
 		}
 
-		Message	+= CSG_String::Format(SG_T("\n%s\n"), msg.c_str());
+		Message	+= SG_T("\n");
+		Message	+= m_sError;
+		Message	+= SG_T("\n");
 
 		return( true );
 	}
@@ -350,28 +322,22 @@ void CSG_Formula::Set_Variable(SG_Char Var, double Value)
 }
 
 //---------------------------------------------------------
-bool CSG_Formula::Set_Formula(const SG_Char *Formula)
+bool CSG_Formula::Set_Formula(const CSG_String &Formula)
 {
-	if( Formula )
+	if( Formula.Length() > 0 )
 	{
+		Destroy();
+
 		m_sFormula	= Formula;
+		m_Formula	= _Translate(Formula, SG_T("abcdefghijklmnopqrstuvwxyz"), &m_Length, &m_Error_Position);
 
-		if( m_Formula.code )
+		if( m_Formula.code != NULL )
 		{
-			SG_Free(m_Formula.code);
-			m_Formula.code		= NULL;
+			return( true );
 		}
-
-		if( m_Formula.ctable )
-		{
-			SG_Free(m_Formula.ctable);
-			m_Formula.ctable	= NULL;
-		}
-
-		m_Formula	= _Translate(Formula, SG_T("abcdefghijklmnopqrstxyz"), &m_Length, &m_Error_Position);
-
-		return( m_Formula.code != NULL );
 	}
+
+	Destroy();
 
 	return( false );
 }
@@ -384,57 +350,63 @@ bool CSG_Formula::Set_Formula(const SG_Char *Formula)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-double CSG_Formula::Get_Value(void)
+double CSG_Formula::Get_Value(void) const
 {
-	_Set_Error();
-
-	return( _Get_Value(m_Formula) );
+	return( _Get_Value(m_Parameters, m_Formula) );
 }
 
 //---------------------------------------------------------
-double CSG_Formula::Get_Value(double x)
+double CSG_Formula::Get_Value(double x) const
 {
-	m_Parameters['x'-'a']	= x;
+	double	Parameters[32];
 
-	_Set_Error();
+	memcpy(Parameters, m_Parameters, 32 * sizeof(double));
 
-	return( _Get_Value(m_Formula) );
+	Parameters['x'-'a']	= x;
+
+	return( _Get_Value(Parameters, m_Formula) );
 }
 
 //---------------------------------------------------------
-double CSG_Formula::Get_Value(double *Values, int nValues)
+double CSG_Formula::Get_Value(const CSG_Vector &Values) const
 {
+	return( Get_Value(Values.Get_Data(), Values.Get_N()) );
+}
+
+//---------------------------------------------------------
+double CSG_Formula::Get_Value(double *Values, int nValues) const
+{
+	double	Parameters[32];
+
 	for(int i=0; i<nValues; i++)
 	{
-		m_Parameters[i]	= Values[i];
+		Parameters[i]	= Values[i];
 	}
 
-	_Set_Error();
-
-	return( _Get_Value(m_Formula) );
+	return( _Get_Value(Parameters, m_Formula) );
 }
 
 //---------------------------------------------------------
-double CSG_Formula::Get_Value(SG_Char *Args, ...)
+double CSG_Formula::Get_Value(SG_Char *Args, ...) const
 {
+	double	Parameters[32];
+
 	va_list	ap;
 
 	va_start(ap, Args);
 
 	while( *Args )
 	{
-		m_Parameters[(*Args++) - 'a']	= va_arg(ap, double);
+		Parameters[(*Args++) - 'a']	= va_arg(ap, double);
 	}
 
 	va_end(ap);
 
-	_Set_Error();
-
-	return( _Get_Value(m_Formula) );
+	return( _Get_Value(Parameters, m_Formula) );
 }
 
 //---------------------------------------------------------
-double CSG_Formula::_Get_Value(TMAT_Formula func)
+double CSG_Formula::_Get_Value(const double *Parameters, TMAT_Formula func) const
 {
 	double	x, y, z, buffer[GET_VALUE_BUFSIZE];
 
@@ -445,12 +417,12 @@ double CSG_Formula::_Get_Value(TMAT_Formula func)
 
 	if( !function )
 	{
-		_Set_Error(LNG("empty coded function"));
+	//	_Set_Error(_TL("empty coded function"));
 
 		return( 0 );
 	}
 
-	for(; ; )
+	for( ; ; )
 	{
 		switch( *function++ )
 		{
@@ -462,7 +434,7 @@ double CSG_Formula::_Get_Value(TMAT_Formula func)
 			break;
 
 		case 'V': 
-			*bufp++	= m_Parameters[(*function++) - 'a'];
+			*bufp++	= Parameters[(*function++) - 'a'];
 			break;
 
 		case 'M':
@@ -556,13 +528,13 @@ double CSG_Formula::_Get_Value(TMAT_Formula func)
 				break;
 
 			default:
-				_Set_Error(LNG("I2: too many parameters"));
+			//	_Set_Error(_TL("I2: too many parameters"));
 				return( 0 );
 			}
 			break;
 
 		default:
-			_Set_Error(LNG("I1: unrecognizable operator"));
+		//	_Set_Error(_TL("I1: unrecognizable operator"));
 			return( 0 );
 		}
 	}
@@ -571,7 +543,7 @@ finish:
 
 	if( (bufp - buffer) != 1 )
 	{
-		_Set_Error(LNG("I3: corrupted buffer"));
+	//	_Set_Error(_TL("I3: corrupted buffer"));
 	}
 
 	return( buffer[0] );
@@ -625,7 +597,7 @@ int CSG_Formula::Del_Function(SG_Char *name)
 
 	if( place < STD_FNC_NUM )
 	{
-		_Set_Error(LNG("original functions may not be deleted"));
+		_Set_Error(_TL("original functions may not be deleted"));
 
 		return( -1 );
 	}
@@ -659,7 +631,7 @@ int CSG_Formula::Add_Function(SG_Char *name, TSG_PFNC_Formula_1 f, int n_pars, i
 	
 	if( n_pars < 0 || n_pars > 3 )
 	{
-		_Set_Error(LNG("invalid number of parameters"));
+		_Set_Error(_TL("invalid number of parameters"));
 
 		return( 0 );
 	}
@@ -681,7 +653,7 @@ int CSG_Formula::Add_Function(SG_Char *name, TSG_PFNC_Formula_1 f, int n_pars, i
 	}
 	else if( (where - gSG_Functions) >= MAX_CTABLE - 1 )
 	{
-		_Set_Error(LNG("function table full"));
+		_Set_Error(_TL("function table full"));
 
 		return 0;
 	}
@@ -691,7 +663,7 @@ int CSG_Formula::Add_Function(SG_Char *name, TSG_PFNC_Formula_1 f, int n_pars, i
 
 		if( where->name == NULL )
 		{
-			_Set_Error(LNG("no memory"));
+			_Set_Error(_TL("no memory"));
 
 			return( 0 );
 		}
@@ -719,7 +691,7 @@ int CSG_Formula::_Get_Function(int i, SG_Char *name, int *n_pars, int *varying)
 {
 	if( !gSG_Functions[i].f )
 	{
-		_Set_Error(LNG("index out of bounds"));
+		_Set_Error(_TL("index out of bounds"));
 
 		return( 0 );
 	}
@@ -747,7 +719,7 @@ int CSG_Formula::_Get_Function(SG_Char *name)
 
 	if( pFunction->f == NULL )
 	{
-		_Set_Error(LNG("function not found"));
+		_Set_Error(_TL("function not found"));
 
 		return( -1 );
 	}
@@ -840,7 +812,7 @@ CSG_Formula::TMAT_Formula CSG_Formula::_Translate(const SG_Char *sourc, const SG
 
 	if( source == NULL )
 	{
-		_Set_Error(LNG("no memory"));
+		_Set_Error(_TL("no memory"));
 
 		return( returned );
 	}
@@ -856,7 +828,7 @@ CSG_Formula::TMAT_Formula CSG_Formula::_Translate(const SG_Char *sourc, const SG
 
 			if( *scarg == SG_T('\0') )
 			{
-				_Set_Error(LNG("undeclared parameter"));
+				_Set_Error(_TL("undeclared parameter"));
 
 				i_error	= scan;
 				*error	= i_error - source;
@@ -873,7 +845,7 @@ CSG_Formula::TMAT_Formula CSG_Formula::_Translate(const SG_Char *sourc, const SG
 
 	if( !(code =(SG_Char *) SG_Malloc(size_estim)) )
 	{
-		_Set_Error(LNG("no memory"));
+		_Set_Error(_TL("no memory"));
 
 		*error	= -1;
 
@@ -888,7 +860,7 @@ CSG_Formula::TMAT_Formula CSG_Formula::_Translate(const SG_Char *sourc, const SG
 
 	if( !(i_ctable = (double *)SG_Malloc(MAX_CTABLE * sizeof(double))) )
 	{
-		_Set_Error(LNG("no memory"));
+		_Set_Error(_TL("no memory"));
 
 		*error = -1;
 
@@ -923,7 +895,7 @@ CSG_Formula::TMAT_Formula CSG_Formula::_Translate(const SG_Char *sourc, const SG
 
 		if( ((*leng) + 1) * sizeof(SG_Char) > size_estim )
 		{
-			_Set_Error(LNG("I4: size estimate too small"));
+			_Set_Error(_TL("I4: size estimate too small"));
 
 			SG_Free(source);
 
@@ -999,7 +971,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 	
 	if (begin >= end)
 	{
-		_Set_Error(LNG("missing operand"));
+		_Set_Error(_TL("missing operand"));
 		i_error = begin;
 		return NULL;
 	}
@@ -1012,7 +984,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 	}
 	if (pars < 0 || pars > 0)
 	{
-		_Set_Error(LNG("unmatched parentheses"));
+		_Set_Error(_TL("unmatched parentheses"));
 		i_error = scan - 1;
 		return NULL;
 	}
@@ -1149,7 +1121,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 		}
 		else
 		{
-			_Set_Error(LNG("too many constants"));
+			_Set_Error(_TL("too many constants"));
 			i_error = begin;
 			return NULL;
 		}
@@ -1159,7 +1131,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 				/*function*/
 	if (!isalpha(*begin) && *begin != SG_T('_'))
 	{
-		_Set_Error(LNG("syntax error"));
+		_Set_Error(_TL("syntax error"));
 		i_error = begin;
 		return NULL;
 	}
@@ -1177,7 +1149,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 	*endf = tempch;
 	if (*endf != SG_T('(') || *(end - 1) != SG_T(')'))
 	{
-		_Set_Error(LNG("improper function syntax"));
+		_Set_Error(_TL("improper function syntax"));
 		i_error = endf;
 		return NULL;
 	}
@@ -1201,7 +1173,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 			else 
 			{
 				i_error = endf + 1;
-				_Set_Error(LNG("too many parameters"));
+				_Set_Error(_TL("too many parameters"));
 				return NULL;
 			}
 	}
@@ -1213,7 +1185,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 
 		if (!par_buf)
 		{    
-			_Set_Error(LNG("no memory")); 
+			_Set_Error(_TL("no memory")); 
 			i_error = NULL;  
 			return NULL;   
 		}
@@ -1232,7 +1204,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 		{
 			SG_Free(par_buf);
 			i_error = end - 2;
-			_Set_Error(LNG("too few parameters"));
+			_Set_Error(_TL("too few parameters"));
 			return NULL;
 		}
 
@@ -1240,7 +1212,7 @@ SG_Char *CSG_Formula::i_trans(SG_Char *function, SG_Char *begin, SG_Char *end)
 		{
 			SG_Free(par_buf);
 			i_error =(temps - par_buf) +(endf + 1); 
-			_Set_Error(LNG("too many parameters"));
+			_Set_Error(_TL("too many parameters"));
 			return NULL;
 		}
 		
@@ -1295,7 +1267,7 @@ SG_Char *CSG_Formula::comp_time(SG_Char *function, SG_Char *fend, int npars)
 	
 	trans.code = function;
 	trans.ctable = i_ctable;
-	tempd = _Get_Value(trans);
+	tempd = _Get_Value(m_Parameters, trans);
 	*fend = temp;
 	*function++ = SG_T('D');
 	i_pctable -= npars;

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pointcloud.h 1167 2011-09-21 08:45:40Z reklov_w $
+ * Version $Id: pointcloud.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -115,10 +115,7 @@ public:
 	bool							is_Compatible		(CSG_PointCloud *pPointCloud)	const;
 
 	//-----------------------------------------------------
-	virtual bool					Add_Field			(const SG_Char *Name, TSG_Data_Type Type, int iField = -1);
-#ifdef _SAGA_UNICODE
-	virtual bool					Add_Field			(const char    *Name, TSG_Data_Type Type, int iField = -1);
-#endif
+	virtual bool					Add_Field			(const CSG_String &Name, TSG_Data_Type Type, int iField = -1);
 	virtual bool					Del_Field			(int iField);
 
 	//-----------------------------------------------------

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: GSGrid_Variance_Radius.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: GSGrid_Variance_Radius.cpp 1596 2013-01-25 16:04:41Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ bool CGSGrid_Variance_Radius::On_Execute(void)
 	//-----------------------------------------------------
 	stopVariance	= M_SQR(Parameters("VARIANCE")->asDouble());
 	maxRadius		= Parameters("RADIUS")	->asInt();
-	bWriteGridsize	= Parameters("OUTPUT")	->asInt() == 1;
+	bWriteGridsize	= Parameters("OUTPUT")	->asInt() == 0;
 
 	pGrid			= Parameters("INPUT")	->asGrid();
 	pResult			= Parameters("RESULT")	->asGrid();

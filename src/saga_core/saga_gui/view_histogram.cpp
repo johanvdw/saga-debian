@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_histogram.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: view_histogram.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -223,6 +223,7 @@ void CVIEW_Histogram_Control::On_Mouse_LDown(wxMouseEvent &event)
 	default:
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -263,6 +264,7 @@ void CVIEW_Histogram_Control::On_Mouse_RDown(wxMouseEvent &event)
 	default:
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -280,8 +282,8 @@ void CVIEW_Histogram_Control::On_Mouse_RDown(wxMouseEvent &event)
 
 		case WKSP_ITEM_Shapes:
 			m_pLayer->Set_Color_Range(
-				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Minimum(m_pLayer->Get_Parameters()->Get_Parameter("METRIC_ATTRIB")->asInt()),
-				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Maximum(m_pLayer->Get_Parameters()->Get_Parameter("METRIC_ATTRIB")->asInt())
+				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Minimum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt()),
+				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Maximum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt())
 			);
 			break;
 		}
@@ -357,7 +359,7 @@ void CVIEW_Histogram_Control::_Draw_Histogram(wxDC &dc, wxRect r)
 	}
 	else
 	{
-		Draw_Text(dc, TEXTALIGN_CENTER, r.GetLeft() + r.GetWidth() / 2, r.GetBottom() - r.GetHeight() / 2, LNG("no histogram for unclassified data"));
+		Draw_Text(dc, TEXTALIGN_CENTER, r.GetLeft() + r.GetWidth() / 2, r.GetBottom() - r.GetHeight() / 2, _TL("no histogram for unclassified data"));
 	}
 }
 
@@ -367,84 +369,61 @@ void CVIEW_Histogram_Control::_Draw_Frame(wxDC &dc, wxRect r)
 	const int	dyFont		= 12,
 				Precision	= 3;
 
-	int		iPixel, iStep, nSteps, Maximum, nClasses;
-	double	dPixel, dPixelFont, dz, dArea	= m_pLayer->Get_Type() == WKSP_ITEM_Grid ? ((CSG_Grid *)m_pLayer->Get_Object())->Get_Cellarea() : 1.0;
-	wxFont	Font;
-
 	//-----------------------------------------------------
 	Draw_Edge(dc, EDGE_STYLE_SIMPLE, r);
 
-	Maximum	= m_bCumulative
-			? m_pLayer->Get_Classifier()->Histogram_Get_Total()
-			: m_pLayer->Get_Classifier()->Histogram_Get_Maximum();
+	int	Maximum	= m_bCumulative
+		? m_pLayer->Get_Classifier()->Histogram_Get_Total()
+		: m_pLayer->Get_Classifier()->Histogram_Get_Maximum();
 
 	if( Maximum > 0 )
 	{
-		Font	= dc.GetFont();
-		Font.SetPointSize((int)(0.7 * dyFont));
-		dc.SetFont(Font);
+		Draw_Scale(dc, wxRect(r.GetLeft() - 20, r.GetTop(), 20, r.GetHeight()), 0, Maximum, false, false, false);
+	}
 
-		//-------------------------------------------------
-		dPixelFont	= dyFont;
+	//-----------------------------------------------------
+	int		iPixel, iStep, nSteps, nClasses;
+	double	dPixel, dPixelFont, dz;
+	wxFont	Font;
 
-		if( (dPixel = r.GetHeight() / (double)Maximum) < dPixelFont )
+	Font	= dc.GetFont();
+	Font.SetPointSize((int)(0.7 * dyFont));
+	dc.SetFont(Font);
+
+	nClasses	= m_pLayer->Get_Classifier()->Get_Class_Count();
+	dPixelFont	= dyFont + 5;
+
+	if( (dPixel = r.GetWidth() / (double)nClasses) < dPixelFont )
+	{
+		dPixel	= dPixel * (1 + (int)(dPixelFont / dPixel));
+	}
+
+	nSteps	= (int)(r.GetWidth() / dPixel);
+	dz		= dPixel / (double)r.GetWidth();
+
+	if( m_pLayer->Get_Classifier()->Get_Mode() == CLASSIFY_LUT )
+	{
+		for(iStep=0; iStep<nSteps; iStep++)
 		{
-			dPixel	= dPixel * (1 + (int)(dPixelFont / dPixel));
+			iPixel	= r.GetLeft() + (int)(dPixel * iStep);
+			dc.DrawLine(iPixel, r.GetBottom(), iPixel, r.GetBottom() + 5);
+			Draw_Text(dc, TEXTALIGN_TOPRIGHT, iPixel, r.GetBottom() + 7, 45.0,
+				m_pLayer->Get_Classifier()->Get_Class_Name((int)(nClasses * iStep * dz))
+			);
 		}
-
-		nSteps	= (int)(r.GetHeight() / dPixel);
-		dz		= Maximum * dPixel / (double)r.GetHeight();
+	}
+	else
+	{
+		double	zFactor	= m_pLayer->Get_Type() == WKSP_ITEM_Grid ? ((CWKSP_Grid *)m_pLayer)->Get_Grid()->Get_ZFactor() : 1.0;
 
 		for(iStep=0; iStep<=nSteps; iStep++)
 		{
-			iPixel	= r.GetBottom()	- (int)(dPixel * iStep);
-			dc.DrawLine(r.GetLeft(), iPixel, r.GetLeft() - 5, iPixel);
-
-			if( 1 )
-				Draw_Text(dc, TEXTALIGN_CENTERRIGHT, r.GetLeft() - 7, iPixel,
-					wxString::Format(wxT("%d"), (int)(iStep * dz))
-				);
-			else
-				Draw_Text(dc, TEXTALIGN_CENTERRIGHT, r.GetLeft() - 7, iPixel,
-					wxString::Format(wxT("%.2f"), iStep * dz * dArea)
-				);
-		}
-
-		//-------------------------------------------------
-		nClasses	= m_pLayer->Get_Classifier()->Get_Class_Count();
-		dPixelFont	= dyFont + 5;
-
-		if( (dPixel = r.GetWidth() / (double)nClasses) < dPixelFont )
-		{
-			dPixel	= dPixel * (1 + (int)(dPixelFont / dPixel));
-		}
-
-		nSteps	= (int)(r.GetWidth() / dPixel);
-		dz		= dPixel / (double)r.GetWidth();
-
-		if( m_pLayer->Get_Classifier()->Get_Mode() == CLASSIFY_LUT )
-		{
-			for(iStep=0; iStep<nSteps; iStep++)
-			{
-				iPixel	= r.GetLeft() + (int)(dPixel * iStep);
-				dc.DrawLine(iPixel, r.GetBottom(), iPixel, r.GetBottom() + 5);
-				Draw_Text(dc, TEXTALIGN_TOPRIGHT, iPixel, r.GetBottom() + 7, 45.0,
-					m_pLayer->Get_Classifier()->Get_Class_Name((int)(nClasses * iStep * dz))
-				);
-			}
-		}
-		else
-		{
-			double	zFactor	= m_pLayer->Get_Type() == WKSP_ITEM_Grid ? ((CWKSP_Grid *)m_pLayer)->Get_Grid()->Get_ZFactor() : 1.0;
-
-			for(iStep=0; iStep<=nSteps; iStep++)
-			{
-				iPixel	= r.GetLeft() + (int)(dPixel * iStep);
-				dc.DrawLine(iPixel, r.GetBottom(), iPixel, r.GetBottom() + 5);
-				Draw_Text(dc, TEXTALIGN_CENTERRIGHT, iPixel, r.GetBottom() + 7, 45.0,
-					wxString::Format(wxT("%.*f"), Precision, zFactor * m_pLayer->Get_Classifier()->Get_RelativeToMetric(iStep * dz))
-				);
-			}
+			iPixel	= r.GetLeft() + (int)(dPixel * iStep);
+			dc.DrawLine(iPixel, r.GetBottom(), iPixel, r.GetBottom() + 5);
+			Draw_Text(dc, TEXTALIGN_CENTERRIGHT, iPixel, r.GetBottom() + 7, 45.0,
+			//	wxString::Format(wxT("%.*f"), Precision, zFactor * m_pLayer->Get_Classifier()->Get_RelativeToMetric(iStep * dz))
+				SG_Get_String(zFactor * m_pLayer->Get_Classifier()->Get_RelativeToMetric(iStep * dz), -2).c_str()
+			);
 		}
 	}
 }
@@ -455,13 +434,13 @@ wxRect CVIEW_Histogram_Control::_Draw_Get_rDiagram(wxRect r)
 	if( m_pLayer->Get_Classifier()->Get_Mode() == CLASSIFY_LUT )
 	{
 		return(	wxRect(
-			wxPoint(r.GetLeft()  + 50, r.GetTop()    +  10),
+			wxPoint(r.GetLeft()  + 30, r.GetTop()    +  10),
 			wxPoint(r.GetRight() - 10, r.GetBottom() - 100)
 		));
 	}
 
 	return(	wxRect(
-		wxPoint(r.GetLeft()  + 50, r.GetTop()    + 10),
+		wxPoint(r.GetLeft()  + 30, r.GetTop()    + 10),
 		wxPoint(r.GetRight() - 10, r.GetBottom() - 40)
 	));
 }
@@ -490,7 +469,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CVIEW_Histogram::CVIEW_Histogram(CWKSP_Layer *pLayer)
-	: CVIEW_Base(ID_VIEW_HISTOGRAM, pLayer->Get_Name(), ID_IMG_WND_HISTOGRAM, CVIEW_Histogram::_Create_Menu(), LNG("[CAP] Histogram"))
+	: CVIEW_Base(ID_VIEW_HISTOGRAM, pLayer->Get_Name(), ID_IMG_WND_HISTOGRAM)
 {
 	m_pLayer	= pLayer;
 	m_pControl	= new CVIEW_Histogram_Control(this, pLayer);
@@ -510,7 +489,7 @@ CVIEW_Histogram::~CVIEW_Histogram(void)
 //---------------------------------------------------------
 wxMenu * CVIEW_Histogram::_Create_Menu(void)
 {
-	wxMenu	*pMenu	= new wxMenu();
+	wxMenu	*pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, true , ID_CMD_HISTOGRAM_CUMULATIVE);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_HISTOGRAM_AS_TABLE);
@@ -526,7 +505,7 @@ wxToolBarBase * CVIEW_Histogram::_Create_ToolBar(void)
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_HISTOGRAM_CUMULATIVE);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_HISTOGRAM_AS_TABLE);
 
-	CMD_ToolBar_Add(pToolBar, LNG("[CAP] Histogram"));
+	CMD_ToolBar_Add(pToolBar, _TL("Histogram"));
 
 	return( pToolBar );
 }
@@ -573,27 +552,29 @@ void CVIEW_Histogram::On_AsTable(wxCommandEvent &event)
 	{
 		pTable	= new CSG_Table;
 
-		pTable->Set_Name(wxString::Format(wxT("%s: %s"), LNG("[CAP] Histogram"), m_pLayer->Get_Name().c_str()));
+		pTable->Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Histogram"), m_pLayer->Get_Object()->Get_Name()));
 
-		pTable->Add_Field(LNG("CLASS")	, SG_DATATYPE_Int);
-		pTable->Add_Field(LNG("COUNT")	, SG_DATATYPE_Int);
-		pTable->Add_Field(LNG("AREA")	, SG_DATATYPE_Double);
-		pTable->Add_Field(LNG("NAME")	, SG_DATATYPE_String);
-		pTable->Add_Field(LNG("MIN")	, SG_DATATYPE_Double);
-		pTable->Add_Field(LNG("CENTER")	, SG_DATATYPE_Double);
-		pTable->Add_Field(LNG("MAX")	, SG_DATATYPE_Double);
+		pTable->Add_Field(_TL("CLASS")	, SG_DATATYPE_Int);
+		pTable->Add_Field(_TL("AREA")	, SG_DATATYPE_Double);
+		pTable->Add_Field(_TL("COUNT")	, SG_DATATYPE_Int);
+		pTable->Add_Field(_TL("CUMUL")	, SG_DATATYPE_Int);
+		pTable->Add_Field(_TL("NAME")	, SG_DATATYPE_String);
+		pTable->Add_Field(_TL("MIN")	, SG_DATATYPE_Double);
+		pTable->Add_Field(_TL("CENTER")	, SG_DATATYPE_Double);
+		pTable->Add_Field(_TL("MAX")	, SG_DATATYPE_Double);
 
 		for(i=0; i<n; i++)
 		{
 			pRecord	= pTable->Add_Record();
 
 			pRecord->Set_Value(0, i + 1);
-			pRecord->Set_Value(1, m_pLayer->Get_Classifier()->Histogram_Get_Count    (i, false));
-			pRecord->Set_Value(2, m_pLayer->Get_Classifier()->Histogram_Get_Count    (i, false) * dArea);
-			pRecord->Set_Value(3, m_pLayer->Get_Classifier()->Get_Class_Name         (i).c_str());
-			pRecord->Set_Value(4, m_pLayer->Get_Classifier()->Get_Class_Value_Minimum(i));
-			pRecord->Set_Value(5, m_pLayer->Get_Classifier()->Get_Class_Value_Center (i));
-			pRecord->Set_Value(6, m_pLayer->Get_Classifier()->Get_Class_Value_Maximum(i));
+			pRecord->Set_Value(2, m_pLayer->Get_Classifier()->Histogram_Get_Count     (i, false) * dArea);
+			pRecord->Set_Value(1, m_pLayer->Get_Classifier()->Histogram_Get_Count     (i, false));
+			pRecord->Set_Value(3, m_pLayer->Get_Classifier()->Histogram_Get_Cumulative(i, false));
+			pRecord->Set_Value(4, m_pLayer->Get_Classifier()->Get_Class_Name          (i).wx_str());
+			pRecord->Set_Value(5, m_pLayer->Get_Classifier()->Get_Class_Value_Minimum (i));
+			pRecord->Set_Value(6, m_pLayer->Get_Classifier()->Get_Class_Value_Center  (i));
+			pRecord->Set_Value(7, m_pLayer->Get_Classifier()->Get_Class_Value_Maximum (i));
 		}
 
 		g_pData->Add(pTable);

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_history.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: active_history.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -97,7 +97,8 @@ public:
 
 private:
 	
-	int					_Get_Image				(const CSG_String &Identifier);
+	int					_Get_Image				(TSG_Parameter_Type Type);
+	int					_Get_Image				(const CSG_String  &Type);
 	bool				_Add_History			(wxTreeItemId Parent, CSG_MetaData &History);
 
 

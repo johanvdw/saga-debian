@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_reclass_extract.h 1164 2011-09-16 08:55:11Z reklov_w $
+ * Version $Id: pc_reclass_extract.h 1406 2012-05-21 14:22:39Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ public:
 	CPC_Reclass_Extract(void);
 	virtual ~CPC_Reclass_Extract(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("R:Tools") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:Tools") );	}
 
 
 protected:
@@ -100,7 +100,7 @@ protected:
 private:
 
 	int				m_Single;
-	bool			m_bExtract;
+	bool			m_bExtract, m_bCreateAttrib;
 	int				m_AttrField;
 
 	CSG_PointCloud	*m_pInput, *m_pResult;

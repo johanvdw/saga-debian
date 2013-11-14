@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: land_surface_temperature.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: land_surface_temperature.cpp 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -135,10 +135,6 @@ CLand_Surface_Temperature::CLand_Surface_Temperature(void)
 		PARAMETER_TYPE_Double	, 1.0
 	);
 }
-
-//---------------------------------------------------------
-CLand_Surface_Temperature::~CLand_Surface_Temperature(void)
-{}
 
 
 ///////////////////////////////////////////////////////////

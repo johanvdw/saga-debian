@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: CellBalance.h 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: CellBalance.h 1616 2013-02-27 16:23:56Z oconrad $
  *********************************************************/
 /*******************************************************************************
     CellBalance.h
@@ -30,9 +30,8 @@ class CCellBalance : public CSG_Module_Grid
 {
 public:
 	CCellBalance(void);
-	virtual ~CCellBalance(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Miscellaneous") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Miscellaneous") );	}
 
 
 protected:
@@ -47,8 +46,6 @@ private:
 
 	void					Set_D8			(int x, int y, double Weight);
 	void					Set_MFD			(int x, int y, double Weight);
-
-//	double				getCellBalance	(int x, int y);
 
 };
 

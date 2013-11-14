@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1546 2012-11-27 12:12:54Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@
 
 
 //---------------------------------------------------------
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -71,7 +71,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Shapes - Point Clouds") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O.Conrad, Volker Wichmann (c) 2009-10") );
+		return( SG_T("O.Conrad, V.Wichmann, M.Bremer (c) 2009-12") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for point clouds.") );
@@ -92,6 +92,7 @@ const SG_Char * Get_Info(int i)
 #include "pc_drop_attribute.h"
 #include "pc_from_grid.h"
 #include "pc_from_shapes.h"
+#include "pc_merge.h"
 #include "pc_reclass_extract.h"
 #include "pc_thinning_simple.h"
 #include "pc_to_grid.h"
@@ -116,6 +117,7 @@ CSG_Module *		Create_Module(int i)
 	case 9:		return( new CPC_Thinning_Simple );
 	case 10:	return( new CPC_Attribute_Calculator );
 	case 11:	return( new CPC_Cluster_Analysis );
+	case 12:	return( new CPC_Merge );
 	}
 
 	return( NULL );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Calculator.h 1098 2011-06-16 16:06:32Z oconrad $
+ * Version $Id: Table_Calculator.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*******************************************************************************
     TableCalculator.h
@@ -65,7 +65,7 @@ class CTable_Calculator_Shapes : public CTable_Calculator_Base
 public:
 	CTable_Calculator_Shapes(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("A:Shapes|Table") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("A:Shapes|Table") );	}
 
 };
 

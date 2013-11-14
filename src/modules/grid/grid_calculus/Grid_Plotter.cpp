@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Plotter.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Plotter.cpp 1398 2012-05-10 11:36:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -116,19 +116,11 @@ bool CGrid_Plotter::On_Execute(void)
 
 	Formel.Set_Formula(formel);
 
-	int Pos;
 	CSG_String Msg;
-	if (Formel.Get_Error(&Pos,&Msg))
+	if (Formel.Get_Error(Msg))
 	{
-		CSG_String	msg;
-		msg.Printf(_TL("Error at character #%d of the function: \n%s\n"), Pos, formel);
+		Message_Add(Msg);
 		
-		Message_Add(msg);
-		
-		msg.Printf(SG_T("\n%s\n"), Msg.c_str());
-		
-		Message_Add(msg);
-
 		return false;
 	}
 

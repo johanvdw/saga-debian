@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_menu.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_module_menu.h 1493 2012-10-19 11:31:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -71,16 +71,25 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CWKSP_Module_Menu
+#include <wx/menu.h>
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CWKSP_Menu_Modules
 {
 public:
-	CWKSP_Module_Menu(void);
-	virtual ~CWKSP_Module_Menu(void);
+	CWKSP_Menu_Modules(void);
+	virtual ~CWKSP_Menu_Modules(void);
 
 	void						Destroy				(void);
 
-	void						Add					(class wxMenu *pMenu);
-	void						Del					(class wxMenu *pMenu);
+	wxMenu *					Get_Menu			(void)	{	return( m_pMenu );	}
 
 	void						Update				(void);
 
@@ -91,17 +100,15 @@ public:
 
 private:
 
-	int							m_nMenus;
-
-	class wxMenu				**m_Menus;
+	wxMenu						*m_pMenu;
 
 	class CWKSP_Module			**m_Recent;
 
 
-	void						_Update				(class wxMenu *pMenu);
-	class wxMenu *				_Get_SubMenu		(class wxMenu *pMenu, wxString Menu_Path);
-	class wxMenu* 				_Find_SubMenu_For_Token( wxMenu* menu, wxString token );
-	void						_Set_Recent			(class wxMenu *pMenu);
+	void						_Update				(wxMenu *pMenu);
+	wxMenu *					_Get_SubMenu		(wxMenu *pMenu, wxString Menu_Path);
+	wxMenu *					_Get_SubMenu_byToken(wxMenu *pMenu, wxString Token);
+	void						_Set_Recent			(wxMenu *pMenu);
 
 };
 

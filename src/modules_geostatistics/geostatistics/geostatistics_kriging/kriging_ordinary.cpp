@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: kriging_ordinary.cpp 1206 2011-10-28 11:54:29Z oconrad $
+ * Version $Id: kriging_ordinary.cpp 1633 2013-03-22 13:35:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ CKriging_Ordinary::CKriging_Ordinary(void)
 	CSG_Parameter	*pNode;
 
 	//-----------------------------------------------------
-	Set_Name		(_TL("Ordinary Kriging (VF)"));
+	Set_Name		(_TL("Ordinary Kriging"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2008"));
 
@@ -86,8 +86,13 @@ CKriging_Ordinary::CKriging_Ordinary(void)
 	));
 
 	//-----------------------------------------------------
+	CSG_Parameter	*pSearch	= Parameters.Add_Node(
+		NULL	, "NODE_SEARCH"			, _TL("Search Options"),
+		_TL("")
+	);
+
 	pNode	= Parameters.Add_Choice(
-		NULL	, "GLOBAL"		, _TL("Search Range"),
+		pSearch	, "SEARCH_RANGE"		, _TL("Search Range"),
 		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|"),
 			_TL("local"),
@@ -96,34 +101,34 @@ CKriging_Ordinary::CKriging_Ordinary(void)
 	);
 
 	Parameters.Add_Value(
-		pNode	, "MAXRADIUS"	, _TL("Maximum Search Radius (map units)"),
-		_TL(""),
+		pNode	, "SEARCH_RADIUS"		, _TL("Maximum Search Distance"),
+		_TL("local maximum search distance given in map units"),
 		PARAMETER_TYPE_Double	, 1000.0, 0, true
 	);
 
 	pNode	= Parameters.Add_Choice(
-		NULL	, "ALL_POINTS"	, _TL("Number of Points"),
+		pSearch	, "SEARCH_POINTS_ALL"	, _TL("Number of Points"),
 		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|"),
-			_TL("maximum number of points"),
-			_TL("all points in search distance")
+			_TL("maximum number of nearest points"),
+			_TL("all points within search distance")
 		)
 	);
 
 	Parameters.Add_Value(
-		pNode	, "NPOINTS_MIN"	, _TL("Minimum"),
-		_TL(""),
+		pNode	, "SEARCH_POINTS_MIN"	, _TL("Minimum"),
+		_TL("minimum number of points to use"),
 		PARAMETER_TYPE_Int, 4, 1, true
 	);
 
 	Parameters.Add_Value(
-		pNode	, "NPOINTS_MAX"	, _TL("Maximum"),
-		_TL(""),
+		pNode	, "SEARCH_POINTS_MAX"	, _TL("Maximum"),
+		_TL("maximum number of nearest points"),
 		PARAMETER_TYPE_Int, 20, 1, true
 	);
 
 	Parameters.Add_Choice(
-		NULL	, "MODE"		, _TL("Search Mode"),
+		pNode	, "SEARCH_DIRECTION"	, _TL("Search Direction"),
 		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|"),
 			_TL("all directions"),
@@ -132,10 +137,6 @@ CKriging_Ordinary::CKriging_Ordinary(void)
 	);
 }
 
-//---------------------------------------------------------
-CKriging_Ordinary::~CKriging_Ordinary(void)
-{}
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -144,18 +145,35 @@ CKriging_Ordinary::~CKriging_Ordinary(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CKriging_Ordinary::On_Initialise(void)
+bool CKriging_Ordinary::On_Initialize(void)
 {
-	m_Radius		= Parameters("GLOBAL")->asBool() ? 0.0 : Parameters("MAXRADIUS")->asDouble();
-
-	m_nPoints_Min	= Parameters("NPOINTS_MIN")	->asInt();
-	m_nPoints_Max	= Parameters("ALL_POINTS")	->asBool() ? m_pPoints->Get_Count()
-					: Parameters("NPOINTS_MAX")	->asInt();
-
-	m_Mode			= Parameters("MODE")->asInt();
+	m_nPoints_Min	= Parameters("SEARCH_POINTS_MIN")->asInt   ();
+	m_nPoints_Max	= Parameters("SEARCH_POINTS_ALL")->asInt   () == 0
+					? Parameters("SEARCH_POINTS_MAX")->asInt   () : 0;
+	m_Radius		= Parameters("SEARCH_RANGE"     )->asInt   () == 0
+					? Parameters("SEARCH_RADIUS"    )->asDouble() : 0.0;
+	m_Direction		= Parameters("SEARCH_DIRECTION" )->asInt   () == 0 ? -1 : 4;
 
 	//-----------------------------------------------------
-	if( !m_Search.Create(m_pPoints, m_zField) )
+	if( m_nPoints_Max <= 0 && m_Radius <= 0 )	// global
+	{
+		return( CKriging_Ordinary_Global::On_Execute() );
+	}
+
+	//-----------------------------------------------------
+	m_Search.Create(m_pPoints->Get_Extent());
+
+	for(int iPoint=0; iPoint<m_pPoints->Get_Count() && Set_Progress(iPoint, m_pPoints->Get_Count()); iPoint++)
+	{
+		CSG_Shape	*pPoint	= m_pPoints->Get_Shape(iPoint);
+
+		if( !pPoint->is_NoData(m_zField) )
+		{
+			m_Search.Add_Point(pPoint->Get_Point(0).x, pPoint->Get_Point(0).y, m_bLog ? log(pPoint->asDouble(m_zField)) : pPoint->asDouble(m_zField));
+		}
+	}
+
+	if( !m_Search.is_Okay() )
 	{
 		SG_UI_Msg_Add(_TL("could not initialize point search engine"), true);
 
@@ -163,17 +181,13 @@ bool CKriging_Ordinary::On_Initialise(void)
 	}
 
 	//-----------------------------------------------------
-	int		nPoints_Max;
+	return( true );
+}
 
-	switch( m_Mode )
-	{
-	default:	nPoints_Max	= m_nPoints_Max;		break;
-	case 1:		nPoints_Max	= m_nPoints_Max * 4;	break;
-	}
-
-	m_Points.Set_Count	(nPoints_Max);
-	m_G		.Create		(nPoints_Max + 1);
-	m_W		.Create		(nPoints_Max + 1, nPoints_Max + 1);
+//---------------------------------------------------------
+bool CKriging_Ordinary::On_Finalize(void)
+{
+	m_Search.Destroy();
 
 	return( true );
 }
@@ -186,49 +200,34 @@ bool CKriging_Ordinary::On_Initialise(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CKriging_Ordinary::Get_Value(double x, double y, double &z, double &v)
+int CKriging_Ordinary::Get_Weights(const TSG_Point &p, CSG_Matrix &W, CSG_Points_Z &Points)
 {
-	int		i, j, n;
-	double	Lambda;
+	int		n	= m_Search.Get_Nearest_Points(Points, p, m_nPoints_Max, m_Radius, m_Direction);
 
-	//-----------------------------------------------------
-	if(	(n = Get_Weights(x, y)) > 0 )
+	if( n >= m_nPoints_Min )
 	{
-		for(i=0; i<n; i++)
+		W.Create(n + 1, n + 1);
+
+		for(int i=0; i<n; i++)
 		{
-			if( !m_bBlock )
+			W[i][i]	= 0.0;				// diagonal...
+			W[i][n]	= W[n][i]	= 1.0;	// edge...
+
+			for(int j=i+1; j<n; j++)
 			{
-				m_G[i]	=	Get_Weight(x - m_Points[i].x, y - m_Points[i].y);
-			}
-			else
-			{
-				m_G[i]	= (	Get_Weight((x          ) - m_Points[i].x, (y          ) - m_Points[i].y)
-						+	Get_Weight((x + m_Block) - m_Points[i].x, (y + m_Block) - m_Points[i].y)
-						+	Get_Weight((x + m_Block) - m_Points[i].x, (y - m_Block) - m_Points[i].y)
-						+	Get_Weight((x - m_Block) - m_Points[i].x, (y + m_Block) - m_Points[i].y)
-						+	Get_Weight((x - m_Block) - m_Points[i].x, (y - m_Block) - m_Points[i].y) ) / 5.0;
+				W[i][j]	= W[j][i]	= Get_Weight(Points[i], Points[j]);
 			}
 		}
 
-		m_G[n]	= 1.0;
+		W[n][n]	= 0.0;
 
-		//-------------------------------------------------
-		for(i=0, z=0.0, v=0.0; i<n; i++)
+		if( W.Set_Inverse(true, 1 + n) )
 		{
-			for(j=0, Lambda=0.0; j<=n; j++)
-			{
-				Lambda	+= m_W[i][j] * m_G[j];
-			}
-
-			z	+= Lambda * m_Points[i].z;
-			v	+= Lambda * m_G[i];
+			return( n );
 		}
-
-		//-------------------------------------------------
-		return( true );
 	}
 
-	return( false );
+	return( 0 );
 }
 
 
@@ -239,54 +238,43 @@ bool CKriging_Ordinary::Get_Value(double x, double y, double &z, double &v)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-int CKriging_Ordinary::Get_Weights(double x, double y)
+bool CKriging_Ordinary::Get_Value(const TSG_Point &p, double &z, double &v)
 {
-	int		i, j, n;
+	int				i, j, n;
+	CSG_Points_Z	Points;
+	CSG_Matrix		W;
 
 	//-----------------------------------------------------
-	switch( m_Mode )
+	if(	(n = Get_Weights(p, W, Points)) > 0 )
 	{
-	default:	n	= m_Search.Select_Nearest_Points(x, y, m_nPoints_Max, m_Radius);	break;
-	case 1:		n	= m_Search.Select_Nearest_Points(x, y, m_nPoints_Max, m_Radius, 4);	break;
-	}
+		CSG_Vector	G(n + 1);
 
-	//-----------------------------------------------------
-	if( n >= m_nPoints_Min )
-	{
 		for(i=0; i<n; i++)
 		{
-			m_Search.Get_Selected_Point(i, m_Points[i].x, m_Points[i].y, m_Points[i].z);
+			G[i]	=	Get_Weight(p.x, p.y, Points[i].x, Points[i].y);
+		}
 
-			if( m_bLog )
+		G[n]	= 1.0;
+
+		//-------------------------------------------------
+		for(i=0, z=0.0, v=0.0; i<n; i++)
+		{
+			double	Lambda	= 0.0;
+
+			for(j=0; j<=n; j++)
 			{
-				m_Points[i].z	= log(m_Points[i].z);
+				Lambda	+= W[i][j] * G[j];
 			}
+
+			z	+= Lambda * Points[i].z;
+			v	+= Lambda * G[i];
 		}
 
 		//-------------------------------------------------
-		for(i=0; i<n; i++)
-		{
-			m_W[i][i]	= 0.0;				// diagonale...
-			m_W[i][n]	= m_W[n][i]	= 1.0;	// edge...
-
-			for(j=i+1; j<n; j++)
-			{
-				m_W[i][j]	= m_W[j][i]	= Get_Weight(
-					m_Points[i].x - m_Points[j].x,
-					m_Points[i].y - m_Points[j].y
-				);
-			}
-		}
-
-		m_W[n][n]	= 0.0;
-
-		if( m_W.Set_Inverse(true, 1 + n) )
-		{
-			return( n );
-		}
+		return( true );
 	}
 
-	return( 0 );
+	return( false );
 }
 
 

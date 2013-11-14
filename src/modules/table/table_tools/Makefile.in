@@ -76,8 +76,8 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libtable_tools_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libtable_tools_la_OBJECTS = Join_Tables.lo MLB_Interface.lo \
-	table_change_date_format.lo Table_Create_Empty.lo \
-	Table_Enumerate.lo Table_Rotate.lo
+	table_change_date_format.lo table_change_field_type.lo \
+	Table_Create_Empty.lo Table_Enumerate.lo Table_Rotate.lo
 libtable_tools_la_OBJECTS = $(am_libtable_tools_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -136,6 +136,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -166,7 +167,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -247,25 +247,27 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1169 2011-09-21 16:56:01Z oconrad $
+# $Id: Makefile.am 1358 2012-03-28 17:17:15Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libtable_tools.la
 libtable_tools_la_SOURCES = \
 Join_Tables.cpp\
 MLB_Interface.cpp\
 table_change_date_format.cpp\
+table_change_field_type.cpp\
 Table_Create_Empty.cpp\
 Table_Enumerate.cpp\
 Table_Rotate.cpp\
 Join_Tables.h\
 MLB_Interface.h\
 table_change_date_format.h\
+table_change_field_type.h\
 Table_Create_Empty.h\
 Table_Enumerate.h\
 Table_Rotate.h
@@ -351,6 +353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Enumerate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Rotate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_change_date_format.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_change_field_type.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

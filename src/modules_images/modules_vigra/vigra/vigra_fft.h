@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_fft.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: vigra_fft.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ class CViGrA_FFT : public CSG_Module_Grid
 public:
 	CViGrA_FFT(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
 
 
 protected:
@@ -106,7 +106,7 @@ class CViGrA_FFT_Inverse : public CSG_Module_Grid
 public:
 	CViGrA_FFT_Inverse(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
 
 
 protected:
@@ -127,7 +127,7 @@ class CViGrA_FFT_Real : public CSG_Module_Grid
 public:
 	CViGrA_FFT_Real(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
 
 
 protected:
@@ -148,7 +148,7 @@ class CViGrA_FFT_Filter : public CSG_Module_Grid
 public:
 	CViGrA_FFT_Filter(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Fourier Analysis") );	}
 
 
 protected:

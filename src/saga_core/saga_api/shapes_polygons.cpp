@@ -80,7 +80,7 @@ public:
 	CSG_Converter_WorldToInt		(void)															{	Create(0.0, 1.0, 0.0, 1.0);					}
 	CSG_Converter_WorldToInt		(const CSG_Converter_WorldToInt &Converter)						{	Create(Converter);							}
 	CSG_Converter_WorldToInt		(double xOffset, double xScale, double yOffset, double yScale)	{	Create(xOffset, xScale, yOffset, yScale);	}
-	CSG_Converter_WorldToInt		(const CSG_Rect &Extent)										{	Create(Extent);								}
+	CSG_Converter_WorldToInt		(const CSG_Rect &Extent, bool bAspectRatio = false)				{	Create(Extent, bAspectRatio);				}
 
 	bool			Create			(const CSG_Converter_WorldToInt &Converter)
 	{
@@ -102,12 +102,31 @@ public:
 		return( false );
 	}
 
-	bool			Create			(const CSG_Rect &Extent)
+	bool			Create			(const CSG_Rect &Extent, bool bAspectRatio = false)
 	{
-		return( Create(
-			Extent.Get_XMin(), (1000000000000000000LL) / Extent.Get_XRange(),
-			Extent.Get_YMin(), (1000000000000000000LL) / Extent.Get_YRange()
-		));
+		double	xRange	= Extent.Get_XRange();
+		double	yRange	= Extent.Get_YRange();
+		double	xMin	= Extent.Get_XMin  ();
+		double	yMin	= Extent.Get_YMin  ();
+
+		if( bAspectRatio )
+		{
+			if( xRange < yRange )
+			{
+				xMin	-= (yRange - xRange) / 2.0;
+				xRange	 =  yRange;
+			}
+			else if( yRange < xRange )
+			{
+				yMin	-= (xRange - yRange) / 2.0;
+				yRange	 =  xRange;
+			}
+		}
+
+		return( xRange > 0 && yRange > 0 ? Create(
+			xMin, (1000000000000000000LL) / xRange,
+			yMin, (1000000000000000000LL) / yRange
+		) : false);
 	}
 
 	static ClipperLib::long64	Round			(double Value)	{	return( (ClipperLib::long64)(Value < 0.0 ? Value - 0.5 : Value + 0.5) );	}
@@ -121,8 +140,11 @@ public:
 	bool						Convert			(CSG_Shapes *pPolygons, ClipperLib::Polygons &P)		const;
 	bool						Convert			(const ClipperLib::Polygons &P, CSG_Shapes *pPolygons)	const;
 
-	bool						Convert			(CSG_Shape_Polygon *pPolygon, ClipperLib::Polygons &P)	const;
+	bool						Convert			(CSG_Shape *pPolygon, ClipperLib::Polygons &P)	const;
 	bool						Convert			(const ClipperLib::Polygons &P, CSG_Shape *pPolygon)	const;
+
+	double						Get_xScale		(void)	const	{	return( m_xScale );	}
+	double						Get_yScale		(void)	const	{	return( m_yScale );	}
 
 
 private:
@@ -144,11 +166,13 @@ bool CSG_Converter_WorldToInt::Convert(CSG_Shapes *pPolygons, ClipperLib::Polygo
 
 	for(int iPolygon=0, jPolygon=0; iPolygon<pPolygons->Get_Count(); iPolygon++)
 	{
-		CSG_Shape_Polygon	*pPolygon	= (CSG_Shape_Polygon *)pPolygons->Get_Shape(iPolygon);
+		CSG_Shape	*pPolygon	= pPolygons->Get_Shape(iPolygon);
 
 		for(int iPart=0; iPart<pPolygon->Get_Part_Count(); iPart++, jPolygon++)
 		{
-			bool	bAscending	= pPolygon->is_Lake(iPart) != pPolygon->is_Clockwise(iPart);
+			bool	bAscending	= pPolygon->Get_Type() != SHAPE_TYPE_Polygon
+			|| (((CSG_Shape_Polygon *)pPolygon)->is_Lake(iPart)
+			==  ((CSG_Shape_Polygon *)pPolygon)->is_Clockwise(iPart));
 
 			Polygons.resize(1 + jPolygon);
 			Polygons[jPolygon].resize(pPolygon->Get_Point_Count(iPart));
@@ -182,13 +206,15 @@ bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Polygons &Polygons, CSG
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CSG_Converter_WorldToInt::Convert(CSG_Shape_Polygon *pPolygon, ClipperLib::Polygons &Polygons) const
+bool CSG_Converter_WorldToInt::Convert(CSG_Shape *pPolygon, ClipperLib::Polygons &Polygons) const
 {
 	Polygons.clear();
 
 	for(int iPart=0, iPolygon=0; iPart<pPolygon->Get_Part_Count(); iPart++, iPolygon++)
 	{
-		bool	bAscending	= pPolygon->is_Lake(iPart) != pPolygon->is_Clockwise(iPart);
+		bool	bAscending	= pPolygon->Get_Type() != SHAPE_TYPE_Polygon
+		|| (((CSG_Shape_Polygon *)pPolygon)->is_Lake(iPart)
+		==  ((CSG_Shape_Polygon *)pPolygon)->is_Clockwise(iPart));
 
 		Polygons.resize(1 + iPolygon);
 		Polygons[iPolygon].resize(pPolygon->Get_Point_Count(iPart));
@@ -212,25 +238,22 @@ bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Polygons &Polygons, CSG
 
 	for(size_t iPolygon=0, iPart=0; iPolygon<Polygons.size(); iPolygon++)
 	{
-	//	if( fabs(ClipperLib::Area(Polygons[iPolygon])) > (1.0e-15) )
+		for(size_t iPoint=0; iPoint<Polygons[iPolygon].size(); iPoint++)
 		{
-			for(size_t iPoint=0; iPoint<Polygons[iPolygon].size(); iPoint++)
-			{
-				pPolygon->Add_Point(
-					Get_X_asWorld(Polygons[iPolygon][iPoint].X),
-					Get_Y_asWorld(Polygons[iPolygon][iPoint].Y),
-					iPart
-				);
-			}
+			pPolygon->Add_Point(
+				Get_X_asWorld(Polygons[iPolygon][iPoint].X),
+				Get_Y_asWorld(Polygons[iPolygon][iPoint].Y),
+				(int)iPart
+			);
+		}
 
-			if( ((CSG_Shape_Polygon *)pPolygon)->Get_Area(iPart) > (1.0e-15) )
-			{
-				iPart++;
-			}
-			else
-			{
-				pPolygon->Del_Part(iPart);
-			}
+		if( pPolygon->Get_Type() != SHAPE_TYPE_Polygon || ((CSG_Shape_Polygon *)pPolygon)->Get_Area((int)iPart) > (1.0e-12) )
+		{
+			iPart++;
+		}
+		else
+		{
+			pPolygon->Del_Part((int)iPart);
 		}
 	}
 
@@ -251,8 +274,8 @@ bool _SG_Polygon_Clip(ClipperLib::ClipType ClipType, CSG_Shape *pPolygon, CSG_Sh
 
 	ClipperLib::Polygons		Polygon, Clip, Result;
 
-	if(	Converter.Convert((CSG_Shape_Polygon *)pPolygon, Polygon)
-	&&	Converter.Convert((CSG_Shape_Polygon *)pClip   , Clip   ) )
+	if(	Converter.Convert(pPolygon, Polygon)
+	&&	Converter.Convert(pClip   , Clip   ) )
 	{
 		ClipperLib::Clipper	Clipper;
 
@@ -275,25 +298,108 @@ bool _SG_Polygon_Clip(ClipperLib::ClipType ClipType, CSG_Shape *pPolygon, CSG_Sh
 //---------------------------------------------------------
 bool	SG_Polygon_Intersection	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult)
 {
-	return( _SG_Polygon_Clip(ClipperLib::ctIntersection	, pPolygon, pClip, pResult) );
+	switch( pClip->Intersects(pPolygon) )
+	{
+	case INTERSECTION_None:
+		return( false );
+
+	case INTERSECTION_Identical:
+	case INTERSECTION_Contains:
+		if( pResult )	pResult->Assign(pPolygon, false);
+		return( true );
+
+	case INTERSECTION_Contained:
+		if( pResult )	pResult ->Assign(pClip  , false);
+		else			pPolygon->Assign(pClip  , false);
+		return( true );
+
+	case INTERSECTION_Overlaps: default:
+		return( _SG_Polygon_Clip(ClipperLib::ctIntersection	, pPolygon, pClip, pResult) );
+	}
 }
 
 //---------------------------------------------------------
 bool	SG_Polygon_Difference	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult)
 {
-	return( _SG_Polygon_Clip(ClipperLib::ctDifference	, pPolygon, pClip, pResult) );
+	switch( pClip->Intersects(pPolygon) )
+	{
+	case INTERSECTION_Contains:
+	case INTERSECTION_Identical:
+		return( false );
+
+	case INTERSECTION_None:
+		if( pResult )	pResult->Assign(pPolygon, false);
+		return( true );
+
+	case INTERSECTION_Contained:
+	case INTERSECTION_Overlaps: default:
+		return( _SG_Polygon_Clip(ClipperLib::ctDifference	, pPolygon, pClip, pResult) );
+	}
 }
 
 //---------------------------------------------------------
 bool	SG_Polygon_ExclusiveOr	(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult)
 {
-	return( _SG_Polygon_Clip(ClipperLib::ctXor			, pPolygon, pClip, pResult) );
+	switch( pClip->Intersects(pPolygon) )
+	{
+	case INTERSECTION_Identical:
+		return( false );
+
+	case INTERSECTION_None:
+		if( pResult )	pResult->Assign(pPolygon, false);
+		else			pResult	= pPolygon;
+
+		{	for(int iPart=0, jPart=pResult->Get_Part_Count(); iPart<pClip->Get_Part_Count(); iPart++, jPart++)
+			{
+				for(int iPoint=0; iPoint<pClip->Get_Point_Count(iPart); iPoint++)
+				{
+					pResult->Add_Point(pClip->Get_Point(iPoint, iPart), jPart);
+				}
+			}
+		}
+
+		return( true );	
+
+	case INTERSECTION_Contained:
+	case INTERSECTION_Contains:
+	case INTERSECTION_Overlaps: default:
+		return( _SG_Polygon_Clip(ClipperLib::ctXor			, pPolygon, pClip, pResult) );
+	}
 }
 
 //---------------------------------------------------------
 bool	SG_Polygon_Union		(CSG_Shape *pPolygon, CSG_Shape *pClip, CSG_Shape *pResult)
 {
-	return( _SG_Polygon_Clip(ClipperLib::ctUnion		, pPolygon, pClip, pResult) );
+	switch( pClip->Intersects(pPolygon) )
+	{
+	case INTERSECTION_Contained:
+	case INTERSECTION_Identical:
+		if( pResult )	pResult->Assign(pPolygon, false);
+		return( true );
+
+	case INTERSECTION_Contains:
+		if( pResult )	pResult ->Assign(pClip  , false);
+		else			pPolygon->Assign(pClip  , false);
+		return( true );
+
+	case INTERSECTION_None:
+		if( pResult )	pResult->Assign(pPolygon, false);
+		else			pResult	= pPolygon;
+
+		{	for(int iPart=0, jPart=pResult->Get_Part_Count(); iPart<pClip->Get_Part_Count(); iPart++, jPart++)
+			{
+				for(int iPoint=0; iPoint<pClip->Get_Point_Count(iPart); iPoint++)
+				{
+					pResult->Add_Point(pClip->Get_Point(iPoint, iPart), jPart);
+				}
+			}
+		}
+
+		return( true );	
+
+	case INTERSECTION_Overlaps: default:
+		return( _SG_Polygon_Clip(ClipperLib::ctUnion		, pPolygon, pClip, pResult) );
+	}
 }
 
 //---------------------------------------------------------
@@ -303,13 +409,56 @@ bool	SG_Polygon_Dissolve		(CSG_Shape *pPolygon, CSG_Shape *pResult)
 
 	ClipperLib::Polygons		Polygon, Result;
 
-	if(	Converter.Convert((CSG_Shape_Polygon *)pPolygon, Polygon) )
+	if(	Converter.Convert(pPolygon, Polygon) )
 	{
 		ClipperLib::Clipper	Clipper;
 
 		Clipper.AddPolygons(Polygon, ClipperLib::ptSubject);
 
 		Clipper.Execute(ClipperLib::ctUnion, Result);
+
+		return( Converter.Convert(Result, pResult ? pResult : pPolygon) );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool	SG_Polygon_Simplify		(CSG_Shape *pPolygon, CSG_Shape *pResult)
+{
+	CSG_Converter_WorldToInt	Converter(pPolygon->Get_Extent());
+
+	ClipperLib::Polygons		Polygon, Result;
+
+	if(	Converter.Convert(pPolygon, Polygon) )
+	{
+		ClipperLib::SimplifyPolygons(Polygon, Result);
+
+		return( Converter.Convert(Result, pResult ? pResult : pPolygon) );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool	SG_Polygon_Offset		(CSG_Shape *pPolygon, double dSize, double dArc, CSG_Shape *pResult)
+{
+	CSG_Rect					r(pPolygon->Get_Extent());	if( dSize > 0.0 )	r.Inflate(2.5 * dSize, false);
+
+	CSG_Converter_WorldToInt	Converter(r, true);
+
+	ClipperLib::Polygons		Polygon, Result;
+
+	if(	Converter.Convert(pPolygon, Polygon) )
+	{
+		if( pPolygon->Get_Type() == SHAPE_TYPE_Line )
+		{
+			ClipperLib::OffsetPolyLines(Polygon, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, ClipperLib::etRound, dArc);
+		}
+		else
+		{
+			ClipperLib::OffsetPolygons(Polygon, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, dArc);
+		}
 
 		return( Converter.Convert(Result, pResult ? pResult : pPolygon) );
 	}

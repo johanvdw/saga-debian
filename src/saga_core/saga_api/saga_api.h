@@ -66,7 +66,7 @@
 #ifdef SWIG
 
 //---------------------------------------------------------
-#if defined(_SAGA_PYTHON) && defined(_SAGA_UNICODE)
+#if defined(_SAGA_PYTHON)
 %include <typemaps.i>
 %include <python/cwstring.i>
 #endif
@@ -75,6 +75,7 @@
 %{
 #include "api_core.h"
 #include "dataobject.h"
+#include "data_manager.h"
 #include "geo_tools.h"
 #include "grid.h"
 #include "grid_pyramid.h"
@@ -115,6 +116,7 @@
 
 //---------------------------------------------------------
 #include "module_library.h"
+#include "data_manager.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -134,7 +136,7 @@ SAGA_API_DLL_EXPORT const SG_Char *	SAGA_API_Get_Version(void);
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define SAGA_VERSION			SG_T("2.0.8")
+#define SAGA_VERSION			SG_T("2.1.0")
 
 
 ///////////////////////////////////////////////////////////

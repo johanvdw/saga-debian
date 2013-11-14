@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Value_Type.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Value_Type.cpp 1497 2012-10-22 15:25:48Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -101,15 +101,15 @@ CGrid_Value_Type::CGrid_Value_Type(void)
 		NULL	, "TYPE"	, _TL("Data storage type"),
 		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|%s|%s|%s|%s|%s|%s|%s|"),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Bit),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Byte),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Char),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Word),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Short),
-			SG_Data_Type_Get_Name(SG_DATATYPE_DWord),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Int),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Float),
-			SG_Data_Type_Get_Name(SG_DATATYPE_Double)
+			SG_Data_Type_Get_Name(SG_DATATYPE_Bit   ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Byte  ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Char  ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Word  ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Short ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_DWord ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Int   ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Float ).c_str(),
+			SG_Data_Type_Get_Name(SG_DATATYPE_Double).c_str()
 		)
 	);
 }
@@ -150,7 +150,22 @@ bool CGrid_Value_Type::On_Execute(void)
 	}
 
 	//-----------------------------------------------------
-	pOutput->Assign(pInput);
+	
+	for(int y=0; y<Get_NY() && Set_Progress(y); y++)
+	{
+		#pragma omp parallel for
+		for(int x=0; x<Get_NX(); x++)
+		{
+			if( pInput->is_NoData(x, y) )
+			{
+			  pOutput->Set_NoData(x, y);
+			}
+			else
+			{
+			  pOutput->Set_Value(x, y, pInput->asDouble(x, y));	    
+			}
+		}
+	}
 
 	//-----------------------------------------------------
 	if( pInput != Parameters("INPUT")->asGrid() )

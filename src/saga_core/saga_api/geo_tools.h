@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: geo_tools.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: geo_tools.h 1736 2013-06-19 12:28:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -465,6 +465,7 @@ public:
 	void						Inflate			(double dx, double dy, bool bPercent = true);
 	void						Deflate			(double dx, double dy, bool bPercent = true);
 
+	void						Union			(const CSG_Point &Point);
 	void						Union			(const CSG_Rect &Rect);
 	bool						Intersect		(const CSG_Rect &Rect);
 
@@ -538,8 +539,10 @@ public:
 	CSG_Distance_Weighting(void);
 	virtual ~CSG_Distance_Weighting(void);
 
-	class CSG_Parameters *	Get_Parameters		(void)	const		{	return( m_pParameters );	}
+	bool					Create_Parameters	(class CSG_Parameters *pParameters, bool bDialog = true);
+	int						Enable_Parameters	(class CSG_Parameters *pParameters);
 	bool					Set_Parameters		(class CSG_Parameters *pParameters);
+	class CSG_Parameters *	Get_Parameters		(void)	const		{	return( m_pParameters );	}
 
 	TSG_Distance_Weighting	Get_Weighting		(void)	const		{	return( m_Weighting );		}
 	bool					Set_Weighting		(TSG_Distance_Weighting Weighting);
@@ -774,8 +777,15 @@ SAGA_API_DLL_EXPORT CSG_Projections &	SG_Get_Projections	(void);
 
 //---------------------------------------------------------
 SAGA_API_DLL_EXPORT double		SG_Get_Length					(double dx, double dy);
+
+SAGA_API_DLL_EXPORT double		SG_Get_Distance					(double ax, double ay, double bx, double by, bool bPolar);
+SAGA_API_DLL_EXPORT double		SG_Get_Distance					(const TSG_Point &A, const TSG_Point &B    , bool bPolar);
+
 SAGA_API_DLL_EXPORT double		SG_Get_Distance					(double ax, double ay, double bx, double by);
 SAGA_API_DLL_EXPORT double		SG_Get_Distance					(const TSG_Point &A, const TSG_Point &B);
+
+SAGA_API_DLL_EXPORT double		SG_Get_Distance_Polar			(double aLon, double aLat, double bLon, double bLat, double a = 6378137.0, double e = 298.257223563, bool bDegree = true);
+SAGA_API_DLL_EXPORT double		SG_Get_Distance_Polar			(const TSG_Point &A      , const TSG_Point &B      , double a = 6378137.0, double e = 298.257223563, bool bDegree = true);
 
 SAGA_API_DLL_EXPORT double		SG_Get_Angle_Of_Direction		(double dx, double dy);
 SAGA_API_DLL_EXPORT double		SG_Get_Angle_Of_Direction		(double ax, double ay, double bx, double by);

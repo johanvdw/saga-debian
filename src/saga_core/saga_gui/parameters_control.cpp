@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters_control.cpp 1075 2011-05-31 16:15:26Z oconrad $
+ * Version $Id: parameters_control.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -61,6 +61,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <wx/propgrid/manager.h>
+
 #include <saga_api/saga_api.h>
 
 #include "res_dialogs.h"
@@ -216,7 +218,7 @@ void CParameters_Control::On_PG_Changed(wxPropertyGridEvent &event)
 //---------------------------------------------------------
 bool CParameters_Control::Save_Changes(bool bSilent)
 {
-	if( m_pOriginal && m_bModified && (bSilent || DLG_Message_Confirm(LNG("[DLG] Save changes?"), wxString::Format(wxT("%s: %s"), LNG("[CAP] Parameters"), m_pParameters->Get_Name()))) )
+	if( m_pOriginal && m_bModified && (bSilent || DLG_Message_Confirm(_TL("Save changes?"), wxString::Format(wxT("%s: %s"), _TL("Parameters"), m_pParameters->Get_Name().w_str()))) )
 	{
 		m_pOriginal->Assign_Values(m_pParameters);
 
@@ -267,10 +269,10 @@ bool CParameters_Control::Load(void)
 
 	if( DLG_Open(File_Path, ID_DLG_PARAMETERS_OPEN) )
 	{
-		CSG_File	File(File_Path.c_str());
+		CSG_File	File(&File_Path);
 
 		if(	m_pParameters->Serialize_Compatibility(File)
-		||	m_pParameters->Serialize(File_Path.c_str(), false) )
+		||	m_pParameters->Serialize(&File_Path, false) )
 		{
 			_Init_Pararameters();
 
@@ -281,7 +283,7 @@ bool CParameters_Control::Load(void)
 			return( true );
 		}
 
-		DLG_Message_Show(LNG("Parameters file could not be imported."), LNG("Load Parameters"));
+		DLG_Message_Show(_TL("Parameters file could not be imported."), _TL("Load Parameters"));
 	}
 
 	return( false );
@@ -294,12 +296,12 @@ bool CParameters_Control::Save(void)
 
 	if( DLG_Save(File_Path, ID_DLG_PARAMETERS_SAVE) )
 	{
-		if( m_pParameters->Serialize(File_Path.c_str(), true) )
+		if( m_pParameters->Serialize(&File_Path, true) )
 		{
 			return( true );
 		}
 
-		DLG_Message_Show(LNG("Parameters file could not be exported."), LNG("Save Parameters"));
+		DLG_Message_Show(_TL("Parameters file could not be exported."), _TL("Save Parameters"));
 	}
 
 	return( false );
@@ -329,10 +331,12 @@ bool CParameters_Control::Set_Parameters(CSG_Parameters *pParameters)
 
 			m_pPG->Clear();
 
-			m_pPG->Append(new wxPropertyCategory(LNG("[TXT] No parameters available."), wxPG_LABEL));
+			m_pPG->Append(new wxPropertyCategory(_TL("No parameters available."), wxPG_LABEL));
 		}
 		else if( m_pOriginal != pParameters )
 		{
+			pParameters->DataObjects_Check(true);
+
 			m_pParameters->Set_Callback(false);
 			m_pParameters->Assign(m_pOriginal = pParameters);
 
@@ -375,7 +379,7 @@ bool CParameters_Control::Set_Parameters(CSG_Parameters *pParameters)
 	{\
 		pNode	= new wxPropertyCategory(Name, ID);\
 		if( !pData )\
-			m_pPG->Append(pData = new wxPropertyCategory(LNG("[PRM] Data Objects"), wxT("_DATAOBJECT_DATAOBJECTS")));\
+			m_pPG->Append(pData = new wxPropertyCategory(_TL("Data Objects"), wxT("_DATAOBJECT_DATAOBJECTS")));\
 		m_pPG->Insert(pData, -1, pNode);\
 	}\
 	pRoot	= pNode;
@@ -407,7 +411,7 @@ void CParameters_Control::_Add_Properties(CSG_Parameters *pParameters)
 			case PARAMETER_TYPE_Grid_System:
 				if( pParameters->Get_Parameter(i)->Get_Children_Count() == 0 )
 				{
-					CHECK_DATA_NODE( pGrids	, LNG("[PRM] Grids"), wxT("_DATAOBJECT_GRIDS") );
+					CHECK_DATA_NODE( pGrids	, _TL("Grids"), wxT("_DATAOBJECT_GRIDS") );
 				}
 				else
 				{
@@ -416,7 +420,7 @@ void CParameters_Control::_Add_Properties(CSG_Parameters *pParameters)
 						if(	pParameters->Get_Parameter(i)->Get_Child(j)->Get_Type() != PARAMETER_TYPE_Grid_List
 						||	pParameters->Get_Parameter(i)->Get_Child(j)->is_Input() )
 						{
-							CHECK_DATA_NODE( pGrids	, LNG("[PRM] Grids"), wxT("_DATAOBJECT_GRIDS") );
+							CHECK_DATA_NODE( pGrids	, _TL("Grids"), wxT("_DATAOBJECT_GRIDS") );
 						}
 					}
 				}
@@ -425,37 +429,37 @@ void CParameters_Control::_Add_Properties(CSG_Parameters *pParameters)
 			case PARAMETER_TYPE_Grid_List:
 				CHECK_LIST_OUTPUT(pParameters->Get_Parameter(i));
 			case PARAMETER_TYPE_Grid:
-				CHECK_DATA_NODE(pGrids		, LNG("[PRM] Grids") , wxT("_DATAOBJECT_GRIDS"));
+				CHECK_DATA_NODE(pGrids		, _TL("Grids") , wxT("_DATAOBJECT_GRIDS"));
 				break;
 
 			case PARAMETER_TYPE_Table_List:
 				CHECK_LIST_OUTPUT(pParameters->Get_Parameter(i));
 			case PARAMETER_TYPE_Table:
-				CHECK_DATA_NODE(pTables		, LNG("[PRM] Tables"), wxT("_DATAOBJECT_TABLES"));
+				CHECK_DATA_NODE(pTables		, _TL("Tables"), wxT("_DATAOBJECT_TABLES"));
 				break;
 
 			case PARAMETER_TYPE_Shapes_List:
 				CHECK_LIST_OUTPUT(pParameters->Get_Parameter(i));
 			case PARAMETER_TYPE_Shapes:
-				CHECK_DATA_NODE(pShapes		, LNG("[PRM] Shapes"), wxT("_DATAOBJECT_SHAPES"));
+				CHECK_DATA_NODE(pShapes		, _TL("Shapes"), wxT("_DATAOBJECT_SHAPES"));
 				break;
 
 			case PARAMETER_TYPE_TIN_List:
 				CHECK_LIST_OUTPUT(pParameters->Get_Parameter(i));
 			case PARAMETER_TYPE_TIN:
-				CHECK_DATA_NODE(pTINs		, LNG("[PRM] TIN"), wxT("_DATAOBJECT_TINS"));
+				CHECK_DATA_NODE(pTINs		, _TL("TIN"), wxT("_DATAOBJECT_TINS"));
 				break;
 
 			case PARAMETER_TYPE_PointCloud_List:
 				CHECK_LIST_OUTPUT(pParameters->Get_Parameter(i));
 			case PARAMETER_TYPE_PointCloud:
-				CHECK_DATA_NODE(pPointClouds, LNG("[PRM] Point Clouds"), wxT("_DATAOBJECT_POINTCLOUDS"));
+				CHECK_DATA_NODE(pPointClouds, _TL("Point Clouds"), wxT("_DATAOBJECT_POINTCLOUDS"));
 				break;
 
 			default:
 				if( !pOptions )
 				{
-					m_pPG->Append(pOptions = new wxPropertyCategory(LNG("[PRM] Options"), wxT("_DATAOBJECT_OPTIONS")));
+					m_pPG->Append(pOptions = new wxPropertyCategory(_TL("Options"), wxT("_DATAOBJECT_OPTIONS")));
 				}
 
 				pRoot	= pOptions;
@@ -539,6 +543,7 @@ wxPGProperty * CParameters_Control::_Get_Property(wxPGProperty *pParent, CSG_Par
 	case PARAMETER_TYPE_Text:
 	case PARAMETER_TYPE_FilePath:
 	case PARAMETER_TYPE_Font:
+	case PARAMETER_TYPE_Table_Fields:
 	case PARAMETER_TYPE_FixedTable:
 	case PARAMETER_TYPE_Parameters:
 		pProperty	= new CParameters_PG_Dialog	(Name, ID, pParameter);
@@ -699,9 +704,7 @@ void CParameters_Control::_Set_Parameter(const wxString &Identifier)
 	if( pProperty )
 	{
 		CSG_Parameter	*pParameter	= m_pParameters->Get_Parameter(
-			!pProperty->IsSubProperty()
-			? Identifier
-			: Identifier.AfterLast(wxT('.'))
+			!pProperty->IsSubProperty() ? Identifier.wx_str() : Identifier.AfterLast(wxT('.')).wx_str()
 		);
 
 		if( pParameter )
@@ -713,7 +716,7 @@ void CParameters_Control::_Set_Parameter(const wxString &Identifier)
 
 			case PARAMETER_TYPE_String:
 			case PARAMETER_TYPE_FilePath:
-				pParameter->Set_Value(m_pPG->GetPropertyValueAsString(pProperty).c_str());
+				pParameter->Set_Value(m_pPG->GetPropertyValueAsString(pProperty).wx_str());
 				break;
 
 			case PARAMETER_TYPE_Bool:
@@ -747,8 +750,8 @@ void CParameters_Control::_Update_Parameter(CSG_Parameter *pParameter)
 
 	if( pProperty )
 	{
-	//	m_pPG->EnableProperty(pProperty, _Get_Enabled(pParameter));
-		m_pPG->HideProperty(pProperty, !_Get_Enabled(pParameter));
+		pProperty->Enable( _Get_Enabled(pParameter));
+		pProperty->Hide  (!_Get_Enabled(pParameter));
 
 		switch( pParameter->Get_Type() )
 		{
@@ -805,6 +808,7 @@ void CParameters_Control::_Update_Parameter(CSG_Parameter *pParameter)
 		case PARAMETER_TYPE_Text:
 		case PARAMETER_TYPE_FilePath:
 		case PARAMETER_TYPE_Font:
+		case PARAMETER_TYPE_Table_Fields:
 		case PARAMETER_TYPE_FixedTable:
 		case PARAMETER_TYPE_Grid_List:
 		case PARAMETER_TYPE_Table_List:
@@ -849,7 +853,7 @@ bool CParameters_Control::Update_DataObjects(void)
 				case PARAMETER_TYPE_Shapes_List:
 				case PARAMETER_TYPE_TIN_List:
 				case PARAMETER_TYPE_PointCloud_List:
-					if( g_pData->Check_Parameter(pParameter) == false )
+					if( pParameter->Check() == false )
 					{
 					}
 					break;
@@ -862,6 +866,26 @@ bool CParameters_Control::Update_DataObjects(void)
 }
 
 //---------------------------------------------------------
+#define UPDATE_DATA_NODE(NODE)	{\
+	wxPGProperty	*pProperty	= m_pPG->GetProperty(NODE);\
+	\
+	if( pProperty )\
+	{\
+		bool	bShow	= false;\
+		\
+		for(size_t i=0; i<pProperty->GetChildCount() && !bShow; i++)\
+		{\
+			if( pProperty->Item(i)->IsEnabled() )\
+			{\
+				bShow	= true;\
+			}\
+		}\
+		\
+		pProperty->Hide(!bShow, wxPG_DONT_RECURSE);\
+	}\
+}
+
+//---------------------------------------------------------
 void CParameters_Control::_Update_Parameters(void)
 {
 	if( m_pParameters )
@@ -870,6 +894,13 @@ void CParameters_Control::_Update_Parameters(void)
 		{
 			_Update_Parameter(m_pParameters->Get_Parameter(i));
 		}
+
+		UPDATE_DATA_NODE("_DATAOBJECT_GRIDS");
+		UPDATE_DATA_NODE("_DATAOBJECT_TABLES");
+		UPDATE_DATA_NODE("_DATAOBJECT_SHAPES");
+		UPDATE_DATA_NODE("_DATAOBJECT_TINS");
+		UPDATE_DATA_NODE("_DATAOBJECT_POINTCLOUDS");
+		UPDATE_DATA_NODE("_DATAOBJECT_OPTIONS");
 
 		m_pPG->Refresh();
 	}

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_ruler.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_ruler.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -183,8 +183,9 @@ void CVIEW_Ruler::On_Paint(wxPaintEvent &event)
 void CVIEW_Ruler::_Draw_Corners(wxDC &dc, int Width, int Height)
 {
 	wxFont	Font;
+	
+	Font.Create((int)(0.65 * (double)Height), wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 
-	Font.Create((int)(0.65 * (double)Height), wxSWISS, wxNORMAL, wxNORMAL);
 	dc.SetFont(Font);
 
 	if( m_bHorizontal )
@@ -244,6 +245,19 @@ void CVIEW_Ruler::_Draw_Core(wxDC &dc, int Width, int Height)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+void CVIEW_Ruler::Set_Mode(int Mode)
+{
+	Mode	= (Mode & RULER_MODE_SCALE) ? 1 : ((Mode & RULER_MODE_CORNERS) ? 2 : 0);
+
+	if( m_Mode != Mode )
+	{
+		m_Mode	= Mode;
+
+		Refresh();
+	}
+}
+
+//---------------------------------------------------------
 void CVIEW_Ruler::Set_Range(double Min, double Max)
 {
 	if( m_Min != Min || m_Max != Max )
@@ -295,7 +309,7 @@ void CVIEW_Ruler::_Draw_Position(wxDC &dc, int Width, int Height, int Position)
 {
 	if( m_Position >= 0 && m_Position < Width )
 	{
-		int		lf	= dc.GetLogicalFunction();
+		wxRasterOperationMode	lf	= dc.GetLogicalFunction();
 
 		dc.SetLogicalFunction(wxINVERT);
 

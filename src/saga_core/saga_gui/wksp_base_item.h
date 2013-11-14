@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_item.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_base_item.h 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -133,17 +133,18 @@ public:
 	CWKSP_Base_Item(void);
 	virtual ~CWKSP_Base_Item(void);
 
-	virtual TWKSP_Item				Get_Type				(void)	= 0;
+	virtual TWKSP_Item				Get_Type				(void)	{	return( WKSP_ITEM_Undefined );	}
 
-	virtual wxString				Get_Name				(void)	= 0;
-	virtual wxString				Get_Description			(void)	= 0;
+	virtual wxString				Get_Name				(void)	{	return( wxEmptyString );		}
+	virtual wxString				Get_Description			(void)	{	return( wxEmptyString );		}
 
-	virtual wxMenu *				Get_Menu				(void)	= 0;
+	virtual wxMenu *				Get_Menu				(void)	{	return( NULL );					}
 
 	virtual bool					On_Command				(int Cmd_ID);
 	virtual bool					On_Command_UI			(wxUpdateUIEvent &event);
 
 	virtual CSG_Parameters *		Get_Parameters			(void);
+	virtual CSG_Parameter *			Get_Parameter			(const CSG_String &Identifier);
 	virtual void					Parameters_Changed		(void);
 
 	class CWKSP_Base_Control *		Get_Control				(void);
@@ -180,16 +181,6 @@ private:
 	static int						_On_Parameter_Changed	(CSG_Parameter *pParameter, int Flags);
 
 };
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-CWKSP_Base_Item *				Get_Active_Item		(void);
 
 
 ///////////////////////////////////////////////////////////

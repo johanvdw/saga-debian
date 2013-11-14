@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shape.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: shape.cpp 1689 2013-05-14 15:29:21Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -209,19 +209,26 @@ TSG_Intersection CSG_Shape::Intersects(CSG_Shape *pShape)
 	}
 
 	//-----------------------------------------------------
-	if( Get_Type() >= pShape->Get_Type() )
+	TSG_Intersection	Intersection;
+
+	if( Get_Type() >= pShape->Get_Type() && (Intersection = On_Intersects(pShape)) != INTERSECTION_None )
 	{
-		return( On_Intersects(pShape) );
+		return( Intersection );
 	}
 
-	TSG_Intersection	Intersection	= pShape->On_Intersects(this);
+	Intersection	= pShape->On_Intersects(this);
 
-	switch( Intersection )
+	if( Intersection == INTERSECTION_Contained )
 	{
-	default:						return( Intersection );
-	case INTERSECTION_Contained:	return( INTERSECTION_Contains );
-	case INTERSECTION_Contains:		return( INTERSECTION_Contained );
+		return( INTERSECTION_Contains );
 	}
+
+	if( Intersection == INTERSECTION_Contains )
+	{
+		return( INTERSECTION_Contained );
+	}
+
+	return( Intersection );
 }
 
 //---------------------------------------------------------

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Curvature_Classification.cpp 1118 2011-06-24 15:02:43Z oconrad $
+ * Version $Id: Curvature_Classification.cpp 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -98,10 +98,6 @@ CCurvature_Classification::CCurvature_Classification(void)
 	Parameters.Add_Value(NULL, "THRESHOLD"	, _TL("Threshold for plane")		, _TL(""), PARAMETER_TYPE_Double, 0.001, 0.0, true);
 	Parameters.Add_Grid (NULL, "CLASS"		, _TL("Curvature Classification")	, _TL(""), PARAMETER_OUTPUT, true, SG_DATATYPE_Char);
 }
-
-//---------------------------------------------------------
-CCurvature_Classification::~CCurvature_Classification(void)
-{}
 
 
 ///////////////////////////////////////////////////////////

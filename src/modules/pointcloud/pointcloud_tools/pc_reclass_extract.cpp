@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_reclass_extract.cpp 1164 2011-09-16 08:55:11Z reklov_w $
+ * Version $Id: pc_reclass_extract.cpp 1517 2012-11-06 10:42:49Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -119,6 +119,12 @@ CPC_Reclass_Extract::CPC_Reclass_Extract(void)
 		NULL	, "MODE"	, _TL("Mode of operation"),
 		_TL("Choose whether to reclassify a Point Cloud or to extract a subset from a Point Cloud."),
 		_TL("Reclassify|Extract Subset|"), 0
+	);
+
+	Parameters.Add_Value(
+		NULL	, "CREATE_ATTRIB"	, _TL("Create new Attribute"),
+		_TL("Check this to create a new attribute with the reclassification result. If unchecked, the existing attribute is updated."),
+		PARAMETER_TYPE_Bool, false
 	);
 
 	Parameters.Add_Choice(
@@ -289,14 +295,18 @@ bool CPC_Reclass_Extract::On_Execute(void)
 	method			= Parameters("METHOD")->asInt();
 	m_AttrField		= Parameters("ATTRIB")->asInt();
 	m_bExtract		= Parameters("MODE")->asInt() == 0 ? false : true;
+	m_bCreateAttrib	= Parameters("CREATE_ATTRIB")->asBool();
 
 	m_pResult->Create(m_pInput);
 
 	if (m_bExtract)
 		m_pResult->Set_Name(CSG_String::Format(SG_T("%s_subset_%s"), m_pInput->Get_Name(), m_pInput->Get_Field_Name(m_AttrField)));
 	else
+	{
 		m_pResult->Set_Name(CSG_String::Format(SG_T("%s_reclass_%s"), m_pInput->Get_Name(), m_pInput->Get_Field_Name(m_AttrField)));
-
+		if( m_bCreateAttrib )
+			m_pResult->Add_Field(CSG_String::Format(SG_T("%s_reclass"), m_pInput->Get_Field_Name(m_AttrField)), m_pInput->Get_Field_Type(m_AttrField));
+	}
 
 	//-----------------------------------------------------
 	switch( method )
@@ -321,8 +331,12 @@ bool CPC_Reclass_Extract::On_Execute(void)
 	if (m_bExtract)
 		Set_Display_Attributes(m_pResult, 2, sParms);
 	else
-		Set_Display_Attributes(m_pResult, m_AttrField, sParms);
-
+	{
+		if( m_bCreateAttrib )
+			Set_Display_Attributes(m_pResult, m_pResult->Get_Field_Count()-1, sParms);
+		else
+			Set_Display_Attributes(m_pResult, m_AttrField, sParms);
+	}
 
 	return( true );
 }
@@ -512,15 +526,13 @@ void CPC_Reclass_Extract::Reclass_Single(void)
 	return;
 }
 
-//---------------------------------------------------------
-#define MAX_CAT	128
 
 //---------------------------------------------------------
 bool CPC_Reclass_Extract::Reclass_Table(bool bUser)
 {
 	bool				set, otherOpt, noDataOpt;
-	int					n, opera, recCount, count[MAX_CAT], field_Min, field_Max, field_Code;
-	double				min[MAX_CAT], max[MAX_CAT], code[MAX_CAT], value, others, noData, noDataValue;
+	int					opera, field_Min, field_Max, field_Code;
+	double				value, others, noData, noDataValue;
 
 	CSG_Table			*pReTab;
 	CSG_Table_Record	*pRecord = NULL;
@@ -556,73 +568,55 @@ bool CPC_Reclass_Extract::Reclass_Table(bool bUser)
 		return( false );
 	}
 
-	recCount = pReTab->Get_Record_Count();
-	if( recCount > MAX_CAT )
-	{
-		Error_Set(_TL("At the moment the reclass table is limited to 128 categories!\n"));
-		return( false );
-	}
-
-	if( recCount == 0 )
+	if( pReTab->Get_Record_Count() == 0 )
 	{
 		Error_Set(_TL("You must specify a reclass table with a minimium of one record!\n"));
 		return( false );
 	}
 
-	for(n=0; n<recCount ; n++)								// initialize reclass arrays
-	{
-		pRecord		= pReTab->Get_Record(n);
-		min[n]		= pRecord->asDouble(field_Min);
-		max[n]		= pRecord->asDouble(field_Max);
-		code[n]		= pRecord->asDouble(field_Code);
-		count[n]	= 0;
-	}
 
-
-	for (int i=0; i<m_pInput->Get_Point_Count(); i++)
+	for (int i=0; i<m_pInput->Get_Point_Count() && Set_Progress(i, m_pInput->Get_Point_Count()); i++)
 	{
 		value	= m_pInput->Get_Value(i, m_AttrField);
 		set		= false;
 
-		for(n=0; n< recCount; n++)									// reclass
+		for(int iRecord=0; iRecord<pReTab->Get_Record_Count(); iRecord++)									// reclass
 		{
+			pRecord		= pReTab->Get_Record(iRecord);
+
 			if( opera == 0 )										// min <= value < max
 			{
-				if( value >= min[n] && value < max[n] )
+				if( value >= pRecord->asDouble(field_Min) && value < pRecord->asDouble(field_Max) )
 				{
-					Set_Value(i, code[n]);
+					Set_Value(i, pRecord->asDouble(field_Code));
 					set = true;
-					count[n] += 1;
 					break;
 				}
 			}
 			else if( opera == 1 )									// min <= value <= max
 			{
-				if( value >= min[n] && value <= max[n] )
+				if( value >= pRecord->asDouble(field_Min) && value <= pRecord->asDouble(field_Max) )
 				{
-					Set_Value(i, code[n]);
+					Set_Value(i, pRecord->asDouble(field_Code));
 					set = true;
-					count[n] += 1;
 					break;
 				}
 			}
 			else if( opera == 2 )									// min < value <= max
 			{
-				if( value > min[n] && value <= max[n] )
+				if( value > pRecord->asDouble(field_Min) && value <= pRecord->asDouble(field_Max) )
 				{
-					Set_Value(i, code[n]);
+					Set_Value(i, pRecord->asDouble(field_Code));
 					set = true;
-					count[n] += 1;
 					break;
 				}
 			}
 			else if( opera == 3 )									// min < value < max
 			{
-				if( value > min[n] && value < max[n] )
+				if( value > pRecord->asDouble(field_Min) && value < pRecord->asDouble(field_Max) )
 				{
-					Set_Value(i, code[n]);
+					Set_Value(i, pRecord->asDouble(field_Code));
 					set = true;
-					count[n] += 1;
 					break;
 				}
 			}
@@ -655,7 +649,12 @@ void CPC_Reclass_Extract::Set_Value(int i, double value)
 		m_pResult->Set_Attribute(j, m_pInput->Get_Attribute(i, j));
 
 	if (!m_bExtract)
-		m_pResult->Set_Value(m_AttrField, value);
+	{
+		if (m_bCreateAttrib)
+			m_pResult->Set_Value(m_pResult->Get_Field_Count()-1, value);
+		else
+			m_pResult->Set_Value(m_AttrField, value);
+	}
 
 	return;
 }
@@ -688,6 +687,8 @@ int CPC_Reclass_Extract::On_Parameters_Enable(CSG_Parameters *pParameters, CSG_P
 	{
 		int		iMode	= pParameters->Get_Parameter("MODE")->asInt();		// 0 == reclassify, 1 == extract
 		int		Value	= pParameters->Get_Parameter("METHOD")->asInt();
+
+		pParameters->Get_Parameter("CREATE_ATTRIB")->Set_Enabled(iMode == 0);
 
 		// single
 		pParameters->Get_Parameter("OLD"		)->Set_Enabled(Value == 0);

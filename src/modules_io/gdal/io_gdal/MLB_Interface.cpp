@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1706 2013-05-29 11:06:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -59,13 +59,13 @@
 //---------------------------------------------------------
 // 1. Include the appropriate SAGA-API header...
 
-#include "MLB_Interface.h"
+#include "gdal_driver.h"
 
 
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -76,7 +76,11 @@ const SG_Char * Get_Info(int i)
 		return( _TL("SAGA User Group Associaton (c) 2008" ));
 
 	case MLB_INFO_Description:
-		return( _TL("SAGA interface to Frank Warmerdam's Geospatial Data Abstraction Library (GDAL).") );
+		return( CSG_String::Format(SG_T("%s\n%s %s\n%s: %s"),
+			_TL("Interface to Frank Warmerdam's Geospatial Data Abstraction Library (GDAL)."),
+			_TL("Version"), SG_Get_GDAL_Drivers().Get_Version().c_str(),
+			_TL("Homepage"), SG_T("<a target=\"_blank\" href=\"http://www.gdal.org/\">www.gdal.org</a>\n")
+		));
 
 	case MLB_INFO_Version:
 		return( SG_T("2.0") );
@@ -93,9 +97,11 @@ const SG_Char * Get_Info(int i)
 #include "gdal_import.h"
 #include "gdal_export.h"
 #include "gdal_export_geotiff.h"
+#include "gdal_import_netcdf.h"
 
 #include "ogr_import.h"
 #include "ogr_export.h"
+#include "ogr_export_kml.h"
 
 
 //---------------------------------------------------------
@@ -105,12 +111,20 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
-	case 0:		return( new CGDAL_Import );
-	case 1:		return( new CGDAL_Export );
-	case 2:		return( new CGDAL_Export_GeoTIFF );
+	case  0:	return( new CGDAL_Import );
+	case  1:	return( new CGDAL_Export );
+	case  2:	return( new CGDAL_Export_GeoTIFF );
 
-	case 3:		return( new COGR_Import );
-	case 4:		return( new COGR_Export );
+	case  3:	return( new COGR_Import );
+	case  4:	return( new COGR_Export );
+
+	case  5:	return( new COGR_Export_KML );
+
+	case  6:	return( SG_Get_GDAL_Drivers().Get_Driver("netCDF") ? new CGDAL_Import_NetCDF : NULL );
+
+	//-----------------------------------------------------
+	case  9:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
 	}
 
 	return( NULL );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_layer_classify.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: wksp_layer_classify.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,6 +78,8 @@
 //---------------------------------------------------------
 CWKSP_Layer_Classify::CWKSP_Layer_Classify(void)
 {
+	m_Count			= 100;
+
 	m_Mode			= CLASSIFY_UNIQUE;
 	m_Shade_Mode	= SHADE_MODE_DSC_GREY;
 
@@ -114,20 +116,7 @@ bool CWKSP_Layer_Classify::Initialise(CWKSP_Layer *pLayer, CSG_Table *pLUT, CSG_
 	m_pLayer	= pLayer;
 	m_pLUT		= pLUT;
 	m_pColors	= pColors;
-
-	//-----------------------------------------------------
-	switch( m_pLayer->Get_Type() )
-	{
-	default:
-		m_pColors->Set_Count(10);
-		break;
-
-	case WKSP_ITEM_TIN:
-	case WKSP_ITEM_PointCloud:
-	case WKSP_ITEM_Grid:
-		m_pColors->Set_Count(100);
-		break;
-	}
+	m_pColors	->Set_Count(11);
 
 	//-----------------------------------------------------
 	if( m_pLUT && m_pLUT->Get_Record_Count() == 0 )
@@ -136,15 +125,15 @@ bool CWKSP_Layer_Classify::Initialise(CWKSP_Layer *pLayer, CSG_Table *pLUT, CSG_
 
 		pRecord	= m_pLUT->Add_Record();
 		pRecord->Set_Value(LUT_COLOR		, SG_GET_RGB(1, 1, 1));
-		pRecord->Set_Value(LUT_TITLE		, LNG("Class 1"));
-		pRecord->Set_Value(LUT_DESCRIPTION	, LNG("First Class"));
+		pRecord->Set_Value(LUT_TITLE		, _TL("Class 1"));
+		pRecord->Set_Value(LUT_DESCRIPTION	, _TL("First Class"));
 		pRecord->Set_Value(LUT_MIN			, 0.0);
 		pRecord->Set_Value(LUT_MAX			, 1.0);
 
 		pRecord	= m_pLUT->Add_Record();
 		pRecord->Set_Value(LUT_COLOR		, SG_GET_RGB(255, 0, 0));
-		pRecord->Set_Value(LUT_TITLE		, LNG("Class 2"));
-		pRecord->Set_Value(LUT_DESCRIPTION	, LNG("Second Class"));
+		pRecord->Set_Value(LUT_TITLE		, _TL("Class 2"));
+		pRecord->Set_Value(LUT_DESCRIPTION	, _TL("Second Class"));
 		pRecord->Set_Value(LUT_MIN			, 1.0);
 		pRecord->Set_Value(LUT_MAX			, 2.0);
 	}
@@ -174,6 +163,7 @@ double CWKSP_Layer_Classify::Get_Class_Value_Minimum(int iClass)
 		}
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -201,6 +191,7 @@ double CWKSP_Layer_Classify::Get_Class_Value_Maximum(int iClass)
 		}
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -228,6 +219,7 @@ double CWKSP_Layer_Classify::Get_Class_Value_Center(int iClass)
 		}
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -258,6 +250,7 @@ wxString CWKSP_Layer_Classify::Get_Class_Name(int iClass)
 		}
 		break;
 
+	case CLASSIFY_GRADUATED:
 	case CLASSIFY_METRIC:
 	case CLASSIFY_SHADE:
 	case CLASSIFY_OVERLAY:
@@ -273,6 +266,14 @@ wxString CWKSP_Layer_Classify::Get_Class_Name(int iClass)
 wxString CWKSP_Layer_Classify::Get_Class_Name_byValue(double Value)
 {
 	return( Get_Class_Name(Get_Class(Value)) );
+}
+
+wxString CWKSP_Layer_Classify::Get_Class_Name_byValue(const wxString &Value)
+{
+	return( SG_Data_Type_is_Numeric(m_pLUT->Get_Field_Type(LUT_MIN))
+		? Get_Class_Name(Get_Class(CSG_String(&Value).asDouble()))
+		: Get_Class_Name(Get_Class(CSG_String(&Value)))
+	);
 }
 
 
@@ -324,21 +325,84 @@ inline int CWKSP_Layer_Classify::_LUT_Cmp_Class(double Value, int iClass)
 
 	double	min	= pClass->asDouble(LUT_MIN);
 
-	if( Value < min )
-	{
-		return( 1 );
-	}
+	if( Value == min )	{	return(  0 );	}
+	if( Value  < min )	{	return(  1 );	}
 
 	double	max	= pClass->asDouble(LUT_MAX);
 
-	return( min < max
-		?	(Value < max ?  0 : -1)
-		:	(Value > min ? -1 :  0)
-	);
+	if( max    < min )	{	return( -1 );	}
+	if( Value  < max )	{	return(  0 );	}
+
+	return( iClass == m_pLUT->Get_Count() - 1 && Value == max ? 0 : -1 );
 }
 
 //---------------------------------------------------------
 int CWKSP_Layer_Classify::_LUT_Get_Class(double Value)
+{
+	int		a, b, i, c;
+
+	if( m_pLUT->Get_Record_Count() > 0 )
+	{
+		if( m_pLUT->Get_Index_Field(0) != LUT_MIN || m_pLUT->Get_Index_Order(0) != TABLE_INDEX_Ascending )
+		{
+			m_pLUT->Set_Index(LUT_MIN, TABLE_INDEX_Ascending);
+		}
+
+		for(a=0, b=m_pLUT->Get_Record_Count()-1; a < b; )
+		{
+			i	= a + (b - a) / 2;
+			c	= _LUT_Cmp_Class(Value, i);
+
+			if( c > 0 )
+			{
+				b	= b > i ? i : b - 1;
+			}
+			else if( c < 0 )
+			{
+				a	= a < i ? i : a + 1;
+			}
+			else
+			{
+				return( m_pLUT->Get_Record_byIndex(i)->Get_Index() );
+			}
+		}
+
+		if( _LUT_Cmp_Class(Value, a) == 0 )
+		{
+			return( m_pLUT->Get_Record_byIndex(a)->Get_Index() );
+		}
+
+		if( a != b && _LUT_Cmp_Class(Value, b) == 0 )
+		{
+			return( m_pLUT->Get_Record_byIndex(b)->Get_Index() );
+		}
+	}
+
+	return( -1 );
+}
+
+//---------------------------------------------------------
+inline int CWKSP_Layer_Classify::_LUT_Cmp_Class(const CSG_String &Value, int iClass)
+{
+	CSG_Table_Record	*pClass	= m_pLUT->Get_Record_byIndex(iClass);
+
+	int		c	= Value.Cmp(pClass->asString(LUT_MIN));
+
+	if( c < 0 )
+	{
+		return( 1 );
+	}
+
+	if( c > 0 && Value.Cmp(pClass->asString(LUT_MAX)) > 0 )
+	{
+		return( -1 );
+	}
+
+	return( 0 );
+}
+
+//---------------------------------------------------------
+int CWKSP_Layer_Classify::_LUT_Get_Class(const CSG_String &Value)
 {
 	int		a, b, i, c;
 
@@ -415,8 +479,8 @@ void CWKSP_Layer_Classify::Metric2EqualElements(void)
 
 			pRecord	= m_pLUT->Add_Record();
 			pRecord->Set_Value(LUT_COLOR		, m_pColors->Get_Color(iClass));
-			pRecord->Set_Value(LUT_TITLE		, wxString::Format(wxT(">=%f"), zB));
-			pRecord->Set_Value(LUT_DESCRIPTION	, wxString::Format(wxT("%f <-> %f"), zB, zA));
+			pRecord->Set_Value(LUT_TITLE		, CSG_String::Format(SG_T(">=%f"), zB));
+			pRecord->Set_Value(LUT_DESCRIPTION	, CSG_String::Format(SG_T("%f <-> %f"), zB, zA));
 			pRecord->Set_Value(LUT_MIN			, zB);
 			pRecord->Set_Value(LUT_MAX			, zA);
 		}
@@ -426,13 +490,13 @@ void CWKSP_Layer_Classify::Metric2EqualElements(void)
 		zA		= pGrid->asDouble(x, y);
 		pRecord	= m_pLUT->Add_Record();
 		pRecord->Set_Value(LUT_COLOR		, m_pColors->Get_Color(iClass));
-		pRecord->Set_Value(LUT_TITLE		, wxString::Format(wxT(">=%f"), zB));
-		pRecord->Set_Value(LUT_DESCRIPTION	, wxString::Format(wxT("%f <-> %f"), zB, zA));
+		pRecord->Set_Value(LUT_TITLE		, CSG_String::Format(SG_T(">=%f"), zB));
+		pRecord->Set_Value(LUT_DESCRIPTION	, CSG_String::Format(SG_T("%f <-> %f"), zB, zA));
 		pRecord->Set_Value(LUT_MIN			, zB);
 		pRecord->Set_Value(LUT_MAX			, zA);
 
 		Set_Mode(CLASSIFY_LUT);
-		m_pLayer->Update_Views(false);
+		m_pLayer->Update_Views();
 	}
 }
 
@@ -460,7 +524,7 @@ bool CWKSP_Layer_Classify::Histogram_Update(void)
 	//-----------------------------------------------------
 	if( Get_Class_Count() > 0 )
 	{
-		STATUSBAR_Set_Text(LNG("[MSG] Build Histogram..."));
+		STATUSBAR_Set_Text(_TL("Build Histogram..."));
 
 		m_HST_Count	= (int *)SG_Calloc(Get_Class_Count(), sizeof(int));
 		m_HST_Cumul	= (int *)SG_Calloc(Get_Class_Count(), sizeof(int));
@@ -526,7 +590,9 @@ bool CWKSP_Layer_Classify::_Histogram_Update(CSG_Shapes *pShapes, int Attribute)
 	{
 		for(int i=0; i<pShapes->Get_Count() && PROGRESSBAR_Set_Position(i, pShapes->Get_Count()); i++)
 		{
-			int		Class	= Get_Class(pShapes->Get_Record(i)->asDouble(Attribute));
+			int		Class	= SG_Data_Type_is_Numeric(m_pLUT->Get_Field_Type(LUT_MIN))
+				? Get_Class(pShapes->Get_Record(i)->asDouble(Attribute))
+				: Get_Class(pShapes->Get_Record(i)->asString(Attribute));
 			
 			if( Class >= 0 && Class < Get_Class_Count() )
 			{

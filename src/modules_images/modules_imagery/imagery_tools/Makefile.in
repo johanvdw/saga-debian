@@ -75,8 +75,10 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libimagery_tools_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libimagery_tools_la_OBJECTS = Image_VI_Distance.lo \
-	Image_VI_Slope.lo MLB_Interface.lo
+am_libimagery_tools_la_OBJECTS = evi.lo Image_VI_Distance.lo \
+	Image_VI_Slope.lo landsat_acca.lo landsat_toar.lo \
+	landsat_toar_core.lo MLB_Interface.lo pansharpening.lo \
+	tasseled_cap.lo
 libimagery_tools_la_OBJECTS = $(am_libimagery_tools_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -135,6 +137,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -165,7 +168,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -248,16 +250,28 @@ top_srcdir = @top_srcdir@
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libimagery_tools.la
 libimagery_tools_la_SOURCES = \
+evi.cpp\
 Image_VI_Distance.cpp\
 Image_VI_Slope.cpp\
+landsat_acca.cpp\
+landsat_toar.cpp\
+landsat_toar_core.cpp\
 MLB_Interface.cpp\
+pansharpening.cpp\
+tasseled_cap.cpp\
+evi.h\
 Image_VI_Distance.h\
 Image_VI_Slope.h\
-MLB_Interface.h
+landsat_acca.h\
+landsat_toar.h\
+landsat_toar_core.h\
+MLB_Interface.h\
+pansharpening.h\
+tasseled_cap.h
 
 libimagery_tools_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -337,6 +351,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Image_VI_Distance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Image_VI_Slope.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/evi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/landsat_acca.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/landsat_toar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/landsat_toar_core.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pansharpening.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tasseled_cap.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow_AreaUpslope.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Flow_AreaUpslope.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ public:
 	CFlow_AreaUpslope_Interactive(void);
 	virtual ~CFlow_AreaUpslope_Interactive(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
 
 
 protected:
@@ -154,7 +154,7 @@ public:
 	CFlow_AreaUpslope_Area(void);
 	virtual ~CFlow_AreaUpslope_Area(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
 
 
 protected:

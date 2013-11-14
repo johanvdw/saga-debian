@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_manager.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_data_manager.h 1651 2013-04-11 16:13:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -105,8 +105,11 @@ public:
 
 	virtual void					Parameters_Changed	(void);
 
+	CWKSP_Base_Manager *			Get_Manager			(TSG_Data_Object_Type Type, bool bAdd = false);
 	CWKSP_Base_Manager *			Get_Manager			(int i)		{	return( (CWKSP_Base_Manager *)Get_Item(i) );	}
-	void							Del_Manager			(class CWKSP_Base_Item *pItem);
+	void							Del_Manager			(CWKSP_Base_Item *pItem);
+
+	class CWKSP_Project *			Get_Project			(void)		{	return( m_pProject     );	}
 
 	class CWKSP_Table_Manager *		Get_Tables			(void)		{	return( m_pTables      );	}
 	class CWKSP_Shapes_Manager *	Get_Shapes			(void)		{	return( m_pShapes      );	}
@@ -114,32 +117,24 @@ public:
 	class CWKSP_PointCloud_Manager *Get_PointClouds		(void)		{	return( m_pPointClouds );	}
 	class CWKSP_Grid_Manager *		Get_Grids			(void)		{	return( m_pGrids       );	}
 
-	bool							Get_DataObject_List	(CSG_Parameters *pParameters);
+	class CWKSP_Layer *				Get_Layer			(CSG_Data_Object *pObject);
 
-	class CWKSP_Data_Menu_Files *	Get_FileMenus		(void)		{	return( m_pMenu_Files );	}
+	class CWKSP_Data_Menu_Files *	Get_Menu_Files		(void)		{	return( m_pMenu_Files );	}
 
-	bool							Check_Parameters	(class CSG_Parameters *pParameters);
-	bool							Check_Parameter		(class CSG_Parameter  *pParameter);
-
-	bool							Open_CMD			(int Cmd_ID);
-	bool							Open				(const wxChar *FileName);
+	CWKSP_Base_Item *				Open				(const wxString &File, int DataType);
+	bool							Open				(const wxString &File);
 	bool							Open				(int DataType);
-	CWKSP_Base_Item *				Open				(int DataType, const wxChar *FileName);
-	bool							Open_GDAL			(const wxChar *File_Name);
-
-	bool							Exists				(class CSG_Grid_System *pSystem);
-	bool							Exists				(class CSG_Data_Object *pObject, int DataType = -1);
-
-	class CSG_Data_Object *			Get_byFileName		(const wxChar *File_Name, int DataType = -1);
+	bool							Open_CMD			(int Cmd_ID);
 
 	bool							Save_Modified		(class CWKSP_Base_Item *pItem);
 	bool							Save_Modified_Sel	(void);
 	bool							Close				(bool bSilent);
 
-	CWKSP_Base_Item *				Add					(class CSG_Data_Object *pObject);
+	class CWKSP_Data_Item *			Add					(class CSG_Data_Object *pObject);
+	class CWKSP_Data_Item *			Get					(class CSG_Data_Object *pObject);
 	bool							Update				(class CSG_Data_Object *pObject, class CSG_Parameters *pParameters);
 	bool							Update_Views		(class CSG_Data_Object *pObject);
-	bool							Show				(class CSG_Data_Object *pObject, int Map_Mode);
+	bool							Show				(class CSG_Data_Object *pObject, int Flags = 0);
 	bool							asImage				(class CSG_Data_Object *pObject, class CSG_Grid *pImage);
 
 	bool							Get_Colors			(class CSG_Data_Object *pObject, class CSG_Colors *pColors);
@@ -168,8 +163,6 @@ private:
 
 	class CWKSP_Grid_Manager		*m_pGrids;
 
-
-	bool							_Get_Manager		(int DataType);
 
 };
 

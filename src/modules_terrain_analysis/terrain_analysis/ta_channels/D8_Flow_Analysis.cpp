@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: D8_Flow_Analysis.cpp 1213 2011-11-03 10:21:14Z oconrad $
+ * Version $Id: D8_Flow_Analysis.cpp 1291 2012-01-04 14:52:03Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -164,9 +164,9 @@ bool CD8_Flow_Analysis::On_Execute(void)
 
 	m_pDEM		= Parameters("DEM")			->asGrid();
 
-	m_pDir		= Parameters("DIRECTION")	->asGrid();		if( !m_pDir    ) { m_pDir    = &Dir   ; Dir   .Create(*Get_System(), SG_DATATYPE_Char ); }
-	m_pOrder	= Parameters("ORDER")		->asGrid();		if( !m_pOrder  ) { m_pOrder  = &Order ; Order .Create(*Get_System(), SG_DATATYPE_Short); }
-	m_pBasins	= Parameters("BASIN")		->asGrid();		if( !m_pBasins ) { m_pBasins = &Basins; Basins.Create(*Get_System(), SG_DATATYPE_Short); }
+	m_pDir		= Parameters("DIRECTION")	->asGrid();		if( !m_pDir    ) { m_pDir    = &Dir   ; Dir   .Create(*Get_System(), SG_DATATYPE_Char ); Dir   .Set_Name(_TL("Flow Direction" )); }
+	m_pOrder	= Parameters("ORDER")		->asGrid();		if( !m_pOrder  ) { m_pOrder  = &Order ; Order .Create(*Get_System(), SG_DATATYPE_Short); Order .Set_Name(_TL("Strahler Order" )); }
+	m_pBasins	= Parameters("BASIN")		->asGrid();		if( !m_pBasins ) { m_pBasins = &Basins; Basins.Create(*Get_System(), SG_DATATYPE_Short); Basins.Set_Name(_TL("Drainage Basins")); }
 
 	m_Threshold	= Parameters("THRESHOLD")	->asInt();
 

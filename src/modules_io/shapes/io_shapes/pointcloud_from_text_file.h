@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pointcloud_from_text_file.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pointcloud_from_text_file.h 1501 2012-10-25 09:43:44Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include <wx/tokenzr.h>
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -93,12 +93,14 @@ public:
 	CPointCloud_From_Text_File(void);
 	virtual ~CPointCloud_From_Text_File(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Import") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Import") );	}
 
 
 protected:
 
 	virtual bool			On_Execute	(void);
+
+    TSG_Data_Type           Get_Data_Type(int iType);
 
 };
 

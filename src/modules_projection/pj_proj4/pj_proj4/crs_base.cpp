@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: crs_base.cpp 1090 2011-06-15 12:01:09Z oconrad $
+ * Version $Id: crs_base.cpp 1726 2013-06-13 09:34:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -99,11 +99,31 @@ CCRS_Base::CCRS_Base(void)
 	if( SG_UI_Get_Window_Main() )
 	{
 		Parameters.Add_Parameters(
-			pNode_0	, "CRS_DIALOG"		, _TL("Dialog"),
+			pNode_0	, "CRS_DIALOG"		, _TL("User Defined"),
 			_TL("")
 		);
 
 		Set_User_Parameters(Parameters("CRS_DIALOG")->asParameters());
+	}
+
+	//-----------------------------------------------------
+	if( SG_UI_Get_Window_Main() )
+	{
+		pNode_1	= Parameters.Add_Parameters(pNode_0, "CRS_GRID"  , _TL("Loaded Grid")  , _TL(""));
+
+		pNode_1->asParameters()->Add_Grid(
+			NULL	, "PICK"	, _TL("Grid"),
+			_TL(""),
+			PARAMETER_INPUT_OPTIONAL, false
+		);
+
+		pNode_1	= Parameters.Add_Parameters(pNode_0, "CRS_SHAPES", _TL("Loaded Shapes"), _TL(""));
+
+		pNode_1->asParameters()->Add_Shapes(
+			NULL	, "PICK"	, _TL("Shapes"),
+			_TL(""),
+			PARAMETER_INPUT_OPTIONAL
+		);
 	}
 
 	//-----------------------------------------------------
@@ -143,22 +163,11 @@ CCRS_Base::CCRS_Base(void)
 	}
 
 	//-----------------------------------------------------
-	if( SG_UI_Get_Window_Main() )
-	{
-		pNode_0	= Parameters.Add_Node(NULL, "NODE_DATA", _TL("Pick CRS from loaded data set"), _TL(""));
-
-		Parameters.Add_Grid(
-			pNode_0	, "CRS_GRID"		, _TL("Grid"),
-			_TL(""),
-			PARAMETER_INPUT_OPTIONAL, false
-		);
-
-		Parameters.Add_Shapes(
-			pNode_0	, "CRS_SHAPES"		, _TL("Shapes"),
-			_TL(""),
-			PARAMETER_INPUT_OPTIONAL
-		);
-	}
+	Parameters.Add_Value(
+		NULL	, "PRECISE"		, _TL("Precise Datum Conversion"),
+		_TL("avoids precision problems when source and target crs use different geodedtic datums."),
+		PARAMETER_TYPE_Bool, false
+	);
 }
 
 
@@ -222,21 +231,21 @@ int CCRS_Base::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *
 	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_GRID"))
 	||	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_SHAPES")) )
 	{
-		if( pParameter->asDataObject() && pParameter->asDataObject()->Get_Projection().is_Okay() )
+		CSG_Data_Object	*pPick	= pParameter->asParameters()->Get_Parameter("PICK")->asDataObject();
+
+		if( pPick && pPick->Get_Projection().is_Okay() )
 		{
-			if( pParameter->asDataObject()->Get_Projection().Get_EPSG() > 0 )
+			if( pPick->Get_Projection().Get_EPSG() > 0 )
 			{
-				pParameters->Get_Parameter("CRS_EPSG")->Set_Value(pParameter->asDataObject()->Get_Projection().Get_EPSG());
+				pParameters->Get_Parameter("CRS_EPSG")->Set_Value(pPick->Get_Projection().Get_EPSG());
 
 				On_Parameter_Changed(pParameters, pParameters->Get_Parameter("CRS_EPSG"));
 			}
 			else
 			{
-				pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(pParameter->asDataObject()->Get_Projection().Get_Proj4().c_str());
+				pParameters->Get_Parameter("CRS_PROJ4")->Set_Value(pPick->Get_Projection().Get_Proj4().c_str());
 			}
 		}
-
-		pParameter->Set_Value((void *)NULL);
 	}
 
 	//-----------------------------------------------------
@@ -367,10 +376,10 @@ bool CCRS_Base::Set_User_Parameters(CSG_Parameters *pParameters)
 	// Datums ---------------------------------------------
 	for(struct PJ_DATUMS *pDatum=pj_datums; pDatum->id; ++pDatum)
 	{
-		sDatums	+= CSG_String::Format(SG_T("{%s}%s|"), SG_STR_MBTOSG(pDatum->id),
-			SG_STR_MBTOSG(pDatum->comments) && SG_STR_MBTOSG(*pDatum->comments) ?
-			SG_STR_MBTOSG(pDatum->comments) : SG_STR_MBTOSG(pDatum->id)
-		);
+		CSG_String	id      (pDatum->id);
+		CSG_String	comments(pDatum->comments);
+
+		sDatums	+= CSG_String::Format(SG_T("{%s}%s|"), id.c_str(), comments.Length() ? comments.c_str() : id.c_str());
 	}
 
 	// Ellipsoids -----------------------------------------
@@ -506,9 +515,11 @@ bool CCRS_Base::Set_User_Parameters(CSG_Parameters *pParameters)
 }
 
 //---------------------------------------------------------
-#define PRM_ADD_BOL(key, name, val)	pParms->Add_Value(NULL, key, name, _TL(""), PARAMETER_TYPE_Bool  , val);
-#define PRM_ADD_INT(key, name, val)	pParms->Add_Value(NULL, key, name, _TL(""), PARAMETER_TYPE_Int   , val);
-#define PRM_ADD_FLT(key, name, val)	pParms->Add_Value(NULL, key, name, _TL(""), PARAMETER_TYPE_Double, val);
+#define PRM_ADD_BOL(key, name, val)	pParms->Add_Value (NULL, key, name, _TL(""), PARAMETER_TYPE_Bool  , val);
+#define PRM_ADD_INT(key, name, val)	pParms->Add_Value (NULL, key, name, _TL(""), PARAMETER_TYPE_Int   , val);
+#define PRM_ADD_FLT(key, name, val)	pParms->Add_Value (NULL, key, name, _TL(""), PARAMETER_TYPE_Double, val);
+#define PRM_ADD_STR(key, name, val)	pParms->Add_String(NULL, key, name, _TL(""), val);
+#define PRM_ADD_CHO(key, name, val)	pParms->Add_Choice(NULL, key, name, _TL(""), val);
 
 //---------------------------------------------------------
 bool CCRS_Base::Add_User_Projection(const CSG_String &sID, const CSG_String &sName, const CSG_String &sArgs)
@@ -687,7 +698,8 @@ bool CCRS_Base::Add_User_Projection(const CSG_String &sID, const CSG_String &sNa
 
 	if(	!sID.CmpNoCase(SG_T("geos")) )		// Geostationary Satellite View
 	{
-		PRM_ADD_FLT("h"			, _TL("Satellite Height [m]")	, 42157000.0);
+		PRM_ADD_FLT("h"			, _TL("Satellite Height [m]")	, 35785831.0);
+		PRM_ADD_CHO("sweep"		, _TL("Sweep Angle")			, "x|y|");
 	}
 
 	if(	!sID.CmpNoCase(SG_T("lsat")) )		// Space oblique for LANDSAT
@@ -856,9 +868,11 @@ CSG_String CCRS_Base::Get_User_Definition(CSG_Parameters &P)
 
 		switch( p->Get_Type() )
 		{
-		case PARAMETER_TYPE_Bool:	Proj4	+= STR_ADD_BOL(p->Get_Identifier(), p->asBool());	break;
-		case PARAMETER_TYPE_Int:	Proj4	+= STR_ADD_INT(p->Get_Identifier(), p->asInt());	break;
-		case PARAMETER_TYPE_Double:	Proj4	+= STR_ADD_FLT(p->Get_Identifier(), p->asDouble());	break;
+		case PARAMETER_TYPE_Choice:
+		case PARAMETER_TYPE_String: Proj4	+= STR_ADD_STR(p->Get_Identifier(), p->asString());	break;
+		case PARAMETER_TYPE_Bool:   Proj4	+= STR_ADD_BOL(p->Get_Identifier(), p->asBool  ());	break;
+		case PARAMETER_TYPE_Int:    Proj4	+= STR_ADD_INT(p->Get_Identifier(), p->asInt   ());	break;
+		case PARAMETER_TYPE_Double: Proj4	+= STR_ADD_FLT(p->Get_Identifier(), p->asDouble());	break;
 		}
 	}
 

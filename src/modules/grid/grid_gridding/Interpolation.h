@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Interpolation.h 1130 2011-07-14 07:42:46Z reklov_w $
+ * Version $Id: Interpolation.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ class grid_gridding_EXPORT CInterpolation : public CSG_Module
 public:
 	CInterpolation(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("R:Interpolation from Points") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:Interpolation from Points") );	}
 
 
 protected:

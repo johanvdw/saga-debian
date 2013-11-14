@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_table.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_table.h 1677 2013-05-02 11:51:36Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,9 +72,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <saga_api/saga_api.h>
-
-#include "wksp_base_manager.h"
+#include "wksp_data_item.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -84,32 +82,22 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CWKSP_Table : public CWKSP_Base_Item
+class CWKSP_Table : public CWKSP_Data_Item
 {
 public:
-	CWKSP_Table(class CSG_Table *pTable, CWKSP_Base_Item *pOwner);
+	CWKSP_Table(class CSG_Table *pTable);
 	virtual ~CWKSP_Table(void);
 
 	virtual TWKSP_Item				Get_Type				(void)			{	return( WKSP_ITEM_Table );	}
 
-	virtual void					Parameters_Changed		(void);
+	CSG_Table *						Get_Table				(void)			{	return( (CSG_Table *)m_pObject );	}
 
-	virtual wxString				Get_Name				(void);
 	virtual wxString				Get_Description			(void);
 
 	virtual wxMenu *				Get_Menu				(void);
 
 	virtual bool					On_Command				(int Cmd_ID);
 	virtual bool					On_Command_UI			(wxUpdateUIEvent &event);
-
-	CWKSP_Base_Item *				Get_Owner				(void)			{	return( m_pOwner );	}
-
-	CSG_Table *						Get_Table				(void)			{	return( m_pTable );	}
-
-	bool							Save					(void);
-	bool							Save					(const wxChar *File_Path);
-
-	bool							DataObject_Changed		(CSG_Parameters *pParameters);
 
 	class CVIEW_Table *				Get_View				(void)			{	return( m_pView );	}
 	void							Set_View				(bool bShow);
@@ -119,22 +107,21 @@ public:
 	void							Set_Diagram				(bool bShow);
 	void							Toggle_Diagram			(void);
 
-	void							Update_Views			(void);
-	void							View_Closes				(class wxMDIChildFrame *pView);
+	virtual bool					Show					(int Flags = 0);
+	virtual bool					View_Closes				(class wxMDIChildFrame *pView);
+
+
+protected:
+
+	virtual void					On_Update_Views			(bool bAll);
 
 
 private:
-
-	CSG_Table						*m_pTable;
-
-	CWKSP_Base_Item					*m_pOwner;
 
 	class CVIEW_Table				*m_pView;
 
 	class CVIEW_Table_Diagram		*m_pDiagram;
 
-
-	virtual int						On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
 };
 

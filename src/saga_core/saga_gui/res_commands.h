@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_commands.h 1125 2011-07-06 09:29:08Z oconrad $
+ * Version $Id: res_commands.h 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -126,12 +126,20 @@ enum ID_COMMANDS
 
 	ID_CMD_DATASOURCE_REFRESH,
 
+	ID_CMD_ODBC_REFRESH,
+	ID_CMD_ODBC_SOURCE_CLOSE_ALL,
+	ID_CMD_ODBC_SOURCE_CLOSE,
+	ID_CMD_ODBC_SOURCE_OPEN,
+	ID_CMD_ODBC_TABLE_OPEN,
+	ID_CMD_ODBC_TABLE_DELETE,
+	ID_CMD_ODBC_TABLE_FROM_QUERY,
+
 	ID_CMD_MODULES_FIRST,
 	ID_CMD_MODULES_RECENT_FIRST,
 	ID_CMD_MODULES_RECENT_LAST		= RECENT_COUNT + ID_CMD_MODULES_RECENT_FIRST,
 	ID_CMD_MODULES_OPEN,
-	ID_CMD_MODULES_SAVE_HTML,
 	ID_CMD_MODULES_SAVE_SCRIPT,
+	ID_CMD_MODULES_SAVE_DOCS,
 	ID_CMD_MODULES_LAST,
 
 	ID_CMD_DATA_FIRST,
@@ -159,9 +167,9 @@ enum ID_COMMANDS
 	ID_CMD_GRIDS_HISTOGRAM,
 	ID_CMD_GRIDS_SCATTERPLOT,
 	ID_CMD_GRIDS_EQUALINTERVALS,
-	ID_CMD_GRIDS_RANGE_MINMAX,
-	ID_CMD_GRIDS_RANGE_STDDEV150,
-	ID_CMD_GRIDS_RANGE_STDDEV200,
+	ID_CMD_GRIDS_FIT_MINMAX,
+	ID_CMD_GRIDS_FIT_STDDEV,
+	ID_CMD_GRIDS_FIT_DIALOG,
 	ID_CMD_GRIDS_SET_LUT,
 	ID_CMD_GRIDS_LAST,
 
@@ -227,7 +235,6 @@ enum ID_COMMANDS
 	ID_CMD_MAPS_SAVE_TO_CLIPBOARD_LEGEND,
 	ID_CMD_MAPS_SAVE_IMAGE_ON_CHANGE,
 	ID_CMD_MAPS_SAVE_IMAGE_TO_MEMORY,
-	ID_CMD_MAPS_SYNCHRONIZE,
 	ID_CMD_MAPS_LAYER_SHOW,
 	ID_CMD_MAPS_MOVE_TOP,
 	ID_CMD_MAPS_MOVE_BOTTOM,
@@ -246,6 +253,7 @@ enum ID_COMMANDS
 	ID_CMD_MAP_TOOLBAR,
 	ID_CMD_MAP_3D_SHOW,
 	ID_CMD_MAP_LAYOUT_SHOW,
+	ID_CMD_MAP_SCALEBAR,
 	ID_CMD_MAP_SAVE_IMAGE,
 	ID_CMD_MAP_SAVE_IMAGE_ON_CHANGE,
 	ID_CMD_MAP_SYNCHRONIZE,
@@ -303,11 +311,13 @@ enum ID_COMMANDS
 	ID_CMD_TABLE_FIELD_DEL,
 	ID_CMD_TABLE_FIELD_SORT,
 	ID_CMD_TABLE_FIELD_RENAME,
+	ID_CMD_TABLE_FIELD_TYPE,
 	ID_CMD_TABLE_RECORD_ADD,
 	ID_CMD_TABLE_RECORD_INS,
 	ID_CMD_TABLE_RECORD_DEL,
 	ID_CMD_TABLE_RECORD_DEL_ALL,
 	ID_CMD_TABLE_SELECTION_TO_TOP,
+	ID_CMD_TABLE_SELECTION_ONLY,
 	ID_CMD_TABLE_AUTOSIZE_COLS,
 	ID_CMD_TABLE_AUTOSIZE_ROWS,
 	ID_CMD_TABLE_LAST,
@@ -321,7 +331,10 @@ enum ID_COMMANDS
 
 	ID_CMD_SCATTERPLOT_FIRST,
 	ID_CMD_SCATTERPLOT_PARAMETERS,
+	ID_CMD_SCATTERPLOT_OPTIONS,
 	ID_CMD_SCATTERPLOT_UPDATE,
+	ID_CMD_SCATTERPLOT_AS_TABLE,
+	ID_CMD_SCATTERPLOT_TO_CLIPBOARD,
 	ID_CMD_SCATTERPLOT_LAST,
 
 	ID_CMD_HISTOGRAM_FIRST,
@@ -357,15 +370,15 @@ enum ID_COMMANDS
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-const wxChar *			CMD_Get_Name				(int Cmd_ID);
-const wxChar *			CMD_Get_Help				(int Cmd_ID);
+wxString				CMD_Get_Name				(int Cmd_ID);
+wxString				CMD_Get_Help				(int Cmd_ID);
 int						CMD_Get_ImageID				(int Cmd_ID);
 
 void					CMD_Menu_Add_Item			(class wxMenu *pMenu, bool bCheck, int Cmd_ID);
 void					CMD_Menu_Ins_Item			(class wxMenu *pMenu, bool bCheck, int Cmd_ID, int Position);
 
 class wxToolBarBase *	CMD_ToolBar_Create			(int ID);
-void					CMD_ToolBar_Add				(class wxToolBarBase *pToolBar, const wxChar *Name);
+void					CMD_ToolBar_Add				(class wxToolBarBase *pToolBar, const wxString &Name);
 void					CMD_ToolBar_Add_Item		(class wxToolBarBase *pToolBar, bool bCheck, int Cmd_ID);
 void					CMD_ToolBar_Add_Separator	(class wxToolBarBase *pToolBar);
 

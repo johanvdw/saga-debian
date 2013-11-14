@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grib2_import.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: grib2_import.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*
  * Thomas Schorr 2007
@@ -21,7 +21,7 @@ public:
 	SGGrib2Import(void);
 	virtual ~SGGrib2Import(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)		{	return( _TL("R:Import") );	}
+	virtual CSG_String		Get_MenuPath	(void)		{	return( _TL("R:Import") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_points.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_shapes_points.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,16 +86,9 @@ class CWKSP_Shapes_Points : public CWKSP_Shapes_Point
 {
 public:
 	CWKSP_Shapes_Points(CSG_Shapes *pShapes);
-	virtual ~CWKSP_Shapes_Points(void);
 
 
 protected:
-
-	virtual void				On_Create_Parameters	(void);
-	virtual void				On_DataObject_Changed	(void);
-	virtual void				On_Parameters_Changed	(void);
-
-	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
 	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection);
 	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);

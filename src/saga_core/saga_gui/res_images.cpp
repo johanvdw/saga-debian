@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.cpp 1119 2011-06-29 12:13:43Z oconrad $
+ * Version $Id: res_images.cpp 1685 2013-05-14 09:52:41Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -182,6 +182,9 @@
 #include "./res/xpm/wksp_module_library.xpm"
 #include "./res/xpm/wksp_module_manager.xpm"
 #include "./res/xpm/wksp_noitems.xpm"
+#include "./res/xpm/wksp_odbc_sources.xpm"
+#include "./res/xpm/wksp_odbc_source_on.xpm"
+#include "./res/xpm/wksp_odbc_source_off.xpm"
 #include "./res/xpm/wksp_shapes_line.xpm"
 #include "./res/xpm/wksp_shapes_manager.xpm"
 #include "./res/xpm/wksp_shapes_point.xpm"
@@ -211,8 +214,8 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_NB_ACTIVE_LEGEND:	return( nb_active_legend_xpm );
 	case ID_IMG_NB_ACTIVE_PARAMETERS:	return( nb_active_parameters_xpm );
 	case ID_IMG_NB_ACTIVE_HTMLEXTRAINFO:	return( nb_active_htmlextrainfo_xpm );
-	case ID_IMG_NB_DATA_SOURCE_FILES:
-	case ID_IMG_NB_DATA_SOURCE_DATABASE:
+	case ID_IMG_NB_DATA_SOURCE_FILES:		return( tb_wksp_xpm );
+	case ID_IMG_NB_DATA_SOURCE_DATABASE:	return( wksp_odbc_sources_xpm );
 	case ID_IMG_NB_DATA_SOURCE_WEBSERVICE:	return( tb_wksp_xpm );
 	case ID_IMG_NB_INFO_ERROR:	return( nb_info_error_xpm );
 	case ID_IMG_NB_INFO_EXECUTION:	return( nb_info_execution_xpm );
@@ -316,6 +319,10 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_WKSP_MODULE_LIBRARY:	return( wksp_module_library_xpm );
 	case ID_IMG_WKSP_MODULE_MANAGER:	return( wksp_module_manager_xpm );
 	case ID_IMG_WKSP_NOITEMS:	return( wksp_noitems_xpm );
+	case ID_IMG_WKSP_ODBC_SOURCES:	return( wksp_odbc_sources_xpm );
+	case ID_IMG_WKSP_ODBC_SOURCE_ON:	return( wksp_odbc_source_on_xpm );
+	case ID_IMG_WKSP_ODBC_SOURCE_OFF:	return( wksp_odbc_source_off_xpm );
+	case ID_IMG_WKSP_ODBC_TABLE:	return( wksp_table_xpm );
 	case ID_IMG_WKSP_SHAPES_LINE:	return( wksp_shapes_line_xpm );
 	case ID_IMG_WKSP_SHAPES_MANAGER:	return( wksp_shapes_manager_xpm );
 	case ID_IMG_WKSP_SHAPES_POINT:	return( wksp_shapes_point_xpm );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: geo_functions.cpp 951 2011-03-18 16:18:43Z oconrad $
+ * Version $Id: geo_functions.cpp 1419 2012-05-30 16:52:55Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,6 +80,18 @@ double		SG_Get_Length(double dx, double dy)
 }
 
 //---------------------------------------------------------
+double		SG_Get_Distance(double ax, double ay, double bx, double by, bool bPolar)
+{
+	return( bPolar ? SG_Get_Distance_Polar(ax, ay, bx, by) : SG_Get_Distance(ax, ay, bx, by) );
+}
+
+//---------------------------------------------------------
+double		SG_Get_Distance(const TSG_Point &A, const TSG_Point &B, bool bPolar)
+{
+	return( bPolar ? SG_Get_Distance_Polar(A, B) : SG_Get_Distance(A, B) );
+}
+
+//---------------------------------------------------------
 double		SG_Get_Distance(double ax, double ay, double bx, double by)
 {
 	ax	-= bx;
@@ -97,6 +109,58 @@ double		SG_Get_Distance(const TSG_Point &A, const TSG_Point &B)
 	dy	= B.y - A.y;
 
 	return( sqrt(dx*dx + dy*dy) );
+}
+
+//---------------------------------------------------------
+double	SG_Get_Distance_Polar(double aLon, double aLat, double bLon, double bLat, double a, double e, bool bDegree)
+{
+	if( bDegree )
+	{
+		aLon	*= M_DEG_TO_RAD;
+		aLat	*= M_DEG_TO_RAD;
+		bLon	*= M_DEG_TO_RAD;
+		bLat	*= M_DEG_TO_RAD;
+	}
+
+	if( e <= 0.0 )
+	{
+		return(	a * acos(sin(aLat) * sin(bLat) + cos(aLat) * cos(bLat) * cos(bLon - aLon)) );
+	}
+	else
+	{
+		double	F	= (aLat + bLat) / 2.0;
+		double	G	= (aLat - bLat) / 2.0;
+		double	l	= (aLon - bLon) / 2.0;
+
+		double	sin2_F	= SG_Get_Square(sin(F));
+		double	cos2_F	= SG_Get_Square(cos(F));
+		double	sin2_G	= SG_Get_Square(sin(G));
+		double	cos2_G	= SG_Get_Square(cos(G));
+		double	sin2_l	= SG_Get_Square(sin(l));
+		double	cos2_l	= SG_Get_Square(cos(l));
+
+		double	S	= sin2_G * cos2_l + cos2_F * sin2_l;
+		double	C	= cos2_G * cos2_l + sin2_F * sin2_l;
+
+		double	w	= atan(sqrt(S / C));
+		double	D	= 2.0 * w * a;
+
+		double	R	= sqrt(S * C) / w;
+		double	H1	= (3.0 * R - 1.0) / (2.0 * C);
+		double	H2	= (3.0 * R + 1.0) / (2.0 * S);
+
+		double	f	= 1.0 / e;
+
+		double	d	= D * (1.0 + f * H1 * sin2_F * cos2_G - f * H2 * cos2_F * sin2_G);
+
+		return( d );
+	}
+}
+
+//---------------------------------------------------------
+double	SG_Get_Distance_Polar(const TSG_Point &A, const TSG_Point &B, double a, double e, bool bDegree)
+{
+	return( SG_Get_Distance_Polar(A.x, A.y, B.x, B.y, a, e, bDegree) );
 }
 
 
@@ -147,8 +211,7 @@ double		SG_Get_Angle_Of_Direction(const TSG_Point &A, const TSG_Point &B)
 //---------------------------------------------------------
 bool	SG_Get_Crossing(TSG_Point &Crossing, const TSG_Point &a1, const TSG_Point &a2, const TSG_Point &b1, const TSG_Point &b2, bool bExactMatch)
 {
-	double	lambda, div, a_dx, a_dy, b_dx, b_dy;
-
+	//-----------------------------------------------------
 	if( bExactMatch
 	&&	(	(M_GET_MAX(a1.x, a2.x) < M_GET_MIN(b1.x, b2.x))
 		||	(M_GET_MIN(a1.x, a2.x) > M_GET_MAX(b1.x, b2.x))
@@ -157,6 +220,24 @@ bool	SG_Get_Crossing(TSG_Point &Crossing, const TSG_Point &a1, const TSG_Point &
 	{
 		return( false );
 	}
+
+	//-----------------------------------------------------
+	if( (a1.x == b1.x && a1.y == b1.y) || (a1.x == b2.x && a1.y == b2.y) )
+	{
+		Crossing	= a1;
+
+		return( true );
+	}
+
+	if( (a2.x == b1.x && a2.y == b1.y) || (a2.x == b2.x && a2.y == b2.y) )
+	{
+		Crossing	= a2;
+
+		return( true );
+	}
+
+	//-----------------------------------------------------
+	double	lambda, div, a_dx, a_dy, b_dx, b_dy;
 
 	a_dx	= a2.x - a1.x;
 	a_dy	= a2.y - a1.y;

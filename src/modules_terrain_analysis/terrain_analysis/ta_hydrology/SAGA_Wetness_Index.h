@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SAGA_Wetness_Index.h 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: SAGA_Wetness_Index.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,22 +79,25 @@ class CSAGA_Wetness_Index : public CSG_Module_Grid
 {
 public:
 	CSAGA_Wetness_Index(void);
-	virtual ~CSAGA_Wetness_Index(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Topographic Indices" ));	}
 
 
 protected:
 
-	virtual bool				On_Execute			(void);
+	virtual bool			On_Execute			(void);
 
 
 private:
 
-	bool						Get_Area_Catchment	(CSG_Grid *pDEM, CSG_Grid *pC, CSG_Grid *pGN);
-	bool						Get_Area_Modified	(CSG_Grid *pDEM, CSG_Grid *pC, CSG_Grid *pCS, double t);
-	double						Get_Local_Maximum	(CSG_Grid *pGrid, int x, int y);
-	bool						Get_Wetness_Index	(CSG_Grid *pDEM, CSG_Grid *pCS, CSG_Grid *pSB, double a);
+	CSG_Grid				*m_pDEM, *m_pSlope, *m_pArea, *m_pAreaMod, *m_pTWI, m_Suction;
+
+
+	double					Get_Local_Maximum	(CSG_Grid *pGrid, int x, int y);
+
+	bool					Get_Area			(void);
+	bool					Get_Modified		(void);
+	bool					Get_TWI				(void);
 
 };
 

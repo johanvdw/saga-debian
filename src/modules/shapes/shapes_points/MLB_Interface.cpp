@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1170 2011-09-21 16:57:34Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1568 2012-12-14 13:00:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -108,6 +108,8 @@ const SG_Char * Get_Info(int i)
 #include "points_thinning.h"
 #include "thiessen_polygons.h"
 #include "gps_track_aggregation.h"
+#include "snap_points_to_features.h"
+#include "snap_points_to_grid.h"
 
 
 //---------------------------------------------------------
@@ -135,6 +137,9 @@ CSG_Module *		Create_Module(int i)
 	case 15:	return( new CPoints_From_MultiPoints );
 	case 16:	return( new CThiessen_Polygons );
 	case 17:	return( new CGPS_Track_Aggregation );
+	case 18:	return( new CSnap_Points_to_Features(SHAPE_TYPE_Point) );
+	case 19:	return( new CSnap_Points_to_Features(SHAPE_TYPE_Line) );
+	case 20:	return( new CSnap_Points_to_Grid() );
 	}
 
 	return( NULL );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid.cpp 1231 2011-11-22 11:14:49Z oconrad $
+ * Version $Id: grid.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -109,7 +109,16 @@ CSG_Grid * SG_Create_Grid(CSG_Grid *pGrid, TSG_Data_Type Type, TSG_Grid_Memory_T
 //---------------------------------------------------------
 CSG_Grid * SG_Create_Grid(const CSG_Grid_System &System, TSG_Data_Type Type, TSG_Grid_Memory_Type Memory_Type)
 {
-	return( new CSG_Grid(System, Type, Memory_Type) );
+	CSG_Grid	*pGrid	= new CSG_Grid(System, Type, Memory_Type);
+
+	if( pGrid && !pGrid->is_Valid() )
+	{
+		delete(pGrid);
+
+		pGrid	= NULL;
+	}
+
+	return( pGrid );
 }
 
 //---------------------------------------------------------
@@ -343,7 +352,7 @@ void CSG_Grid::_Set_Properties(TSG_Data_Type Type, int NX, int NY, double Cellsi
 	switch( m_Type )
 	{
 	case SG_DATATYPE_Bit:		Set_NoData_Value(          0.0);	break;
-	case SG_DATATYPE_Byte:		Set_NoData_Value(       -127.0);	break;
+	case SG_DATATYPE_Byte:		Set_NoData_Value(          0.0);	break;
 	case SG_DATATYPE_Char:		Set_NoData_Value(       -127.0);	break;
 	case SG_DATATYPE_Word:		Set_NoData_Value(      65535.0);	break;
 	case SG_DATATYPE_Short:		Set_NoData_Value(     -32767.0);	break;
@@ -1055,8 +1064,10 @@ bool CSG_Grid::On_Update(void)
 	{
 		m_zStats.Invalidate();
 
-		for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
+		for(int y=0; y<Get_NY(); y++)
 		{
+			SG_UI_Process_Get_Okay();
+
 			for(int x=0; x<Get_NX(); x++)
 			{
 				double	z	= asDouble(x, y);
@@ -1213,7 +1224,7 @@ bool CSG_Grid::_Set_Index(void)
 	double	a;
 
 	//-----------------------------------------------------
-	SG_UI_Process_Set_Text(CSG_String::Format(SG_T("%s: %s"), LNG("Create index"), Get_Name()));
+	SG_UI_Process_Set_Text(CSG_String::Format(SG_T("%s: %s"), _TL("Create index"), Get_Name()));
 
 	if( m_Index == NULL )
 	{
@@ -1221,7 +1232,7 @@ bool CSG_Grid::_Set_Index(void)
 
 		if( m_Index == NULL )
 		{
-			SG_UI_Msg_Add_Error(LNG("could not create index: insufficient memory"));
+			SG_UI_Msg_Add_Error(_TL("could not create index: insufficient memory"));
 
 			SG_UI_Process_Set_Ready();
 

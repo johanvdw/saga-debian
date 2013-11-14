@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: ChannelNetwork_Altitude.h 1214 2011-11-03 10:22:00Z oconrad $
+ * Version $Id: ChannelNetwork_Altitude.h 1527 2012-11-09 15:11:22Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -104,6 +104,27 @@ private:
 
 	double					Get_Change			(int nCells);
 	double					Get_Change			(int nCells, int x, int y);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class ta_channels_EXPORT CValley_Depth : public CSG_Module_Grid  
+{
+public:
+	CValley_Depth(void);
+
+
+protected:
+
+	virtual bool			On_Execute			(void);
+
+
+private:
 
 };
 

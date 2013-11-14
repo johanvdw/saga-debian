@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1613 2013-02-22 11:20:39Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@
 #include "MLB_Interface.h"
 
 //---------------------------------------------------------
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -72,7 +72,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Terrain Analysis - Lighting, Visibility" ));
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad (c) 2003-10") );
+		return( SG_T("O. Conrad, V. Wichmann (c) 2003-13") );
 
 	case MLB_INFO_Description:
 		return( _TL("Lighting and visibility calculations for digital terrain models." ));
@@ -91,6 +91,8 @@ const SG_Char * Get_Info(int i)
 #include "SolarRadiation.h"
 #include "view_shed.h"
 #include "topographic_correction.h"
+#include "topographic_openness.h"
+#include "Visibility_Points.h"
 
 //---------------------------------------------------------
 CSG_Module * Create_Module(int i)
@@ -102,6 +104,8 @@ CSG_Module * Create_Module(int i)
 	case  2:	return( new CSolarRadiation );
 	case  3:	return( new CView_Shed );
 	case  4:	return( new CTopographic_Correction );
+	case  5:	return( new CTopographic_Openness );
+	case  6:	return( new CVisibility_Points );
 	}
 
 	return( NULL );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1116 2011-06-24 14:34:18Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1317 2012-01-26 13:43:10Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -98,6 +98,7 @@ const SG_Char * Get_Info(int i)
 #include "classify_cluster_analysis.h"
 #include "change_detection.h"
 #include "decision_tree.h"
+#include "classify_supervised_polygons.h"
 
 
 //---------------------------------------------------------
@@ -111,6 +112,7 @@ CSG_Module *		Create_Module(int i)
 	case  1:	return( new CGrid_Cluster_Analysis );
 	case  2:	return( new CChange_Detection );
 	case  3:	return( new CDecision_Tree );
+	case  4:	return( new CPolygon_Classify_Supervised );
 	}
 
 	return( NULL );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_ConstantGrid.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_ConstantGrid.h 1688 2013-05-14 11:40:29Z oconrad $
  *********************************************************/
 /*******************************************************************************
     Grid_ConstantGrid.h
@@ -20,23 +20,51 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/ 
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #include "MLB_Interface.h"
 
-class CConstantGrid : public CSG_Module_Grid {
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CConstantGrid : public CSG_Module
+{
+public:
+	CConstantGrid(void);
+	
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Construction") );	}
+
+
+protected:
+
+	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool				On_Execute				(void);
+
 
 private:
 
-public:
-	CConstantGrid(void);
-	virtual ~CConstantGrid(void);
-	
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("A:Grid|Construction") );	}
-
-protected:
-	virtual bool		On_Execute(void);
+	CSG_Parameters_Grid_Target	m_Grid_Target;
 
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

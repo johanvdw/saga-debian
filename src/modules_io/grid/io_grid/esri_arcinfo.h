@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: esri_arcinfo.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: esri_arcinfo.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ class CESRI_ArcInfo_Import : public CSG_Module
 public:
 	CESRI_ArcInfo_Import(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)		{	return( _TL("R:Import") );	}
+	virtual CSG_String		Get_MenuPath		(void)		{	return( _TL("R:Import") );	}
 
 
 protected:
@@ -112,7 +112,7 @@ class CESRI_ArcInfo_Export : public CSG_Module_Grid
 public:
 	CESRI_ArcInfo_Export(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)		{	return( _TL("R:Export") );	}
+	virtual CSG_String		Get_MenuPath		(void)		{	return( _TL("R:Export") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Values_AddTo_Points.h 1025 2011-04-28 16:16:37Z oconrad $
+ * Version $Id: Grid_Values_AddTo_Points.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ class CGrid_Values_AddTo_Points : public CSG_Module
 public:
 	CGrid_Values_AddTo_Points(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Grid Values") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Grid Values") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_table.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,6 +94,8 @@ BEGIN_EVENT_TABLE(CVIEW_Table, CVIEW_Base)
 	EVT_UPDATE_UI				(ID_CMD_TABLE_FIELD_SORT		, CVIEW_Table::On_Field_Sort_UI)
 	EVT_MENU					(ID_CMD_TABLE_FIELD_RENAME		, CVIEW_Table::On_Field_Rename)
 	EVT_UPDATE_UI				(ID_CMD_TABLE_FIELD_RENAME		, CVIEW_Table::On_Field_Rename_UI)
+	EVT_MENU					(ID_CMD_TABLE_FIELD_TYPE		, CVIEW_Table::On_Field_Type)
+	EVT_UPDATE_UI				(ID_CMD_TABLE_FIELD_TYPE		, CVIEW_Table::On_Field_Type_UI)
 
 	EVT_MENU					(ID_CMD_TABLE_RECORD_ADD		, CVIEW_Table::On_Record_Add)
 	EVT_UPDATE_UI				(ID_CMD_TABLE_RECORD_ADD		, CVIEW_Table::On_Record_Add_UI)
@@ -116,7 +118,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CVIEW_Table::CVIEW_Table(CWKSP_Table *pTable)
-	: CVIEW_Base(ID_VIEW_TABLE, pTable->Get_Name(), ID_IMG_WND_TABLE, CVIEW_Table::_Create_Menu(), LNG("[CAP] Table"))
+	: CVIEW_Base(ID_VIEW_TABLE, pTable->Get_Name(), ID_IMG_WND_TABLE)
 {
 	m_pTable	= pTable;
 
@@ -139,7 +141,7 @@ CVIEW_Table::~CVIEW_Table(void)
 //---------------------------------------------------------
 wxMenu * CVIEW_Table::_Create_Menu(void)
 {
-	wxMenu	*pMenu	= new wxMenu();
+	wxMenu	*pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_FIELD_ADD);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLE_FIELD_DEL);
@@ -165,7 +167,7 @@ wxToolBarBase * CVIEW_Table::_Create_ToolBar(void)
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_TABLE_RECORD_DEL);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_TABLE_RECORD_DEL_ALL);
 
-	CMD_ToolBar_Add(pToolBar, LNG("[CAP] Table"));
+	CMD_ToolBar_Add(pToolBar, _TL("Table"));
 
 	return( pToolBar );
 }
@@ -219,6 +221,17 @@ void CVIEW_Table::On_Field_Rename(wxCommandEvent &event)
 void CVIEW_Table::On_Field_Rename_UI(wxUpdateUIEvent &event)
 {
 	m_pControl->On_Field_Rename_UI(event);
+}
+
+//---------------------------------------------------------
+void CVIEW_Table::On_Field_Type(wxCommandEvent &event)
+{
+	m_pControl->On_Field_Type(event);
+}
+
+void CVIEW_Table::On_Field_Type_UI(wxUpdateUIEvent &event)
+{
+	m_pControl->On_Field_Type_UI(event);
 }
 
 //---------------------------------------------------------

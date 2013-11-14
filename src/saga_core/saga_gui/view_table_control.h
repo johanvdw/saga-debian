@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table_control.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_table_control.h 1566 2012-12-13 13:53:35Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -111,6 +111,8 @@ public:
 	void						On_Field_Sort_UI	(wxUpdateUIEvent &event);
 	void						On_Field_Rename		(wxCommandEvent  &event);
 	void						On_Field_Rename_UI	(wxUpdateUIEvent &event);
+	void						On_Field_Type		(wxCommandEvent  &event);
+	void						On_Field_Type_UI	(wxUpdateUIEvent &event);
 
 	void						On_Record_Add		(wxCommandEvent  &event);
 	void						On_Record_Add_UI	(wxUpdateUIEvent &event);
@@ -124,6 +126,9 @@ public:
 	void						On_Sel_To_Top		(wxCommandEvent  &event);
 	void						On_Sel_To_Top_UI	(wxUpdateUIEvent &event);
 
+	void						On_Sel_Only			(wxCommandEvent  &event);
+	void						On_Sel_Only_UI		(wxUpdateUIEvent &event);
+
 	void						On_Autosize_Cols	(wxCommandEvent  &event);
 	void						On_Autosize_Rows	(wxCommandEvent  &event);
 
@@ -135,8 +140,8 @@ public:
 	void						On_LDClick_Label	(wxGridEvent &event);
 	void						On_Select			(wxGridRangeSelectEvent &event);
 
-	bool						Load				(const wxChar *File_Name);
-	bool						Save				(const wxChar *File_Name, int Format = 0);
+	bool						Load				(const wxString &File_Name);
+	bool						Save				(const wxString &File_Name, int Format = 0);
 
 	bool						Add_Record			(void);
 	bool						Ins_Record			(void);
@@ -151,7 +156,7 @@ public:
 
 private:
 
-	bool						m_bUpdating;
+	bool						m_bUpdating, m_bSelOnly;
 
 	int							m_Constraint, m_Field_Offset;
 

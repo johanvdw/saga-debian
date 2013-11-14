@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_TPS_Global.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Gridding_Spline_TPS_Global.h 1482 2012-10-08 16:15:45Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,7 +86,6 @@ class grid_spline_EXPORT CGridding_Spline_TPS_Global : public CGridding_Spline_B
 {
 public:
 	CGridding_Spline_TPS_Global(void);
-	virtual ~CGridding_Spline_TPS_Global(void);
 
 
 protected:

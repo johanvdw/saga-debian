@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Shapes2Grid.h 1130 2011-07-14 07:42:46Z reklov_w $
+ * Version $Id: Shapes2Grid.h 1390 2012-05-02 15:37:51Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -93,11 +93,12 @@ protected:
 	virtual bool				On_Execute				(void);
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:
 
-	int							m_Method_Multi, m_Method_Lines;
+	int							m_Method_Multi, m_Method_Lines, m_Method_Polygon;
 
 	double						m_Value;
 
@@ -119,6 +120,8 @@ private:
 	void						Set_Line_B				(TSG_Point a, TSG_Point b);
 
 	void						Set_Polygon				(CSG_Shape *pShape);
+	void						Set_Polygon_Node		(CSG_Shape_Polygon *pPolygon);
+	void						Set_Polygon_Cell		(CSG_Shape_Polygon *pPolygon);
 
 };
 

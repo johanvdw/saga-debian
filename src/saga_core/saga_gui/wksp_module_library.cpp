@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_library.cpp 1200 2011-10-25 15:23:04Z oconrad $
+ * Version $Id: wksp_module_library.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ CWKSP_Module_Library::CWKSP_Module_Library(CSG_Module_Library *pLibrary)
 
 		if( pModule != NULL && pModule != MLB_INTERFACE_SKIP_MODULE )
 		{
-			Add_Item(new CWKSP_Module(pModule, m_pLibrary->Get_Menu().c_str()));
+			Add_Item(new CWKSP_Module(pModule, m_pLibrary->Get_Menu().w_str()));
 		}
 	}
 }
@@ -128,23 +128,23 @@ wxString CWKSP_Module_Library::Get_Description(void)
 	wxString	s;
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("Module Library"));
+	s	+= wxString::Format(wxT("<b>%s</b>"), _TL("Module Library"));
 
 	s	+= wxT("<table border=\"0\">");
 
-	DESC_ADD_STR(LNG("Name")	, m_pLibrary->Get_Name     ().c_str());
-	DESC_ADD_STR(LNG("Author")	, m_pLibrary->Get_Author   ().c_str());
-	DESC_ADD_STR(LNG("Version")	, m_pLibrary->Get_Version  ().c_str());
-	DESC_ADD_STR(LNG("File")	, m_pLibrary->Get_File_Name().c_str());
+	DESC_ADD_STR(_TL("Name")	, m_pLibrary->Get_Name     ().c_str());
+	DESC_ADD_STR(_TL("Author")	, m_pLibrary->Get_Author   ().c_str());
+	DESC_ADD_STR(_TL("Version")	, m_pLibrary->Get_Version  ().c_str());
+	DESC_ADD_STR(_TL("File")	, m_pLibrary->Get_File_Name().c_str());
 
 	s	+= wxT("</table><hr>");
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b><br>"), LNG("Description"));
+	s	+= wxString::Format(wxT("<b>%s</b><br>"), _TL("Description"));
 
 	wxString	sDesc;
 
-	if( g_pModules->Get_Parameters()->Get_Parameter("HELP_SOURCE")->asInt() == 1 )
+	if( g_pModules->Get_Parameter("HELP_SOURCE")->asInt() == 1 )
 	{
 		sDesc	= Get_Online_Module_Description(m_pLibrary->Get_File_Name().c_str());
 	}
@@ -152,13 +152,13 @@ wxString CWKSP_Module_Library::Get_Description(void)
 	s	+= sDesc.Length() > 0 ? sDesc.c_str() : m_pLibrary->Get_Description().c_str();
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<hr><b>%s:<ul>"), LNG("[CAP] Modules"));
+	s	+= wxString::Format(wxT("<hr><b>%s:<ul>"), _TL("Modules"));
 
 	for(int iModule=0; iModule<Get_Count(); iModule++)
 	{
 		s	+= wxString::Format(wxT("<li>[%d] %s</li>"),
 				Get_Module(iModule)->Get_Module()->Get_ID(),
-				Get_Module(iModule)->Get_Module()->Get_Name()
+				Get_Module(iModule)->Get_Module()->Get_Name().w_str()
 			);
 	}
 

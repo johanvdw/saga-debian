@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_io.cpp 1054 2011-05-17 12:48:06Z oconrad $
+ * Version $Id: shapes_io.cpp 1617 2013-02-28 15:20:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@
 bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 {
 	int				Type, iField, iPart, nParts, *Parts, iPoint, nPoints;
-	double			*pZ, *pM;
+	double			*pZ	= NULL, *pM	= NULL;
 	TSG_Point		*pPoint;
 	CSG_Buffer		File_Header(100), Record_Header(8), Content;
 	CSG_File		fSHP;
@@ -87,43 +87,18 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 	//-----------------------------------------------------
 	// Open DBase File...
 
-	if( !fDBF.Open(SG_File_Make_Path(NULL, File_Name, SG_T("dbf"))) )
+	if( !fDBF.Open_Read(SG_File_Make_Path(NULL, File_Name, SG_T("dbf")), this, false) )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] DBase file could not be opened."));
+		SG_UI_Msg_Add_Error(_TL("DBase file could not be opened."));
 
 		return( false );
 	}
 
 	if( !fDBF.Move_First() || fDBF.Get_Record_Count() <= 0 )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] DBase file does not contain any records."));
+		SG_UI_Msg_Add_Error(_TL("DBase file does not contain any records."));
 
 		return( false );
-	}
-
-	for(iField=0; iField<fDBF.Get_FieldCount(); iField++)
-	{
-		switch( fDBF.Get_FieldType(iField) )
-		{
-		case DBF_FT_LOGICAL:
-			Add_Field(SG_STR_MBTOSG(fDBF.Get_FieldName(iField)), SG_DATATYPE_Char);
-			break;
-
-		case DBF_FT_CHARACTER:	default:
-			Add_Field(SG_STR_MBTOSG(fDBF.Get_FieldName(iField)), SG_DATATYPE_String);
-			break;
-
-		case DBF_FT_DATE:
-			Add_Field(SG_STR_MBTOSG(fDBF.Get_FieldName(iField)), SG_DATATYPE_Date);
-			break;
-
-		case DBF_FT_NUMERIC:
-			Add_Field(SG_STR_MBTOSG(fDBF.Get_FieldName(iField)), fDBF.Get_FieldDecimals(iField) > 0
-					? SG_DATATYPE_Double
-					: SG_DATATYPE_Long
-				);
-			break;
-		}
 	}
 
 	//-----------------------------------------------------
@@ -131,7 +106,7 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 
 	if( !fSHP.Open(SG_File_Make_Path(NULL, File_Name, SG_T("shp")), SG_FILE_R, true) )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] Shape file could not be opened."));
+		SG_UI_Msg_Add_Error(_TL("Shape file could not be opened."));
 
 		return( false );
 	}
@@ -141,21 +116,21 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 
 	if( fSHP.Read(File_Header.Get_Data(), sizeof(char), 100) != 100 )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] corrupted file header"));
+		SG_UI_Msg_Add_Error(_TL("corrupted file header"));
 
 		return( false );
 	}
 
 	if( File_Header.asInt( 0,  true) != 9994 )	// Byte 00 -> File Code 9994 (Integer Big)...
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] invalid file code"));
+		SG_UI_Msg_Add_Error(_TL("invalid file code"));
 
 		return( false );
 	}
 
 	if( File_Header.asInt(28, false) != 1000 )	// Byte 28 -> Version 1000 (Integer Little)...
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] unsupported file version"));
+		SG_UI_Msg_Add_Error(_TL("unsupported file version"));
 
 		return( false );
 	}
@@ -179,7 +154,7 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 
 	default:	// unsupported...
 	case 31:	// unsupported: MultiPatch...
-		SG_UI_Msg_Add_Error(LNG("[ERR] unsupported shape type."));
+		SG_UI_Msg_Add_Error(_TL("unsupported shape type."));
 
 		return( false );
 	}
@@ -191,14 +166,14 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 	{
 		if( fSHP.Read(Record_Header.Get_Data(0), sizeof(int), 2) != 2 )		// read record header
 		{
-			SG_UI_Msg_Add_Error(LNG("[ERR] corrupted record header"));
+			SG_UI_Msg_Add_Error(_TL("corrupted record header"));
 
 			return( false );
 		}
 
 		if( Record_Header.asInt(0, true) != iShape + 1 )					// record number
 		{
-			SG_UI_Msg_Add_Error(LNG("[ERR] corrupted shapefile."));
+			SG_UI_Msg_Add_Error(_TL("corrupted shapefile."));
 
 			return( false );
 		}
@@ -207,14 +182,14 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 
 		if( !Content.Set_Size(Length, false) )
 		{
-			SG_UI_Msg_Add_Error(LNG("[ERR] memory allocation error."));
+			SG_UI_Msg_Add_Error(_TL("memory allocation error."));
 
 			return( false );
 		}
 
 		if( fSHP.Read(Content.Get_Data(), sizeof(char), Length) != Length )
 		{
-			SG_UI_Msg_Add_Error(LNG("[ERR] corrupted shapefile."));
+			SG_UI_Msg_Add_Error(_TL("corrupted shapefile."));
 
 			return( false );
 		}
@@ -227,7 +202,7 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 			}
 			else
 			{
-				SG_UI_Msg_Add_Error(LNG("[ERR] corrupted shapefile."));
+				SG_UI_Msg_Add_Error(_TL("corrupted shapefile."));
 
 				return( false );
 			}
@@ -266,12 +241,12 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 				switch( m_Vertex_Type )	// read Z + M
 				{
 				case SG_VERTEX_TYPE_XYZ:
-					pZ	= (double *)Content.Get_Data(40 + nPoints * 16 + 16);
+					pZ	= 56 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(56 + nPoints * 16) : NULL;	// [40 + nPoints * 16 + 2 * 8] + [nPoints * 8]
 					break;
 
 				case SG_VERTEX_TYPE_XYZM:
-					pZ	= (double *)Content.Get_Data(40 + nPoints * 16 + 16);
-					pM	= pZ + nPoints + 2;
+					pZ	= 56 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(56 + nPoints * 16) : NULL;	// [40 + nPoints * 16 + 2 * 8] + [nPoints * 8]
+					pM	= 72 + nPoints * 32 <= (int)Length ? (double *)Content.Get_Data(72 + nPoints * 24) : NULL;	// [40 + nPoints * 16 + 2 * 8] + [nPoints * 8 + 2 * 8] + [nPoints * 8]
 					break;
 				}
 
@@ -280,11 +255,8 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 				{
 					pShape->Add_Point(pPoint->x, pPoint->y);
 
-					switch( m_Vertex_Type )	// read Z + M
-					{
-					case SG_VERTEX_TYPE_XYZM:	pShape->Set_M(*pM, iPoint);	pM++;
-					case SG_VERTEX_TYPE_XYZ:	pShape->Set_Z(*pZ, iPoint);	pZ++;
-					}
+					if( pZ )	{	pShape->Set_Z(*(pZ++), iPoint);	}
+					if( pM )	{	pShape->Set_M(*(pM++), iPoint);	}
 				}
 
 				break;
@@ -301,12 +273,12 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 				switch( m_Vertex_Type )	// read Z + M
 				{
 				case SG_VERTEX_TYPE_XYZ:
-					pZ	= (double *)Content.Get_Data(44 + 4 * nParts + 16 * nPoints + 16);
+					pZ	= 60 + nParts * 4 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(60 + nParts * 4 + nPoints * 16) : NULL;	// [44 + nParts * 4 + nPoints * 16 + 2 * 8] + [nPoints * 8]
 					break;
 
 				case SG_VERTEX_TYPE_XYZM:
-					pZ	= (double *)Content.Get_Data(44 + 4 * nParts + 16 * nPoints + 16);
-					pM	= pZ + nPoints + 2;
+					pZ	= 60 + nParts * 4 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(60 + nParts * 4 + nPoints * 16) : NULL;	// [44 + nParts * 4 + nPoints * 16 + 2 * 8] + [nPoints * 8]
+					pM	= 76 + nParts * 4 + nPoints * 32 <= (int)Length ? (double *)Content.Get_Data(76 + nParts * 4 + nPoints * 24) : NULL;	// [44 + nParts * 4 + nPoints * 16 + 2 * 8] + [nPoints * 8 + 2 * 8] +  [nPoints * 8]
 					break;
 				}
 
@@ -321,11 +293,8 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 
 					pShape->Add_Point(pPoint->x, pPoint->y, iPart);
 
-					switch( m_Vertex_Type )	// read Z + M
-					{
-					case SG_VERTEX_TYPE_XYZM:	pShape->Set_M(*pM, iPoint, iPart);	pM++;
-					case SG_VERTEX_TYPE_XYZ:	pShape->Set_Z(*pZ, iPoint, iPart);	pZ++;
-					}
+					if( pZ )	{	pShape->Set_Z(*(pZ++), iPoint);	}
+					if( pM )	{	pShape->Set_M(*(pM++), iPoint);	}
 				}
 
 				break;
@@ -334,39 +303,14 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 			//---------------------------------------------
 			for(iField=0; iField<Get_Field_Count(); iField++)
 			{
-				switch( Get_Field_Type(iField) )
+				switch( fDBF.Get_Field_Type(iField) )
 				{
-				case SG_DATATYPE_Char:
-					pShape->Set_Value(iField, SG_STR_MBTOSG(fDBF.asString(iField)) );
+				default:
+					pShape->Set_Value(iField, fDBF.asString(iField));
 					break;
 
-				case SG_DATATYPE_String:	default:
-					pShape->Set_Value(iField, SG_STR_MBTOSG(fDBF.asString(iField)) );
-					break;
-
-				case SG_DATATYPE_Date:
-					{
-						int		Value;
-
-						if( fDBF.asInt(iField, Value) )
-							pShape->Set_Value(iField, Value);
-						else
-							pShape->Set_NoData(iField);
-					}
-					break;
-
-				case SG_DATATYPE_Long:
-					{
-						int		Value;
-
-						if( fDBF.asInt(iField, Value) )
-							pShape->Set_Value(iField, Value);
-						else
-							pShape->Set_NoData(iField);
-					}
-					break;
-
-				case SG_DATATYPE_Double:
+				case DBF_FT_FLOAT:
+				case DBF_FT_NUMERIC:
 					{
 						double	Value;
 
@@ -409,7 +353,7 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 //---------------------------------------------------------
 bool CSG_Shapes::_Save_ESRI(const CSG_String &File_Name)
 {
-	int				Type, fSHP_Size, fSHX_Size, iField, iPart, iPoint, nPoints, nBytes;
+	int				Type, fSHP_Size, fSHX_Size, iField, iPart, iPoint, nPoints;
 	TSG_Point		Point;
 	CSG_Buffer		File_Header(100), Record_Header(8), Content;
 	CSG_File		fSHP, fSHX;
@@ -440,71 +384,24 @@ bool CSG_Shapes::_Save_ESRI(const CSG_String &File_Name)
 	//-----------------------------------------------------
 	// DBase File Access...
 
-	CSG_Table_DBase::TFieldDesc	*dbfFields	= new CSG_Table_DBase::TFieldDesc[Get_Field_Count()];
-
-	for(iField=0; iField<Get_Field_Count(); iField++)
+	if( !fDBF.Open_Write(SG_File_Make_Path(NULL, File_Name, SG_T("dbf")), this, false) )
 	{
-		strncpy(dbfFields[iField].Name, SG_STR_SGTOMB(Get_Field_Name(iField)), 11);
-
-		switch( Get_Field_Type(iField) )
-		{
-		case SG_DATATYPE_String: default:
-			dbfFields[iField].Type		= DBF_FT_CHARACTER;
-			dbfFields[iField].Width		= (BYTE)((nBytes = Get_Field_Length(iField)) > 255 ? 255 : nBytes);
-			break;
-
-		case SG_DATATYPE_Date:
-			dbfFields[iField].Type		= DBF_FT_DATE;
-			dbfFields[iField].Width		= (BYTE)8;
-			break;
-
-		case SG_DATATYPE_Char:
-			dbfFields[iField].Type		= DBF_FT_CHARACTER;
-			dbfFields[iField].Width		= (BYTE)1;
-			break;
-
-		case SG_DATATYPE_Short:
-		case SG_DATATYPE_Int:
-		case SG_DATATYPE_Long:
-		case SG_DATATYPE_Color:
-			dbfFields[iField].Type		= DBF_FT_NUMERIC;
-			dbfFields[iField].Width		= (BYTE)16;
-			dbfFields[iField].Decimals	= (BYTE)0;
-			break;
-
-		case SG_DATATYPE_Float:
-		case SG_DATATYPE_Double:
-			dbfFields[iField].Type		= DBF_FT_NUMERIC;
-			dbfFields[iField].Width		= (BYTE)16;
-			dbfFields[iField].Decimals	= (BYTE)8;
-			break;
-		}
-	}
-
-	if( !fDBF.Open(SG_File_Make_Path(NULL, File_Name, SG_T("dbf")), Get_Field_Count(), dbfFields) )
-	{
-		delete[](dbfFields);
-
-		SG_UI_Msg_Add_Error(LNG("[ERR] dbase file could not be opened"));
-
 		return( false );
 	}
-
-	delete[](dbfFields);
 
 	//-----------------------------------------------------
 	// Shape File Access...
 
 	if( !fSHX.Open(SG_File_Make_Path(NULL, File_Name, SG_T("shx")), SG_FILE_W, true) )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] index file could not be opened"));
+		SG_UI_Msg_Add_Error(_TL("index file could not be opened"));
 
 		return( false );
 	}
 
 	if( !fSHP.Open(SG_File_Make_Path(NULL, File_Name, SG_T("shp")), SG_FILE_W, true) )
 	{
-		SG_UI_Msg_Add_Error(LNG("[ERR] shape file could not be opened."));
+		SG_UI_Msg_Add_Error(_TL("shape file could not be opened."));
 
 		return( false );
 	}
@@ -695,22 +592,19 @@ bool CSG_Shapes::_Save_ESRI(const CSG_String &File_Name)
 
 		for(iField=0; iField<Get_Field_Count(); iField++)
 		{
-			switch( fDBF.Get_FieldType(iField) )
+			if( pShape->is_NoData(iField) )
 			{
-			case DBF_FT_DATE:
-			case DBF_FT_CHARACTER:
-				fDBF.Set_Value(iField, SG_STR_SGTOMB(pShape->asString(iField)));
+				fDBF.Set_NoData(iField);
+			}
+			else switch( fDBF.Get_Field_Type(iField) )
+			{
+			default:
+				fDBF.Set_Value(iField, CSG_String(pShape->asString(iField)));
 				break;
 
+			case DBF_FT_FLOAT:
 			case DBF_FT_NUMERIC:
-				if( pShape->is_NoData(iField) )
-				{
-					fDBF.Set_NoData(iField);
-				}
-				else
-				{
-					fDBF.Set_Value(iField, pShape->asDouble(iField));
-				}
+				fDBF.Set_Value(iField, pShape->asDouble(iField));
 				break;
 			}
 		}

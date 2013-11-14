@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygons_From_Lines.h 915 2011-02-15 08:43:36Z oconrad $
+ * Version $Id: Polygons_From_Lines.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ class CPolygons_From_Lines : public CSG_Module
 public:
 	CPolygons_From_Lines(void);
 
-	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:

@@ -58,29 +58,30 @@ am_saga_gui_OBJECTS = active.$(OBJEXT) active_attributes.$(OBJEXT) \
 	active_HTMLExtraInfo.$(OBJEXT) active_legend.$(OBJEXT) \
 	active_parameters.$(OBJEXT) callback.$(OBJEXT) \
 	data_source.$(OBJEXT) data_source_files.$(OBJEXT) \
-	dc_helper.$(OBJEXT) dlg_about.$(OBJEXT) \
-	dlg_about_logo.$(OBJEXT) dlg_base.$(OBJEXT) \
-	dlg_colors.$(OBJEXT) dlg_colors_control.$(OBJEXT) \
-	dlg_list_base.$(OBJEXT) dlg_list_grid.$(OBJEXT) \
-	dlg_list_pointcloud.$(OBJEXT) dlg_list_shapes.$(OBJEXT) \
-	dlg_list_table.$(OBJEXT) dlg_list_tin.$(OBJEXT) \
-	dlg_parameters.$(OBJEXT) dlg_table.$(OBJEXT) \
-	dlg_text.$(OBJEXT) helper.$(OBJEXT) info.$(OBJEXT) \
-	info_messages.$(OBJEXT) parameters_control.$(OBJEXT) \
-	parameters_properties.$(OBJEXT) project.$(OBJEXT) \
-	res_commands.$(OBJEXT) res_controls.$(OBJEXT) \
-	res_dialogs.$(OBJEXT) res_images.$(OBJEXT) saga.$(OBJEXT) \
-	saga_frame.$(OBJEXT) saga_frame_droptarget.$(OBJEXT) \
-	view_base.$(OBJEXT) view_histogram.$(OBJEXT) \
-	view_layout.$(OBJEXT) view_layout_control.$(OBJEXT) \
-	view_layout_info.$(OBJEXT) view_layout_printout.$(OBJEXT) \
-	view_map.$(OBJEXT) view_map_3d.$(OBJEXT) \
-	view_map_3d_image.$(OBJEXT) view_map_control.$(OBJEXT) \
-	view_ruler.$(OBJEXT) view_scatterplot.$(OBJEXT) \
-	view_table.$(OBJEXT) view_table_control.$(OBJEXT) \
-	view_table_diagram.$(OBJEXT) wksp.$(OBJEXT) \
-	wksp_base_control.$(OBJEXT) wksp_base_item.$(OBJEXT) \
-	wksp_base_manager.$(OBJEXT) wksp_data_control.$(OBJEXT) \
+	data_source_odbc.$(OBJEXT) dc_helper.$(OBJEXT) \
+	dlg_about.$(OBJEXT) dlg_about_logo.$(OBJEXT) \
+	dlg_base.$(OBJEXT) dlg_colors.$(OBJEXT) \
+	dlg_colors_control.$(OBJEXT) dlg_list_base.$(OBJEXT) \
+	dlg_list_grid.$(OBJEXT) dlg_list_pointcloud.$(OBJEXT) \
+	dlg_list_shapes.$(OBJEXT) dlg_list_table.$(OBJEXT) \
+	dlg_list_tin.$(OBJEXT) dlg_parameters.$(OBJEXT) \
+	dlg_table.$(OBJEXT) dlg_text.$(OBJEXT) helper.$(OBJEXT) \
+	info.$(OBJEXT) info_messages.$(OBJEXT) \
+	parameters_control.$(OBJEXT) parameters_properties.$(OBJEXT) \
+	project.$(OBJEXT) res_commands.$(OBJEXT) \
+	res_controls.$(OBJEXT) res_dialogs.$(OBJEXT) \
+	res_images.$(OBJEXT) saga.$(OBJEXT) saga_frame.$(OBJEXT) \
+	saga_frame_droptarget.$(OBJEXT) view_base.$(OBJEXT) \
+	view_histogram.$(OBJEXT) view_layout.$(OBJEXT) \
+	view_layout_control.$(OBJEXT) view_layout_info.$(OBJEXT) \
+	view_layout_printout.$(OBJEXT) view_map.$(OBJEXT) \
+	view_map_3d.$(OBJEXT) view_map_3d_image.$(OBJEXT) \
+	view_map_control.$(OBJEXT) view_ruler.$(OBJEXT) \
+	view_scatterplot.$(OBJEXT) view_table.$(OBJEXT) \
+	view_table_control.$(OBJEXT) view_table_diagram.$(OBJEXT) \
+	wksp.$(OBJEXT) wksp_base_control.$(OBJEXT) \
+	wksp_base_item.$(OBJEXT) wksp_base_manager.$(OBJEXT) \
+	wksp_data_control.$(OBJEXT) wksp_data_item.$(OBJEXT) \
 	wksp_data_layers.$(OBJEXT) wksp_data_manager.$(OBJEXT) \
 	wksp_data_menu_file.$(OBJEXT) wksp_data_menu_files.$(OBJEXT) \
 	wksp_grid.$(OBJEXT) wksp_grid_manager.$(OBJEXT) \
@@ -98,9 +99,7 @@ am_saga_gui_OBJECTS = active.$(OBJEXT) active_attributes.$(OBJEXT) \
 	wksp_shapes_points.$(OBJEXT) wksp_shapes_polygon.$(OBJEXT) \
 	wksp_shapes_type.$(OBJEXT) wksp_table.$(OBJEXT) \
 	wksp_table_manager.$(OBJEXT) wksp_tin.$(OBJEXT) \
-	wksp_tin_manager.$(OBJEXT) advprops.$(OBJEXT) \
-	editors.$(OBJEXT) extras.$(OBJEXT) manager.$(OBJEXT) \
-	odcombo.$(OBJEXT) propgrid.$(OBJEXT) props.$(OBJEXT)
+	wksp_tin_manager.$(OBJEXT)
 saga_gui_OBJECTS = $(am_saga_gui_OBJECTS)
 saga_gui_DEPENDENCIES = ../saga_api/libsaga_api.la \
 	../saga_odbc/libsaga_odbc.la
@@ -199,6 +198,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -229,7 +229,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -310,17 +309,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1119 2011-06-29 12:13:43Z oconrad $
+# $Id: Makefile.am 1648 2013-04-11 08:55:01Z oconrad $
 #
 INCS = -I.. -I.
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
-MLIBPATH = "MODULE_LIBRARY_PATH=\"$(prefix)/lib/saga\""
+MLIBPATH = "MODULE_LIBRARY_PATH=\"$(libdir)/saga\""
 MSHAREPATH = "SHARE_PATH=\"$(prefix)/share/saga\""
 BASEFLAGS = -fPIC -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_DONOTUSE_HARU -D$(MLIBPATH) -D$(MSHAREPATH) $(DBGFLAGS) $(INCS)
-@SAGA_UNICODE_FALSE@AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=no --cxxflags`
-@SAGA_UNICODE_TRUE@AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=yes --cxxflags` -D_SAGA_UNICODE
-@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs` -lm
-@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs` -lm 
+@SAGA_UNICODE_FALSE@AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=no --cxxflags` $(GOMPFLAGS)
+@SAGA_UNICODE_TRUE@AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=yes --cxxflags` -D_SAGA_UNICODE $(GOMPFLAGS)
+@SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs adv,aui,base,core,html,net,propgrid,xml`
+@SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs adv,aui,base,core,html,net,propgrid,xml`
 saga_gui_SOURCES = \
 active.cpp\
 active_attributes.cpp\
@@ -332,6 +331,7 @@ active_parameters.cpp\
 callback.cpp\
 data_source.cpp\
 data_source_files.cpp\
+data_source_odbc.cpp\
 dc_helper.cpp\
 dlg_about.cpp\
 dlg_about_logo.cpp\
@@ -380,6 +380,7 @@ wksp_base_control.cpp\
 wksp_base_item.cpp\
 wksp_base_manager.cpp\
 wksp_data_control.cpp\
+wksp_data_item.cpp\
 wksp_data_layers.cpp\
 wksp_data_manager.cpp\
 wksp_data_menu_file.cpp\
@@ -425,6 +426,7 @@ active_parameters.h\
 callback.h\
 data_source.h\
 data_source_files.h\
+data_source_odbc.h\
 dc_helper.h\
 dlg_about.h\
 dlg_about_logo.h\
@@ -473,6 +475,7 @@ wksp_base_control.h\
 wksp_base_item.h\
 wksp_base_manager.h\
 wksp_data_control.h\
+wksp_data_item.h\
 wksp_data_layers.h\
 wksp_data_manager.h\
 wksp_data_menu_file.h\
@@ -506,22 +509,7 @@ wksp_shapes_type.h\
 wksp_table.h\
 wksp_table_manager.h\
 wksp_tin.h\
-wksp_tin_manager.h\
-wx/propgrid/advprops.cpp\
-wx/propgrid/advprops.h\
-wx/propgrid/editors.cpp\
-wx/propgrid/editors.h\
-wx/propgrid/extras.cpp\
-wx/propgrid/extras.h\
-wx/propgrid/manager.cpp\
-wx/propgrid/manager.h\
-wx/propgrid/odcombo.cpp\
-wx/propgrid/odcombo.h\
-wx/propgrid/propdev.h\
-wx/propgrid/propgrid.cpp\
-wx/propgrid/propgrid.h\
-wx/propgrid/props.cpp\
-wx/propgrid/props.h
+wksp_tin_manager.h
 
 saga_gui_LDADD = ../saga_api/libsaga_api.la ../saga_odbc/libsaga_odbc.la
 SUBDIRS = man 
@@ -619,10 +607,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/active_history.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/active_legend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/active_parameters.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/advprops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/callback.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_source.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_source_files.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_source_odbc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dc_helper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlg_about.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlg_about_logo.Po@am__quote@
@@ -638,18 +626,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlg_parameters.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlg_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlg_text.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/editors.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/extras.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/info_messages.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/manager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/odcombo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parameters_control.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parameters_properties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/project.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/propgrid.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/props.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/res_commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/res_controls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/res_dialogs.Po@am__quote@
@@ -677,6 +659,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_base_item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_base_manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_data_control.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_data_item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_data_layers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_data_manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wksp_data_menu_file.Po@am__quote@
@@ -733,104 +716,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
-
-advprops.o: wx/propgrid/advprops.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT advprops.o -MD -MP -MF $(DEPDIR)/advprops.Tpo -c -o advprops.o `test -f 'wx/propgrid/advprops.cpp' || echo '$(srcdir)/'`wx/propgrid/advprops.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/advprops.Tpo $(DEPDIR)/advprops.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/advprops.cpp' object='advprops.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o advprops.o `test -f 'wx/propgrid/advprops.cpp' || echo '$(srcdir)/'`wx/propgrid/advprops.cpp
-
-advprops.obj: wx/propgrid/advprops.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT advprops.obj -MD -MP -MF $(DEPDIR)/advprops.Tpo -c -o advprops.obj `if test -f 'wx/propgrid/advprops.cpp'; then $(CYGPATH_W) 'wx/propgrid/advprops.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/advprops.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/advprops.Tpo $(DEPDIR)/advprops.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/advprops.cpp' object='advprops.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o advprops.obj `if test -f 'wx/propgrid/advprops.cpp'; then $(CYGPATH_W) 'wx/propgrid/advprops.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/advprops.cpp'; fi`
-
-editors.o: wx/propgrid/editors.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT editors.o -MD -MP -MF $(DEPDIR)/editors.Tpo -c -o editors.o `test -f 'wx/propgrid/editors.cpp' || echo '$(srcdir)/'`wx/propgrid/editors.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/editors.Tpo $(DEPDIR)/editors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/editors.cpp' object='editors.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o editors.o `test -f 'wx/propgrid/editors.cpp' || echo '$(srcdir)/'`wx/propgrid/editors.cpp
-
-editors.obj: wx/propgrid/editors.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT editors.obj -MD -MP -MF $(DEPDIR)/editors.Tpo -c -o editors.obj `if test -f 'wx/propgrid/editors.cpp'; then $(CYGPATH_W) 'wx/propgrid/editors.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/editors.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/editors.Tpo $(DEPDIR)/editors.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/editors.cpp' object='editors.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o editors.obj `if test -f 'wx/propgrid/editors.cpp'; then $(CYGPATH_W) 'wx/propgrid/editors.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/editors.cpp'; fi`
-
-extras.o: wx/propgrid/extras.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT extras.o -MD -MP -MF $(DEPDIR)/extras.Tpo -c -o extras.o `test -f 'wx/propgrid/extras.cpp' || echo '$(srcdir)/'`wx/propgrid/extras.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/extras.Tpo $(DEPDIR)/extras.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/extras.cpp' object='extras.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o extras.o `test -f 'wx/propgrid/extras.cpp' || echo '$(srcdir)/'`wx/propgrid/extras.cpp
-
-extras.obj: wx/propgrid/extras.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT extras.obj -MD -MP -MF $(DEPDIR)/extras.Tpo -c -o extras.obj `if test -f 'wx/propgrid/extras.cpp'; then $(CYGPATH_W) 'wx/propgrid/extras.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/extras.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/extras.Tpo $(DEPDIR)/extras.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/extras.cpp' object='extras.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o extras.obj `if test -f 'wx/propgrid/extras.cpp'; then $(CYGPATH_W) 'wx/propgrid/extras.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/extras.cpp'; fi`
-
-manager.o: wx/propgrid/manager.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT manager.o -MD -MP -MF $(DEPDIR)/manager.Tpo -c -o manager.o `test -f 'wx/propgrid/manager.cpp' || echo '$(srcdir)/'`wx/propgrid/manager.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/manager.Tpo $(DEPDIR)/manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/manager.cpp' object='manager.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o manager.o `test -f 'wx/propgrid/manager.cpp' || echo '$(srcdir)/'`wx/propgrid/manager.cpp
-
-manager.obj: wx/propgrid/manager.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT manager.obj -MD -MP -MF $(DEPDIR)/manager.Tpo -c -o manager.obj `if test -f 'wx/propgrid/manager.cpp'; then $(CYGPATH_W) 'wx/propgrid/manager.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/manager.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/manager.Tpo $(DEPDIR)/manager.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/manager.cpp' object='manager.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o manager.obj `if test -f 'wx/propgrid/manager.cpp'; then $(CYGPATH_W) 'wx/propgrid/manager.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/manager.cpp'; fi`
-
-odcombo.o: wx/propgrid/odcombo.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT odcombo.o -MD -MP -MF $(DEPDIR)/odcombo.Tpo -c -o odcombo.o `test -f 'wx/propgrid/odcombo.cpp' || echo '$(srcdir)/'`wx/propgrid/odcombo.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/odcombo.Tpo $(DEPDIR)/odcombo.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/odcombo.cpp' object='odcombo.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o odcombo.o `test -f 'wx/propgrid/odcombo.cpp' || echo '$(srcdir)/'`wx/propgrid/odcombo.cpp
-
-odcombo.obj: wx/propgrid/odcombo.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT odcombo.obj -MD -MP -MF $(DEPDIR)/odcombo.Tpo -c -o odcombo.obj `if test -f 'wx/propgrid/odcombo.cpp'; then $(CYGPATH_W) 'wx/propgrid/odcombo.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/odcombo.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/odcombo.Tpo $(DEPDIR)/odcombo.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/odcombo.cpp' object='odcombo.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o odcombo.obj `if test -f 'wx/propgrid/odcombo.cpp'; then $(CYGPATH_W) 'wx/propgrid/odcombo.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/odcombo.cpp'; fi`
-
-propgrid.o: wx/propgrid/propgrid.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT propgrid.o -MD -MP -MF $(DEPDIR)/propgrid.Tpo -c -o propgrid.o `test -f 'wx/propgrid/propgrid.cpp' || echo '$(srcdir)/'`wx/propgrid/propgrid.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/propgrid.Tpo $(DEPDIR)/propgrid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/propgrid.cpp' object='propgrid.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o propgrid.o `test -f 'wx/propgrid/propgrid.cpp' || echo '$(srcdir)/'`wx/propgrid/propgrid.cpp
-
-propgrid.obj: wx/propgrid/propgrid.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT propgrid.obj -MD -MP -MF $(DEPDIR)/propgrid.Tpo -c -o propgrid.obj `if test -f 'wx/propgrid/propgrid.cpp'; then $(CYGPATH_W) 'wx/propgrid/propgrid.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/propgrid.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/propgrid.Tpo $(DEPDIR)/propgrid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/propgrid.cpp' object='propgrid.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o propgrid.obj `if test -f 'wx/propgrid/propgrid.cpp'; then $(CYGPATH_W) 'wx/propgrid/propgrid.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/propgrid.cpp'; fi`
-
-props.o: wx/propgrid/props.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT props.o -MD -MP -MF $(DEPDIR)/props.Tpo -c -o props.o `test -f 'wx/propgrid/props.cpp' || echo '$(srcdir)/'`wx/propgrid/props.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/props.Tpo $(DEPDIR)/props.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/props.cpp' object='props.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o props.o `test -f 'wx/propgrid/props.cpp' || echo '$(srcdir)/'`wx/propgrid/props.cpp
-
-props.obj: wx/propgrid/props.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT props.obj -MD -MP -MF $(DEPDIR)/props.Tpo -c -o props.obj `if test -f 'wx/propgrid/props.cpp'; then $(CYGPATH_W) 'wx/propgrid/props.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/props.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/props.Tpo $(DEPDIR)/props.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='wx/propgrid/props.cpp' object='props.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o props.obj `if test -f 'wx/propgrid/props.cpp'; then $(CYGPATH_W) 'wx/propgrid/props.cpp'; else $(CYGPATH_W) '$(srcdir)/wx/propgrid/props.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

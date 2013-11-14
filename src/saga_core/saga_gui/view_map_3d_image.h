@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_3d_image.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_map_3d_image.h 1283 2012-01-02 16:01:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ public:
 	wxImage &						Get_Image				(void)	{	return( m_img );	}
 
 	void							Save					(void);
-	void							Save					(const wxChar *file, int type);
+	void							Save					(const wxString &file, int type);
 
 
 private:

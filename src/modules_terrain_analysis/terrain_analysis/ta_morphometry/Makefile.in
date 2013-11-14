@@ -77,11 +77,13 @@ libta_morphometry_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libta_morphometry_la_OBJECTS = Convergence.lo Convergence_Radius.lo \
 	Curvature_Classification.lo Hypsometry.lo MLB_Interface.lo \
-	mass_balance_index.lo Morphometry.lo ProtectionIndex.lo \
-	RealArea.lo ruggedness.lo SurfaceSpecificPoints.lo mrvbf.lo \
-	distance_gradient.lo air_flow_height.lo anisotropic_heating.lo \
-	land_surface_temperature.lo relative_heights.lo tpi.lo \
-	wind_effect.lo
+	Morphometry.lo ProtectionIndex.lo RealArea.lo \
+	SurfaceSpecificPoints.lo air_flow_height.lo \
+	anisotropic_heating.lo distance_gradient.lo \
+	fuzzy_landform_elements.lo land_surface_temperature.lo \
+	mass_balance_index.lo mrvbf.lo param_scale.lo \
+	relative_heights.lo ruggedness.lo tc_iwahashi_pike.lo \
+	top_hat.lo tpi.lo wind_effect.lo
 libta_morphometry_la_OBJECTS = $(am_libta_morphometry_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -140,6 +142,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -170,7 +173,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -251,13 +253,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1107 2011-06-21 14:21:10Z oconrad $
+# $Id: Makefile.am 1619 2013-03-05 16:07:00Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libta_morphometry.la
 libta_morphometry_la_SOURCES = \
@@ -266,18 +268,22 @@ Convergence_Radius.cpp\
 Curvature_Classification.cpp\
 Hypsometry.cpp\
 MLB_Interface.cpp\
-mass_balance_index.cpp\
 Morphometry.cpp\
 ProtectionIndex.cpp\
 RealArea.cpp\
-ruggedness.cpp\
 SurfaceSpecificPoints.cpp\
-mrvbf.cpp\
-distance_gradient.cpp\
 air_flow_height.cpp\
 anisotropic_heating.cpp\
+distance_gradient.cpp\
+fuzzy_landform_elements.cpp\
 land_surface_temperature.cpp\
+mass_balance_index.cpp\
+mrvbf.cpp\
+param_scale.cpp\
 relative_heights.cpp\
+ruggedness.cpp\
+tc_iwahashi_pike.cpp\
+top_hat.cpp\
 tpi.cpp\
 wind_effect.cpp\
 Convergence.h\
@@ -285,18 +291,22 @@ Convergence_Radius.h\
 Curvature_Classification.h\
 Hypsometry.h\
 MLB_Interface.h\
-mass_balance_index.h\
 Morphometry.h\
 ProtectionIndex.h\
 RealArea.h\
-ruggedness.h\
 SurfaceSpecificPoints.h\
-mrvbf.h\
-distance_gradient.h\
 air_flow_height.h\
 anisotropic_heating.h\
+distance_gradient.h\
+fuzzy_landform_elements.h\
 land_surface_temperature.h\
+mass_balance_index.h\
+mrvbf.h\
+param_scale.h\
 relative_heights.h\
+ruggedness.h\
+tc_iwahashi_pike.h\
+top_hat.h\
 tpi.h\
 wind_effect.h
 
@@ -387,11 +397,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/air_flow_height.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/anisotropic_heating.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/distance_gradient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fuzzy_landform_elements.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/land_surface_temperature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mass_balance_index.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrvbf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/param_scale.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relative_heights.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ruggedness.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_iwahashi_pike.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/top_hat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wind_effect.Plo@am__quote@
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gw_regression.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: gw_regression.h 1549 2012-11-29 16:38:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,17 +78,20 @@ class CGW_Regression : public CSG_Module
 public:
 	CGW_Regression(void);
 
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:GWR") );	}
+
 
 protected:
 
 	virtual bool				On_Execute				(void);
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:
 
-	int							m_iDependent, m_iPredictor, m_nPoints_Min, m_nPoints_Max, m_Mode;
+	int							m_iDependent, m_iPredictor, m_nPoints_Min, m_nPoints_Max, m_Direction;
 
 	double						m_Radius;
 

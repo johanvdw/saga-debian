@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: info_messages.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: info_messages.cpp 1454 2012-07-31 10:25:12Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -101,8 +101,6 @@ CINFO_Messages::CINFO_Messages(wxWindow *pParent)
 	: wxTextCtrl(pParent, ID_WND_INFO_MESSAGES, wxT(""), wxDefaultPosition, wxDefaultSize, wxTE_RICH2|wxTE_NOHIDESEL|wxTE_MULTILINE|wxTE_READONLY|wxSUNKEN_BORDER)
 {
 	m_MaxLength	= 0x10000;
-
-	SetMaxLength(m_MaxLength);
 }
 
 //---------------------------------------------------------
@@ -122,8 +120,8 @@ void CINFO_Messages::On_Context_Menu(wxContextMenuEvent &event)
 {
 	wxMenu	Menu;
 
-	Menu.Append(ID_CMD_INFO_COPY		, LNG("Copy"));
-	Menu.Append(ID_CMD_INFO_CLEAR		, LNG("Clear"));
+	Menu.Append(ID_CMD_INFO_COPY		, _TL("Copy"));
+	Menu.Append(ID_CMD_INFO_CLEAR		, _TL("Clear"));
 
 	PopupMenu(&Menu);
 }
@@ -179,7 +177,7 @@ void CINFO_Messages::_Set_Style(TSG_UI_MSG_STYLE Style)
 {
 	int			i	= 0;
 	wxColour	c	= wxColour(  0,   0,   0);
-	wxFont		f	= wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	wxFont		f	= wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	wxTextAttr	t;
 
 	switch( Style )
@@ -206,19 +204,19 @@ void CINFO_Messages::_Set_Style(TSG_UI_MSG_STYLE Style)
 
 	case SG_UI_MSG_STYLE_BIG:
 		f.SetWeight(wxFONTWEIGHT_BOLD);
-		f.SetPointSize(10);
+		f.SetPointSize(12);
 		break;
 
 	case SG_UI_MSG_STYLE_SMALL:
 		f.SetWeight(wxFONTWEIGHT_LIGHT);
-		f.SetPointSize(6);
+		f.SetPointSize(8);
 		break;
 
 	case SG_UI_MSG_STYLE_01:
 		i	= 50;
 		c	= wxColour(  0,   0, 127);
 		f.SetWeight(wxFONTWEIGHT_LIGHT);
-		f.SetPointSize(8);
+		f.SetPointSize(10);
 		break;
 
 	case SG_UI_MSG_STYLE_02:

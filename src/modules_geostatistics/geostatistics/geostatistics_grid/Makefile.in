@@ -76,9 +76,9 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libgeostatistics_grid_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libgeostatistics_grid_la_OBJECTS = fast_representativeness.lo \
-	grid_autocorrelation.lo multiband_variation.lo grid_pca.lo \
-	GSGrid_Directional_Statistics.lo GSGrid_Residuals.lo \
-	GSGrid_Statistics.lo GSGrid_Variance.lo \
+	grid_autocorrelation.lo grid_latlon_statistics.lo grid_pca.lo \
+	multiband_variation.lo GSGrid_Directional_Statistics.lo \
+	GSGrid_Residuals.lo GSGrid_Statistics.lo GSGrid_Variance.lo \
 	GSGrid_Variance_Radius.lo GSGrid_Zonal_Statistics.lo \
 	MLB_Interface.lo
 libgeostatistics_grid_la_OBJECTS =  \
@@ -140,6 +140,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -170,7 +171,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -251,20 +251,21 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1554 2012-12-05 18:29:04Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgeostatistics_grid.la
 libgeostatistics_grid_la_SOURCES = \
 fast_representativeness.cpp\
 grid_autocorrelation.cpp\
-multiband_variation.cpp\
+grid_latlon_statistics.cpp\
 grid_pca.cpp\
+multiband_variation.cpp\
 GSGrid_Directional_Statistics.cpp\
 GSGrid_Residuals.cpp\
 GSGrid_Statistics.cpp\
@@ -273,9 +274,10 @@ GSGrid_Variance_Radius.cpp\
 GSGrid_Zonal_Statistics.cpp\
 MLB_Interface.cpp\
 fast_representativeness.h\
-multiband_variation.h\
 grid_autocorrelation.h\
+grid_latlon_statistics.h\
 grid_pca.h\
+multiband_variation.h\
 GSGrid_Directional_Statistics.h\
 GSGrid_Residuals.h\
 GSGrid_Statistics.h\
@@ -368,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fast_representativeness.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_autocorrelation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_latlon_statistics.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_pca.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multiband_variation.Plo@am__quote@
 

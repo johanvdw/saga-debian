@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: land_surface_temperature.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: land_surface_temperature.h 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,12 +79,13 @@ class CLand_Surface_Temperature : public CSG_Module_Grid
 {
 public:
 	CLand_Surface_Temperature(void);
-	virtual ~CLand_Surface_Temperature(void);
+
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Terrain Analysis|Climate and Weather" ));	}
 
 
 protected:
 
-	virtual bool				On_Execute			(void);
+	virtual bool			On_Execute		(void);
 
 
 private:

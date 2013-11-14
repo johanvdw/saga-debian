@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp.h 1283 2012-01-02 16:01:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ public:
 	class CWKSP_Map_Buttons *		Get_Maps_Buttons		(void)	{	return( m_pMaps_Buttons );	}
 
 	bool							Open					(void);
-	bool							Open					(const wxChar *File_Name);
+	bool							Open					(const wxString &File_Name);
 
 
 private:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module.cpp 1003 2011-04-19 10:21:49Z oconrad $
+ * Version $Id: wksp_module.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,51 +96,41 @@ CWKSP_Module	*g_pModule	= NULL;
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CWKSP_Module::CWKSP_Module(CSG_Module *pModule, const wxChar *Menu_Path_default)
+CWKSP_Module::CWKSP_Module(CSG_Module *pModule, const wxString &Menu_Library)
 {
-	m_pModule		= pModule;
-
-	m_Menu_ID		= -1;
+	m_pModule	= pModule;
+	m_Menu_ID	= -1;
+	m_Menu_Path	.Clear();
 
 	//-----------------------------------------------------
-	bool		bLibrary, bModule;
-	const wxChar	*sModule	= m_pModule->Get_MenuPath();
+	wxString	Menu_Module	= m_pModule->Get_MenuPath().w_str();
 
-	m_Menu_Path.Empty();
-
-	if( sModule && *sModule && *(sModule + 1) == wxT(':') )
+	if( Menu_Module.Length() > 2 && Menu_Module[1] == ':' )
 	{
-		if( *sModule == wxT('A') || *sModule == wxT('a') )
+		if( Menu_Module[0] == 'A' || Menu_Module[0] == 'a' )		// absolute menu path, overwrites library's default menu path
 		{
-			sModule	+= 2;
-
-			if( *sModule )
-			{
-				m_Menu_Path.Printf(wxT("%s"), sModule);
-			}
+			m_Menu_Path.Printf(wxT("%s"), Menu_Module.AfterFirst(':'));
 		}
-		else
+		else //if( Menu_Module[0] == 'R' || Menu_Module[0] == 'r' )	// menu path explicitly declared as relative to library's default menu path
 		{
-			sModule	+= 2;
+			Menu_Module	= Menu_Module.AfterFirst(':');
 		}
 	}
 
-	if( m_Menu_Path.Length() == 0 )	// Menu path is relative to default menu path...
+	//-----------------------------------------------------
+	if( m_Menu_Path.Length() == 0 )	// menu path is relative to library's default menu
 	{
-		bLibrary	= Menu_Path_default	&& *Menu_Path_default;
-		bModule		= sModule			&& *sModule;
-
-		if( bLibrary && bModule )
+		if( Menu_Library.Length() > 0 && Menu_Module.Length() > 0 )
 		{
-			m_Menu_Path.Printf(wxT("%s|%s"), Menu_Path_default, sModule);
+			m_Menu_Path.Printf(wxT("%s|%s"), Menu_Library, Menu_Module);
 		}
-		else if( bLibrary )
+		else if( Menu_Library.Length() > 0 )
 		{
-			m_Menu_Path.Printf(wxT("%s"), Menu_Path_default);
+			m_Menu_Path.Printf(wxT("%s"), Menu_Library);
 		}
-		else if( bModule )
+		else if( Menu_Module.Length() > 0 )
 		{
-			m_Menu_Path.Printf(wxT("%s"), sModule);
+			m_Menu_Path.Printf(wxT("%s"), Menu_Module);
 		}
 	}
 }
@@ -173,8 +163,8 @@ CWKSP_Module::~CWKSP_Module(void)
 wxString CWKSP_Module::Get_Name(void)
 {
 	return( m_pModule->is_Interactive()
-		? wxString::Format(wxT("%s [%s]"), m_pModule->Get_Name(), LNG("interactive"))
-		: wxString::Format(wxT("%s")     , m_pModule->Get_Name())
+		? wxString::Format(wxT("%s [%s]"), m_pModule->Get_Name().c_str(), _TL("interactive"))
+		: wxString::Format(wxT("%s")     , m_pModule->Get_Name().c_str())
 	);
 }
 
@@ -187,130 +177,14 @@ void CWKSP_Module::Set_File_Name(const wxString &File_Name)
 //---------------------------------------------------------
 wxString CWKSP_Module::Get_Description(void)
 {
-	wxString	s;
+	wxString	Description;
 
-	//-----------------------------------------------------
-	wxString	sMenu(m_Menu_Path);	sMenu.Replace(wxT("|"), wxT(" <b>></b> "));
-
-	wxString	sType(m_pModule->is_Grid() ? LNG("Grid") : LNG("Base"));	if( m_pModule->is_Interactive() )	sType	+= LNG("Interactive");
-
-	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("Module"));
-
-	s	+= wxT("<table border=\"0\">");
-
-	DESC_ADD_STR(LNG("Name")		, m_pModule->Get_Name());
-	DESC_ADD_INT(LNG("ID")			, m_pModule->Get_ID());
-	DESC_ADD_STR(LNG("Author")		, m_pModule->Get_Author());
-	DESC_ADD_STR(LNG("Menu")		, sMenu.c_str());
-	DESC_ADD_STR(LNG("Type")		, sType.c_str());
-
-	s	+= wxT("</table><hr>");
-
-	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b><br>"), LNG("Description"));
-
-	wxString	sDesc;
-
-	if( g_pModules->Get_Parameters()->Get_Parameter("HELP_SOURCE")->asInt() == 1 )
+	if( g_pModules->Get_Parameter("HELP_SOURCE")->asInt() == 1 )
 	{
-		sDesc	= Get_Online_Module_Description(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), Get_Module()->Get_ID());
+		Description	= Get_Online_Module_Description(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), Get_Module()->Get_ID());
 	}
 
-	s	+= sDesc.Length() > 0 ? sDesc.c_str() : m_pModule->Get_Description();
-
-	//-----------------------------------------------------
-	if( 1 )
-	{
-		bool	bFirst, bOptionals	= false;
-		int		i;
-
-		s	+= wxString::Format(wxT("<hr><b>%s</b><br>"), LNG("Parameters"));
-		s	+= wxString::Format(wxT("<table border=\"1\" width=\"100%%\" valign=\"top\" cellpadding=\"5\" rules=\"all\"><tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>\n"),
-				LNG("Name"), LNG("Type"), LNG("Identifier"), LNG("Description"), LNG("Constraints")
-			);
-
-		for(i=0, bFirst=true; i<m_pModule->Get_Parameters()->Get_Count(); i++)
-		{
-			CSG_Parameter	*pParameter	= m_pModule->Get_Parameters()->Get_Parameter(i);
-
-			if( pParameter->is_Input() )
-			{
-				if( bFirst )
-				{
-					bFirst	= false;
-					s	+= wxString::Format(wxT("<tr><th colspan=\"5\">%s</th></tr>"), LNG("Input"));
-				}
-
-				s	+= wxString::Format(wxT("<tr><td>%s%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"),
-					pParameter->Get_Name(),
-					pParameter->is_Optional() ? wxT(" (*)") : wxT(" "),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_TYPE).c_str(),
-					pParameter->Get_Identifier(),
-					pParameter->Get_Description(),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_PROPERTIES).c_str()
-				);
-			}
-		}
-
-		for(i=0, bFirst=true; i<m_pModule->Get_Parameters()->Get_Count(); i++)
-		{
-			CSG_Parameter	*pParameter	= m_pModule->Get_Parameters()->Get_Parameter(i);
-
-			if( pParameter->is_Output() )
-			{
-				if( bFirst )
-				{
-					bFirst	= false;
-					s	+= wxString::Format(wxT("<tr><th colspan=\"5\">%s</th></tr>"), LNG("Output"));
-				}
-
-				s	+= wxString::Format(wxT("<tr><td>%s%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"),
-					pParameter->Get_Name(),
-					pParameter->is_Optional() ? wxT(" (*)") : wxT(""),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_TYPE).c_str(),
-					pParameter->Get_Identifier(),
-					pParameter->Get_Description(),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_PROPERTIES).c_str()
-				);
-			}
-		}
-
-		for(i=0, bFirst=true; i<m_pModule->Get_Parameters()->Get_Count(); i++)
-		{
-			CSG_Parameter	*pParameter	= m_pModule->Get_Parameters()->Get_Parameter(i);
-
-			if( pParameter->is_Option() && pParameter->Get_Type() != PARAMETER_TYPE_Grid_System )
-			{
-				if( bFirst )
-				{
-					bFirst	= false;
-					s	+= wxString::Format(wxT("<tr><th colspan=\"5\">%s</th></tr>"), LNG("Options"));
-				}
-
-				s	+= wxString::Format(wxT("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"),
-					pParameter->Get_Name(),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_TYPE).c_str(),
-					pParameter->Get_Identifier(),
-					pParameter->Get_Description(),
-					pParameter->Get_Description(PARAMETER_DESCRIPTION_PROPERTIES).c_str()
-				);
-			}
-			else if( pParameter->is_Optional() )
-			{
-				bOptionals	= true;
-			}
-		}
-
-		s	+= wxT("</table>");
-
-		if( bOptionals )
-		{
-			s	+= wxString::Format(wxT("(*) <i>%s</i>"), LNG("optional"));
-		}
-	}
-
-	return( s );
+	return( m_pModule->Get_Summary(true, &m_Menu_Path, &Description).c_str() );
 }
 
 //---------------------------------------------------------
@@ -320,7 +194,7 @@ wxMenu * CWKSP_Module::Get_Menu(void)
 
 	pMenu	= new wxMenu(Get_Name());
 
-	pMenu->AppendCheckItem(Get_Menu_ID(), LNG("[CMD] Execute"), LNG("[HLP] Execute Module"));
+	pMenu->AppendCheckItem(Get_Menu_ID(), _TL("Execute"), _TL("Execute Module"));
 
 	pMenu->AppendSeparator();
 
@@ -374,17 +248,17 @@ void CWKSP_Module::_Save_Script(void)
 {
 	wxString	FileName;
 
-	if( DLG_Save(FileName, LNG("[CAP] Create Script Command File"), SG_T("DOS Batch Script (*.bat)|*.bat|Python Script (*.py)|*.py")) )
+	if( DLG_Save(FileName, _TL("Create Script Command File"), SG_T("DOS Batch Script (*.bat)|*.bat|Python Script (*.py)|*.py")) )
 	{
 		CSG_File	File;
 		CSG_String	Command;
 
-		if(      SG_File_Cmp_Extension(FileName.c_str(), SG_T("bat")) )
+		if(      SG_File_Cmp_Extension(FileName, SG_T("bat")) )
 		{
 			Command	+= SG_T("@ECHO OFF\n\n");
 
-			Command	+= SG_T("REM SET SAGA_MLB = C:\\SAGA\\Modules\n");
-			Command	+= SG_T("REM SET PATH = %PATH%;C:\\SAGA\n\n");
+			Command	+= SG_T("REM SET SAGA_MLB=C:\\SAGA\\Modules\n");
+			Command	+= SG_T("REM SET PATH=%PATH%;C:\\SAGA\n\n");
 
 			Command	+= SG_T("saga_cmd ");
 
@@ -403,7 +277,7 @@ void CWKSP_Module::_Save_Script(void)
 
 			Command	+= SG_T("\n\nPAUSE\n");
 		}
-		else if( SG_File_Cmp_Extension(FileName.c_str(), SG_T("py" )) )
+		else if( SG_File_Cmp_Extension(FileName, SG_T("py" )) )
 		{
 			Command	+= SG_T("# Python script template for SAGA module execution (automatically created, experimental)\n\n");
 			Command	+= SG_T("import saga_api, sys, os\n");
@@ -413,7 +287,7 @@ void CWKSP_Module::_Save_Script(void)
 			Command	+= SG_T("\n");
 			Command	+= SG_T("    Library = saga_api.CSG_Module_Library()\n");
 			Command	+= SG_T("    if Library.Create(saga_api.CSG_String('");
-			Command	+= ((CWKSP_Module_Library *)Get_Manager())->Get_File_Name();
+			Command	+= ((CWKSP_Module_Library *)Get_Manager())->Get_File_Name().wc_str();
 			Command	+= SG_T("')) == 0:\n");
 			Command	+= SG_T("        print 'unable to load SAGA module library'\n");
 			Command	+= SG_T("        return 0\n");
@@ -422,11 +296,11 @@ void CWKSP_Module::_Save_Script(void)
 			switch( m_pModule->Get_Type() )
 			{
 			default:
-				Command	+= CSG_String::Format(SG_T("    Module = Library.Get_Module('%s')\n")		, m_pModule->Get_Name());
+				Command	+= CSG_String::Format(SG_T("    Module = Library.Get_Module('%s')\n")		, m_pModule->Get_Name().c_str());
 				break;
 
 			case MODULE_TYPE_Grid:
-				Command	+= CSG_String::Format(SG_T("    Module = Library.Get_Module_Grid('%s')\n")	, m_pModule->Get_Name());
+				Command	+= CSG_String::Format(SG_T("    Module = Library.Get_Module_Grid('%s')\n")	, m_pModule->Get_Name().c_str());
 				Command	+= SG_T("    Module.Get_System().Assign(in__grid.Get_System())\n");
 				break;
 			}
@@ -465,7 +339,7 @@ void CWKSP_Module::_Save_Script(void)
 			Command	+= SG_T("            shapes_out.Save(saga_api.CSG_String(sys.argv[4]))\n");
 		}
 
-		if( File.Open(FileName.c_str(), SG_FILE_W, false) && Command.Length() > 0 )
+		if( File.Open(&FileName, SG_FILE_W, false) && Command.Length() > 0 )
 		{
 			File.Write(Command);
 		}
@@ -473,11 +347,11 @@ void CWKSP_Module::_Save_Script(void)
 }
 
 //---------------------------------------------------------
-#define GET_ID1(p)		(p->Get_Owner()->Get_Identifier() && *(p->Get_Owner()->Get_Identifier()) \
-						? wxString::Format(wxT("%s_%s"), p->Get_Owner()->Get_Identifier(), p->Get_Identifier()) \
-						: wxString::Format(p->Get_Identifier())).c_str()
+#define GET_ID1(p)		(p->Get_Owner()->Get_Identifier().Length() > 0 \
+						? CSG_String::Format(SG_T("%s_%s"), p->Get_Owner()->Get_Identifier().c_str(), p->Get_Identifier()) \
+						: CSG_String::Format(p->Get_Identifier())).c_str()
 
-#define GET_ID2(p, s)	wxString::Format(wxT("%s_%s"), GET_ID1(p), s).c_str()
+#define GET_ID2(p, s)	CSG_String::Format(SG_T("%s_%s"), GET_ID1(p), s).c_str()
 
 //---------------------------------------------------------
 void CWKSP_Module::_Save_Script_CMD(CSG_String &Command, CSG_Parameters *pParameters)
@@ -502,14 +376,19 @@ void CWKSP_Module::_Save_Script_CMD(CSG_String &Command, CSG_Parameters *pParame
 			Command	+= CSG_String::Format(SG_T(" -%s=%d"), GET_ID1(p), p->asInt());
 			break;
 
+		case PARAMETER_TYPE_Table_Fields:
+			if( p->asString() != '\0' )
+				Command	+= CSG_String::Format(SG_T(" -%s=%s"), GET_ID1(p), p->asString());
+			break;
+
 		case PARAMETER_TYPE_Double:
 		case PARAMETER_TYPE_Degree:
 			Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID1(p), p->asDouble());
 			break;
 
 		case PARAMETER_TYPE_Range:
-			Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, "MIN"), p->asRange()->Get_LoVal());
-			Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, "MAX"), p->asRange()->Get_HiVal());
+			Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, SG_T("MIN")), p->asRange()->Get_LoVal());
+			Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, SG_T("MAX")), p->asRange()->Get_HiVal());
 			break;
 
 		case PARAMETER_TYPE_String:
@@ -525,11 +404,11 @@ void CWKSP_Module::_Save_Script_CMD(CSG_String &Command, CSG_Parameters *pParame
 		case PARAMETER_TYPE_Grid_System:
 			if( p->Get_Children_Count() == 0 )
 			{
-				Command	+= CSG_String::Format(SG_T(" -%s=%d"), GET_ID2(p, "NX"), p->asGrid_System()->Get_NX());
-				Command	+= CSG_String::Format(SG_T(" -%s=%d"), GET_ID2(p, "NY"), p->asGrid_System()->Get_NY());
-				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p,  "X"), p->asGrid_System()->Get_XMin());
-				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p,  "Y"), p->asGrid_System()->Get_YMin());
-				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p,  "D"), p->asGrid_System()->Get_Cellsize());
+				Command	+= CSG_String::Format(SG_T(" -%s=%d"), GET_ID2(p, SG_T("NX")), p->asGrid_System()->Get_NX());
+				Command	+= CSG_String::Format(SG_T(" -%s=%d"), GET_ID2(p, SG_T("NY")), p->asGrid_System()->Get_NY());
+				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, SG_T( "X")), p->asGrid_System()->Get_XMin());
+				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, SG_T( "Y")), p->asGrid_System()->Get_YMin());
+				Command	+= CSG_String::Format(SG_T(" -%s=%f"), GET_ID2(p, SG_T( "D")), p->asGrid_System()->Get_Cellsize());
 			}
 			break;
 
@@ -556,12 +435,14 @@ void CWKSP_Module::_Save_Script_CMD(CSG_String &Command, CSG_Parameters *pParame
 				}
 				else
 				{
-					Command	+= p->asList()->asDataObject(0)->Get_File_Name(true);
+					Command	+= SG_File_Exists(p->asList()->asDataObject(0)->Get_File_Name())
+							 ? p->asList()->asDataObject(0)->Get_File_Name() : _TL("memory");
 
 					for(int iObject=1; iObject<p->asList()->Get_Count(); iObject++)
 					{
 						Command	+= SG_T(";");
-						Command	+= p->asList()->asDataObject(iObject)->Get_File_Name(true);
+						Command	+= SG_File_Exists(p->asList()->asDataObject(iObject)->Get_File_Name())
+								 ? p->asList()->asDataObject(iObject)->Get_File_Name() : _TL("memory");
 					}
 				}
 			}
@@ -590,6 +471,10 @@ void CWKSP_Module::_Save_Script_Python(CSG_String &Command, CSG_Parameters *pPar
 		case PARAMETER_TYPE_Choice:
 		case PARAMETER_TYPE_Table_Field:
 			Command	+= CSG_String::Format(SG_T("    Parms('%s').Set_Value(%d)\n"), p->Get_Identifier(), p->asInt());
+			break;
+
+		case PARAMETER_TYPE_Table_Fields:
+			Command	+= CSG_String::Format(SG_T("    Parms('%s').Set_Value(%s)\n"), p->Get_Identifier(), p->asString());
 			break;
 
 		case PARAMETER_TYPE_Double:
@@ -707,7 +592,7 @@ bool CWKSP_Module::is_Executing(void)
 							MSG_Execution_Add(s, true, true);
 
 #define MSG_ADD2(b, s1, s2)	MSG_General_Add  (b ? s1 : s2, true, true, b ? SG_UI_MSG_STYLE_SUCCESS : SG_UI_MSG_STYLE_FAILURE);\
-								MSG_Execution_Add(b ? s1 : s2, true, true, b ? SG_UI_MSG_STYLE_SUCCESS : SG_UI_MSG_STYLE_FAILURE);
+							MSG_Execution_Add(b ? s1 : s2, true, true, b ? SG_UI_MSG_STYLE_SUCCESS : SG_UI_MSG_STYLE_FAILURE);
 
 //---------------------------------------------------------
 bool CWKSP_Module::Execute(bool bDialog)
@@ -721,14 +606,14 @@ bool CWKSP_Module::Execute(bool bDialog)
 		{
 			if( g_pModule->is_Executing() )
 			{
-				if( !bDialog || DLG_Message_Confirm(LNG("[MSG] Shall execution be stopped?"), LNG("[CAP] Module Execution")) )
+				if( !bDialog || DLG_Message_Confirm(_TL("Shall execution be stopped?"), _TL("Module Execution")) )
 				{
 					PROCESS_Set_Okay(false);
 				}
 			}
 			else if( m_pModule->is_Interactive() )
 			{
-				if( !bDialog || DLG_Message_Confirm(LNG("[MSG] Shall execution be stopped?"), LNG("[CAP] Module Execution")) )
+				if( !bDialog || DLG_Message_Confirm(_TL("Shall execution be stopped?"), _TL("Module Execution")) )
 				{
 					bResult		= ((CSG_Module_Interactive *)m_pModule)->Execute_Finish();
 					g_pModule	= NULL;
@@ -736,15 +621,15 @@ bool CWKSP_Module::Execute(bool bDialog)
 					PROCESS_Set_Okay(true);
 
 					MSG_ADD2(bResult,
-						LNG("[MSG] Interactive module execution has been stopped"),
-						LNG("[MSG] Interactive module execution failed")
+						_TL("Interactive module execution has been stopped"),
+						_TL("Interactive module execution failed")
 					);
 				}
 			}
 		}
 		else
 		{
-			DLG_Message_Show(LNG("[ERR] Can't execute a module while another runs"), LNG("[CAP] Module Execution"));
+			DLG_Message_Show(_TL("Can't execute a module while another runs"), _TL("Module Execution"));
 		}
 	}
 
@@ -755,20 +640,13 @@ bool CWKSP_Module::Execute(bool bDialog)
 
 		if( m_pModule->On_Before_Execution() && (!bDialog || DLG_Parameters(m_pModule->Get_Parameters())) )
 		{
-			g_pModules->Get_Modules_Menu()->Set_Recent(this);
-
-			g_pData->Check_Parameters(m_pModule->Get_Parameters());
-
-			for(int i=0; i<m_pModule->Get_Parameters_Count(); i++)
-			{
-				g_pData->Check_Parameters(m_pModule->Get_Parameters(i));
-			}
+			g_pModules->Get_Menu_Modules()->Set_Recent(this);
 
 			MSG_General_Add_Line();
 			MSG_Execution_Add_Line();
-			MSG_ADD(wxString::Format(wxT("%s: %s"), LNG("[MSG] Executing module"), m_pModule->Get_Name()));
+			MSG_ADD(wxString::Format(wxT("%s: %s"), _TL("Executing module"), m_pModule->Get_Name().c_str()));
 
-			STATUSBAR_Set_Text(m_pModule->Get_Name());
+			STATUSBAR_Set_Text(m_pModule->Get_Name().w_str());
 
 			bResult		= m_pModule->Execute();
 
@@ -777,15 +655,15 @@ bool CWKSP_Module::Execute(bool bDialog)
 			if( m_pModule->is_Interactive() )
 			{
 				MSG_ADD2(bResult,
-					LNG("[MSG] Interactive module execution has been started"),
-					LNG("[MSG] Interactive module execution failed")
+					_TL("Interactive module execution has been started"),
+					_TL("Interactive module execution failed")
 				);
 			}
 			else
 			{
 				MSG_ADD2(bResult,
-					LNG("[MSG] Module execution succeeded"),
-					LNG("[MSG] Module execution failed")
+					_TL("Module execution succeeded"),
+					_TL("Module execution failed")
 				);
 			}
 
@@ -805,16 +683,12 @@ bool CWKSP_Module::Execute(bool bDialog)
 //---------------------------------------------------------
 bool CWKSP_Module::Execute(CSG_Point ptWorld, TSG_Module_Interactive_Mode Mode, int Keys)
 {
-	bool	bResult	= false;
-
-	if( g_pModule == this && m_pModule->is_Interactive() && !m_pModule->is_Executing() )
+	if( g_pModule == this && m_pModule->is_Interactive() )
 	{
-		bResult	= ((CSG_Module_Interactive *)m_pModule)->Execute_Position(ptWorld, Mode, Keys);
-
-		PROCESS_Set_Okay();
+		return( ((CSG_Module_Interactive *)m_pModule)->Execute_Position(ptWorld, Mode, Keys) );
 	}
 
-	return( bResult );
+	return( false );
 }
 
 

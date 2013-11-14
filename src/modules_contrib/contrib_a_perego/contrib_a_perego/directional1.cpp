@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: directional1.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: directional1.cpp 1514 2012-11-06 09:47:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@
 Cdirectional1::Cdirectional1(void)
 {
 	// 1. Info...
-	Set_Name(_TL("Directional Average 1"));
+	Set_Name(_TL("Directional Average"));
 	Set_Author(_TL("Alessandro Perego"));
 	Set_Description(_TL("directional1 average for Grids"));
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: point_multi_grid_regression.h 1160 2011-09-14 15:11:54Z oconrad $
+ * Version $Id: point_multi_grid_regression.h 1349 2012-03-12 16:17:35Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -83,7 +83,9 @@ public:
 
 protected:
 
-	virtual bool				On_Execute			(void);
+	virtual bool				On_Execute				(void);
+
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:

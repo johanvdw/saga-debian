@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_shed.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_shed.h 1446 2012-07-12 13:10:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,7 +79,6 @@ class CView_Shed : public CSG_Module_Grid
 {
 public:
 	CView_Shed(void);
-	virtual ~CView_Shed(void);
 
 
 protected:
@@ -89,13 +88,11 @@ protected:
 
 private:
 
-	int						m_Method, m_MaxLevel;
+	int						m_Method, m_nLevels;
 
-	double					m_MaxRadius;
+	double					m_Radius;
 
 	CSG_Points_Z			m_Direction;
-
-	CSG_Vector				m_Angles;
 
 	CSG_Grid				*m_pDEM;
 
@@ -104,11 +101,11 @@ private:
 
 	bool					Initialise				(int nDirections);
 
-	bool					Get_Angles_Multi_Scale	(int x, int y);
-	bool					Get_Angles_Sectoral		(int x, int y);
-	double					Get_Angle_Sectoral		(int x, int y, double dx, double dy);
+	bool					Get_Angles_Multi_Scale	(int x, int y, CSG_Vector &Angles, CSG_Vector &Distances);
+	bool					Get_Angles_Sectoral		(int x, int y, CSG_Vector &Angles, CSG_Vector &Distances);
+	void					Get_Angle_Sectoral		(int x, int y, int i, double &Angle, double &Distance);
 
-	bool					Get_View_Shed			(int x, int y, double &Sky_Visible, double &Sky_Factor, double &Sky_Simple, double &Sky_Terrain);
+	bool					Get_View_Shed			(int x, int y, double &Sky_Visible, double &Sky_Factor, double &Sky_Simple, double &Sky_Terrain, double &Distance);
 
 };
 

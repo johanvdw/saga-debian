@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Fuzzify.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Fuzzify.cpp 1318 2012-01-26 13:44:28Z oconrad $
  *********************************************************/
 /*******************************************************************************
     Fuzzify.cpp
@@ -119,7 +119,7 @@ int CFuzzify::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *p
 	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("INPUT"))
 	||	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("AUTOFIT")) )
 	{
-		if( pParameters->Get_Parameter("AUTOFIT")->asBool() )
+		if( pParameters->Get_Parameter("AUTOFIT")->asBool() && pParameters->Get_Parameter("INPUT")->asGrid() )
 		{
 			CSG_Grid	*pGrid	= pParameters->Get_Parameter("INPUT")->asGrid();
 

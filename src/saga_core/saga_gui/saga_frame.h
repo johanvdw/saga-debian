@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_frame.h 1119 2011-06-29 12:13:43Z oconrad $
+ * Version $Id: saga_frame.h 1679 2013-05-02 13:46:09Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ public:
 
 	virtual wxStatusBar *		OnCreateStatusBar			(int number, long style, wxWindowID id, const wxString& name);
 
-	void						StatusBar_Set_Text			(const wxChar *Text, int iPane = 0);
+	void						StatusBar_Set_Text			(const wxString &Text, int iPane = 0);
 
 	void						Set_Project_Name			(wxString Project_Name = wxEmptyString);
 
@@ -158,15 +158,12 @@ public:
 	wxWindow *					Top_Window_Get				(void);
 
 	//-----------------------------------------------------
-	void						On_Child_Activates			(class CVIEW_Base *pChild, bool bActivates);
+	void						On_Child_Activates			(int View_ID);
 
-	void						Set_Pane_Caption			(wxWindow *pWindow, wxString Caption);
-
-	wxMenuBar *					MB_Create					(class CVIEW_Base *pChild);
-	void						MB_Remove					(wxMenu *pMenu_File, wxMenu *pMenu_Modules);
+	void						Set_Pane_Caption			(wxWindow *pWindow, const wxString &Caption);
 
 	class wxToolBarBase *		TB_Create					(int ID);
-	void						TB_Add						(class wxToolBarBase *pToolBar, const wxChar *Name);
+	void						TB_Add						(class wxToolBarBase *pToolBar, const wxString &Name);
 	void						TB_Add_Item					(class wxToolBarBase *pToolBar, bool bCheck, int Cmd_ID);
 	void						TB_Add_Separator			(class wxToolBarBase *pToolBar);
 
@@ -179,7 +176,9 @@ private:
 
 	class wxGauge				*m_pProgressBar;
 
-	class wxToolBarBase			*m_pTB_Main, *m_pTB_Table, *m_pTB_Diagram, *m_pTB_Map, *m_pTB_Map_3D, *m_pTB_Histogram, *m_pTB_ScatterPlot, *m_pTB_Layout;
+	class wxMenu				*m_pMN_Table, *m_pMN_Diagram, *m_pMN_Map, *m_pMN_Map_3D, *m_pMN_Histogram, *m_pMN_ScatterPlot, *m_pMN_Layout;
+
+	class wxToolBarBase			*m_pTB_Table, *m_pTB_Diagram, *m_pTB_Map, *m_pTB_Map_3D, *m_pTB_Histogram, *m_pTB_ScatterPlot, *m_pTB_Layout, *m_pTB_Main;
 
 	class CINFO					*m_pINFO;
 
@@ -192,7 +191,9 @@ private:
 	class wxAuiManager			*m_pLayout;
 
 
-	void						_Bar_Add					(class wxWindow *pWindow, int Position);
+	class wxMenuBar *			_Create_MenuBar				(void);
+
+	void						_Bar_Add					(wxWindow *pWindow, int Position, int Row);
 	void						_Bar_Toggle					(wxWindow *pWindow);
 	void						_Bar_Show					(wxWindow *pWindow, bool bShow);
 

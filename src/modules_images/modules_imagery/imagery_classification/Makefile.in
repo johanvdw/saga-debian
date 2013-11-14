@@ -77,7 +77,8 @@ libimagery_classification_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libimagery_classification_la_OBJECTS = change_detection.lo \
 	classify_cluster_analysis.lo classify_supervised.lo \
-	decision_tree.lo MLB_Interface.lo
+	classify_supervised_polygons.lo decision_tree.lo \
+	MLB_Interface.lo
 libimagery_classification_la_OBJECTS =  \
 	$(am_libimagery_classification_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -137,6 +138,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -167,7 +169,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -250,18 +251,20 @@ top_srcdir = @top_srcdir@
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libimagery_classification.la
 libimagery_classification_la_SOURCES = \
 change_detection.cpp\
 classify_cluster_analysis.cpp\
 classify_supervised.cpp\
+classify_supervised_polygons.cpp\
 decision_tree.cpp\
 MLB_Interface.cpp\
 change_detection.h\
 classify_cluster_analysis.h\
 classify_supervised.h\
+classify_supervised_polygons.h\
 decision_tree.h\
 MLB_Interface.h
 
@@ -344,6 +347,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/change_detection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/classify_cluster_analysis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/classify_supervised.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/classify_supervised_polygons.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/decision_tree.Plo@am__quote@
 
 .cpp.o:

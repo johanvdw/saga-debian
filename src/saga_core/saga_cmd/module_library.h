@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 1198 2011-10-21 12:21:08Z oconrad $
+ * Version $Id: module_library.h 1667 2013-04-24 11:06:35Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,6 +72,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <wx/cmdline.h>
+
 #include <saga_api/saga_api.h>
 
 
@@ -82,74 +84,35 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CData_Objects
+class CCMD_Module
 {
 public:
-	CData_Objects(void);
-	virtual ~CData_Objects(void);
+	CCMD_Module(void);
+	CCMD_Module(CSG_Module *pModule);
+	virtual ~CCMD_Module(void);
 
-	void						Clear					(bool bDelete = true);
-
-	void						Add						(class CSG_Data_Object *pObject);
-
-
-private:
-
-	int							m_nObjects;
-
-	class CSG_Data_Object		**m_pObjects;
-
-};
-
-
-///////////////////////////////////////////////////////////
-//                                                       //
-//                                                       //
-//                                                       //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-class CModule_Library  
-{
-public:
-	CModule_Library(void);
-	virtual ~CModule_Library(void);
-
-	bool						Create					(const SG_Char *FileName, const SG_Char *FilePath);
+	bool						Create					(CSG_Module *pModule);
 	void						Destroy					(void);
-
-	int							Get_Count				(void)		{	return( m_Library.Get_Count() );	}
-	CSG_Module *				Get_Module				(int i)		{	return( m_Library.Get_Module(i) );	}
-
-	class CSG_Module *			Select					(const SG_Char *ModuleName);
-	class CSG_Module *			Get_Selected			(void)		{	return( m_pModule );	}
 
 	bool						Execute					(int argc, char *argv[]);
 
-	bool						Get_Parameters			(class CSG_Parameters *pParameters);
-	bool						Add_DataObject			(class CSG_Data_Object *pObject);
+	bool						Get_Parameters			(CSG_Parameters *pParameters)	{	return( _Get_Parameters(pParameters) );	}
 
 
 private:
 
 	CSG_Module					*m_pModule;
 
-	CSG_Module_Library			m_Library;
-
-	CData_Objects				m_Data_Objects;
-
-	class wxCmdLineParser		*m_pCMD;
+	wxCmdLineParser				m_CMD;
 
 
-	void						_Set_CMD				(class CSG_Parameters *pParameters, bool bExtra);
-	bool						_Get_CMD				(class CSG_Parameters *pParameters, bool bNoDataObjects);
+	wxString					_Get_ID					(CSG_Parameter  *pParameter, const wxString &Modifier = wxT(""));
 
-	bool						_Create_DataObjects		(class CSG_Parameters *pParameters);
-	bool						_Create_DataObject		(class CSG_Parameter *pParameter, const wxChar *FileName);
-	bool						_Create_DataObject_List	(class CSG_Parameter *pParameter, wxString sList);
+	bool						_Set_Parameters			(CSG_Parameters *pParameters, bool bOptional);
+	bool						_Get_Parameters			(CSG_Parameters *pParameters);
 
-	bool						_Destroy_DataObjects	(bool bSave);
-	bool						_Destroy_DataObjects	(bool bSave, class CSG_Parameters *pParameters);
+	bool						_Load_Input				(CSG_Parameter  *pParameter);
+	bool						_Save_Output			(CSG_Parameters *pParameters);
 
 };
 

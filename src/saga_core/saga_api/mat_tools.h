@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_tools.h 1238 2011-11-23 08:49:08Z oconrad $
+ * Version $Id: mat_tools.h 1734 2013-06-19 10:09:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -131,6 +131,9 @@
 //---------------------------------------------------------
 SAGA_API_DLL_EXPORT double		SG_Get_Square		(double x);
 
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT int			SG_Get_Digit_Count	(int Number);
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -205,7 +208,14 @@ public:
 
 	bool						Destroy				(void);
 
+	bool						Set_Rows			(int nRows);
+	bool						Add_Rows			(int nRows);
+	bool						Del_Rows			(int nRows);
+	bool						Add_Row				(double Value = 0.0);
+	bool						Del_Row				(void);
+
 	int							Get_N				(void)	const	{	return( m_n );		}
+	operator const double *							(void)	const	{	return( m_z );		}
 	double *					Get_Data			(void)	const	{	return( m_z );		}
 	double						operator ()			(int x)	const	{	return( m_z[x] );	}
 	double &					operator []			(int x)			{	return( m_z[x] );	}
@@ -285,8 +295,13 @@ public:
 
 	bool						Destroy				(void);
 
+	bool						Set_Size			(int nRows, int nCols);
+	bool						Set_Cols			(int nCols);
+	bool						Set_Rows			(int nRows);
 	bool						Add_Cols			(int nCols);
 	bool						Add_Rows			(int nRows);
+	bool						Del_Cols			(int nCols);
+	bool						Del_Rows			(int nRows);
 	bool						Add_Col				(          double *Data = NULL);
 	bool						Add_Col				(          const CSG_Vector &Data);
 	bool						Add_Row				(          double *Data = NULL);
@@ -309,6 +324,7 @@ public:
 	int							Get_NY				(void)			const	{	return( m_ny );			}
 	int							Get_NRows			(void)			const	{	return( m_ny );			}
 
+	operator const double **						(void)			const	{	return( (const double **)m_z );	}
 	double **					Get_Data			(void)			const	{	return( m_z );			}
 	double						operator ()			(int y, int x)	const	{	return( m_z[y][x] );	}
 	double *					operator []			(int y)			const	{	return( m_z[y] );		}
@@ -369,6 +385,9 @@ private:
 SAGA_API_DLL_EXPORT CSG_Matrix	operator *			(double Scalar, const CSG_Matrix &Matrix);
 
 //---------------------------------------------------------
+SAGA_API_DLL_EXPORT bool		SG_Matrix_LU_Decomposition	(int n,       int *Permutation,       double **Matrix                , bool bSilent = true);
+SAGA_API_DLL_EXPORT bool		SG_Matrix_LU_Solve			(int n, const int *Permutation, const double **Matrix, double *Vector, bool bSilent = true);
+
 SAGA_API_DLL_EXPORT bool		SG_Matrix_Solve				(CSG_Matrix &Matrix, CSG_Vector &Vector, bool bSilent = true);
 SAGA_API_DLL_EXPORT bool		SG_Matrix_Eigen_Reduction	(const CSG_Matrix &Matrix, CSG_Matrix &Eigen_Vectors, CSG_Vector &Eigen_Values, bool bSilent = true);
 
@@ -471,22 +490,47 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Random
+{
+public:
+	CSG_Random(void);
+
+	static void			Initialize		(void);
+	static void			Initialize		(unsigned int Value);
+
+	static double		Get_Uniform		(void);
+	static double		Get_Uniform		(double min, double max);
+
+	static double		Get_Gaussian	(double mean, double stddev);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Simple_Statistics
 {
 public:
 	CSG_Simple_Statistics(void);
 	CSG_Simple_Statistics(bool bHoldValues);
 	CSG_Simple_Statistics(const CSG_Simple_Statistics &Statistics);
+	CSG_Simple_Statistics(double Mean, double StdDev, int Count = 1000);
 
 	bool						Create				(bool bHoldValues = false);
 	bool						Create				(const CSG_Simple_Statistics &Statistics);
+	bool						Create				(double Mean, double StdDev, int Count = 1000);
 
 	void						Invalidate			(void);
 
-	bool						is_Evaluated		(void)		{	return( m_bEvaluated );	}
+	bool						is_Evaluated		(void)	const	{	return( m_bEvaluated );	}
 
-	int							Get_Count			(void)		{	return( m_nValues );	}
-	double						Get_Weights			(void)		{	return( m_Weights );	}
+	int							Get_Count			(void)	const	{	return( m_nValues );	}
+	double						Get_Weights			(void)	const	{	return( m_Weights );	}
 
 	double						Get_Minimum			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Minimum	);	}
 	double						Get_Maximum			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Maximum	);	}
@@ -496,11 +540,14 @@ public:
 	double						Get_Variance		(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Variance	);	}
 	double						Get_StdDev			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_StdDev	);	}
 
+	void						Add					(const CSG_Simple_Statistics &Statistics);
+
 	void						Add_Value			(double Value, double Weight = 1.0);
 
-	double						Get_Value			(int i)		{	return( i >= 0 && i < (int)m_Values.Get_Size() ? ((double *)m_Values.Get_Array())[i] : Get_Mean() );	}
+	double						Get_Value			(int i)	const	{	return( i >= 0 && i < (int)m_Values.Get_Size() ? ((double *)m_Values.Get_Array())[i] : m_Mean );	}
 
 	CSG_Simple_Statistics &		operator  =			(const CSG_Simple_Statistics &Statistics)	{	Create(Statistics);	return( *this );	}
+	CSG_Simple_Statistics &		operator +=			(const CSG_Simple_Statistics &Statistics)	{	Add(Statistics);	return( *this );	}
 	CSG_Simple_Statistics &		operator +=			(double Value)								{	Add_Value(Value);	return( *this );	}
 
 
@@ -666,6 +713,101 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+enum
+{
+	SG_CLASSIFY_SUPERVISED_BinaryEncoding	= 0,
+	SG_CLASSIFY_SUPERVISED_ParallelEpiped,
+	SG_CLASSIFY_SUPERVISED_MinimumDistance,
+	SG_CLASSIFY_SUPERVISED_Mahalonobis,
+	SG_CLASSIFY_SUPERVISED_MaximumLikelihood,
+	SG_CLASSIFY_SUPERVISED_SAM,
+	SG_CLASSIFY_SUPERVISED_WTA,
+	SG_CLASSIFY_SUPERVISED_SID,
+	SG_CLASSIFY_SUPERVISED_SVM
+};
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Classifier_Supervised
+{
+public:
+	CSG_Classifier_Supervised(void);
+	virtual ~CSG_Classifier_Supervised(void);
+
+	void						Create						(int nFeatures);
+	void						Destroy						(void);
+
+	int							Get_Feature_Count			(void)			{	return( m_nFeatures );			}
+
+	int							Get_Element_Count			(int iClass)	{	return( m_nElements[iClass] );	}
+	void						Del_Element_Count			(void);
+
+	int							Get_Class_Count				(void)			{	return( m_IDs.Get_Count() );	}
+	const CSG_String &			Get_Class_ID				(int iClass)	{	return( m_IDs[iClass] );		}
+
+	int							Get_Class					(const CSG_String &Class_ID);
+
+	CSG_Simple_Statistics *		Get_Statistics				(const CSG_String &Class_ID);
+	CSG_Simple_Statistics *		Get_Statistics				(int iClass)	{	return( m_Statistics[iClass] );	}
+	CSG_Simple_Statistics *		operator []					(int iClass)	{	return( m_Statistics[iClass] );	}
+
+	bool						Get_Class					(const CSG_Vector &Features, int &Class, double &Quality, int Method);
+
+	void						Set_Distance_Threshold		(double Value)	{	m_Distance_Threshold	= Value;	}
+	double						Get_Distance_Threshold		(void)			{	return( m_Distance_Threshold );		}
+
+	void						Set_Probability_Threshold	(double Value)	{	m_Probability_Threshold	= Value;	}
+	double						Get_Probability_Threshold	(void)			{	return( m_Probability_Threshold );	}
+	void						Set_Probability_Relative	(bool   Value)	{	m_Probability_Relative	= Value;	}
+	bool						Get_Probability_Relative	(void)			{	return( m_Probability_Relative );	}
+
+	void						Set_Angle_Threshold			(double Value)	{	m_Angle_Threshold		= Value;	}
+	double						Get_Angle_Threshold			(void)			{	return( m_Angle_Threshold );		}
+
+	void						Set_WTA						(int Method, bool bOn)	{	if( Method >= 0 && Method < SG_CLASSIFY_SUPERVISED_WTA ) m_bWTA[Method]	= bOn;		}
+	bool						Get_WTA						(int Method)			{	return( Method >= 0 && Method < SG_CLASSIFY_SUPERVISED_WTA ? m_bWTA[Method] : false );	}
+
+	static CSG_String			Get_Name_of_Method			(int Method);
+	static CSG_String			Get_Name_of_Quality			(int Method);
+
+
+private:
+
+	bool						m_Probability_Relative, m_bWTA[SG_CLASSIFY_SUPERVISED_WTA];
+
+	int							m_nFeatures, *m_nElements;
+
+	double						m_Distance_Threshold, m_Probability_Threshold, m_Angle_Threshold;
+
+	CSG_Strings					m_IDs;
+
+	CSG_Simple_Statistics		**m_Statistics;
+
+	CSG_Vector					m_ML_s, m_SAM_l, m_BE_m;
+
+	CSG_Matrix					m_ML_a, m_ML_b, m_BE_s;
+
+
+	void						_Update						(void);
+
+	void						_Get_Binary_Encoding		(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Parallel_Epiped		(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Minimum_Distance		(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Mahalanobis_Distance	(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Maximum_Likelihood		(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Spectral_Angle_Mapping	(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Spectral_Divergence	(const CSG_Vector &Features, int &Class, double &Quality);
+	void						_Get_Winner_Takes_All		(const CSG_Vector &Features, int &Class, double &Quality);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Spline
 {
 public:
@@ -679,8 +821,11 @@ public:
 
 	void						Add					(double x, double y);
 
-	double						Get_xMin			(void)	{	return( m_nValues > 0 ? m_Values[0            ].x : 0.0 );	}
-	double						Get_xMax			(void)	{	return( m_nValues > 0 ? m_Values[m_nValues - 1].x : 0.0 );	}
+	int							Get_Count			(void)	const	{	return( m_x.Get_N() );	}
+	double						Get_xMin			(void)	const	{	return( m_x.Get_N() > 0 ? m_x(0              ) : 0.0 );	}
+	double						Get_xMax			(void)	const	{	return( m_x.Get_N() > 0 ? m_x(m_x.Get_N() - 1) : 0.0 );	}
+	double						Get_x				(int i)	const	{	return( i >= 0 && i < m_x.Get_N() ? m_x(i) : 0.0 );	}
+	double						Get_y				(int i)	const	{	return( i >= 0 && i < m_y.Get_N() ? m_y(i) : 0.0 );	}
 
 	bool						Get_Value			(double x, double &y);
 	double						Get_Value			(double x);
@@ -690,9 +835,7 @@ protected:
 
 	bool						m_bCreated;
 
-	int							m_nValues, m_nBuffer;
-
-	TSG_Point_Z					*m_Values;
+	CSG_Vector					m_x, m_y, m_z;
 
 
 	bool						_Create				(double yA, double yB);
@@ -948,27 +1091,42 @@ enum ESG_Multiple_Regression_Info_Vars
 class SAGA_API_DLL_EXPORT CSG_Regression_Multiple
 {
 public:
-	CSG_Regression_Multiple(void);
+	CSG_Regression_Multiple(bool bIntercept = true);
 	virtual ~CSG_Regression_Multiple(void);
 
 	void						Destroy				(void);
 
-	bool						Calculate			(const CSG_Matrix &Samples                           , CSG_Strings *pNames = NULL);
-	bool						Calculate_Forward	(const CSG_Matrix &Samples, double P_in              , CSG_Strings *pNames = NULL);
-	bool						Calculate_Backward	(const CSG_Matrix &Samples, double P_out             , CSG_Strings *pNames = NULL);
-	bool						Calculate_Stepwise	(const CSG_Matrix &Samples, double P_in, double P_out, CSG_Strings *pNames = NULL);
+	bool						Set_Data			(const CSG_Matrix &Samples, CSG_Strings *pNames = NULL);
+
+	void						Set_With_Intercept	(bool bOn = true)		{	m_bIntercept	= bOn;	}
+	bool						Get_With_Intercept	(void)			const	{	return( m_bIntercept );	}
+
+	bool						Get_Model			(const CSG_Matrix &Samples                           , CSG_Strings *pNames = NULL);
+	bool						Get_Model_Forward	(const CSG_Matrix &Samples, double P_in              , CSG_Strings *pNames = NULL);
+	bool						Get_Model_Backward	(const CSG_Matrix &Samples, double P_out             , CSG_Strings *pNames = NULL);
+	bool						Get_Model_Stepwise	(const CSG_Matrix &Samples, double P_in, double P_out, CSG_Strings *pNames = NULL);
+
+	bool						Get_Model			(void);
+	bool						Get_Model_Forward	(double P_in);
+	bool						Get_Model_Backward	(double P_out);
+	bool						Get_Model_Stepwise	(double P_in, double P_out);
+
+	bool						Get_CrossValidation	(int nSubSamples = 0);
 
 	CSG_String					Get_Info			(void)			const;
-
-	class CSG_Table *			Get_Regression		(void)			const	{	return( m_pRegression );	}
-	class CSG_Table *			Get_Model			(void)			const	{	return( m_pModel );			}
-	class CSG_Table *			Get_Steps			(void)			const	{	return( m_pSteps );			}
+	class CSG_Table *			Get_Info_Regression	(void)			const	{	return( m_pRegression );	}
+	class CSG_Table *			Get_Info_Model		(void)			const	{	return( m_pModel );			}
+	class CSG_Table *			Get_Info_Steps		(void)			const	{	return( m_pSteps );			}
 
 	double						Get_R2				(void)			const;
 	double						Get_R2_Adj			(void)			const;
 	double						Get_StdError		(void)			const;
 	double						Get_F				(void)			const;
 	double						Get_P				(void)			const;
+	double						Get_CV_RMSE			(void)			const;
+	double						Get_CV_NRMSE		(void)			const;
+	double						Get_CV_R2			(void)			const;
+	int							Get_CV_nSamples		(void)			const;
 	int							Get_DegFreedom		(void)			const;
 	int							Get_nSamples		(void)			const;
 	int							Get_nPredictors		(void)			const;
@@ -986,31 +1144,40 @@ public:
 
 	double						Get_Parameter		(int iVariable, int Parameter)	const;
 
+	double						Get_Value			(const CSG_Vector &Predictors)					const;
+	bool						Get_Value			(const CSG_Vector &Predictors, double &Value)	const;
+
+	double						Get_Residual		(int iSample)					const;
+	bool						Get_Residual		(int iSample, double &Residual)	const;
+
+	bool						Get_Residuals		(CSG_Vector &Residuals)			const;
+
 
 protected:
+
+	bool						m_bIntercept;
 
 	int							*m_bIncluded, *m_Predictor, m_nPredictors;
 
 	CSG_Strings					m_Names;
 
+	CSG_Matrix					m_Samples, m_Samples_Model;
+
 	class CSG_Table				*m_pRegression, *m_pModel, *m_pSteps;
 
 
-	bool						_Initialize			(const CSG_Matrix &Samples, CSG_Strings *pNames, bool bInclude);
+	bool						_Initialize			(bool bInclude);
 
 	double						_Get_F				(int nPredictors, int nSamples, double r2_full, double r2_reduced);
 	double						_Get_P				(int nPredictors, int nSamples, double r2_full, double r2_reduced);
 
 	bool						_Get_Regression		(const class CSG_Matrix &Samples);
 
-	bool						_Set_Step_Info		(const CSG_Matrix &X);
-	bool						_Set_Step_Info		(const CSG_Matrix &X, double R2_prev, int iVariable, bool bIn);
 	int							_Get_Step_In		(CSG_Matrix &X, double P_in , double &R2, const CSG_Matrix &Samples);
 	int							_Get_Step_Out		(CSG_Matrix &X, double P_out, double &R2);
 
-	bool						__Get_Forward		(const class CSG_Matrix &Samples, double p_in);
-	bool						__Get_Forward		(int nSamples, int nPredictors, double **X, double *Y, int &iMax, double &rMax);
-	bool						__Eliminate			(int nSamples, double *X, double *Y);
+	bool						_Set_Step_Info		(const CSG_Matrix &X);
+	bool						_Set_Step_Info		(const CSG_Matrix &X, double R2_prev, int iVariable, bool bIn);
 
 };
 
@@ -1034,24 +1201,25 @@ public:
 	CSG_Formula(void);
 	virtual ~CSG_Formula(void);
 
-	static CSG_String			Get_Help_Operators	(void);
-	static CSG_String			Get_Help_Usage		(void);
+	bool						Destroy				(void);
 
-	bool						Get_Error			(int *pPosition = NULL, CSG_String *pMessage = NULL);
+	static CSG_String			Get_Help_Operators	(void);
+
 	bool						Get_Error			(CSG_String &Message);
 
 	int							Add_Function		(SG_Char *Name, TSG_PFNC_Formula_1 f, int N_of_Pars, int Varying);
 	int							Del_Function		(SG_Char *Name);
 
-	bool						Set_Formula			(const SG_Char *Formula);
-	CSG_String					Get_Formula			(void)		{	return( m_sFormula );	}
+	bool						Set_Formula			(const CSG_String &Formula);
+	CSG_String					Get_Formula			(void)	const	{	return( m_sFormula );	}
 
 	void						Set_Variable		(SG_Char Variable, double Value);
 
-	double						Get_Value			(void);
-	double						Get_Value			(double x);
-	double						Get_Value			(double *Values, int nValues);
-	double						Get_Value			(SG_Char *Arguments, ...);
+	double						Get_Value			(void)							const;
+	double						Get_Value			(double x)						const;
+	double						Get_Value			(const CSG_Vector &Values)		const;
+	double						Get_Value			(double *Values, int nValues)	const;
+	double						Get_Value			(SG_Char *Arguments, ...)		const;
 
 	const SG_Char *				Get_Used_Variables	(void);
 
@@ -1088,15 +1256,16 @@ private:
 	CSG_String					m_sFormula, m_sError;
 
 	const SG_Char				*i_error;
+
 	int							i_pctable;			// number of items in a table of constants - used only by the translating functions
 
-	double						m_Parameters[256],
+	double						m_Parameters[32],
 								*i_ctable;			// current table of constants - used only by the translating functions
 
 
 	void						_Set_Error			(const SG_Char *Error = NULL);
 
-	double						_Get_Value			(TMAT_Formula Function);
+	double						_Get_Value			(const double *Parameters, TMAT_Formula Function)	const;
 
 	int							_is_Operand			(SG_Char c);
 	int							_is_Operand_Code	(SG_Char c);
@@ -1214,6 +1383,50 @@ private:
 	bool						_Get_mrqcof			(double *Parameters, double **Alpha, double *Beta);
 
 	void						_Get_Function		(double x, double *Parameters, double &y, double *dy_da);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_Trend_Polynom
+{
+public:
+	CSG_Trend_Polynom(void);
+
+	bool						Destroy				(void);
+
+	bool						Set_Order			(int Order = 1);
+
+	bool						Clr_Data			(void);
+	bool						Set_Data			(double *x, double *y, int n, bool bAdd = false);
+	bool						Add_Data			(double  x, double  y);
+	int							Get_Data_Count		(void)		const	{	return( m_x.Get_N() );	}
+	double						Get_Data_X			(int i)		const	{	return( m_x(i) );	}
+	double						Get_Data_Y			(int i)		const	{	return( m_y(i) );	}
+
+	bool						Get_Trend			(void);
+
+	int							Get_Order			(void)		const	{	return( m_Order     );	}
+	int							Get_nCoefficients	(void)		const	{	return( m_Order + 1 );	}
+	double						Get_Coefficient		(int i)		const	{	return( m_a(i)      );	}
+	double						Get_R2				(void)		const	{	return( m_r2        );	}
+
+	double						Get_Value			(double x)	const;
+
+
+private:
+
+	double						m_r2;
+
+	int							m_Order;
+
+	CSG_Vector					m_x, m_y, m_a;
 
 };
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1170 2011-09-21 16:57:34Z oconrad $
+# $Id: Makefile.am 1568 2012-12-14 13:00:29Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_points.la
 libshapes_points_la_SOURCES =\
@@ -30,6 +30,8 @@ points_thinning.cpp\
 remove_duplicates.cpp\
 select_points.cpp\
 separate_by_direction.cpp\
+snap_points_to_features.cpp\
+snap_points_to_grid.cpp\
 thiessen_polygons.cpp\
 add_polygon_attributes.h\
 AddCoordinates.h\
@@ -48,6 +50,8 @@ points_thinning.h\
 remove_duplicates.h\
 select_points.h\
 separate_by_direction.h\
+snap_points_to_features.h\
+snap_points_to_grid.h\
 thiessen_polygons.h
 
 libshapes_points_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

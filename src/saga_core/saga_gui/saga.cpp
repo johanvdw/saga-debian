@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga.cpp 1225 2011-11-15 16:28:38Z oconrad $
+ * Version $Id: saga.cpp 1752 2013-06-26 12:37:36Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ END_EVENT_TABLE()
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define SAGA_GUI_BUILD			wxT("20110401")
+#define SAGA_GUI_BUILD			wxT("20130701")
 
 //---------------------------------------------------------
 const wxChar *	SAGA_GUI_Get_Build(void)
@@ -148,6 +148,17 @@ bool CSAGA::OnInit(void)
 
 	m_App_Path			= wxFileName(argv[0]).GetPath();
 
+
+	/* workaround: wxwidgets 2.9.3 is complaining about setlocale
+	 * mismatch between c setlocale and wxLocale. since saga has its own
+	 * translation system, we use english as default. this assures
+	 * using . as decimal separator in printf like formatting of
+	 * floating point values. wxXLocale is currently not fully
+	 * implemented (wxPrintf_l and similar still missing). */
+	//setlocale(LC_NUMERIC, "C");
+	m_wxLocale.Init(wxLANGUAGE_ENGLISH);
+	
+	
 	_Init_Config();
 
 	//-----------------------------------------------------
@@ -186,44 +197,53 @@ bool CSAGA::OnInit(void)
 
 	if( wxGetEnv(wxT("PATH"), &Path) && Path.Length() > 0 )
 	{
-		Path	+= wxT(";");
+		wxSetEnv("PATH", Get_App_Path() + wxT("\\dll;") + Path);
+	}
+	else
+	{
+		wxSetEnv("PATH", Get_App_Path() + wxT("\\dll"));
 	}
 
-	Path	+= wxString::Format(wxT( "%s\\dll")      , Get_App_Path().c_str());
-	Path	+= wxString::Format(wxT(";%s\\dll\\gdal"), Get_App_Path().c_str());
-
-	wxSetEnv(wxT("PATH"), Path);
+	wxSetEnv(wxT("GDAL_DRIVER_PATH"), Get_App_Path() + wxT("\\dll"));
 #endif // defined(_SAGA_MSW)
 
 	//-----------------------------------------------------
 	wxString	File;
 
 	//-----------------------------------------------------
-	if( !CONFIG_Read(wxT("/MODULES"), wxT("LNG_FILE_DIC"), File) || !SG_File_Exists(File) )
+	if( !CONFIG_Read(wxT("/MODULES"), wxT("LNG_FILE_DIC"), File) || !wxFileExists(File) )
 	{
-		File	= SG_File_Make_Path(Get_App_Path(), wxT("saga"), wxT("lng")).c_str();
+		File	= SG_File_Make_Path(Get_App_Path(), SG_T("saga"), SG_T("lng")).c_str();
 	}
 
-	SG_Get_Translator().Create(File.c_str(), false);
+	SG_Get_Translator().Create(&File, false);
 
 	//-----------------------------------------------------
-	if( !CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_DIC"), File) || !SG_File_Exists(File) )
+	if( !CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_DIC"), File) || !wxFileExists(File) )
 	{
-		File	= SG_File_Make_Path(Get_App_Path(), wxT("saga_prj"), wxT("dic")).c_str();
+		File	= SG_File_Make_Path(Get_App_Path(), SG_T("saga_prj"), SG_T("dic")).c_str();
 	}
 
-	SG_Get_Projections().Load_Dictionary(File.c_str());
+	SG_Get_Projections().Load_Dictionary(&File);
 
 	//-----------------------------------------------------
-	if( !CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_SRS"), File) || !SG_File_Exists(File) )
+	if( !CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_SRS"), File) || !wxFileExists(File) )
 	{
-		File	= SG_File_Make_Path(Get_App_Path(), wxT("saga_prj"), wxT("srs")).c_str();
+		File	= SG_File_Make_Path(Get_App_Path(), SG_T("saga_prj"), SG_T("srs")).c_str();
 	}
 
-	SG_Get_Projections().Load_DB(File.c_str());
+	SG_Get_Projections().Load_DB(&File);
 
 	//-----------------------------------------------------
 	SetTopWindow(new CSAGA_Frame());
+
+	//-----------------------------------------------------
+	if( pLogo && (iLogo == 1 || argc > 1) )
+	{
+		pLogo->Destroy();
+
+		wxYield();
+	}
 
 	//-----------------------------------------------------
 	if( argc > 1 )
@@ -232,14 +252,6 @@ bool CSAGA::OnInit(void)
 		{
 			g_pWKSP->Open(argv[i]);
 		}
-	}
-
-	//-----------------------------------------------------
-	if( pLogo && iLogo == 1 )
-	{
-		pLogo->Destroy();
-
-		wxYield();
 	}
 
 	//-----------------------------------------------------
@@ -340,10 +352,7 @@ bool CSAGA::Process_Wait(bool bEnforce)
 		//	Yield();
 		//	wxSafeYield(g_pSAGA_Frame);
 
-		while( Pending() )
-		{
-			Dispatch();
-		}
+		while( Pending() && Dispatch() );
 
 		bYield	= false;
 		tYield	= wxDateTime::UNow();

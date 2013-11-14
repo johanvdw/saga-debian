@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes.cpp 1209 2011-11-03 10:16:12Z oconrad $
+ * Version $Id: wksp_shapes.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -65,6 +65,7 @@
 #include "res_dialogs.h"
 
 #include "helper.h"
+#include "dc_helper.h"
 
 #include "wksp_layer_classify.h"
 
@@ -84,15 +85,16 @@
 CWKSP_Shapes::CWKSP_Shapes(CSG_Shapes *pShapes)
 	: CWKSP_Layer(pShapes)
 {
-	m_pShapes		= pShapes;
-	m_pTable		= new CWKSP_Table(m_pShapes, this);
+	m_pTable		= new CWKSP_Table(pShapes);
 
-	m_Edit_Shapes.Create(m_pShapes->Get_Type());
+	m_Edit_Shapes.Create(pShapes->Get_Type());
 	m_Edit_pShape	= NULL;
 
 	m_Edit_Attributes.Destroy();
-	m_Edit_Attributes.Add_Field(LNG("[FLD] Name") , SG_DATATYPE_String);
-	m_Edit_Attributes.Add_Field(LNG("[FLD] Value"), SG_DATATYPE_String);
+	m_Edit_Attributes.Add_Field(_TL("Name") , SG_DATATYPE_String);
+	m_Edit_Attributes.Add_Field(_TL("Value"), SG_DATATYPE_String);
+
+	m_Edit_Color    = wxColor(0, 0, 0);
 }
 
 //---------------------------------------------------------
@@ -114,31 +116,32 @@ wxString CWKSP_Shapes::Get_Description(void)
 	wxString	s;
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("[CAP] Shapes"));
+	s	+= wxString::Format(wxT("<b>%s</b>"), _TL("Shapes"));
 
 	s	+= wxT("<table border=\"0\">");
 
-	DESC_ADD_STR(LNG("[CAP] Name")				, m_pShapes->Get_Name());
-	DESC_ADD_STR(LNG("[CAP] File")				, m_pShapes->Get_File_Name());
-	DESC_ADD_STR(LNG("[CAP] Projection")		, m_pShapes->Get_Projection().Get_Description().c_str());
-	DESC_ADD_FLT(LNG("[CAP] West")				, m_pShapes->Get_Extent().Get_XMin());
-	DESC_ADD_FLT(LNG("[CAP] East")				, m_pShapes->Get_Extent().Get_XMax());
-	DESC_ADD_FLT(LNG("[CAP] West-East")			, m_pShapes->Get_Extent().Get_XRange());
-	DESC_ADD_FLT(LNG("[CAP] South")				, m_pShapes->Get_Extent().Get_YMin());
-	DESC_ADD_FLT(LNG("[CAP] North")				, m_pShapes->Get_Extent().Get_YMax());
-	DESC_ADD_FLT(LNG("[CAP] South-North")		, m_pShapes->Get_Extent().Get_YRange());
-	DESC_ADD_STR(LNG("[CAP] Modified")			, m_pShapes->is_Modified() ? LNG("[VAL] yes") : LNG("[VAL] no"));
-	DESC_ADD_STR(LNG("[CAP] Type")				, SG_Get_ShapeType_Name(m_pShapes->Get_Type()));
-	DESC_ADD_STR(LNG("[CAP] Vertex Type")		, m_pShapes->Get_Vertex_Type() == 0 ? LNG("X, Y") : m_pShapes->Get_Vertex_Type() == 1 ? LNG("X, Y, Z") : LNG("X, Y, Z, M"));
-	DESC_ADD_INT(LNG("[CAP] Number Of Shapes")	, m_pShapes->Get_Count());
+	DESC_ADD_STR(_TL("Name")			, m_pObject->Get_Name());
+	DESC_ADD_STR(_TL("Description")		, m_pObject->Get_Description());
+	DESC_ADD_STR(_TL("File")			, SG_File_Exists(m_pObject->Get_File_Name()) ? m_pObject->Get_File_Name() : _TL("memory"));
+	DESC_ADD_STR(_TL("Modified")		, m_pObject->is_Modified() ? _TL("yes") : _TL("no"));
+	DESC_ADD_STR(_TL("Projection")		, m_pObject->Get_Projection().Get_Description().c_str());
+	DESC_ADD_FLT(_TL("West")			, Get_Shapes()->Get_Extent().Get_XMin());
+	DESC_ADD_FLT(_TL("East")			, Get_Shapes()->Get_Extent().Get_XMax());
+	DESC_ADD_FLT(_TL("West-East")		, Get_Shapes()->Get_Extent().Get_XRange());
+	DESC_ADD_FLT(_TL("South")			, Get_Shapes()->Get_Extent().Get_YMin());
+	DESC_ADD_FLT(_TL("North")			, Get_Shapes()->Get_Extent().Get_YMax());
+	DESC_ADD_FLT(_TL("South-North")		, Get_Shapes()->Get_Extent().Get_YRange());
+	DESC_ADD_STR(_TL("Type")			, SG_Get_ShapeType_Name(Get_Shapes()->Get_Type()).c_str());
+	DESC_ADD_STR(_TL("Vertex Type")		, Get_Shapes()->Get_Vertex_Type() == 0 ? _TL("X, Y") : Get_Shapes()->Get_Vertex_Type() == 1 ? _TL("X, Y, Z") : _TL("X, Y, Z, M"));
+	DESC_ADD_INT(_TL("Number Of Shapes"), Get_Shapes()->Get_Count());
 
 	s	+= wxT("</table>");
 
-	s	+= Get_TableInfo_asHTML(m_pShapes);
+	s	+= Get_TableInfo_asHTML(Get_Shapes());
 
 	//-----------------------------------------------------
-//	s	+= wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), LNG("[CAP] Data History"));
-//	s	+= m_pShapes->Get_History().Get_HTML();
+//	s	+= wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), _TL("Data History"));
+//	s	+= Get_Shapes()->Get_History().Get_HTML();
 //	s	+= wxString::Format(wxT("</font"));
 
 	return( s );
@@ -147,9 +150,7 @@ wxString CWKSP_Shapes::Get_Description(void)
 //---------------------------------------------------------
 wxMenu * CWKSP_Shapes::Get_Menu(void)
 {
-	wxMenu	*pMenu;
-
-	pMenu	= new wxMenu(m_pShapes->Get_Name());
+	wxMenu	*pMenu	= new wxMenu(m_pObject->Get_Name());
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_SAVE);
@@ -161,13 +162,14 @@ wxMenu * CWKSP_Shapes::Get_Menu(void)
 
 	pMenu->AppendSeparator();
 
-	wxMenu	*pTable	= new wxMenu(LNG("[MNU] Table"));
+	wxMenu	*pTable	= new wxMenu(_TL("Table"));
 	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_SHOW);
 	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_DIAGRAM);
 	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SCATTERPLOT);
-	pMenu->Append(ID_CMD_WKSP_FIRST, LNG("[MNU] Attributes"), pTable);
+	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SAVE);
+	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Attributes"), pTable);
 
-	pMenu->Append(ID_CMD_WKSP_FIRST, LNG("[MNU] Edit"), Edit_Get_Menu());
+	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Edit"), Edit_Get_Menu());
 
 	return( pMenu );
 }
@@ -216,8 +218,8 @@ bool CWKSP_Shapes::On_Command(int Cmd_ID)
 		break;
 
 	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
-		m_pShapes->Inv_Selection();
-		Update_Views(false);
+		Get_Shapes()->Inv_Selection();
+		Update_Views();
 		break;
 
 	case ID_CMD_TABLES_SHOW:
@@ -230,6 +232,19 @@ bool CWKSP_Shapes::On_Command(int Cmd_ID)
 
 	case ID_CMD_TABLES_SCATTERPLOT:
 		Add_ScatterPlot(Get_Table()->Get_Table());
+		break;
+
+	case ID_CMD_TABLES_SAVE:
+		{
+			wxString	File(m_pObject->Get_File_Name());
+
+			if( DLG_Save(File, ID_DLG_TABLES_SAVE) )
+			{
+				CSG_Table	Table(*((CSG_Table *)m_pObject));
+
+				Table.Save(&File);
+			}
+		}
 		break;
 
 	case ID_CMD_SHAPES_HISTOGRAM:
@@ -249,7 +264,7 @@ bool CWKSP_Shapes::On_Command_UI(wxUpdateUIEvent &event)
 		return( CWKSP_Layer::On_Command_UI(event) );
 
 	case ID_CMD_SHAPES_EDIT_SHAPE:
-		event.Enable(m_pShapes->Get_Selection_Count() > 0 || m_Edit_pShape != NULL);
+		event.Enable(Get_Shapes()->Get_Selection_Count() > 0 || m_Edit_pShape != NULL);
 		event.Check(m_Edit_pShape != NULL);
 		break;
 
@@ -258,7 +273,7 @@ bool CWKSP_Shapes::On_Command_UI(wxUpdateUIEvent &event)
 		break;
 
 	case ID_CMD_SHAPES_EDIT_DEL_SHAPE:
-		event.Enable(m_pShapes->Get_Selection_Count() > 0 && m_Edit_pShape == NULL);
+		event.Enable(Get_Shapes()->Get_Selection_Count() > 0 && m_Edit_pShape == NULL);
 		break;
 
 	case ID_CMD_SHAPES_EDIT_ADD_PART:
@@ -309,115 +324,136 @@ void CWKSP_Shapes::On_Create_Parameters(void)
 	// Classification...
 
 	_AttributeList_Add(
-		m_Parameters("NODE_LUT")		, "LUT_ATTRIB"				, LNG("[CAP] Attribute"),
-		LNG("")
+		m_Parameters("NODE_LUT")		, "LUT_ATTRIB"				, _TL("Attribute"),
+		_TL("")
 	);
 
 	_AttributeList_Add(
-		m_Parameters("NODE_METRIC")		, "METRIC_ATTRIB"			, LNG("[CAP] Attribute"),
-		LNG("")
+		m_Parameters("NODE_METRIC")		, "METRIC_ATTRIB"			, _TL("Attribute"),
+		_TL("")
 	);
-
 
 	//-----------------------------------------------------
 	// Display...
 
 	m_Parameters.Add_Parameters(
-		m_Parameters("NODE_DISPLAY")	, "DISPLAY_CHART"			, LNG("[CAP] Chart"),
-		LNG("")
+		m_Parameters("NODE_DISPLAY")	, "DISPLAY_CHART"			, _TL("Chart"),
+		_TL("")
 	);
-
 
 	//-----------------------------------------------------
 	// Label...
 
 	_AttributeList_Add(
-		m_Parameters("NODE_LABEL")		, "LABEL_ATTRIB"			, LNG("[CAP] Attribute"),
-		LNG("")
+		m_Parameters("NODE_LABEL")		, "LABEL_ATTRIB"			, _TL("Attribute"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Font(
-		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_FONT"		, LNG("[CAP] Font"),
-		LNG("")
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_FONT"		, _TL("Font"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Choice(
-		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_PREC"		, LNG("[CAP] Numerical Precision"),
-		LNG(""),
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_PREC"		, _TL("Numerical Precision"),
+		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|%s|"),
-			LNG("fit to value"),
-			LNG("standard"),
+			_TL("fit to value"),
+			_TL("standard"),
 			SG_T("0|0.1|0.12|0.123|0.1234|0.12345|0.1234567|0.12345678|0.123456789|0.1234567890|0.12345678901|0.123456789012|0.1234567890123|0.12345678901234|0.123456789012345|0.1234567890123456|0.12345678901234567|0.123456789012345678|0.1234567890123456789|0.12345678901234567890")
 		), 0
 	);
 
 	m_Parameters.Add_Choice(
-		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_SIZE_TYPE"	, LNG("[CAP] Size relates to..."),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("[VAL] Screen"),
-			LNG("[VAL] Map Units")
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_SIZE_TYPE"	, _TL("Size relates to..."),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("Screen"),
+			_TL("Map Units")
 		), 0
 	);
 
-	_AttributeList_Add(
-		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_SIZE_BY"	, LNG("[CAP] Size by Attribute"),
-		LNG("")
+	m_Parameters.Add_Choice(
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_EFFECT"		, _TL("Boundary Effect"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|"),
+			_TL("none"),
+			_TL("full frame"),
+			_TL("top"),
+			_TL("top left"),
+			_TL("left"),
+			_TL("bottom left"),
+			_TL("bottom"),
+			_TL("bottom right"),
+			_TL("right"),
+			_TL("top right")
+		), 1
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("LABEL_ATTRIB_SIZE_BY"), "LABEL_ATTRIB_SIZE"	, LNG("[CAP] Default Size"),
-		LNG(""),
-		PARAMETER_TYPE_Double, 100.0, 0.0, true
+		m_Parameters("LABEL_ATTRIB_EFFECT"), "LABEL_ATTRIB_EFFECT_COLOR"	, _TL("Color"),
+		_TL(""),
+		PARAMETER_TYPE_Color, SG_GET_RGB(255, 255, 255)
 	);
 
+	_AttributeList_Add(
+		m_Parameters("LABEL_ATTRIB")	, "LABEL_ATTRIB_SIZE_BY"	, _TL("Size by Attribute"),
+		_TL("")
+	);
+
+	m_Parameters.Add_Value(
+		m_Parameters("LABEL_ATTRIB_SIZE_BY"), "LABEL_ATTRIB_SIZE"	, _TL("Default Size"),
+		_TL(""),
+		PARAMETER_TYPE_Double, 100.0, 0.0, true
+	);
 
 	//-----------------------------------------------------
 	// Selection...
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_SELECTION")	, "SEL_COLOR"				, LNG("[CAP] Color"),
-		LNG(""),
+		m_Parameters("NODE_SELECTION")	, "SEL_COLOR"				, _TL("Color"),
+		_TL(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(255, 0, 0)
 	);
-
 
 	//-----------------------------------------------------
 	// Edit...
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_EDIT")		, "EDIT_COLOR"				, LNG("[CAP] Color"),
-		LNG(""),
+		m_Parameters("NODE_EDIT")		, "EDIT_COLOR"				, _TL("Color"),
+		_TL(""),
 		PARAMETER_TYPE_Color, SG_GET_RGB(0, 0, 0)
 	);
 
 	m_Parameters.Add_Shapes_List(
-		m_Parameters("NODE_EDIT")		, "EDIT_SNAP_LIST"			, LNG("[CAP] Snap to..."),
-		LNG(""),
+		m_Parameters("NODE_EDIT")		, "EDIT_SNAP_LIST"			, _TL("Snap to..."),
+		_TL(""),
 		PARAMETER_INPUT
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("EDIT_SNAP_LIST")	, "EDIT_SNAP_DIST"			, LNG("[CAP] Snap Distance"),
-		LNG(""),
+		m_Parameters("EDIT_SNAP_LIST")	, "EDIT_SNAP_DIST"			, _TL("Snap Distance"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 10, 0, true
 	);
-
 
 #ifdef USE_HTMLINFO
 	//-----------------------------------------------------
 	// HTML Extra info
 
 	m_Parameters.Add_Node(
-		NULL							, "NODE_EXTRAINFO"			, LNG("[CAP] Html Extra Info"),
-		LNG("")
+		NULL							, "NODE_EXTRAINFO"			, _TL("Html Extra Info"),
+		_TL("")
 	);
 
 	_AttributeList_Add(
-		m_Parameters("NODE_EXTRAINFO")	, "EXTRAINFO_ATTRIB"		, LNG("[CAP] Attribute"),
-		LNG("")
+		m_Parameters("NODE_EXTRAINFO")	, "EXTRAINFO_ATTRIB"		, _TL("Attribute"),
+		_TL("")
 	);
 #endif
+
+	m_Parameters("LUT")->asTable()->Set_Field_Type(LUT_MIN, SG_DATATYPE_String);
+	m_Parameters("LUT")->asTable()->Set_Field_Type(LUT_MAX, SG_DATATYPE_String);
 }
 
 
@@ -430,6 +466,8 @@ void CWKSP_Shapes::On_Create_Parameters(void)
 //---------------------------------------------------------
 void CWKSP_Shapes::On_DataObject_Changed(void)
 {
+	CWKSP_Layer::On_DataObject_Changed();
+
 	_AttributeList_Set(m_Parameters("LUT_ATTRIB")			, false);
 	_AttributeList_Set(m_Parameters("METRIC_ATTRIB")		, false);
 	_AttributeList_Set(m_Parameters("LABEL_ATTRIB")			, true);
@@ -437,7 +475,7 @@ void CWKSP_Shapes::On_DataObject_Changed(void)
 
 	_Chart_Set_Options();
 
-	m_pTable->DataObject_Changed(NULL);
+	m_pTable->DataObject_Changed();
 
 #ifdef USE_HTMLINFO
 	_AttributeList_Set(m_Parameters("EXTRAINFO_ATTRIB") , true);
@@ -447,17 +485,21 @@ void CWKSP_Shapes::On_DataObject_Changed(void)
 //---------------------------------------------------------
 void CWKSP_Shapes::On_Parameters_Changed(void)
 {
+	CWKSP_Layer::On_Parameters_Changed();
+
 	m_Def_Color	= Get_Color_asWX(m_Parameters("UNISYMBOL_COLOR")->asColor());
 
 	//-----------------------------------------------------
 	switch( m_Parameters("COLORS_TYPE")->asInt() )
 	{
-	default:	m_iColor	= -1;	break;
-	case 1:		m_iColor	= m_Parameters("LUT_ATTRIB")   ->asInt();	break;
-	case 2:		m_iColor	= m_Parameters("METRIC_ATTRIB")->asInt();	break;
+	default:
+	case 0:	m_iColor	= -1;										break;	// CLASSIFY_UNIQUE
+	case 1:	m_iColor	= m_Parameters("LUT_ATTRIB"   )->asInt();	break;	// CLASSIFY_LUT
+	case 2:	m_iColor	= m_Parameters("METRIC_ATTRIB")->asInt();	break;	// CLASSIFY_METRIC
+	case 3:	m_iColor	= m_Parameters("METRIC_ATTRIB")->asInt();	break;	// CLASSIFY_GRADUATED
 	}
 
-	if( m_iColor >= m_pShapes->Get_Field_Count() )
+	if( m_iColor >= Get_Shapes()->Get_Field_Count() )
 	{
 		m_iColor	= -1;
 	}
@@ -468,21 +510,37 @@ void CWKSP_Shapes::On_Parameters_Changed(void)
 	}
 
 	//-----------------------------------------------------
-	if( (m_iLabel = m_Parameters("LABEL_ATTRIB")->asInt()) >= m_pShapes->Get_Field_Count() )
+	if( (m_iLabel = m_Parameters("LABEL_ATTRIB")->asInt()) >= Get_Shapes()->Get_Field_Count() )
 	{
 		m_iLabel	= -1;
 	}
 
-	if( (m_iLabel_Size = m_Parameters("LABEL_ATTRIB_SIZE_BY")->asInt()) >= m_pShapes->Get_Field_Count() )
+	if( (m_iLabel_Size = m_Parameters("LABEL_ATTRIB_SIZE_BY")->asInt()) >= Get_Shapes()->Get_Field_Count() )
 	{
 		m_iLabel_Size	= -1;
 	}
 
-	m_Label_Prec	= m_Parameters("LABEL_ATTRIB_PREC")->asInt() - 2;
+	m_Label_Prec		= m_Parameters("LABEL_ATTRIB_PREC")->asInt() - 2;
+
+	switch( m_Parameters("LABEL_ATTRIB_EFFECT")->asInt() )
+	{
+	default:	m_Label_Eff	= TEXTEFFECT_NONE;			break;
+	case 1:		m_Label_Eff	= TEXTEFFECT_FRAME;			break;
+	case 2:		m_Label_Eff	= TEXTEFFECT_TOP;			break;
+	case 3:		m_Label_Eff	= TEXTEFFECT_TOPLEFT;		break;
+	case 4:		m_Label_Eff	= TEXTEFFECT_LEFT;			break;
+	case 5:		m_Label_Eff	= TEXTEFFECT_BOTTOMLEFT;	break;
+	case 6:		m_Label_Eff	= TEXTEFFECT_BOTTOM;		break;
+	case 7:		m_Label_Eff	= TEXTEFFECT_BOTTOMRIGHT;	break;
+	case 8:		m_Label_Eff	= TEXTEFFECT_RIGHT;			break;
+	case 9:		m_Label_Eff	= TEXTEFFECT_TOPRIGHT;		break;
+	}
+
+	m_Label_Eff_Color	= m_Parameters("LABEL_ATTRIB_EFFECT_COLOR")->asColor();
 
 	//-----------------------------------------------------
 #ifdef USE_HTMLINFO
-	if( (m_iExtraInfo = m_Parameters("EXTRAINFO_ATTRIB")->asInt()) >= m_pShapes->Get_Field_Count() )
+	if( (m_iExtraInfo = m_Parameters("EXTRAINFO_ATTRIB")->asInt()) >= Get_Shapes()->Get_Field_Count() )
 	{
 		m_iExtraInfo	= -1;
 	}
@@ -511,9 +569,19 @@ int CWKSP_Shapes::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Paramete
 			int		zField	= pParameters->Get_Parameter("METRIC_ATTRIB")->asInt();
 
 			pParameters->Get_Parameter("METRIC_ZRANGE")->asRange()->Set_Range(
-				m_pShapes->Get_Minimum(zField),
-				m_pShapes->Get_Maximum(zField)
+				Get_Shapes()->Get_Minimum(zField),
+				Get_Shapes()->Get_Maximum(zField)
 			);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), wxT("LUT_ATTRIB"))
+		&&  pParameter->asInt() >= 0 && pParameter->asInt() < Get_Shapes()->Get_Field_Count() )
+		{
+			TSG_Data_Type	Type	= SG_Data_Type_is_Numeric(Get_Shapes()->Get_Field_Type(pParameter->asInt()))
+									? SG_DATATYPE_Double : SG_DATATYPE_String;
+
+			m_Parameters("LUT")->asTable()->Set_Field_Type(LUT_MIN, Type);
+			m_Parameters("LUT")->asTable()->Set_Field_Type(LUT_MAX, Type);
 		}
 	}
 
@@ -526,31 +594,30 @@ int CWKSP_Shapes::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Paramete
 			pParameters->Get_Parameter("OUTLINE_SIZE" )->Set_Enabled(pParameter->asBool());
 		}
 
-		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("COLORS_TYPE")) )
-		{
-			int		Value	= pParameter->asInt();
-
-			pParameters->Get_Parameter("NODE_UNISYMBOL")->Set_Enabled(Value == 0);
-			pParameters->Get_Parameter("NODE_LUT"      )->Set_Enabled(Value == 1);
-			pParameters->Get_Parameter("NODE_METRIC"   )->Set_Enabled(Value == 2);
-		}
-
 		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("LABEL_ATTRIB")) )
 		{
-			bool	Value	= pParameter->asInt() < m_pShapes->Get_Field_Count();
+			bool	Value	= pParameter->asInt() < Get_Shapes()->Get_Field_Count();
 
 			pParameters->Get_Parameter("LABEL_ATTRIB_FONT"     )->Set_Enabled(Value);
 			pParameters->Get_Parameter("LABEL_ATTRIB_SIZE_TYPE")->Set_Enabled(Value);
 			pParameters->Get_Parameter("LABEL_ATTRIB_PREC"     )->Set_Enabled(Value);
 			pParameters->Get_Parameter("LABEL_ATTRIB_SIZE"     )->Set_Enabled(Value);
 			pParameters->Get_Parameter("LABEL_ATTRIB_SIZE_BY"  )->Set_Enabled(Value);
+			pParameters->Get_Parameter("LABEL_ATTRIB_EFFECT"   )->Set_Enabled(Value);
 		}
 
 		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("LABEL_ATTRIB_SIZE_BY")) )
 		{
-			bool	Value	= pParameter->asInt() >= m_pShapes->Get_Field_Count();
+			bool	Value	= pParameter->asInt() >= Get_Shapes()->Get_Field_Count();
 
 			pParameters->Get_Parameter("LABEL_ATTRIB_SIZE")->Set_Enabled(Value);
+		}
+
+		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("LABEL_ATTRIB_EFFECT")) )
+		{
+			bool	Value	= pParameter->asInt() > 0;
+
+			pParameters->Get_Parameter("LABEL_ATTRIB_EFFECT_COLOR")->Set_Enabled(Value);
 		}
 
 		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("EDIT_SNAP_LIST")) )
@@ -560,7 +627,7 @@ int CWKSP_Shapes::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Paramete
 
 		if(	!SG_STR_CMP(pParameters->Get_Identifier(), SG_T("DISPLAY_CHART")) )
 		{
-			wxString	s(pParameter->Get_Identifier());
+			CSG_String	s(pParameter->Get_Identifier());
 
 			if( s.Find(wxT("FIELD_")) == 0 )
 			{
@@ -594,16 +661,14 @@ void CWKSP_Shapes::On_Update_Views(void)
 //---------------------------------------------------------
 void CWKSP_Shapes::_LUT_Create(void)
 {
-	int				iField, jField, Type;
+	int				iField, Method;
 	CSG_Colors		*pColors;
-	CSG_Table		*pTable, *pLUT;
+	CSG_Table		*pLUT;
 
 	//-----------------------------------------------------
-	pTable	= Get_Table()->Get_Table();
-
-	if( pTable->Get_Field_Count() <= 0 || pTable->Get_Record_Count() < 1 )
+	if( Get_Shapes()->Get_Field_Count() <= 0 || Get_Shapes()->Get_Record_Count() < 1 )
 	{
-		DLG_Message_Show(LNG("Function failed because no attributes are available"), LNG("Create Lookup Table"));
+		DLG_Message_Show(_TL("Function failed because no attributes are available"), _TL("Create Lookup Table"));
 
 		return;
 	}
@@ -611,9 +676,9 @@ void CWKSP_Shapes::_LUT_Create(void)
 	//-----------------------------------------------------
 	CSG_String	sFields;
 
-	for(iField=0; iField<pTable->Get_Field_Count(); iField++)
+	for(iField=0; iField<Get_Shapes()->Get_Field_Count(); iField++)
 	{
-		sFields	+= pTable->Get_Field_Name(iField);	sFields	+= SG_T("|");
+		sFields	+= Get_Shapes()->Get_Field_Name(iField);	sFields	+= SG_T("|");
 	}
 
 	//-----------------------------------------------------
@@ -625,26 +690,26 @@ void CWKSP_Shapes::_LUT_Create(void)
 	}
 	else
 	{
-		Parameters.Create(NULL, LNG("Create Lookup Table"), LNG(""));
+		Parameters.Create(NULL, _TL("Create Lookup Table"), _TL(""));
 
 		Parameters.Add_Choice(
-			NULL, "FIELD"	, LNG("Attribute"),
-			LNG(""),
+			NULL, "FIELD"	, _TL("Attribute"),
+			_TL(""),
 			sFields
 		);
 
 		Parameters.Add_Colors(
-			NULL, "COLOR"	, LNG("Colors"),
-			LNG("")
+			NULL, "COLOR"	, _TL("Colors"),
+			_TL("")
 		)->asColors()->Set_Count(10);
 
 		Parameters.Add_Choice(
-			NULL, "TYPE"	, LNG("Classification Type"),
-			LNG(""),
+			NULL, "METHOD"	, _TL("Classification Method"),
+			_TL(""),
 			CSG_String::Format(SG_T("%s|%s|%s|"),
-				LNG("unique values"),
-				LNG("equal intervals"),
-				LNG("quantiles")
+				_TL("unique values"),
+				_TL("equal intervals"),
+				_TL("quantiles")
 			), 0
 		);
 	}
@@ -655,57 +720,46 @@ void CWKSP_Shapes::_LUT_Create(void)
 	}
 
 	//-----------------------------------------------------
-	pColors	= Parameters("COLOR")	->asColors();
-	iField	= Parameters("FIELD")	->asInt();
+	pColors	= Parameters("COLOR" )->asColors();
+	iField	= Parameters("FIELD" )->asInt();
+	Method	= !SG_Data_Type_is_Numeric(Get_Shapes()->Get_Field_Type(iField)) ? 0	// unique values
+			: Parameters("METHOD")->asInt();
 
-	if( pTable->Get_Field_Type(iField) == SG_DATATYPE_String )
-	{
-		Type	= 0;	// unique values
-		jField	= pTable->Get_Field_Count();
-		pTable->Add_Field(CSG_String::Format(wxT("%s_LUT"), pTable->Get_Field_Name(iField)), SG_DATATYPE_Int);
-	}
-	else
-	{
-		Type	= Parameters("TYPE")->asInt();
-		jField	= iField;
-	}
-
-	pLUT	= m_Parameters("LUT")->asTable();
+	pLUT	= m_Parameters("LUT" )->asTable();
 	pLUT	->Del_Records();
 
-	switch( Type )
+	switch( Method )
 	{
 	//-----------------------------------------------------
 	case 0:	// unique values
 		{
-			TSG_Table_Index_Order	old_Order	= pTable->Get_Index_Order(0);
-			int						old_Field	= pTable->Get_Index_Field(0);
+			TSG_Table_Index_Order	old_Order	= Get_Shapes()->Get_Index_Order(0);
+			int						old_Field	= Get_Shapes()->Get_Index_Field(0);
 
-			pTable->Set_Index(iField, TABLE_INDEX_Ascending);
+			TSG_Data_Type	Type	= SG_Data_Type_is_Numeric(Get_Shapes()->Get_Field_Type(iField))
+									? SG_DATATYPE_Double : SG_DATATYPE_String;
 
-			double		dValue;
+			pLUT->Set_Field_Type(LUT_MIN, Type);
+			pLUT->Set_Field_Type(LUT_MAX, Type);
+
+			Get_Shapes()->Set_Index(iField, TABLE_INDEX_Ascending);
+
 			CSG_String	sValue;
 
-			for(int iRecord=0; iRecord<pTable->Get_Count(); iRecord++)
+			for(int iRecord=0; iRecord<Get_Shapes()->Get_Count(); iRecord++)
 			{
-				CSG_Table_Record	*pRecord	= pTable->Get_Record_byIndex(iRecord);
+				CSG_Table_Record	*pRecord	= Get_Shapes()->Get_Record_byIndex(iRecord);
 
 				if( iRecord == 0 || sValue.Cmp(pRecord->asString(iField)) )
 				{
 					sValue	= pRecord->asString(iField);
-					dValue	= jField != iField ? 1 + iRecord : pRecord->asDouble(iField);
 
 					CSG_Table_Record	*pClass	= pLUT->Add_Record();
 
 					pClass->Set_Value(1, sValue);	// Name
 					pClass->Set_Value(2, sValue);	// Description
-					pClass->Set_Value(3, dValue);	// Minimum
-					pClass->Set_Value(4, dValue);	// Maximum
-				}
-
-				if( jField != iField )
-				{
-					pRecord->Set_Value(jField, dValue);
+					pClass->Set_Value(3, sValue);	// Minimum
+					pClass->Set_Value(4, sValue);	// Maximum
 				}
 			}
 
@@ -716,7 +770,7 @@ void CWKSP_Shapes::_LUT_Create(void)
 				pLUT->Get_Record(iClass)->Set_Value(0, pColors->Get_Color(iClass));
 			}
 
-			pTable->Set_Index(old_Field, old_Order);
+			Get_Shapes()->Set_Index(old_Field, old_Order);
 		}
 		break;
 
@@ -725,12 +779,15 @@ void CWKSP_Shapes::_LUT_Create(void)
 		{
 			double	Minimum, Maximum, Interval;
 
-			Interval	= pTable->Get_Range  (iField) / (double)pColors->Get_Count();
-			Minimum		= pTable->Get_Minimum(iField);
+			Interval	= Get_Shapes()->Get_Range  (iField) / (double)pColors->Get_Count();
+			Minimum		= Get_Shapes()->Get_Minimum(iField);
+
+			pLUT->Set_Field_Type(LUT_MIN, SG_DATATYPE_Double);
+			pLUT->Set_Field_Type(LUT_MAX, SG_DATATYPE_Double);
 
 			for(int iClass=0; iClass<pColors->Get_Count(); iClass++, Minimum+=Interval)
 			{
-				Maximum	= iClass < pColors->Get_Count() - 1 ? Minimum + Interval : pTable->Get_Maximum(iField) + 1.0;
+				Maximum	= iClass < pColors->Get_Count() - 1 ? Minimum + Interval : Get_Shapes()->Get_Maximum(iField) + 1.0;
 
 				CSG_String	sValue;	sValue.Printf(SG_T("%s - %s"),
 					SG_Get_String(Minimum, -2).c_str(),
@@ -751,25 +808,28 @@ void CWKSP_Shapes::_LUT_Create(void)
 	//-----------------------------------------------------
 	case 2:	// quantiles
 		{
-			TSG_Table_Index_Order	old_Order	= pTable->Get_Index_Order(0);
-			int						old_Field	= pTable->Get_Index_Field(0);
+			TSG_Table_Index_Order	old_Order	= Get_Shapes()->Get_Index_Order(0);
+			int						old_Field	= Get_Shapes()->Get_Index_Field(0);
 
-			pTable->Set_Index(iField, TABLE_INDEX_Ascending);
+			Get_Shapes()->Set_Index(iField, TABLE_INDEX_Ascending);
 
-			if( pTable->Get_Count() < pColors->Get_Count() )
+			pLUT->Set_Field_Type(LUT_MIN, SG_DATATYPE_Double);
+			pLUT->Set_Field_Type(LUT_MAX, SG_DATATYPE_Double);
+
+			if( Get_Shapes()->Get_Count() < pColors->Get_Count() )
 			{
-				pColors->Set_Count(pTable->Get_Count());
+				pColors->Set_Count(Get_Shapes()->Get_Count());
 			}
 
 			double	Minimum, Maximum, Count, iRecord;
 
-			Maximum	= pTable->Get_Minimum(iField);
-			iRecord	= Count	= pTable->Get_Count() / (double)pColors->Get_Count();
+			Maximum	= Get_Shapes()->Get_Minimum(iField);
+			iRecord	= Count	= Get_Shapes()->Get_Count() / (double)pColors->Get_Count();
 
 			for(int iClass=0; iClass<pColors->Get_Count(); iClass++, iRecord+=Count)
 			{
 				Minimum	= Maximum;
-				Maximum	= iRecord < pTable->Get_Count() ? pTable->Get_Record_byIndex((int)iRecord)->asDouble(iField) : pTable->Get_Maximum(iField) + 1.0;
+				Maximum	= iRecord < Get_Shapes()->Get_Count() ? Get_Shapes()->Get_Record_byIndex((int)iRecord)->asDouble(iField) : Get_Shapes()->Get_Maximum(iField) + 1.0;
 
 				CSG_String	sValue;	sValue.Printf(SG_T("%s - %s"),
 					SG_Get_String(Minimum, -2).c_str(),
@@ -785,7 +845,7 @@ void CWKSP_Shapes::_LUT_Create(void)
 				pClass->Set_Value(4, Maximum);	// Maximum
 			}
 
-			pTable->Set_Index(old_Field, old_Order);
+			Get_Shapes()->Set_Index(old_Field, old_Order);
 		}
 		break;
 	}
@@ -793,8 +853,8 @@ void CWKSP_Shapes::_LUT_Create(void)
 	//-----------------------------------------------------
 	DataObject_Changed();
 
-	m_Parameters("COLORS_TYPE")  ->Set_Value(1);	// Lookup Table
-	m_Parameters("LUT_ATTRIB")->Set_Value(jField);
+	m_Parameters("COLORS_TYPE")->Set_Value(CLASSIFY_LUT);	// Lookup Table
+	m_Parameters("LUT_ATTRIB" )->Set_Value(iField);
 
 	Parameters_Changed();
 }
@@ -811,14 +871,14 @@ wxString CWKSP_Shapes::Get_Value(CSG_Point ptWorld, double Epsilon)
 {
 	CSG_Shape		*pShape;
 
-	if( (pShape = m_pShapes->Get_Shape(ptWorld, Epsilon)) != NULL )
+	if( (pShape = Get_Shapes()->Get_Shape(ptWorld, Epsilon)) != NULL )
 	{
 		if( m_iColor >= 0 )
 		{
 			switch( m_pClassify->Get_Mode() )
 			{
 			case CLASSIFY_LUT:
-				return( m_pClassify->Get_Class_Name_byValue(pShape->asDouble(m_iColor)) );
+				return( m_pClassify->Get_Class_Name_byValue(pShape->asString(m_iColor)) );
 
 			case CLASSIFY_METRIC:	default:
 				return( pShape->asString(m_iColor) );
@@ -826,17 +886,17 @@ wxString CWKSP_Shapes::Get_Value(CSG_Point ptWorld, double Epsilon)
 		}
 		else
 		{
-			return( wxString::Format(wxT("%s: %d"), LNG("[CAP] Index"), pShape->Get_Index() + 1) );
+			return( wxString::Format(wxT("%s: %d"), _TL("Index"), pShape->Get_Index() + 1) );
 		}
 	}
 
-	return( LNG("") );
+	return( _TL("") );
 }
 
 //---------------------------------------------------------
 double CWKSP_Shapes::Get_Value_Range(void)
 {
-	return( m_iColor >= 0 ? m_pShapes->Get_Range(m_iColor) : 0.0 );
+	return( m_iColor >= 0 ? Get_Shapes()->Get_Range(m_iColor) : 0.0 );
 }
 
 
@@ -847,10 +907,11 @@ double CWKSP_Shapes::Get_Value_Range(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CWKSP_Shapes::asImage(CSG_Grid *pImage)
+wxString CWKSP_Shapes::Get_Name_Attribute(void)
 {
-	return( false );
+	return(	m_iColor < 0 || m_pClassify->Get_Mode() == CLASSIFY_UNIQUE ? SG_T("") : Get_Shapes()->Get_Field_Name(m_iColor) );
 }
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -878,11 +939,11 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 		_Draw_Initialize(dc);
 
 		//-------------------------------------------------
-		if( bEdit && (m_Edit_pShape || m_pShapes->Get_Selection_Count() > 0) )
+		if( bEdit && (m_Edit_pShape || Get_Shapes()->Get_Selection_Count() > 0) )
 		{
-			for(iShape=0; iShape<m_pShapes->Get_Count(); iShape++)
+			for(iShape=0; iShape<Get_Shapes()->Get_Count(); iShape++)
 			{
-				pShape	= m_pShapes->Get_Shape(iShape);
+				pShape	= Get_Shapes()->Get_Shape(iShape);
 
 				if( !pShape->is_Selected() && dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
 				{
@@ -891,9 +952,9 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 			}
 
 			//---------------------------------------------
-			for(iShape=1; iShape<m_pShapes->Get_Selection_Count(); iShape++)
+			for(iShape=1; iShape<Get_Shapes()->Get_Selection_Count(); iShape++)
 			{
-				pShape	= m_pShapes->Get_Selection(iShape);
+				pShape	= Get_Shapes()->Get_Selection(iShape);
 
 				if( dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
 				{
@@ -907,7 +968,7 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 			}
 			else
 			{
-				pShape	= m_pShapes->Get_Selection(0);
+				pShape	= Get_Shapes()->Get_Selection(0);
 
 				if( dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
 				{
@@ -919,9 +980,9 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 		//-------------------------------------------------
 		else
 		{
-			for(iShape=0; iShape<m_pShapes->Get_Count(); iShape++)
+			for(iShape=0; iShape<Get_Shapes()->Get_Count(); iShape++)
 			{
-				pShape	= m_pShapes->Get_Shape(iShape);
+				pShape	= Get_Shapes()->Get_Shape(iShape);
 
 				if( (m_pClassify->Get_Mode() != CLASSIFY_METRIC || m_iColor < 0 || !pShape->is_NoData(m_iColor))
 				&&	dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
@@ -932,9 +993,9 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 
 			if( _Chart_is_Valid() )
 			{
-				for(iShape=0; iShape<m_pShapes->Get_Count(); iShape++)
+				for(iShape=0; iShape<Get_Shapes()->Get_Count(); iShape++)
 				{
-					pShape	= m_pShapes->Get_Shape(iShape);
+					pShape	= Get_Shapes()->Get_Shape(iShape);
 
 					if( dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
 					{
@@ -969,9 +1030,9 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 				Font.SetPointSize(Size);
 				dc.dc.SetFont(Font);
 
-				for(iShape=0; iShape<m_pShapes->Get_Count(); iShape++)
+				for(iShape=0; iShape<Get_Shapes()->Get_Count(); iShape++)
 				{
-					pShape	= m_pShapes->Get_Shape(iShape);
+					pShape	= Get_Shapes()->Get_Shape(iShape);
 
 					if( dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None )
 					{
@@ -981,9 +1042,9 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 			}
 			else
 			{
-				for(iShape=0; iShape<m_pShapes->Get_Count(); iShape++)
+				for(iShape=0; iShape<Get_Shapes()->Get_Count(); iShape++)
 				{
-					pShape	= m_pShapes->Get_Shape(iShape);
+					pShape	= Get_Shapes()->Get_Shape(iShape);
 
 					if( dc.m_rWorld.Intersects(pShape->Get_Extent()) != INTERSECTION_None
 					&&	(Size = (int)(0.5 + dSize * pShape->asDouble(m_iLabel_Size))) > 0 )
@@ -1025,13 +1086,13 @@ void CWKSP_Shapes::On_Draw(CWKSP_Map_DC &dc_Map, bool bEdit)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CSG_Parameter * CWKSP_Shapes::_AttributeList_Add(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description)
+CSG_Parameter * CWKSP_Shapes::_AttributeList_Add(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description)
 {
 	CSG_Parameter *pParameter;
 
 	pParameter	= m_Parameters.Add_Choice(
 		pNode, Identifier, Name, Description,
-		wxString::Format(wxT("%s|"), LNG("[VAL] [default]")), 0
+		CSG_String::Format(SG_T("%s|"), _TL("<default>")), 0
 	);
 
 	return( pParameter );
@@ -1044,21 +1105,21 @@ void CWKSP_Shapes::_AttributeList_Set(CSG_Parameter *pFields, bool bAddNoField)
 	{
 		wxString	s;
 
-		for(int i=0; i<m_pShapes->Get_Field_Count(); i++)
+		for(int i=0; i<Get_Shapes()->Get_Field_Count(); i++)
 		{
-			s.Append(wxString::Format(wxT("%s|"), m_pShapes->Get_Field_Name(i)));
+			s.Append(wxString::Format(wxT("%s|"), Get_Shapes()->Get_Field_Name(i)));
 		}
 
 		if( bAddNoField )
 		{
-			s.Append(wxString::Format(wxT("%s|"), LNG("[VAL] [none]")));
+			s.Append(wxString::Format(wxT("%s|"), _TL("<none>")));
 		}
 
 		pFields->asChoice()->Set_Items(s);
 
 		if( bAddNoField )
 		{
-			pFields->Set_Value(m_pShapes->Get_Field_Count());
+			pFields->Set_Value(Get_Shapes()->Get_Field_Count());
 		}
 	}
 }
@@ -1071,21 +1132,21 @@ void CWKSP_Shapes::_AttributeList_Set(CSG_Parameter *pFields, bool bAddNoField)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CSG_Parameter * CWKSP_Shapes::_BrushList_Add(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description)
+CSG_Parameter * CWKSP_Shapes::_BrushList_Add(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description)
 {
 	CSG_Parameter *pParameter;
 
 	pParameter	= m_Parameters.Add_Choice(
 		pNode, Identifier, Name, Description,
-		wxString::Format(wxT("%s|%s|%s|%s|%s|%s|%s|%s|"),
-			LNG("[VAL] Opaque"),
-			LNG("[VAL] Transparent"),
-			LNG("[VAL] Backward Diagonal"),
-			LNG("[VAL] Cross Diagonal"),
-			LNG("[VAL] Forward Diagonal"),
-			LNG("[VAL] Cross"),
-			LNG("[VAL] Horizontal"),
-			LNG("[VAL] Vertical")
+		CSG_String::Format(SG_T("%s|%s|%s|%s|%s|%s|%s|%s|"),
+			_TL("Opaque"),
+			_TL("Transparent"),
+			_TL("Backward Diagonal"),
+			_TL("Cross Diagonal"),
+			_TL("Forward Diagonal"),
+			_TL("Cross"),
+			_TL("Horizontal"),
+			_TL("Vertical")
 		), 0
 	);
 
@@ -1110,18 +1171,18 @@ int CWKSP_Shapes::_BrushList_Get_Style(int Index)
 }
 
 //---------------------------------------------------------
-CSG_Parameter * CWKSP_Shapes::_PenList_Add(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description)
+CSG_Parameter * CWKSP_Shapes::_PenList_Add(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description)
 {
 	CSG_Parameter *pParameter;
 
 	pParameter	= m_Parameters.Add_Choice(
 		pNode, Identifier, Name, Description,
-		wxString::Format(wxT("%s|%s|%s|%s|%s|"),
-			LNG("[VAL] Solid"),
-			LNG("[VAL] Dotted"),
-			LNG("[VAL] Long Dashed"),
-			LNG("[VAL] Short Dashed"),
-			LNG("[VAL] Dot And Dash")
+		CSG_String::Format(SG_T("%s|%s|%s|%s|%s|"),
+			_TL("Solid"),
+			_TL("Dotted"),
+			_TL("Long Dashed"),
+			_TL("Short Dashed"),
+			_TL("Dot And Dash")
 		), 0
 	);
 
@@ -1150,6 +1211,29 @@ int CWKSP_Shapes::_PenList_Get_Style(int Index)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+bool CWKSP_Shapes::_Get_Class_Color(CSG_Shape *pShape, int &Color)
+{
+	if( pShape && Get_Shapes() && m_iColor >= 0 )
+	{
+		if( m_pClassify->Get_Mode() == CLASSIFY_LUT && !SG_Data_Type_is_Numeric(Get_Shapes()->Get_Field_Type(m_iColor)) )
+		{
+			return( m_pClassify->Get_Class_Color_byValue(pShape->asString(m_iColor), Color) );
+		}
+
+		return( m_pClassify->Get_Class_Color_byValue(pShape->asDouble(m_iColor), Color) );
+	}
+
+	return( false );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 bool CWKSP_Shapes::_Chart_Set_Options(void)
 {
 	CSG_Parameters	*pChart	= m_Parameters("DISPLAY_CHART")->asParameters();
@@ -1164,80 +1248,80 @@ bool CWKSP_Shapes::_Chart_Set_Options(void)
 		CSG_String		sFields;
 		CSG_Parameter	*pFields, *pField;
 
-		for(i=0, n=0; i<m_pShapes->Get_Field_Count(); i++)
+		for(i=0, n=0; i<Get_Shapes()->Get_Field_Count(); i++)
 		{
-			if( m_pShapes->Get_Field_Type(i) != SG_DATATYPE_String )
+			if( Get_Shapes()->Get_Field_Type(i) != SG_DATATYPE_String )
 				n++;
 		}
 
 		if( n > 0 )
 		{
 			pChart->Add_Choice(
-				NULL, "TYPE"	, LNG("Chart Type"),
-				LNG(""),
-				CSG_String::Format(wxT("%s|%s|%s|%s|"),
-					LNG("bar"),
-					LNG("bar (not outlined)"),
-					LNG("pie"),
-					LNG("pie (not outlined)")
+				NULL, "TYPE"	, _TL("Chart Type"),
+				_TL(""),
+				CSG_String::Format(SG_T("%s|%s|%s|%s|"),
+					_TL("bar"),
+					_TL("bar (not outlined)"),
+					_TL("pie"),
+					_TL("pie (not outlined)")
 				), 0
 			);
 
 			pChart->Add_Choice(
-				NULL, "SIZE_FIELD"		, LNG("[CAP] Attribute (Size)"),
-				LNG(""),
-				CSG_String::Format(wxT("%s|"), LNG("[VAL] [not set]")), 0
+				NULL, "SIZE_FIELD"		, _TL("Attribute (Size)"),
+				_TL(""),
+				CSG_String::Format(SG_T("%s|"), _TL("<not set>")), 0
 			);
 
 			pChart->Add_Choice(
-				NULL, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
-				LNG(""),
-				wxString::Format(wxT("%s|%s|"),
-					LNG("[VAL] Screen"),
-					LNG("[VAL] Map Units")
+				NULL, "SIZE_TYPE"		, _TL("Size relates to..."),
+				_TL(""),
+				CSG_String::Format(SG_T("%s|%s|"),
+					_TL("Screen"),
+					_TL("Map Units")
 				), 0
 			);
 
 			pChart->Add_Value(
-				NULL, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
-				LNG(""),
+				NULL, "SIZE_DEFAULT"	, _TL("Default Size"),
+				_TL(""),
 				PARAMETER_TYPE_Double, 15, 0, true
 			);
 
 			pChart->Add_Range(
-				NULL, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
-				LNG(""),
+				NULL, "SIZE_RANGE"		, _TL("Size Range"),
+				_TL(""),
 				5, 25, 0, true
 			);
 
-			pFields	= pChart->Add_Node(NULL, "NODE_FIELDS", LNG("Fields"), LNG(""));
+			pFields	= pChart->Add_Node(NULL, "NODE_FIELDS", _TL("Fields"), _TL(""));
 
 			Colors.Set_Count(n);
 
-			for(i=0, n=0; i<m_pShapes->Get_Field_Count(); i++)
+			for(i=0, n=0; i<Get_Shapes()->Get_Field_Count(); i++)
 			{
-				if( m_pShapes->Get_Field_Type(i) != SG_DATATYPE_String )
+				if( Get_Shapes()->Get_Field_Type(i) != SG_DATATYPE_String )
 				{
-					sFields.Append(CSG_String::Format(wxT("%s|"), m_pShapes->Get_Field_Name(i)));
+					sFields.Append(CSG_String::Format(SG_T("%s|"), Get_Shapes()->Get_Field_Name(i)));
 
 					pField	= pChart->Add_Value(
-						pFields	, wxString::Format(wxT("FIELD_%d"), i), m_pShapes->Get_Field_Name(i),
-						LNG(""),
+						pFields	, CSG_String::Format(SG_T("FIELD_%d"), i), Get_Shapes()->Get_Field_Name(i),
+						_TL(""),
 						PARAMETER_TYPE_Bool , false
 					);
 
 					pChart->Add_Value(
-						pField	, wxString::Format(wxT("COLOR_%d"), i), SG_T(""),
-						LNG(""),
+						pField	, CSG_String::Format(SG_T("COLOR_%d"), i), SG_T(""),
+						_TL(""),
 						PARAMETER_TYPE_Color, Colors.Get_Color(n++)
 					);
 				}
 			}
 
-			sFields.Append(CSG_String::Format(wxT("%s|"), LNG("[VAL] [none]")));
+			sFields.Append(CSG_String::Format(SG_T("%s|"), _TL("<none>")));
 			pFields	= pChart->Get_Parameter("SIZE_FIELD");
 			pFields->asChoice()->Set_Items(sFields);
-			pFields->Set_Value(m_pShapes->Get_Field_Count());
+			pFields->Set_Value(Get_Shapes()->Get_Field_Count());
 
 			return( true );
 		}
@@ -1257,14 +1341,14 @@ bool CWKSP_Shapes::_Chart_Get_Options(void)
 
 	if( pChart->Get_Parameter("NODE_FIELDS") )
 	{
-		for(int i=0, n=0; i<m_pShapes->Get_Field_Count(); i++)
+		for(int i=0, n=0; i<Get_Shapes()->Get_Field_Count(); i++)
 		{
-			if(	(p = pChart->Get_Parameter(wxString::Format(wxT("FIELD_%d"), i))) != NULL )
+			if(	(p = pChart->Get_Parameter(CSG_String::Format(SG_T("FIELD_%d"), i))) != NULL )
 			{
 				if( pChart->Get_Parameter("SIZE_FIELD")->asInt() == n++ )
 					m_Chart_sField	= i;
 
-				if( p->asBool() && (p = pChart->Get_Parameter(wxString::Format(wxT("COLOR_%d"), i))) != NULL )
+				if( p->asBool() && (p = pChart->Get_Parameter(CSG_String::Format(SG_T("COLOR_%d"), i))) != NULL )
 					m_Chart.Add(i, p->asColor());
 			}
 		}
@@ -1293,11 +1377,11 @@ void CWKSP_Shapes::_Draw_Chart(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 
 		if( m_Chart_sField >= 0 )
 		{
-			double	range	= m_pShapes->Get_Range(m_Chart_sField);
+			double	range	= Get_Shapes()->Get_Range(m_Chart_sField);
 
 			if( range > 0.0 )
 			{
-				dSize	+= m_Chart_sRange * ((pShape->asDouble(m_Chart_sField) - m_pShapes->Get_Minimum(m_Chart_sField)) / range);
+				dSize	+= m_Chart_sRange * ((pShape->asDouble(m_Chart_sField) - Get_Shapes()->Get_Minimum(m_Chart_sField)) / range);
 			}
 		}
 

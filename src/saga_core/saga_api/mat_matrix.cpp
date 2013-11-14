@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_matrix.cpp 1160 2011-09-14 15:11:54Z oconrad $
+ * Version $Id: mat_matrix.cpp 1747 2013-06-24 11:10:21Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -73,10 +73,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		SG_Matrix_LU_Decomposition			(int n, int *Permutation, double **Matrix, bool bSilent);
-bool		SG_Matrix_LU_Solve					(int n, int *Permutation, double **Matrix, double *Vector, bool bSilent);
-
-//---------------------------------------------------------
 bool		SG_Matrix_Triangular_Decomposition	(CSG_Matrix &A, CSG_Vector &d, CSG_Vector &e);
 bool		SG_Matrix_Tridiagonal_QL			(CSG_Matrix &Q, CSG_Vector &d, CSG_Vector &e);
 
@@ -122,20 +118,25 @@ bool CSG_Vector::Create(int n, double *Data)
 		{
 			Destroy();
 
-			m_n	= n;
-			m_z	= (double *)SG_Malloc(m_n * sizeof(double));
+			if( (m_z = (double *)SG_Malloc(n * sizeof(double))) != NULL )
+			{
+				m_n	= n;
+			}
 		}
 
-		if( Data )
+		if( m_z )
 		{
-			memcpy(m_z, Data, m_n * sizeof(double));
-		}
-		else
-		{
-			memset(m_z,    0, m_n * sizeof(double));
-		}
+			if( Data )
+			{
+				memcpy(m_z, Data, m_n * sizeof(double));
+			}
+			else
+			{
+				memset(m_z,    0, m_n * sizeof(double));
+			}
 
-		return( true );
+			return( true );
+		}
 	}
 
 	Destroy();
@@ -154,9 +155,10 @@ bool CSG_Vector::Destroy(void)
 	if( m_z )
 	{
 		SG_Free(m_z);
-		m_z	= NULL;
-		m_n	= 0;
 	}
+
+	m_z	= NULL;
+	m_n	= 0;
 
 	return( true );
 }
@@ -166,6 +168,120 @@ void CSG_Vector::_On_Construction(void)
 {
 	m_z	= NULL;
 	m_n	= 0;
+}
+
+//---------------------------------------------------------
+/**
+  * Sets the number of rows to nRows. Values will be preserved.
+  * Returns true if successful.
+*/
+bool CSG_Vector::Set_Rows(int nRows)
+{
+	if( nRows > m_n )
+	{
+		return( Add_Rows(nRows - m_n) );
+	}
+
+	if( nRows < m_n )
+	{
+		return( Del_Rows(m_n - nRows) );
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Vector::Add_Rows(int nRows)
+{
+	if( nRows > 0 )
+	{
+		double	*z	= (double *)SG_Realloc(m_z, (m_n + nRows) * sizeof(double));
+
+		if( z )
+		{
+			for(int i=m_n; i<m_n+nRows; i++)
+			{
+				z[i]	= 0.0;
+			}
+
+			m_z	 = z;
+			m_n	+= nRows;
+
+			return( true );
+		}
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+/**
+  * Deletes last nRows rows. Sets size to zero if nRows is greater
+  * than current number of rows
+  * Returns true if successful.
+*/
+bool CSG_Vector::Del_Rows(int nRows)
+{
+	if( nRows <= 0 )
+	{
+		return( true );
+	}
+
+	if( nRows >= m_n )
+	{
+		return( Destroy() );
+	}
+
+	double	*z	= (double *)SG_Realloc(m_z, (m_n - nRows) * sizeof(double));
+
+	if( z )
+	{
+		m_z	 = z;
+		m_n	-= nRows;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Vector::Add_Row(double Value)
+{
+	double	*z	= (double *)SG_Realloc(m_z, (m_n + 1) * sizeof(double));
+
+	if( z )
+	{
+		m_z			= z;
+		m_z[m_n++]	= Value;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Vector::Del_Row(void)
+{
+	if( m_n == 1 )
+	{
+		return( Destroy() );
+	}
+	else if( m_n > 1 )
+	{
+		double	*z	= (double *)SG_Realloc(m_z, (m_n - 1) * sizeof(double));
+
+		if( z )
+		{
+			m_z	= z;
+			m_n	--;
+
+			return( true );
+		}
+	}
+
+	return( false );
 }
 
 
@@ -260,7 +376,7 @@ bool CSG_Vector::Add(double Scalar)
 }
 
 //---------------------------------------------------------
-bool CSG_Vector::Add(const class CSG_Vector &Vector)
+bool CSG_Vector::Add(const CSG_Vector &Vector)
 {
 	if( m_n == Vector.m_n && m_n > 0 )
 	{
@@ -276,7 +392,7 @@ bool CSG_Vector::Add(const class CSG_Vector &Vector)
 }
 
 //---------------------------------------------------------
-bool CSG_Vector::Subtract(const class CSG_Vector &Vector)
+bool CSG_Vector::Subtract(const CSG_Vector &Vector)
 {
 	if( m_n == Vector.m_n && m_n > 0 )
 	{
@@ -308,7 +424,7 @@ bool CSG_Vector::Multiply(double Scalar)
 }
 
 //---------------------------------------------------------
-bool CSG_Vector::Multiply(const class CSG_Vector &Vector)
+bool CSG_Vector::Multiply(const CSG_Vector &Vector)
 {
 	if( m_n == Vector.m_n && m_n == 3 )
 	{
@@ -325,7 +441,7 @@ bool CSG_Vector::Multiply(const class CSG_Vector &Vector)
 }
 
 //---------------------------------------------------------
-double CSG_Vector::Multiply_Scalar(const class CSG_Vector &Vector) const
+double CSG_Vector::Multiply_Scalar(const CSG_Vector &Vector) const
 {
 	double	z	= 0.0;
 
@@ -341,7 +457,7 @@ double CSG_Vector::Multiply_Scalar(const class CSG_Vector &Vector) const
 }
 
 //---------------------------------------------------------
-bool CSG_Vector::Multiply(const CSG_Matrix &Matrix)
+bool CSG_Vector::Multiply(const class CSG_Matrix &Matrix)
 {
 	return( Assign(Matrix.Multiply(*this)) );
 }
@@ -382,7 +498,7 @@ CSG_Vector & CSG_Vector::operator += (double Scalar)
 	return( *this );
 }
 
-CSG_Vector & CSG_Vector::operator += (const class CSG_Vector &Vector)
+CSG_Vector & CSG_Vector::operator += (const CSG_Vector &Vector)
 {
 	Add(Vector);
 
@@ -397,7 +513,7 @@ CSG_Vector & CSG_Vector::operator -= (double Scalar)
 	return( *this );
 }
 
-CSG_Vector & CSG_Vector::operator -= (const class CSG_Vector &Vector)
+CSG_Vector & CSG_Vector::operator -= (const CSG_Vector &Vector)
 {
 	Subtract(Vector);
 
@@ -412,14 +528,14 @@ CSG_Vector & CSG_Vector::operator *= (double Scalar)
 	return( *this );
 }
 
-CSG_Vector & CSG_Vector::operator *= (const class CSG_Vector &Vector)
+CSG_Vector & CSG_Vector::operator *= (const CSG_Vector &Vector)
 {
 	Multiply(Vector);
 
 	return( *this );
 }
 
-CSG_Vector & CSG_Vector::operator *= (const CSG_Matrix &Matrix)
+CSG_Vector & CSG_Vector::operator *= (const class CSG_Matrix &Matrix)
 {
 	Multiply(Matrix);
 
@@ -436,7 +552,7 @@ CSG_Vector CSG_Vector::operator + (double Scalar) const
 	return( v );
 }
 
-CSG_Vector CSG_Vector::operator + (const class CSG_Vector &Vector) const
+CSG_Vector CSG_Vector::operator + (const CSG_Vector &Vector) const
 {
 	CSG_Vector	v(*this);
 
@@ -455,7 +571,7 @@ CSG_Vector CSG_Vector::operator - (double Scalar) const
 	return( v );
 }
 
-CSG_Vector CSG_Vector::operator - (const class CSG_Vector &Vector) const
+CSG_Vector CSG_Vector::operator - (const CSG_Vector &Vector) const
 {
 	CSG_Vector	v(*this);
 
@@ -474,7 +590,7 @@ CSG_Vector CSG_Vector::operator * (double Scalar) const
 	return( v );
 }
 
-double CSG_Vector::operator * (const class CSG_Vector &Vector) const
+double CSG_Vector::operator * (const CSG_Vector &Vector) const
 {
 	return( Multiply_Scalar(Vector) );
 }
@@ -621,27 +737,38 @@ bool CSG_Matrix::Create(int nx, int ny, double *Data)
 		{
 			Destroy();
 
-			m_nx	= nx;
-			m_ny	= ny;
-			m_z		= (double **)SG_Malloc(m_ny        * sizeof(double *));
-			m_z[0]	= (double  *)SG_Malloc(m_ny * m_nx * sizeof(double  ));
-
-			for(ny=1; ny<m_ny; ny++)
+			if( (m_z    = (double **)SG_Malloc(ny      * sizeof(double *))) != NULL
+			&&  (m_z[0]	= (double  *)SG_Malloc(ny * nx * sizeof(double  ))) != NULL )
 			{
-				m_z[ny]	= m_z[ny - 1] + nx;
+				m_nx	= nx;
+				m_ny	= ny;
+
+				for(ny=1; ny<m_ny; ny++)
+				{
+					m_z[ny]	= m_z[ny - 1] + nx;
+				}
+			}
+			else
+			{
+				Destroy();
+
+				return( false );
 			}
 		}
 
-		if( Data )
+		if( m_z && m_z[0] )
 		{
-			memcpy(m_z[0], Data, m_ny * m_nx * sizeof(double));
-		}
-		else
-		{
-			memset(m_z[0],    0, m_ny * m_nx * sizeof(double));
-		}
+			if( Data )
+			{
+				memcpy(m_z[0], Data, m_ny * m_nx * sizeof(double));
+			}
+			else
+			{
+				memset(m_z[0],    0, m_ny * m_nx * sizeof(double));
+			}
 
-		return( true );
+			return( true );
+		}
 	}
 
 	Destroy();
@@ -659,13 +786,17 @@ bool CSG_Matrix::Destroy(void)
 {
 	if( m_z )
 	{
-		SG_Free(m_z[0]);
-		SG_Free(m_z);
+		if( m_z[0] )
+		{
+			SG_Free(m_z[0]);
+		}
 
-		m_z		= NULL;
-		m_nx	= 0;
-		m_ny	= 0;
+		SG_Free(m_z);
 	}
+
+	m_z		= NULL;
+	m_nx	= 0;
+	m_ny	= 0;
 
 	return( true );
 }
@@ -684,6 +815,44 @@ void CSG_Matrix::_On_Construction(void)
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Matrix::Set_Size(int nRows, int nCols)
+{
+	return( nRows > 0 && nCols > 0 && Set_Rows(nRows) && Set_Cols(nCols) );
+}
+
+//---------------------------------------------------------
+bool CSG_Matrix::Set_Cols(int nCols)
+{
+	if( nCols > m_nx )
+	{
+		return( Add_Cols(nCols - m_nx) );
+	}
+
+	if( nCols < m_nx )
+	{
+		return( Del_Cols(m_nx - nCols) );
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Matrix::Set_Rows(int nRows)
+{
+	if( nRows > m_ny )
+	{
+		return( Add_Rows(nRows - m_ny) );
+	}
+
+	if( nRows < m_ny )
+	{
+		return( Del_Rows(m_ny - nRows) );
+	}
+
+	return( true );
+}
 
 //---------------------------------------------------------
 bool CSG_Matrix::Add_Cols(int nCols)
@@ -722,6 +891,49 @@ bool CSG_Matrix::Add_Rows(int nRows)
 		}
 
 		memset(m_z[m_ny - nRows], 0, nRows * m_nx * sizeof(double));
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+/**
+  * Deletes the last nCols columns.
+*/
+bool CSG_Matrix::Del_Cols(int nCols)
+{
+	if( nCols > 0 && m_ny > 0 && nCols < m_nx )
+	{
+		CSG_Matrix	Tmp(*this);
+
+		if( Create(Tmp.m_nx - nCols, Tmp.m_ny) )
+		{
+			for(int y=0; y<Tmp.m_ny; y++)
+			{
+				memcpy(m_z[y], Tmp.m_z[y], m_nx * sizeof(double));
+			}
+
+			return( true );
+		}
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+/**
+  * Deletes the last nRows rows.
+*/
+bool CSG_Matrix::Del_Rows(int nRows)
+{
+	if( nRows > 0 && m_nx > 0 && nRows < m_ny )
+	{
+		m_ny	-= nRows;
+
+		m_z		= (double **)SG_Realloc(m_z   , m_ny        * sizeof(double *));
+		m_z[0]	= (double  *)SG_Realloc(m_z[0], m_ny * m_nx * sizeof(double  ));
 
 		return( true );
 	}
@@ -1359,7 +1571,7 @@ bool CSG_Matrix::Set_Transpose(void)
 		{
 			for(int x=0; x<m_nx; x++)
 			{
-				m_z[y][x]	= m.m_z[y][x];
+				m_z[y][x]	= m.m_z[x][y];
 			}
 		}
 
@@ -1403,7 +1615,7 @@ bool CSG_Matrix::Set_Inverse(bool bSilent, int nSubSquare)
 				v.Set_Zero();
 				v[j]	= 1.0;
 
-				SG_Matrix_LU_Solve(n, Permutation, m.Get_Data(), v.Get_Data(), true);
+				SG_Matrix_LU_Solve(n, Permutation, m, v.Get_Data(), true);
 
 				for(int i=0; i<n; i++)
 				{
@@ -1487,7 +1699,7 @@ bool		SG_Matrix_Solve(CSG_Matrix &Matrix, CSG_Vector &Vector, bool bSilent)
 
 		if( SG_Matrix_LU_Decomposition(n, Permutation, Matrix.Get_Data(), bSilent) )
 		{
-			SG_Matrix_LU_Solve(n, Permutation, Matrix.Get_Data(), Vector.Get_Data(), bSilent);
+			SG_Matrix_LU_Solve(n, Permutation, Matrix, Vector.Get_Data(), bSilent);
 
 			bResult	= true;
 		}
@@ -1622,7 +1834,7 @@ bool		SG_Matrix_LU_Decomposition(int n, int *Permutation, double **Matrix, bool 
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		SG_Matrix_LU_Solve(int n, int *Permutation, double **Matrix, double *Vector, bool bSilent)
+bool		SG_Matrix_LU_Solve(int n, const int *Permutation, const double **Matrix, double *Vector, bool bSilent)
 {
 	int		i, j, k;
 	double	Sum;

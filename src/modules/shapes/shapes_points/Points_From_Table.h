@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Points_From_Table.h 915 2011-02-15 08:43:36Z oconrad $
+ * Version $Id: Points_From_Table.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 /*******************************************************************************
@@ -54,7 +54,7 @@ class CPoints_From_Table : public CSG_Module
 public:
 	CPoints_From_Table(void);
 
-	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:

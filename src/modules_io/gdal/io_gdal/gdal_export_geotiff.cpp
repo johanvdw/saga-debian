@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_export_geotiff.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: gdal_export_geotiff.cpp 1379 2012-04-26 11:58:47Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,18 +86,24 @@ CGDAL_Export_GeoTIFF::CGDAL_Export_GeoTIFF(void)
 	//-----------------------------------------------------
 	Parameters.Add_Grid_List(
 		NULL, "GRIDS"	, _TL("Grid(s)"),
-		_TL(""),
+		_TL("The SAGA grids to be exported."),
 		PARAMETER_INPUT
 	);
 
 	Parameters.Add_FilePath(
 		NULL, "FILE"	, _TL("File"),
-		_TL(""),
+		_TL("The GeoTIFF File to be created."),
 		CSG_String::Format(
 			SG_T("%s|*.tif;*.tiff|%s|*.*"),
 			_TL("TIFF files (*.tif)"),
 			_TL("All Files")
 		), NULL, true
+	);
+	
+	Parameters.Add_String(
+		NULL, "OPTIONS"	, _TL("Creation Options"),
+		_TL("A space separated list of key-value pairs (K=V)."), _TL("")
+		
 	);
 }
 
@@ -111,7 +117,7 @@ CGDAL_Export_GeoTIFF::CGDAL_Export_GeoTIFF(void)
 //---------------------------------------------------------
 bool CGDAL_Export_GeoTIFF::On_Execute(void)
 {
-	CSG_String				File_Name;
+	CSG_String				File_Name, Options;
 	CSG_Projection			Projection;
 	CSG_Parameter_Grid_List	*pGrids;
 	CSG_GDAL_DataSet		DataSet;
@@ -119,11 +125,11 @@ bool CGDAL_Export_GeoTIFF::On_Execute(void)
 	//-----------------------------------------------------
 	pGrids		= Parameters("GRIDS")	->asGridList();
 	File_Name	= Parameters("FILE")	->asString();
-
+	Options		= Parameters("OPTIONS")	->asString();
 	Get_Projection(Projection);
 
 	//-----------------------------------------------------
-	if( !DataSet.Open_Write(File_Name, SG_T("GTiff"), SG_Get_Grid_Type(pGrids), pGrids->Get_Count(), *Get_System(), Projection) )
+	if( !DataSet.Open_Write(File_Name, SG_T("GTiff"), Options, SG_Get_Grid_Type(pGrids), pGrids->Get_Count(), *Get_System(), Projection) )
 	{
 		return( false );
 	}
@@ -136,6 +142,11 @@ bool CGDAL_Export_GeoTIFF::On_Execute(void)
 		DataSet.Write(i, pGrids->asGrid(i));
 	}
 
+	if( !DataSet.Close() )
+	{
+		return( false );
+	}
+	
 	return( true );
 }
 

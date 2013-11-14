@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_frame.cpp 1200 2011-10-25 15:23:04Z oconrad $
+ * Version $Id: saga_frame.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -271,7 +271,7 @@ CSAGA_Frame::CSAGA_Frame(void)
 	CreateStatusBar		(STATUSBAR_COUNT);
 	SetStatusWidths		(STATUSBAR_COUNT, STATUSBAR_Sizes);
 	SetStatusBarPane	(STATUSBAR_DEFAULT);
-	StatusBar_Set_Text	(LNG("[VAL] ready"));
+	StatusBar_Set_Text	(_TL("ready"));
 
 	m_pProgressBar		= ((CSAGA_Frame_StatusBar *)GetStatusBar())->m_pProgressBar;
 
@@ -293,13 +293,13 @@ CSAGA_Frame::CSAGA_Frame(void)
 //	m_pLayout->SetFlags(m_pLayout->GetFlags() ^ wxAUI_MGR_ALLOW_ACTIVE_PANE);
 
 	//-----------------------------------------------------
-	_Bar_Add(m_pINFO		= new CINFO       (this), 0);	m_pINFO			->Add_Pages();
-	_Bar_Add(m_pWKSP		= new CWKSP       (this), 2);	m_pWKSP			->Add_Pages();
-	_Bar_Add(m_pActive		= new CACTIVE     (this), 1);	m_pActive		->Add_Pages();
-	_Bar_Add(m_pData_Source	= new CData_Source(this), 2);	m_pData_Source	->Add_Pages();
+	_Bar_Add(m_pINFO		= new CINFO       (this), 0, 0);	m_pINFO			->Add_Pages();
+	_Bar_Add(m_pWKSP		= new CWKSP       (this), 2, 1);	m_pWKSP			->Add_Pages();
+	_Bar_Add(m_pData_Source	= new CData_Source(this), 2, 1);	m_pData_Source	->Add_Pages();
+	_Bar_Add(m_pActive		= new CACTIVE     (this), 2, 0);	m_pActive		->Add_Pages();
 
 	//-----------------------------------------------------
-	SetMenuBar(MB_Create(NULL));
+	_Create_MenuBar();
 
 	//-----------------------------------------------------
 	m_pTB_Main			= 						  _Create_ToolBar();
@@ -319,13 +319,6 @@ CSAGA_Frame::CSAGA_Frame(void)
 	if( CONFIG_Read(wxT("/FL"), wxT("MANAGER"), s) )
 	{
 		m_pLayout->LoadPerspective(s);
-	}
-	else
-	{
-		m_pLayout->GetPane(m_pWKSP       ).BestSize(400, 400).FloatingSize(400, 400).Left();
-		m_pLayout->GetPane(m_pData_Source).BestSize(400, 400).FloatingSize(400, 400).Left();
-		m_pLayout->GetPane(m_pActive     ).BestSize(400, 400).FloatingSize(400, 400).Right();
-		m_pLayout->GetPane(m_pINFO       ).BestSize(400, 100).FloatingSize(600, 400).Bottom();
 	}
 
 	_Bar_Show(m_pTB_Main, true);
@@ -390,11 +383,22 @@ CSAGA_Frame::~CSAGA_Frame(void)
 	}
 
 	//-----------------------------------------------------
-	CONFIG_Write(wxT("/FL"), wxT("MANAGER"), m_pLayout->SavePerspective().c_str());
+	CONFIG_Write(wxT("/FL"), wxT("MANAGER"), m_pLayout->SavePerspective());
 
 	m_pLayout->UnInit();
 
 	delete(m_pLayout);
+
+	//-----------------------------------------------------
+	GetMenuBar()->Remove(2);	// we want delete the following menus...
+
+	delete(m_pMN_Table);
+	delete(m_pMN_Diagram);
+	delete(m_pMN_Map);
+	delete(m_pMN_Map_3D);
+	delete(m_pMN_Histogram);
+	delete(m_pMN_ScatterPlot);
+	delete(m_pMN_Layout);
 
 	//-----------------------------------------------------
 	if( m_pTopWindows )
@@ -429,7 +433,7 @@ void CSAGA_Frame::On_Close(wxCloseEvent &event)
 		{
 			if( g_pModule )
 			{
-				DLG_Message_Show(LNG("Please stop module execution before exiting SAGA."), LNG("Exit SAGA"));
+				DLG_Message_Show(_TL("Please stop module execution before exiting SAGA."), _TL("Exit SAGA"));
 			}
 
 			event.Veto();
@@ -469,7 +473,7 @@ void CSAGA_Frame::On_Help(wxCommandEvent &WXUNUSED(event))
 {
 	if( !Open_WebBrowser(SG_T("http://sourceforge.net/apps/trac/saga-gis/wiki/WikiStart")) )
 	{
-	//	DLG_Message_Show(LNG("Online Help"), LNG("SAGA Help"));
+	//	DLG_Message_Show(_TL("Online Help"), _TL("SAGA Help"));
 	}
 }
 
@@ -675,7 +679,7 @@ void CSAGA_Frame::On_Command_Child(wxCommandEvent &event)
 
 	if( (pChild = GetActiveChild()) != NULL )
 	{
-		pChild->AddPendingEvent(event);
+		pChild->GetEventHandler()->AddPendingEvent(event);
 	}
 }
 
@@ -748,7 +752,7 @@ bool CSAGA_Frame::Process_Get_Okay(bool bBlink)
 //---------------------------------------------------------
 bool CSAGA_Frame::Process_Set_Okay(bool bOkay)
 {
-	StatusBar_Set_Text(LNG("[VAL] ready"));
+	StatusBar_Set_Text(_TL("ready"));
 
 	ProgressBar_Set_Position(0);
 
@@ -784,7 +788,7 @@ bool CSAGA_Frame::ProgressBar_Set_Position(double Position, double Range)
 }
 
 //---------------------------------------------------------
-void CSAGA_Frame::StatusBar_Set_Text(const wxChar *Text, int iPane)
+void CSAGA_Frame::StatusBar_Set_Text(const wxString &Text, int iPane)
 {
 	if( iPane < 0 || iPane >= STATUSBAR_PROGRESS )
 	{
@@ -793,7 +797,7 @@ void CSAGA_Frame::StatusBar_Set_Text(const wxChar *Text, int iPane)
 
 	if( iPane == STATUSBAR_ACTIVE )
 	{
-		Set_Pane_Caption(m_pActive, Text && SG_STR_LEN(Text) > 0 ? Text : LNG("[CAP] Object Properties"));
+		Set_Pane_Caption(m_pActive, Text.Length() > 0 ? Text : wxString(_TL("Object Properties")));
 	}
 
 	SetStatusText(Text, iPane);
@@ -875,37 +879,49 @@ wxWindow * CSAGA_Frame::Top_Window_Get(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CSAGA_Frame::On_Child_Activates(CVIEW_Base *pChild, bool bActivates)
+void CSAGA_Frame::On_Child_Activates(int View_ID)
 {
-	switch( pChild->Get_View_ID() )
+	wxString		Title;
+	wxMenu			*pMenu		= NULL;
+	wxToolBarBase	*pToolBar	= NULL;
+
+	switch( View_ID )
 	{
-	case ID_VIEW_TABLE:
-		_Bar_Show(m_pTB_Table		, bActivates);
-		break;
+	case ID_VIEW_TABLE:			pToolBar = m_pTB_Table      ; pMenu	= m_pMN_Table      ; Title = _TL("Table"      ); break;
+	case ID_VIEW_TABLE_DIAGRAM:	pToolBar = m_pTB_Diagram    ; pMenu	= m_pMN_Diagram    ; Title = _TL("Diagram"    ); break;
+	case ID_VIEW_MAP:			pToolBar = m_pTB_Map        ; pMenu	= m_pMN_Map        ; Title = _TL("Map"        ); break;
+	case ID_VIEW_MAP_3D:		pToolBar = m_pTB_Map_3D     ; pMenu	= m_pMN_Map_3D     ; Title = _TL("3D View"    ); break;
+	case ID_VIEW_HISTOGRAM:		pToolBar = m_pTB_Histogram  ; pMenu	= m_pMN_Histogram  ; Title = _TL("Histogram"  ); break;
+	case ID_VIEW_SCATTERPLOT:	pToolBar = m_pTB_ScatterPlot; pMenu	= m_pMN_ScatterPlot; Title = _TL("Scatterplot"); break;
+	case ID_VIEW_LAYOUT:		pToolBar = m_pTB_Layout     ; pMenu	= m_pMN_Layout     ; Title = _TL("Layout"     ); break;
+	}
 
-	case ID_VIEW_TABLE_DIAGRAM:
-		_Bar_Show(m_pTB_Diagram		, bActivates);
-		break;
+	//-----------------------------------------------------
+	_Bar_Show(m_pTB_Table		, pToolBar == m_pTB_Table);
+	_Bar_Show(m_pTB_Diagram		, pToolBar == m_pTB_Diagram);
+	_Bar_Show(m_pTB_Map			, pToolBar == m_pTB_Map);
+	_Bar_Show(m_pTB_Map_3D		, pToolBar == m_pTB_Map_3D);
+	_Bar_Show(m_pTB_Histogram	, pToolBar == m_pTB_Histogram);
+	_Bar_Show(m_pTB_ScatterPlot	, pToolBar == m_pTB_ScatterPlot);
+	_Bar_Show(m_pTB_Layout		, pToolBar == m_pTB_Layout);
 
-	case ID_VIEW_MAP:
-		_Bar_Show(m_pTB_Map			, bActivates);
-		break;
+	//-----------------------------------------------------
+	wxMenuBar	*pMenuBar	= GetMenuBar();
 
-	case ID_VIEW_MAP_3D:
-		_Bar_Show(m_pTB_Map_3D		, bActivates);
-		break;
-
-	case ID_VIEW_HISTOGRAM:
-		_Bar_Show(m_pTB_Histogram	, bActivates);
-		break;
-
-	case ID_VIEW_SCATTERPLOT:
-		_Bar_Show(m_pTB_ScatterPlot	, bActivates);
-		break;
-
-	case ID_VIEW_LAYOUT:
-		_Bar_Show(m_pTB_Layout		, bActivates);
-		break;
+	if( pMenu )
+	{
+		if( pMenuBar->GetMenuCount() < 5 )
+		{
+			pMenuBar->Insert (2, pMenu, Title);
+		}
+		else if( pMenuBar->GetMenu(2) != pMenu )
+		{
+			pMenuBar->Replace(2, pMenu, Title);
+		}
+	}
+	else if( pMenuBar->GetMenuCount() == 5 )
+	{
+		pMenuBar->Remove(2);
 	}
 }
 
@@ -917,81 +933,59 @@ void CSAGA_Frame::On_Child_Activates(CVIEW_Base *pChild, bool bActivates)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxMenuBar * CSAGA_Frame::MB_Create(CVIEW_Base *pChild)
+wxMenuBar * CSAGA_Frame::_Create_MenuBar(void)
 {
-	wxMenu		*pMenu;
-	wxMenuBar	*pMenuBar	= new wxMenuBar;
+	//-----------------------------------------------------
+	m_pMN_Table			= CVIEW_Table        ::_Create_Menu();
+	m_pMN_Diagram		= CVIEW_Table_Diagram::_Create_Menu();
+	m_pMN_Map			= CVIEW_Map          ::_Create_Menu();
+	m_pMN_Map_3D		= CVIEW_Map_3D       ::_Create_Menu();
+	m_pMN_Histogram		= CVIEW_Histogram    ::_Create_Menu();
+	m_pMN_ScatterPlot	= CVIEW_ScatterPlot  ::_Create_Menu();
+	m_pMN_Layout		= CVIEW_Layout       ::_Create_Menu();
 
 	//-----------------------------------------------------
-	// 1. File...
+	wxMenu	*pMenu_Window	= new wxMenu;	// Window...
 
-	pMenu		= new wxMenu;
-
-	g_pData->Get_FileMenus()->Add(pMenu);
-
-	pMenuBar->Append(pMenu, LNG("[MNU] File"));
-
-
-	//-----------------------------------------------------
-	// 2. Modules...
-
-	pMenu		= new wxMenu;
-
-	g_pModules->Get_Modules_Menu()->Add(pMenu);
-
-	pMenuBar->Append(pMenu, LNG("[MNU] Modules"));
-
-
-	//-----------------------------------------------------
-	// 3. Window...
-
-	pMenu		= new wxMenu;
-
-	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_FRAME_WKSP_SHOW);
-	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_FRAME_ACTIVE_SHOW);
-	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_FRAME_DATA_SOURCE_SHOW);
-	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_FRAME_INFO_SHOW);
+	CMD_Menu_Add_Item(pMenu_Window,  true, ID_CMD_FRAME_WKSP_SHOW);
+	CMD_Menu_Add_Item(pMenu_Window,  true, ID_CMD_FRAME_ACTIVE_SHOW);
+	CMD_Menu_Add_Item(pMenu_Window,  true, ID_CMD_FRAME_DATA_SOURCE_SHOW);
+	CMD_Menu_Add_Item(pMenu_Window,  true, ID_CMD_FRAME_INFO_SHOW);
 
 #ifdef __WXMSW__
-	pMenu->AppendSeparator();
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_CASCADE);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_TILE_HORZ);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_TILE_VERT);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_ARRANGEICONS);
+	pMenu_Window->AppendSeparator();
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_CASCADE);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_TILE_HORZ);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_TILE_VERT);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_ARRANGEICONS);
 #endif	// #ifdef __WXMSW__
 
-	pMenu->AppendSeparator();
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_NEXT);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_PREVIOUS);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_CLOSE);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_CLOSE_ALL);
-
-	pMenuBar->Append(pMenu, LNG("[MNU] Window"));
-
+	pMenu_Window->AppendSeparator();
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_NEXT);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_PREVIOUS);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_CLOSE);
+	CMD_Menu_Add_Item(pMenu_Window, false, ID_CMD_FRAME_CLOSE_ALL);
 
 	//-----------------------------------------------------
-	// 4. Help...
+	wxMenu	*pMenu_Help		= new wxMenu;	// Help...
 
-	pMenu		= new wxMenu;
-
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_HELP);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_TIPS);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_FRAME_ABOUT);
-
-	pMenuBar->Append(pMenu, LNG("[MNU] ?"));
-
+	CMD_Menu_Add_Item(pMenu_Help, false, ID_CMD_FRAME_HELP);
+	CMD_Menu_Add_Item(pMenu_Help, false, ID_CMD_FRAME_TIPS);
+	CMD_Menu_Add_Item(pMenu_Help, false, ID_CMD_FRAME_ABOUT);
 
 	//-----------------------------------------------------
+	wxMenuBar	*pMenuBar	= new wxMenuBar;
+
+	pMenuBar->Append(g_pData   ->Get_Menu_Files  ()->Get_Menu(), _TL("File"   ));	// 0
+	pMenuBar->Append(g_pModules->Get_Menu_Modules()->Get_Menu(), _TL("Modules"));	// 1
+	pMenuBar->Append(pMenu_Window                              , _TL("Window" ));	// 2
+	pMenuBar->Append(pMenu_Help                                , _TL("?"      ));	// 3
+
+	SetMenuBar(pMenuBar);
+
 	return( pMenuBar );
 }
 
-//---------------------------------------------------------
-void CSAGA_Frame::MB_Remove(wxMenu *pMenu_File, wxMenu *pMenu_Modules)
-{
-	g_pData		->Get_FileMenus()		->Del(pMenu_File);
-	g_pModules	->Get_Modules_Menu()	->Del(pMenu_Modules);
-}
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -1000,7 +994,7 @@ void CSAGA_Frame::MB_Remove(wxMenu *pMenu_File, wxMenu *pMenu_Modules)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CSAGA_Frame::Set_Pane_Caption(wxWindow *pWindow, wxString Caption)
+void CSAGA_Frame::Set_Pane_Caption(wxWindow *pWindow, const wxString &Caption)
 {
 	if( m_pLayout && pWindow )
 	{
@@ -1010,26 +1004,30 @@ void CSAGA_Frame::Set_Pane_Caption(wxWindow *pWindow, wxString Caption)
 }
 
 //---------------------------------------------------------
-void CSAGA_Frame::_Bar_Add(wxWindow *pWindow, int Position)
+void CSAGA_Frame::_Bar_Add(wxWindow *pWindow, int Position, int Row)
 {
-	m_pLayout->AddPane(pWindow, wxAuiPaneInfo()
-		.Name		(pWindow->GetName())
-		.Caption	(pWindow->GetName())
-		.Layer		(0)
-		.Row		(0)
-		.Position	(0)
-		.MinSize	(100, 100)
-		.BestSize	(200, 100)
-	);
+	wxAuiPaneInfo	Info;
+
+	Info.Name			(pWindow->GetName());
+	Info.Caption		(pWindow->GetName());
+	Info.MinSize		(100, 100);
+	Info.BestSize		(400, 400);
+	Info.FloatingSize	(400, 400);
+	Info.Position		(0);
+	Info.Layer			(Row);
+	Info.Row			(Row);
 
 	switch( Position )
 	{
 	default:
-	case 0:	m_pLayout->GetPane(pWindow).Bottom().FloatingSize(400, 400);	break;
-	case 1:	m_pLayout->GetPane(pWindow).Right ().FloatingSize(400, 400);	break;
-	case 2:	m_pLayout->GetPane(pWindow).Left  ().FloatingSize(400, 400);	break;
-	case 3:	m_pLayout->GetPane(pWindow).Top   ().FloatingSize(400, 400);	break;
+	case 0:	Info.Bottom();	break;
+	case 1:	Info.Right ();	break;
+	case 2:	Info.Left  ();	break;
+	case 3:	Info.Top   ();	break;
+	case 4:	Info.Center();	break;
 	}
+
+	m_pLayout->AddPane(pWindow, Info);
 }
 
 //---------------------------------------------------------
@@ -1083,7 +1081,7 @@ wxToolBarBase * CSAGA_Frame::TB_Create(int ID)
 }
 
 //---------------------------------------------------------
-void CSAGA_Frame::TB_Add(wxToolBarBase *pToolBar, const wxChar *Name)
+void CSAGA_Frame::TB_Add(wxToolBarBase *pToolBar, const wxString &Name)
 {
 	pToolBar->Realize();
 	pToolBar->Hide();
@@ -1130,7 +1128,7 @@ wxToolBarBase * CSAGA_Frame::_Create_ToolBar(void)
 	CMD_ToolBar_Add_Separator(pToolBar);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_FRAME_HELP);
 
-	TB_Add(pToolBar, LNG("[CAP] Standard"));
+	TB_Add(pToolBar, _TL("Standard"));
 
 	return( pToolBar );
 }

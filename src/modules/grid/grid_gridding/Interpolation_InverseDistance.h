@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Interpolation_InverseDistance.h 1130 2011-07-14 07:42:46Z reklov_w $
+ * Version $Id: Interpolation_InverseDistance.h 1731 2013-06-18 09:35:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,19 +90,25 @@ public:
 
 protected:
 
-	virtual bool			On_Initialize		(void);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
-	virtual bool			Get_Value			(double x, double y, double &z);
+	virtual bool			On_Initialize			(void);
+
+	virtual bool			Get_Value				(double x, double y, double &z);
 
 
 private:
 
-	int						m_Weighting, m_nPoints_Max, m_Mode;
+	int						m_Weighting, m_nPoints_Max, m_iQuadrant;
 
 	double					m_Power, m_Bandwidth, m_Radius;
 
 
-	double					Get_Weight			(double Distance);
+	double					Get_Weight				(double Distance);
+
+	int						Get_Count				(double x, double y);
+
+	bool					Get_Point				(int iPoint, double x, double y, double &iw, double &iz);
 
 
 };

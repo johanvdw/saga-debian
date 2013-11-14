@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_drop_attribute.h 1163 2011-09-16 07:38:07Z reklov_w $
+ * Version $Id: pc_drop_attribute.h 1463 2012-08-18 15:52:03Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -73,6 +73,9 @@
 //---------------------------------------------------------
 #include "MLB_Interface.h"
 
+#include <set>
+#include <algorithm>
+#include <wx/tokenzr.h>
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -87,7 +90,7 @@ public:
 	CPC_Drop_Attribute(void);
 	virtual ~CPC_Drop_Attribute(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("R:Tools") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:Tools") );	}
 
 
 protected:

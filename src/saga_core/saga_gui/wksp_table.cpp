@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_table.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_table.cpp 1677 2013-05-02 11:51:36Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,26 +82,16 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CWKSP_Table::CWKSP_Table(CSG_Table *pTable, CWKSP_Base_Item *pOwner)
+CWKSP_Table::CWKSP_Table(CSG_Table *pTable)
+	: CWKSP_Data_Item(pTable)
 {
-	m_pTable	= pTable;
-	m_pOwner	= pOwner;
 	m_pView		= NULL;
 	m_pDiagram	= NULL;
 
 	//-----------------------------------------------------
 	On_Create_Parameters();
 
-	m_Parameters.Add_String(
-		m_Parameters("NODE_GENERAL")	, "NAME"			, LNG("[CAP] Name"),
-		LNG(""),
-		m_pTable->Get_Name()
-	);
-
-	m_Parameters.Add_Range(
-		m_Parameters("NODE_GENERAL")	, "GENERAL_NODATA"	, LNG("[CAP] No Data"),
-		LNG("")
-	);
+	DataObject_Changed();
 }
 
 //---------------------------------------------------------
@@ -110,13 +100,9 @@ CWKSP_Table::~CWKSP_Table(void)
 	Set_View	(false);
 	Set_Diagram	(false);
 
-	if( m_pOwner->Get_Type() == WKSP_ITEM_Table_Manager )
+	if( m_pObject->Get_ObjectType() != DATAOBJECT_TYPE_Table )
 	{
-		MSG_General_Add(wxString::Format(wxT("%s: %s..."), LNG("[MSG] Close table"), m_pTable->Get_Name() ), true, true);
-
-		delete(m_pTable);
-
-		MSG_General_Add(LNG("[MSG] okay"), false, false, SG_UI_MSG_STYLE_SUCCESS);
+		m_pObject	= NULL;
 	}
 }
 
@@ -128,32 +114,28 @@ CWKSP_Table::~CWKSP_Table(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxString CWKSP_Table::Get_Name(void)
-{
-	return( wxString::Format(wxT("%02d. %s"), 1 + Get_ID(), m_pTable->Get_Name()) );
-}
-
-//---------------------------------------------------------
 wxString CWKSP_Table::Get_Description(void)
 {
 	wxString	s;
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b>"), LNG("[CAP] Table"));
+	s	+= wxString::Format(wxT("<b>%s</b>"), _TL("Table"));
 
 	s	+= wxT("<table border=\"0\">");
 
-	DESC_ADD_STR(LNG("[CAP] Name")		, m_pTable->Get_Name());
-	DESC_ADD_STR(LNG("[CAP] File")		, m_pTable->Get_File_Name());
-	DESC_ADD_INT(LNG("[CAP] Fields")	, m_pTable->Get_Field_Count());
-	DESC_ADD_INT(LNG("[CAP] Records")	, m_pTable->Get_Record_Count());
+	DESC_ADD_STR(_TL("Name")		, m_pObject->Get_Name());
+	DESC_ADD_STR(_TL("Description")	, m_pObject->Get_Description());
+	DESC_ADD_STR(_TL("File")		, SG_File_Exists(m_pObject->Get_File_Name()) ? m_pObject->Get_File_Name() : _TL("memory"));
+	DESC_ADD_STR(_TL("Modified")	, m_pObject->is_Modified() ? _TL("yes") : _TL("no"));
+	DESC_ADD_INT(_TL("Attributes")	, Get_Table()->Get_Field_Count());
+	DESC_ADD_INT(_TL("Records")		, Get_Table()->Get_Record_Count());
 
 	s	+= wxT("</table>");
 
-	s	+= Get_TableInfo_asHTML(m_pTable);
+	s	+= Get_TableInfo_asHTML(Get_Table());
 
 	//-----------------------------------------------------
-//	s	+= wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), LNG("[CAP] Data History"));
+//	s	+= wxString::Format(wxT("<hr><b>%s</b><font size=\"-1\">"), _TL("Data History"));
 //	s	+= m_pTable->Get_History().Get_HTML();
 //	s	+= wxString::Format(wxT("</font"));
 
@@ -166,20 +148,13 @@ wxMenu * CWKSP_Table::Get_Menu(void)
 {
 	wxMenu	*pMenu;
 
-	pMenu	= new wxMenu(m_pTable->Get_Name());
+	pMenu	= new wxMenu(m_pObject->Get_Name());
 
-	switch( m_pOwner->Get_Type() )
+	if( m_pObject->Get_ObjectType() == DATAOBJECT_TYPE_Table )
 	{
-	default:
-	case WKSP_ITEM_Table_Manager:
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLES_SAVE);
 		CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLES_SAVEAS);
-		break;
-
-	case WKSP_ITEM_Shapes:
-	case WKSP_ITEM_TIN:
-		break;
 	}
 
 	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_TABLES_SHOW);
@@ -202,15 +177,7 @@ bool CWKSP_Table::On_Command(int Cmd_ID)
 	switch( Cmd_ID )
 	{
 	default:
-		return( CWKSP_Base_Item::On_Command(Cmd_ID) );
-
-	case ID_CMD_TABLES_SAVE:
-		Save(m_pTable->Get_File_Name());
-		break;
-
-	case ID_CMD_TABLES_SAVEAS:
-		Save();
-		break;
+		return( CWKSP_Data_Item::On_Command(Cmd_ID) );
 
 	case ID_CMD_WKSP_ITEM_RETURN:
 		Set_View(true);
@@ -238,11 +205,7 @@ bool CWKSP_Table::On_Command_UI(wxUpdateUIEvent &event)
 	switch( event.GetId() )
 	{
 	default:
-		return( CWKSP_Base_Item::On_Command_UI(event) );
-
-	case ID_CMD_TABLES_SAVE:
-		event.Enable(m_pTable->is_Modified() && m_pTable->Get_File_Name() && *(m_pTable->Get_File_Name()));
-		break;
+		return( CWKSP_Data_Item::On_Command_UI(event) );
 
 	case ID_CMD_TABLES_SHOW:
 		event.Check(m_pView != NULL);
@@ -264,101 +227,6 @@ bool CWKSP_Table::On_Command_UI(wxUpdateUIEvent &event)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Table::Parameters_Changed(void)
-{
-	m_pTable->Set_Name(m_Parameters("NAME")->asString());
-
-	m_pTable->Set_NoData_Value_Range(
-		m_Parameters("GENERAL_NODATA")->asRange()->Get_LoVal(),
-		m_Parameters("GENERAL_NODATA")->asRange()->Get_HiVal()
-	);
-
-	Update_Views();
-
-	CWKSP_Base_Item::Parameters_Changed();
-}
-
-//---------------------------------------------------------
-int CWKSP_Table::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
-{
-	return( CWKSP_Base_Item::On_Parameter_Changed(pParameters, pParameter, Flags) );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-bool CWKSP_Table::Save(void)
-{
-	bool		bResult	= false;
-	wxString	File_Path;
-
-	if( DLG_Save(File_Path, ID_DLG_TABLES_SAVE) )
-	{
-		bResult	= m_pTable->Save(File_Path.c_str());
-
-		PROCESS_Set_Okay();
-	}
-
-	return( bResult );
-}
-
-//---------------------------------------------------------
-bool CWKSP_Table::Save(const wxChar *File_Path)
-{
-	bool	bResult;
-
-	if( File_Path && *File_Path )
-	{
-		bResult	= m_pTable->Save(File_Path);
-
-		PROCESS_Set_Okay();
-
-		return( bResult );
-	}
-
-	return( Save() );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-bool CWKSP_Table::DataObject_Changed(CSG_Parameters *pParameters)
-{
-	m_Parameters.Set_Name(wxString::Format(wxT("%02d. %s"), 1 + Get_ID(), m_pTable->Get_Name()));
-
-	m_Parameters("NAME")->Set_Value(m_pTable->Get_Name());
-
-	m_Parameters("GENERAL_NODATA")->asRange()->Set_Range(
-		m_pTable->Get_NoData_Value(),
-		m_pTable->Get_NoData_hiValue()
-	);
-
-	//-----------------------------------------------------
-//	g_pACTIVE->Update(this, false);
-
-	Parameters_Changed();
-
-	return( true );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
 void CWKSP_Table::Set_View(bool bShow)
 {
 	if( bShow && !m_pView )
@@ -368,6 +236,7 @@ void CWKSP_Table::Set_View(bool bShow)
 	else if( !bShow && m_pView )
 	{
 		m_pView->Destroy();
+
 		delete(m_pView);
 	}
 }
@@ -395,6 +264,7 @@ void CWKSP_Table::Set_Diagram(bool bShow)
 	else if( !bShow && m_pDiagram )
 	{
 		m_pDiagram->Destroy();
+
 		delete(m_pDiagram);
 	}
 }
@@ -413,7 +283,15 @@ void CWKSP_Table::Toggle_Diagram(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Table::Update_Views(void)
+bool CWKSP_Table::Show(int Flags)
+{
+	Set_View(true);
+
+	return( true );
+}
+
+//---------------------------------------------------------
+void CWKSP_Table::On_Update_Views(bool bAll)
 {
 	if( m_pView )
 	{
@@ -427,7 +305,7 @@ void CWKSP_Table::Update_Views(void)
 }
 
 //---------------------------------------------------------
-void CWKSP_Table::View_Closes(wxMDIChildFrame *pView)
+bool CWKSP_Table::View_Closes(wxMDIChildFrame *pView)
 {
 	if		( wxDynamicCast(pView, CVIEW_Table) )
 	{
@@ -437,6 +315,8 @@ void CWKSP_Table::View_Closes(wxMDIChildFrame *pView)
 	{
 		m_pDiagram	= NULL;
 	}
+
+	return( true );
 }
 
 

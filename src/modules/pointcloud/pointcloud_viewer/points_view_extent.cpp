@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: points_view_extent.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: points_view_extent.cpp 1702 2013-05-23 10:29:26Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -310,6 +310,10 @@ bool CPoints_View_Extent::_Draw_Image(void)
 	double		dx, dy;
 
 	Size		= GetClientSize();
+
+	if (Size.x <= 0 || Size.y <= 0)	// temporary hack for wxGTK to suppress 'assert "isOK()" failed in Get_Height(): invalid image'
+		return( false );			// when dlg.ShowModal() is called; during construction everything is fine, but the first call of
+									// the On_Size() event returns a client size of 0
 
 	m_Image			.Create(Size.x, Size.y);
 	m_Image_Value	.Create(Size.x, Size.y);

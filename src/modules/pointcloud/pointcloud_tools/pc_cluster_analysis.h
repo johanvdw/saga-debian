@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_cluster_analysis.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pc_cluster_analysis.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public:
 	CPC_Cluster_Analysis(void);
 	virtual ~CPC_Cluster_Analysis(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Classification") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Classification") );	}
 
 
 protected:

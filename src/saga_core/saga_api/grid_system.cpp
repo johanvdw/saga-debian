@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_system.cpp 1105 2011-06-21 14:11:47Z oconrad $
+ * Version $Id: grid_system.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -148,21 +148,23 @@ const SG_Char * CSG_Grid_System::Get_Name(bool bShort)
 		else
 		{
 			m_Name.Printf(SG_T("%s: %f, %s: %dx/%dy, %s: %fx/%fy"),
-				LNG("[DAT] Cell size"),
+				_TL("Cell size"),
 				Get_Cellsize(),
-				LNG("[DAT] Number of cells"),
+				_TL("Number of cells"),
 				Get_NX(),
 				Get_NY(),
-				LNG("[DAT] Lower left corner"),
+				_TL("Lower left corner"),
 				Get_XMin(),
 				Get_YMin()
 			);
 		}
-
-		return( m_Name );
+	}
+	else
+	{
+		m_Name	= _TL("<not set>");
 	}
 
-	return( LNG("[DAT] [not set]") );
+	return( m_Name );
 }
 
 
@@ -316,7 +318,7 @@ bool CSG_Grid_Cell_Addressor::Destroy(void)
 }
 
 //---------------------------------------------------------
-bool CSG_Grid_Cell_Addressor::Set_Radius(double Radius)
+bool CSG_Grid_Cell_Addressor::Set_Radius(double Radius, bool bSquare)
 {
 	Destroy();
 
@@ -331,7 +333,7 @@ bool CSG_Grid_Cell_Addressor::Set_Radius(double Radius)
 			{
 				double	d	= SG_Get_Length(x, y);
 
-				if( d <= Radius )
+				if( bSquare || d <= Radius )
 				{
 					ADD_CELL( x,  y, d);
 					ADD_CELL( y, -x, d);

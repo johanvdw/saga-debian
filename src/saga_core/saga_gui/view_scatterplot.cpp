@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_scatterplot.cpp 1101 2011-06-17 12:52:42Z oconrad $
+ * Version $Id: view_scatterplot.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define CHECK_DATA(pData)	if( pData != NULL && !g_pData->Exists(pData) )	{	pData	= NULL;	}
+#define CHECK_DATA(pData)	if( pData != NULL && !SG_Get_Data_Manager().Exists(pData) )	{	pData	= NULL;	}
 
 
 ///////////////////////////////////////////////////////////
@@ -99,79 +99,62 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void		Add_ScatterPlot(CSG_Grid *pGrid)
+int Scatter_Plot_On_Parameter_Changed(CSG_Parameter *pParameter, int Flags)
 {
-	CSG_Parameters	P(NULL, wxString::Format(wxT("%s: %s"), LNG("[CAP] Scatterplot"), pGrid->Get_Name()), LNG(""), NULL);
-
-	P.Add_Choice(
-		NULL	, "TYPE"	, LNG("Compare with..."),
-		LNG(""),
-		CSG_String::Format(SG_T("%s|%s|"),
-			LNG("another grid"),
-			LNG("points")
-		)
-	);
-
-	//-----------------------------------------------------
-	if( DLG_Parameters(&P) )
+	if( !pParameter || !pParameter->Get_Owner() )
 	{
-		if( P("TYPE")->asInt() == 0 )
+		return( -1 );
+	}
+
+	CSG_Parameters	*pParameters	= pParameter->Get_Owner();
+
+	if( Flags & PARAMETER_CHECK_ENABLE )
+	{
+		if( !SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CMP_WITH")) )
 		{
-			P.Del_Parameters();
-
-			P.Add_Grid(
-				NULL	, "GRID"	, LNG("[CAP] Grid"),
-				LNG(""),
-				PARAMETER_INPUT
-			);
-
-			if( DLG_Parameters(&P) )
-			{
-				new CVIEW_ScatterPlot(pGrid, P("GRID")->asGrid());
-			}
+			pParameters->Get_Parameter("GRID"  )->Get_Parent()->Set_Enabled(pParameter->asInt() == 0);
+			pParameters->Get_Parameter("GRID"  )->Set_Enabled(pParameter->asInt() == 0);
+			pParameters->Get_Parameter("POINTS")->Set_Enabled(pParameter->asInt() == 1);
 		}
-		else
+
+		if( !SG_STR_CMP(pParameter->Get_Identifier(), SG_T("REG_SHOW")) )
 		{
-			P.Del_Parameters();
+			pParameters->Get_Parameter("REG_TYPE" )->Set_Enabled(pParameter->asBool());
+			pParameters->Get_Parameter("REG_COLOR")->Set_Enabled(pParameter->asBool());
+			pParameters->Get_Parameter("REG_SIZE" )->Set_Enabled(pParameter->asBool());
+			pParameters->Get_Parameter("REG_INFO" )->Set_Enabled(pParameter->asBool());
+		}
 
-			CSG_Parameter	*pNode	= P.Add_Shapes(
-				NULL	, "POINTS"	, LNG("[CAP] Points"),
-				LNG(""),
-				PARAMETER_INPUT, SHAPE_TYPE_Point
-			);
-
-			P.Add_Table_Field(
-				pNode	, "FIELD"	, LNG("[CAP] Attribute"),
-				LNG("")
-			);
-
-			if( DLG_Parameters(&P) )
-			{
-				new CVIEW_ScatterPlot(pGrid, P("POINTS")->asShapes(), P("FIELD")->asInt());
-			}
+		if( !SG_STR_CMP(pParameter->Get_Identifier(), SG_T("DISPLAY")) )
+		{
+			pParameters->Get_Parameter("DENSITY_RES")->Set_Enabled(pParameter->asInt() == 1);
+			pParameters->Get_Parameter("DENSITY_PAL")->Set_Enabled(pParameter->asInt() == 1);
+			pParameters->Get_Parameter("DENSITY_LEG")->Set_Enabled(pParameter->asInt() == 1);
 		}
 	}
+
+	if( Flags & PARAMETER_CHECK_VALUES )
+	{
+		if( !SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CMP_WITH")) )
+		{
+			pParameters->Get_Parameter("OPTIONS")->asParameters()->
+				Get_Parameter("DISPLAY")->Set_Value(pParameter->asInt() == 0 ? 1 : 0);
+		}
+	}
+
+	return( 0 );
+}
+
+//---------------------------------------------------------
+void		Add_ScatterPlot(CSG_Grid *pGrid)
+{
+	new CVIEW_ScatterPlot(pGrid);
 }
 
 //---------------------------------------------------------
 void		Add_ScatterPlot(CSG_Table *pTable)
 {
-	wxString	sChoices;
-
-	for(int i=0; i<pTable->Get_Field_Count(); i++)
-	{
-		sChoices.Append(wxString::Format(wxT("%s|"), pTable->Get_Field_Name(i)));
-	}
-
-	CSG_Parameters	P(NULL, wxString::Format(wxT("%s: %s"), LNG("[CAP] Scatterplot"), pTable->Get_Name()), LNG(""));
-
-	P.Add_Choice(NULL, "FIELD_A", wxT("X"), wxT(""), sChoices);
-	P.Add_Choice(NULL, "FIELD_B", wxT("Y"), wxT(""), sChoices);
-
-	if( DLG_Parameters(&P) )
-	{
-		new CVIEW_ScatterPlot(pTable, P("FIELD_A")->asInt(), P("FIELD_B")->asInt());
-	}
+	new CVIEW_ScatterPlot(pTable);
 }
 
 
@@ -190,8 +173,10 @@ BEGIN_EVENT_TABLE(CVIEW_ScatterPlot, CVIEW_Base)
 	EVT_SIZE			(CVIEW_ScatterPlot::On_Size)
 
 	EVT_MENU			(ID_CMD_SCATTERPLOT_PARAMETERS	, CVIEW_ScatterPlot::On_Parameters)
+	EVT_MENU			(ID_CMD_SCATTERPLOT_OPTIONS		, CVIEW_ScatterPlot::On_Options)
 	EVT_MENU			(ID_CMD_SCATTERPLOT_UPDATE		, CVIEW_ScatterPlot::On_Update)
-	EVT_MENU			(ID_CMD_HISTOGRAM_AS_TABLE		, CVIEW_ScatterPlot::On_AsTable)
+	EVT_MENU			(ID_CMD_SCATTERPLOT_AS_TABLE	, CVIEW_ScatterPlot::On_AsTable)
+	EVT_MENU			(ID_CMD_SCATTERPLOT_TO_CLIPBOARD, CVIEW_ScatterPlot::On_ToClipboard)
 END_EVENT_TABLE()
 
 
@@ -202,49 +187,28 @@ END_EVENT_TABLE()
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Grid *pGrid_X, CSG_Grid *pGrid_Y)
-	: CVIEW_Base(ID_VIEW_SCATTERPLOT, LNG("[CAP] Scatterplot"), ID_IMG_WND_SCATTERPLOT, CVIEW_ScatterPlot::_Create_Menu(), LNG("[CAP] Scatterplot"))
+CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Grid *pGrid)
+	: CVIEW_Base(ID_VIEW_SCATTERPLOT, _TL("Scatterplot"), ID_IMG_WND_SCATTERPLOT)
 {
+	m_pGrid		= pGrid;
+	m_pTable	= NULL;
+
+	m_Parameters.Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Scatterplot"), m_pGrid->Get_Name()));
+
 	_On_Construction();
-
-	m_Method		= 0;
-	m_pGrid_X		= pGrid_X;
-	m_pGrid_Y		= pGrid_Y;
-
-	_Initialize_Grids();
 }
 
 //---------------------------------------------------------
-CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Grid *pGrid_X, CSG_Shapes *pShapes_Y, int Field)
-	: CVIEW_Base(ID_VIEW_SCATTERPLOT, LNG("[CAP] Scatterplot"), ID_IMG_WND_SCATTERPLOT, CVIEW_ScatterPlot::_Create_Menu(), LNG("[CAP] Scatterplot"))
+CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Table *pTable)
+	: CVIEW_Base(ID_VIEW_SCATTERPLOT, _TL("Scatterplot"), ID_IMG_WND_SCATTERPLOT)
 {
+	m_pGrid		= NULL;
+	m_pTable	= pTable;
+
+	m_Parameters.Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Scatterplot"), m_pTable->Get_Name()));
+
 	_On_Construction();
-
-	m_Method		= 1;
-	m_pGrid_X		= pGrid_X;
-	m_pShapes		= pShapes_Y;
-	m_xField		= Field;
-
-	_Initialize_Shapes();
 }
-
-//---------------------------------------------------------
-CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Table *pTable, int Field_X, int Field_Y)
-	: CVIEW_Base(ID_VIEW_SCATTERPLOT, LNG("[CAP] Scatterplot"), ID_IMG_WND_SCATTERPLOT, CVIEW_ScatterPlot::_Create_Menu(), LNG("[CAP] Scatterplot"))
-{
-	_On_Construction();
-
-	m_Method		= 2;
-	m_pTable		= pTable;
-	m_xField		= Field_X;
-	m_yField		= Field_Y;
-
-	_Initialize_Table();
-}
-
-//---------------------------------------------------------
-CVIEW_ScatterPlot::~CVIEW_ScatterPlot(void)
-{}
 
 
 ///////////////////////////////////////////////////////////
@@ -256,11 +220,12 @@ CVIEW_ScatterPlot::~CVIEW_ScatterPlot(void)
 //---------------------------------------------------------
 wxMenu * CVIEW_ScatterPlot::_Create_Menu(void)
 {
-	wxMenu	*pMenu	= new wxMenu();
+	wxMenu	*pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SCATTERPLOT_PARAMETERS);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SCATTERPLOT_UPDATE);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_HISTOGRAM_AS_TABLE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SCATTERPLOT_AS_TABLE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SCATTERPLOT_TO_CLIPBOARD);
 
 	return( pMenu );
 }
@@ -270,11 +235,12 @@ wxToolBarBase * CVIEW_ScatterPlot::_Create_ToolBar(void)
 {
 	wxToolBarBase	*pToolBar	= CMD_ToolBar_Create(ID_TB_VIEW_SCATTERPLOT);
 
-	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_SCATTERPLOT_PARAMETERS);
+	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_SCATTERPLOT_FIRST);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_SCATTERPLOT_UPDATE);
-	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_HISTOGRAM_AS_TABLE);
+	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_SCATTERPLOT_AS_TABLE);
+	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_SCATTERPLOT_TO_CLIPBOARD);
 
-	CMD_ToolBar_Add(pToolBar, LNG("[CAP] Scatterplot"));
+	CMD_ToolBar_Add(pToolBar, _TL("Scatterplot"));
 
 	return( pToolBar );
 }
@@ -287,92 +253,140 @@ wxToolBarBase * CVIEW_ScatterPlot::_Create_ToolBar(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CVIEW_ScatterPlot::Update_ScatterPlot(void)
-{
-	switch( m_Method )
-	{
-	case 0:	_Initialize_Grids	();	break;
-	case 1:	_Initialize_Shapes	();	break;
-	case 2:	_Initialize_Table	();	break;
-	}
-
-	Refresh();
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
+#define m_Options	(*m_Parameters("OPTIONS")->asParameters())
 
 //---------------------------------------------------------
 void CVIEW_ScatterPlot::_On_Construction(void)
 {
-	m_maxSamples	= 100000;
-	m_Method		= -1;
-	m_pGrid_X		= NULL;
-	m_pGrid_Y		= NULL;
-	m_pShapes		= NULL;
-	m_pTable		= NULL;
-	m_xField		= 0;
-	m_yField		= 0;
-
 	SYS_Set_Color_BG_Window(this);
 
-	m_Parameters.Add_Choice(
-		NULL, "TYPE"		, LNG("[CAP] Regression Formula"),
-		LNG(""),
-		wxT("Y = a + b * X|")
-		wxT("Y = a + b / X|")
-		wxT("Y = a / (b - X)|")
-		wxT("Y = a * X^b|")
-		wxT("Y = a e^(b * X)|")
-		wxT("Y = a + b * ln(X)|")
+	//-----------------------------------------------------
+	CSG_Parameter	*pNode;
+
+	m_Parameters.Add_Parameters(NULL, "OPTIONS", _TL("Options"), _TL(""));
+
+	if( m_pGrid )
+	{
+		m_Parameters.Add_Choice(
+			NULL	, "CMP_WITH"	, _TL("Compare with..."),
+			_TL(""),
+			CSG_String::Format(SG_T("%s|%s|"),
+				_TL("another grid"),
+				_TL("points")
+			), 0
+		);
+
+		m_Parameters.Add_Grid(
+			NULL	, "GRID"	, _TL("Grid"),
+			_TL(""),
+			PARAMETER_INPUT, false
+		);
+
+		pNode	= m_Parameters.Add_Shapes(
+			NULL	, "POINTS"	, _TL("Points"),
+			_TL(""),
+			PARAMETER_INPUT, SHAPE_TYPE_Point
+		);
+
+		m_Parameters.Add_Table_Field(
+			pNode	, "FIELD"	, _TL("Attribute"),
+			_TL("")
+		);
+	}
+	else if( m_pTable )
+	{
+		CSG_String	sChoices;
+
+		for(int i=0; i<m_pTable->Get_Field_Count(); i++)
+		{
+			sChoices.Append(CSG_String::Format(SG_T("%s|"), m_pTable->Get_Field_Name(i)));
+		}
+
+		m_Parameters.Add_Choice(NULL, "FIELD_X", SG_T("X"), _TL(""), sChoices);
+		m_Parameters.Add_Choice(NULL, "FIELD_Y", SG_T("Y"), _TL(""), sChoices);
+	}
+
+	//-----------------------------------------------------
+	m_Options.Add_Value(
+		NULL	, "SAMPLES_MAX"	, _TL("Maximimum Number of Samples"),
+		_TL(""),
+		PARAMETER_TYPE_Int, 100000, 0, true
 	);
 
-	m_Parameters.Add_String(
-		NULL, "INFO"		, LNG("[CAP] Regression Details"),
-		LNG(""),
-		LNG(""), true
-	);
-
-	m_Parameters.Add_Font(
-		NULL, "FONT"		, LNG("[CAP] Font"),
-		LNG("")
-	);
-
-	m_Parameters.Add_Value(
-		NULL, "REGRESSION"	, LNG("[CAP] Show Regression Curve"),
-		LNG(""),
+	pNode	= m_Options.Add_Value(
+		NULL	, "REG_SHOW"	, _TL("Show Regression"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
-	m_Parameters.Add_Choice(
-		NULL, "METHOD"		, LNG("[CAP] Display Type"),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("[CAP] Circles"),
-			LNG("[CAP] Points")
-		)
+	m_Options.Add_Choice(
+		pNode	, "REG_TYPE"	, _TL("Regression Formula"),
+		_TL(""),
+		SG_T("Y = a + b * X|")
+		SG_T("Y = a + b / X|")
+		SG_T("Y = a / (b - X)|")
+		SG_T("Y = a * X^b|")
+		SG_T("Y = a e^(b * X)|")
+		SG_T("Y = a + b * ln(X)|")
 	);
 
-	m_Parameters.Add_Value(
-		NULL, "RESOLUTION"	, LNG("[CAP] Display Resolution"),
-		LNG(""),
-		PARAMETER_TYPE_Int, 1, 1, true
+	m_Options.Add_Value(
+		pNode	, "REG_COLOR"	, _TL("Line Colour"),
+		_TL(""),
+		PARAMETER_TYPE_Color
 	);
 
-	m_Parameters.Add_Colors(
-		NULL, "COLORS"		, LNG("[CAP] Colors"),
-		LNG("")
+	m_Options.Add_Value(
+		pNode	, "REG_SIZE"	, _TL("Line Size"),
+		_TL(""),
+		PARAMETER_TYPE_Int, 0, 0, true
 	);
 
-	m_Parameters.Add_Value(
-		NULL	, "MAX"		, LNG("Maximimum Number of Samples"),
-		LNG(""),
-		PARAMETER_TYPE_Int	, m_maxSamples, 0, true
+	m_Options.Add_Info_String(
+		pNode	, "REG_INFO"	, _TL("Regression Details"),
+		_TL(""),
+		_TL(""), true
 	);
+
+	pNode	= m_Options.Add_Choice(
+		NULL	, "DISPLAY"		, _TL("Display Type"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("Points"),
+			_TL("Density")
+		), m_pGrid ? 1 : 0
+	);
+
+	m_Options.Add_Value(
+		pNode	, "DENSITY_RES"	, _TL("Display Resolution"),
+		_TL(""),
+		PARAMETER_TYPE_Int, 50, 10, true
+	);
+
+	CSG_Colors	Colors(7, SG_COLORS_RAINBOW);
+
+	Colors.Set_Color(0, 255, 255, 255);
+	Colors.Set_Count(100);
+
+	m_Options.Add_Colors(
+		pNode	, "DENSITY_PAL"	, _TL("Colors"),
+		_TL(""),
+		&Colors
+	);
+
+	m_Options.Add_Value(
+		pNode	, "DENSITY_LEG"	, _TL("Show Legend"),
+		_TL(""),
+		PARAMETER_TYPE_Bool, true
+	);
+
+	//-----------------------------------------------------
+	m_Parameters.Set_Callback_On_Parameter_Changed(&Scatter_Plot_On_Parameter_Changed);
+
+	if( DLG_Parameters(&m_Parameters) )
+	{
+		_Initialize();
+	}
 }
 
 
@@ -387,26 +401,23 @@ void CVIEW_ScatterPlot::On_Parameters(wxCommandEvent &event)
 {
 	if( DLG_Parameters(&m_Parameters) )
 	{
-		if( m_Parameters("MAX")->asInt() != m_maxSamples )
-		{
-			m_maxSamples	= m_Parameters("MAX")->asInt();
+		_Initialize();
+	}
+}
 
-			Update_ScatterPlot();
-		}
-
-		if( m_Parameters("TYPE")->asInt() != m_Regression.Get_Type() )
-		{
-			m_Regression.Calculate((TSG_Regression_Type)m_Parameters("TYPE")->asInt());
-		}
-
-		Refresh();
+//---------------------------------------------------------
+void CVIEW_ScatterPlot::On_Options(wxCommandEvent &event)
+{
+	if( DLG_Parameters(&m_Options) )
+	{
+		_Initialize();
 	}
 }
 
 //---------------------------------------------------------
 void CVIEW_ScatterPlot::On_Update(wxCommandEvent &event)
 {
-	Update_ScatterPlot();
+	_Initialize();
 }
 
 //---------------------------------------------------------
@@ -416,11 +427,11 @@ void CVIEW_ScatterPlot::On_AsTable(wxCommandEvent &event)
 	{
 		CSG_Table	*pTable	= new CSG_Table;
 
-		pTable->Set_Name(wxString::Format(wxT("%s: [%s]-[%s]"), LNG("[CAP] Scatterplot"), m_sX.c_str(), m_sY.c_str()));
+		pTable->Set_Name(CSG_String::Format(SG_T("%s: [%s]-[%s]"), _TL("Scatterplot"), m_sX.c_str(), m_sY.c_str()));
 
 		pTable->Add_Field(SG_T("ID"), SG_DATATYPE_Int);
-		pTable->Add_Field(m_sX		, SG_DATATYPE_Double);
-		pTable->Add_Field(m_sY		, SG_DATATYPE_Double);
+		pTable->Add_Field(m_sX      , SG_DATATYPE_Double);
+		pTable->Add_Field(m_sY      , SG_DATATYPE_Double);
 
 		for(int i=0; i<m_Regression.Get_Count() && PROGRESSBAR_Set_Position(i, m_Regression.Get_Count()); i++)
 		{
@@ -434,6 +445,31 @@ void CVIEW_ScatterPlot::On_AsTable(wxCommandEvent &event)
 		PROGRESSBAR_Set_Position(0);
 
 		g_pData->Add(pTable);
+	}
+}
+
+//---------------------------------------------------------
+#include <wx/clipbrd.h>
+
+void CVIEW_ScatterPlot::On_ToClipboard(wxCommandEvent &event)
+{
+	wxBitmap	BMP(GetSize());
+	wxMemoryDC	dc;
+	
+	dc.SelectObject(BMP);
+	dc.SetBackground(*wxWHITE_BRUSH);
+	dc.Clear();
+
+	Draw(dc, wxRect(BMP.GetSize()));
+
+	dc.SelectObject(wxNullBitmap);
+
+	if( wxTheClipboard->Open() )
+	{
+		wxBitmapDataObject	*pBMP	= new wxBitmapDataObject;
+		pBMP->SetBitmap(BMP);
+		wxTheClipboard->SetData(pBMP);
+		wxTheClipboard->Close();
 	}
 }
 
@@ -477,32 +513,25 @@ void CVIEW_ScatterPlot::On_Paint(wxPaintEvent &event)
 //---------------------------------------------------------
 void CVIEW_ScatterPlot::Draw(wxDC &dc, wxRect r)
 {
-	double	dx, dy;
-
 	r	= _Draw_Get_rDiagram(r);
-
-	dc.SetFont				(Get_Font(m_Parameters("FONT")));
-	dc.SetTextForeground	(m_Parameters("FONT")->asColor());
 
 	if( m_Regression.Get_Count() > 1 )
 	{
-		dx	= (r.GetWidth()  - 1.0) / (m_Regression.Get_xMax() - m_Regression.Get_xMin());
-		dy	= (r.GetHeight() - 1.0) / (m_Regression.Get_yMax() - m_Regression.Get_yMin());
-
 		//-------------------------------------------------
-		if( m_Parameters("METHOD")->asInt() == 1 )
+		if( m_Options("DISPLAY")->asInt() == 1 )
 		{
-			_Draw_Image (dc, r, dx, dy);
+			if( m_Options("DENSITY_LEG")->asBool() )
+			{
+				r.SetRight(r.GetRight() - 40);
+
+				_Draw_Legend(dc, wxRect(r.GetRight() + 10, r.GetTop(), 40 - 20, r.GetHeight()));
+			}
+
+			_Draw_Image (dc, r);
 		}
 		else
 		{
-			_Draw_Points(dc, r, dx, dy);
-		}
-
-		//-------------------------------------------------
-		if( m_Parameters("REGRESSION")->asBool() )
-		{
-			_Draw_Regression(dc, r, dx, dy);
+			_Draw_Points(dc, r);
 		}
 
 		//-------------------------------------------------
@@ -510,7 +539,7 @@ void CVIEW_ScatterPlot::Draw(wxDC &dc, wxRect r)
 	}
 	else
 	{
-		Draw_Text(dc, TEXTALIGN_CENTER, r.GetLeft() + r.GetWidth() / 2, r.GetTop() + r.GetHeight() / 2, LNG("[ERR] Invalid data!"));
+		Draw_Text(dc, TEXTALIGN_CENTER, r.GetLeft() + r.GetWidth() / 2, r.GetTop() + r.GetHeight() / 2, _TL("Invalid data!"));
 	}
 }
 
@@ -518,28 +547,29 @@ void CVIEW_ScatterPlot::Draw(wxDC &dc, wxRect r)
 wxRect CVIEW_ScatterPlot::_Draw_Get_rDiagram(wxRect r)
 {
 	return(	wxRect(
-		wxPoint(r.GetLeft()  + 70, r.GetTop()    + 20),
-		wxPoint(r.GetRight() - 20, r.GetBottom() - 50)
+		wxPoint(r.GetLeft()  + 45, r.GetTop()    + 20),
+		wxPoint(r.GetRight() - 20, r.GetBottom() - 40)
 	));
 }
 
 //---------------------------------------------------------
-void CVIEW_ScatterPlot::_Draw_Regression(wxDC &dc, wxRect r, double dx, double dy)
+void CVIEW_ScatterPlot::_Draw_Regression(wxDC &dc, wxRect r)
 {
-	int			ix, ay, by;
-	double		a, b, x, y, ex;
-	wxString	s;
-	wxPen		Pen, oldPen	= dc.GetPen();
-	wxColour	Col, oldCol	= dc.GetTextForeground();
+	int		ix, ay, by;
+	double	a, b, x, y, dx, dy, ex;
+	wxPen	oldPen	= dc.GetPen();
 
-	Col	= wxColour(255, 0, 0);
-	Pen.SetColour(Col);
-	dc.SetPen(Pen);
-	dc.SetTextForeground(Col);
+	dc.SetPen(wxPen(
+		m_Options("REG_COLOR")->asColor(),
+		m_Options("REG_SIZE" )->asInt()
+	));
 
 	//-----------------------------------------------------
 	a	= m_Regression.Get_Constant();
 	b	= m_Regression.Get_Coefficient();
+
+	dx	= (r.GetWidth()  - 1.0) / (m_Regression.Get_xMax() - m_Regression.Get_xMin());
+	dy	= (r.GetHeight() - 1.0) / (m_Regression.Get_yMax() - m_Regression.Get_yMin());
 
 	//-----------------------------------------------------
 	dc.DrawCircle(
@@ -573,103 +603,83 @@ void CVIEW_ScatterPlot::_Draw_Regression(wxDC &dc, wxRect r, double dx, double d
 		}
 	}
 
+	dc.SetPen(oldPen);
+
 	//-----------------------------------------------------
+	wxString	s;
+
 	switch( m_Regression.Get_Type() )
 	{
-	case REGRESSION_Linear:	s	= wxT("Y = %f%+f*X");		break;
-	case REGRESSION_Rez_X:	s	= wxT("Y = %f%+f/X");		break;
-	case REGRESSION_Rez_Y:	s	= wxT("Y = %f/(%f-X)");		break;
-	case REGRESSION_Pow:	s	= wxT("Y = %f*X^%f");		break;
-	case REGRESSION_Exp:	s	= wxT("Y = %f e^(%f*X)");	break;
-	case REGRESSION_Log:	s	= wxT("Y = %f%+f*ln(X)");	break;
+	case REGRESSION_Linear:	s.Printf(wxT("Y = %f%+f*X"    ), a, b);	break;
+	case REGRESSION_Rez_X:	s.Printf(wxT("Y = %f%+f/X"    ), a, b);	break;
+	case REGRESSION_Rez_Y:	s.Printf(wxT("Y = %f/(%f-X)"  ), a, b);	break;
+	case REGRESSION_Pow:	s.Printf(wxT("Y = %f*X^%f"    ), a, b);	break;
+	case REGRESSION_Exp:	s.Printf(wxT("Y = %f e^(%f*X)"), a, b);	break;
+	case REGRESSION_Log:	s.Printf(wxT("Y = %f%+f*ln(X)"), a, b);	break;
 	}
 
-	Draw_Text(dc, TEXTALIGN_TOPLEFT, r.GetLeft(), r.GetTop(),
-		wxString::Format(s, m_Regression.Get_Constant(), m_Regression.Get_Coefficient())
+	Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, r.GetLeft() + r.GetWidth() / 2, r.GetTop(),
+		s + wxString::Format(wxT("; r2 = %.2f%%"), 100.0 * m_Regression.Get_R2())
 	);
-
-	Draw_Text(dc, TEXTALIGN_BOTTOMRIGHT, r.GetRight(), r.GetBottom(),
-		wxString::Format(wxT("R2: %f%%"), 100.0 * m_Regression.Get_R2())	// Coefficient of Determination...
-	);
-
-	dc.SetPen(oldPen);
-	dc.SetTextForeground(oldCol);
 }
 
 //---------------------------------------------------------
-void CVIEW_ScatterPlot::_Draw_Image(wxDC &dc, wxRect r, double dx, double dy)
+void CVIEW_ScatterPlot::_Draw_Legend(wxDC &dc, wxRect r)
 {
-	int			x, y, i, ax, ay, bx, by, Resolution;
-	double		zMax;
-	CSG_Grid	Count;
-	CSG_Colors	*pColors	= m_Parameters("COLORS")->asColors();
-	wxPen		Pen, oldPen(dc.GetPen());
+	CSG_Colors	Colors(*m_Options("DENSITY_PAL")->asColors());
 
-	//-----------------------------------------------------
-	Resolution	= m_Parameters("RESOLUTION")->asInt();
+	Colors.Set_Count(r.GetHeight());
 
-	Count.Create(SG_DATATYPE_Word, 1 + (r.GetWidth() / Resolution), 1 + (r.GetHeight() / Resolution));
-
-	dx	/= Resolution;
-	dy	/= Resolution;
-
-	for(i=0, zMax=0; i<m_Regression.Get_Count(); i++)
+	for(int i=0, y=r.GetBottom(); i<Colors.Get_Count(); i++, y--)
 	{
-		x	= (int)(dx * (m_Regression.Get_xValue(i) - m_Regression.Get_xMin()));
-		y	= (int)(dy * (m_Regression.Get_yValue(i) - m_Regression.Get_yMin()));
-		Count.Add_Value(x, y, 1);
-		if( Count(x, y) > zMax )
-			zMax	= Count(x, y);
+		Draw_FillRect(dc, Get_Color_asWX(Colors.Get_Color(i)), r.GetLeft(), y, r.GetRight(), y + 1);
 	}
 
-	//-----------------------------------------------------
-	if( Resolution <= 1 )
-	{
-		for(y=0, ay=r.GetBottom(); y<Count.Get_NY(); y++, ay--)
-		{
-			for(x=0, ax=r.GetLeft(); x<Count.Get_NX(); x++, ax++)
-			{
-				if( (i = Count.asInt(x, y)) > 0 )
-				{
-					i	= (int)((pColors->Get_Count() - 1) * i / zMax);
-					Pen.SetColour(Get_Color_asWX(pColors->Get_Color(i)));
-					dc.SetPen(Pen);
-					dc.DrawPoint(ax, ay);
-				}
-			}
-		}
-	}
-	else
-	{
-		dx	= r.GetWidth()  / (double)(Count.Get_NX() - 1.0);
-		dy	= r.GetHeight() / (double)(Count.Get_NY() - 1.0);
+//	r.Offset(0, -r.GetHeight());
 
-		for(y=0, by=r.GetBottom(); y<Count.Get_NY(); y++)
-		{
-			ay	= by;
-			by	= r.GetBottom() - (int)(y * dy);
+	Draw_Edge(dc, EDGE_STYLE_SIMPLE, r);
 
-			for(x=0, bx=r.GetLeft(); x<Count.Get_NX(); x++)
-			{
-				ax	= bx;
-				bx	= r.GetLeft() + (int)(x * dx);
-
-				if( (i = Count.asInt(x, y)) > 0 )
-				{
-					i	= (int)((pColors->Get_Count() - 1) * i / zMax);
-					Draw_FillRect(dc, Get_Color_asWX(pColors->Get_Color(i)), ax, ay, bx, by);
-				}
-			}
-		}
-	}
-
-	//-----------------------------------------------------
-	dc.SetPen(oldPen);
+	Draw_Text(dc, TEXTALIGN_BOTTOMLEFT, 2 + r.GetRight(), r.GetBottom(), wxT("0"));
+	Draw_Text(dc, TEXTALIGN_TOPLEFT   , 2 + r.GetRight(), r.GetTop   (), wxString::Format(wxT("%d"), (int)m_Count.Get_ZMax()));
 }
 
 //---------------------------------------------------------
-void CVIEW_ScatterPlot::_Draw_Points(wxDC &dc, wxRect r, double dx, double dy)
+void CVIEW_ScatterPlot::_Draw_Image(wxDC &dc, wxRect r)
 {
+	CSG_Colors	*pColors	= m_Options("DENSITY_PAL")->asColors();
+
+	wxImage	Image(r.GetWidth(), r.GetHeight());
+
+	double	dCount	= (pColors->Get_Count() - 2.0) / log(1.0 + m_Count.Get_ZMax());
+
+	double	dx		= (m_Count.Get_NX() - 1.0) / (double)r.GetWidth ();
+	double	dy		= (m_Count.Get_NY() - 1.0) / (double)r.GetHeight();
+
+	//-----------------------------------------------------
+	#pragma omp parallel for
+	for(int y=Image.GetHeight()-1; y>=0; y--)
+	{
+		double	Count;
+		double	ix	= 0.0;
+		double	iy	= m_Count.Get_NY() - 1 - y * dy;
+
+		for(int x=0; x<Image.GetWidth(); x++, ix+=dx)
+		{
+			int	i	= m_Count.Get_Value(ix, iy, Count) && Count > 0.0 ? (int)(log(1.0 + Count) * dCount) : 0;
+
+			Image.SetRGB(x, y, pColors->Get_Red(i), pColors->Get_Green(i), pColors->Get_Blue(i));
+		}
+	}
+
+	dc.DrawBitmap(wxBitmap(Image), r.GetTopLeft());
+}
+
+//---------------------------------------------------------
+void CVIEW_ScatterPlot::_Draw_Points(wxDC &dc, wxRect r)
+{
+	double	dx	= (r.GetWidth()  - 1.0) / (m_Regression.Get_xMax() - m_Regression.Get_xMin());
+	double	dy	= (r.GetHeight() - 1.0) / (m_Regression.Get_yMax() - m_Regression.Get_yMin());
+
 	for(int i=0; i<m_Regression.Get_Count(); i++)
 	{
 		dc.DrawCircle(
@@ -682,49 +692,34 @@ void CVIEW_ScatterPlot::_Draw_Points(wxDC &dc, wxRect r, double dx, double dy)
 //---------------------------------------------------------
 void CVIEW_ScatterPlot::_Draw_Frame(wxDC &dc, wxRect r)
 {
-	const int	dyFont		= 12,
-				Precision	= 3;
-
-	int		iPixel, iStep, nSteps;
-	double	dPixel, dz;
-	wxFont	Font;
-
 	//-----------------------------------------------------
 	Draw_Edge(dc, EDGE_STYLE_SIMPLE, r);
 
-	Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, r.GetRight(), r.GetTop() + r.GetHeight() / 2, -90.0, m_sY);
-	Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, r.GetLeft() + r.GetWidth() / 2, r.GetTop(), m_sX);
+	//-------------------------------------------------
+	Draw_Scale(dc, wxRect(r.GetLeft() - 20, r.GetTop(), 20, r.GetHeight()),
+		m_Regression.Get_yMin(), m_Regression.Get_yMax(),
+		false, false, false
+	);
 
-	Font	= dc.GetFont();
-	Font.SetPointSize((int)(0.7 * dyFont));
-	dc.SetFont(Font);
+	Draw_Scale(dc, wxRect(r.GetLeft(), r.GetBottom(), r.GetWidth(), 20),
+		m_Regression.Get_xMin(), m_Regression.Get_xMax(),
+		true , true , true
+	);
+
+	Draw_Text(dc, TEXTALIGN_BOTTOMCENTER,
+		r.GetLeft() - 25, r.GetTop() + r.GetHeight() / 2, 90.0,
+		m_sY.c_str()
+	);
+
+	Draw_Text(dc, TEXTALIGN_TOPCENTER,
+		r.GetLeft() + r.GetWidth() / 2, r.GetBottom() + 20,
+		m_sX.c_str()
+	);
 
 	//-------------------------------------------------
-	dPixel	= dyFont;
-	nSteps	= (int)(r.GetHeight() / dPixel);
-	dz		= (m_Regression.Get_yMax() - m_Regression.Get_yMin()) * dPixel / (double)r.GetHeight();
-
-	for(iStep=0; iStep<=nSteps; iStep++)
+	if( m_Options("REG_SHOW")->asBool() )
 	{
-		iPixel	= r.GetBottom()	- (int)(dPixel * iStep);
-		dc.DrawLine(r.GetLeft(), iPixel, r.GetLeft() - 5, iPixel);
-		Draw_Text(dc, TEXTALIGN_CENTERRIGHT, r.GetLeft() - 7, iPixel,
-			wxString::Format(wxT("%.*f"), Precision, m_Regression.Get_yMin() + iStep * dz)
-		);
-	}
-
-	//-------------------------------------------------
-	dPixel	= dyFont + 5;
-	nSteps	= (int)(r.GetWidth() / dPixel);
-	dz		= (m_Regression.Get_xMax() - m_Regression.Get_xMin()) * dPixel / (double)r.GetWidth();
-
-	for(iStep=0; iStep<=nSteps; iStep++)
-	{
-		iPixel	= r.GetLeft() + (int)(dPixel * iStep);
-		dc.DrawLine(iPixel, r.GetBottom(), iPixel, r.GetBottom() + 5);
-		Draw_Text(dc, TEXTALIGN_CENTERRIGHT, iPixel, r.GetBottom() + 7, 45.0,
-			wxString::Format(wxT("%.*f"), Precision, m_Regression.Get_xMin() + iStep * dz)
-		);
+		_Draw_Regression(dc, r);
 	}
 }
 
@@ -738,75 +733,127 @@ void CVIEW_ScatterPlot::_Draw_Frame(wxDC &dc, wxRect r)
 //---------------------------------------------------------
 bool CVIEW_ScatterPlot::_Initialize(void)
 {
-	bool	bResult	= m_Regression.Calculate();
+	bool	bResult;
+
+	m_Regression.Destroy();
+
+	if( m_pGrid )
+	{
+		if( m_Parameters("CMP_WITH")->asInt() == 0 )
+		{
+			bResult	= _Initialize_Grids ();
+		}
+		else
+		{
+			bResult	= _Initialize_Shapes();
+		}
+	}
+	else // if( m_pTable )
+	{
+		bResult	= _Initialize_Table ();
+	}
 
 	PROCESS_Set_Okay(true);
 
-	m_Parameters("METHOD")	->Set_Value(m_Regression.Get_Count() > 1000 ? 1 : 0);
-	m_Parameters("INFO")	->Set_Value((void *)m_Regression.asString());
+	//-----------------------------------------------------
+	if( bResult && m_Regression.Calculate((TSG_Regression_Type)m_Options("REG_TYPE")->asInt()) )
+	{
+		m_Options("REG_INFO")->Set_Value(m_Regression.asString());
 
-	return( bResult );
+		_Initialize_Count();
+
+		Refresh();
+
+		return( true );
+	}
+
+	Refresh();
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CVIEW_ScatterPlot::_Initialize_Count(void)
+{
+	int	Resolution	= m_Options("DENSITY_RES")->asInt();
+
+	m_Count.Create(SG_DATATYPE_Int, Resolution, Resolution, 1.0);
+
+	double	dx	= (m_Count.Get_NX() - 1.0) / (m_Regression.Get_xMax() - m_Regression.Get_xMin());
+	double	dy	= (m_Count.Get_NY() - 1.0) / (m_Regression.Get_yMax() - m_Regression.Get_yMin());
+
+	for(int i=0; i<m_Regression.Get_Count(); i++)
+	{
+		int x	= (int)(0.5 + dx * (m_Regression.Get_xValue(i) - m_Regression.Get_xMin()));
+		int y	= (int)(0.5 + dy * (m_Regression.Get_yValue(i) - m_Regression.Get_yMin()));
+
+		if( m_Count.is_InGrid(x, y, false) )
+		{
+			m_Count.Add_Value(x, y, 1);
+		}
+	}
+
+	return( true );
 }
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 bool CVIEW_ScatterPlot::_Initialize_Grids()
 {
-	CHECK_DATA(m_pGrid_X);
-	CHECK_DATA(m_pGrid_Y);
+	CSG_Grid	*pGrid_Y	= m_Parameters("GRID")->asGrid();
 
-	if( !m_pGrid_X || !m_pGrid_Y )
+	CHECK_DATA(m_pGrid);
+	CHECK_DATA(pGrid_Y);
+
+	if( !m_pGrid || !pGrid_Y )
 	{
 		return( false );
 	}
 
 	//-----------------------------------------------------
-	m_Regression.Destroy();
+	m_sTitle.Printf(SG_T("%s: [%s/%s]"), _TL("Scatterplot"), m_pGrid->Get_Name(), pGrid_Y->Get_Name());
 
-	m_sTitle.Printf(wxT("%s: [%s/%s]"), LNG("[CAP] Scatterplot"), m_pGrid_X->Get_Name(), m_pGrid_Y->Get_Name());
+	m_sX.Printf(SG_T("%s"), m_pGrid->Get_Name());
+	m_sY.Printf(SG_T("%s"), pGrid_Y->Get_Name());
 
-	m_sX.Printf(wxT("%s"), m_pGrid_X->Get_Name());
-	m_sY.Printf(wxT("%s"), m_pGrid_Y->Get_Name());
-
-	bool	bEqual			= m_pGrid_X->Get_System() == m_pGrid_Y->Get_System();
+	bool	bEqual			= m_pGrid->Get_System() == pGrid_Y->Get_System();
 	int		Interpolation	= GRID_INTERPOLATION_BSpline;
-	double	Step			= m_maxSamples > 0 && m_pGrid_X->Get_NCells() > m_maxSamples ? m_pGrid_X->Get_NCells() / m_maxSamples : 1.0;
+	int		maxSamples		= m_Options("SAMPLES_MAX")->asInt();
+	double	Step			= maxSamples > 0 && m_pGrid->Get_NCells() > maxSamples ? m_pGrid->Get_NCells() / maxSamples : 1.0;
 
-	for(double i=0; i<m_pGrid_X->Get_NCells() && PROGRESSBAR_Set_Position(i, m_pGrid_X->Get_NCells()); i+=Step)
+	for(double i=0; i<m_pGrid->Get_NCells() && PROGRESSBAR_Set_Position(i, m_pGrid->Get_NCells()); i+=Step)
 	{
-		if( !m_pGrid_X->is_NoData((long)i) )
+		if( !m_pGrid->is_NoData((long)i) )
 		{
 			if( bEqual )
 			{
-				if( !m_pGrid_Y->is_NoData((long)i) )
+				if( !pGrid_Y->is_NoData((long)i) )
 				{
 					m_Regression.Add_Values(
-						m_pGrid_X->asDouble((long)i, true),
-						m_pGrid_Y->asDouble((long)i, true)
+						m_pGrid->asDouble((long)i, true),
+						pGrid_Y->asDouble((long)i, true)
 					);
 				}
 			}
 			else
 			{
-				int		x	= ((long)i) % m_pGrid_X->Get_NX();
-				int		y	= ((long)i) / m_pGrid_X->Get_NX();
+				int		x	= ((long)i) % m_pGrid->Get_NX();
+				int		y	= ((long)i) / m_pGrid->Get_NX();
 				double	z;
 
-				if(	m_pGrid_Y->Get_Value(m_pGrid_X->Get_System().Get_Grid_to_World(x, y), z, Interpolation, true) )
+				if(	pGrid_Y->Get_Value(m_pGrid->Get_System().Get_Grid_to_World(x, y), z, Interpolation, true) )
 				{
-					m_Regression.Add_Values(m_pGrid_X->asDouble((long)i, true), z);
+					m_Regression.Add_Values(m_pGrid->asDouble((long)i, true), z);
 				}
 			}
 		}
 	}
 
-	return( _Initialize() );
+	return( true );
 }
 
 
@@ -817,34 +864,36 @@ bool CVIEW_ScatterPlot::_Initialize_Grids()
 //---------------------------------------------------------
 bool CVIEW_ScatterPlot::_Initialize_Shapes(void)
 {
-	CHECK_DATA(m_pGrid_X);
-	CHECK_DATA(m_pShapes);
+	CSG_Shapes	*pPoints	= m_Parameters("POINTS")->asShapes();
+	int			Field		= m_Parameters("FIELD" )->asInt();
 
-	if( !m_pGrid_X || !m_pShapes || m_xField < 0 || m_xField >= m_pShapes->Get_Field_Count() )
+	CHECK_DATA(m_pGrid);
+	CHECK_DATA(pPoints);
+
+	if( !m_pGrid || !pPoints || Field < 0 || Field >= pPoints->Get_Field_Count() )
 	{
 		return( false );
 	}
 
-	m_Regression.Destroy();
+	m_sTitle.Printf(SG_T("%s: [%s/%s]"), _TL("Scatterplot"), m_pGrid->Get_Name(), pPoints->Get_Name());
 
-	m_sTitle.Printf(wxT("%s: [%s/%s]"), LNG("[CAP] Scatterplot"), m_pGrid_X->Get_Name(), m_pShapes->Get_Name());
+	m_sX.Printf(SG_T("%s"), m_pGrid->Get_Name());
+	m_sY.Printf(SG_T("%s"), pPoints->Get_Field_Name(Field));
 
-	m_sX.Printf(wxT("%s"), m_pGrid_X->Get_Name());
-	m_sY.Printf(wxT("%s"), m_pShapes->Get_Field_Name(m_xField));
+	int	maxSamples	= m_Options("SAMPLES_MAX")->asInt();
+	double	z, Step	= maxSamples > 0 && pPoints->Get_Count() > maxSamples ? pPoints->Get_Count() / maxSamples : 1.0;
 
-	double	z, Step	= m_maxSamples > 0 && m_pShapes->Get_Count() > m_maxSamples ? m_pShapes->Get_Count() / m_maxSamples : 1.0;
-
-	for(double i=0; i<m_pShapes->Get_Count() && PROGRESSBAR_Set_Position(i, m_pShapes->Get_Count()); i+=Step)
+	for(double i=0; i<pPoints->Get_Count() && PROGRESSBAR_Set_Position(i, pPoints->Get_Count()); i+=Step)
 	{
-		CSG_Shape	*pShape	= m_pShapes->Get_Shape((int)i);
+		CSG_Shape	*pShape	= pPoints->Get_Shape((int)i);
 
-		if( !pShape->is_NoData(m_xField) && m_pGrid_X->Get_Value(pShape->Get_Point(0), z, GRID_INTERPOLATION_BSpline, true) )
+		if( !pShape->is_NoData(Field) && m_pGrid->Get_Value(pShape->Get_Point(0), z, GRID_INTERPOLATION_BSpline, true) )
 		{
-			m_Regression.Add_Values(z, pShape->asDouble(m_xField));
+			m_Regression.Add_Values(z, pShape->asDouble(Field));
 		}
 	}
 
-	return( _Initialize() );
+	return( true );
 }
 
 
@@ -855,36 +904,38 @@ bool CVIEW_ScatterPlot::_Initialize_Shapes(void)
 //---------------------------------------------------------
 bool CVIEW_ScatterPlot::_Initialize_Table(void)
 {
+	int	xField	= m_Parameters("FIELD_X")->asInt();
+	int	yField	= m_Parameters("FIELD_Y")->asInt();
+
 	CHECK_DATA(m_pTable);
 
-	if( !m_pTable || m_xField < 0 || m_xField >= m_pTable->Get_Field_Count() || m_yField < 0 || m_yField >= m_pTable->Get_Field_Count() )
+	if( !m_pTable || xField < 0 || xField >= m_pTable->Get_Field_Count() || yField < 0 || yField >= m_pTable->Get_Field_Count() )
 	{
 		return( false );
 	}
 
-	double	Step	= m_maxSamples > 0 && m_pTable->Get_Count() > m_maxSamples ? m_pTable->Get_Count() / m_maxSamples : 1.0;
+	int	maxSamples	= m_Options("SAMPLES_MAX")->asInt();
+	double	Step	= maxSamples > 0 && m_pTable->Get_Count() > maxSamples ? m_pTable->Get_Count() / maxSamples : 1.0;
 
-	m_Regression.Destroy();
+	m_sTitle.Printf(SG_T("%s: [%s]"), _TL("Scatterplot"), m_pTable->Get_Name());
 
-	m_sTitle.Printf(wxT("%s: [%s]"), LNG("[CAP] Scatterplot"), m_pTable->Get_Name());
-
-	m_sX.Printf(wxT("%s"), m_pTable->Get_Field_Name(m_xField));
-	m_sY.Printf(wxT("%s"), m_pTable->Get_Field_Name(m_yField));
+	m_sX.Printf(SG_T("%s"), m_pTable->Get_Field_Name(xField));
+	m_sY.Printf(SG_T("%s"), m_pTable->Get_Field_Name(yField));
 
 	for(double i=0; i<m_pTable->Get_Record_Count() && PROGRESSBAR_Set_Position(i, m_pTable->Get_Record_Count()); i+=Step)
 	{
 		CSG_Table_Record	*pRecord	= m_pTable->Get_Record((int)i);
 
-		if( !pRecord->is_NoData(m_xField) && !pRecord->is_NoData(m_yField) )
+		if( !pRecord->is_NoData(xField) && !pRecord->is_NoData(yField) )
 		{
 			m_Regression.Add_Values(
-				pRecord->asDouble(m_xField),
-				pRecord->asDouble(m_yField)
+				pRecord->asDouble(xField),
+				pRecord->asDouble(yField)
 			);
 		}
 	}
 
-	return( _Initialize() );
+	return( true );
 }
 
 

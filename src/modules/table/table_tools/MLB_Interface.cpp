@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1169 2011-09-21 16:56:01Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1401 2012-05-11 14:27:10Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -99,7 +99,7 @@ const SG_Char * Get_Info(int i)
 #include "Table_Enumerate.h"
 #include "Join_Tables.h"
 #include "table_change_date_format.h"
-
+#include "table_change_field_type.h"
 
 
 //---------------------------------------------------------
@@ -116,6 +116,8 @@ CSG_Module *		Create_Module(int i)
 	case  4:	return( new CJoin_Tables_Shapes );
 	case  5:	return( new CTable_Change_Date_Format );
 	case  6:	return( new CTable_Change_Time_Format );
+	case  7:	return( new CTable_Change_Field_Type );
+	case  8:	return( new CTable_Append_Rows );
 	}
 
 	return( NULL );

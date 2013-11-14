@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_cmd.cpp 1225 2011-11-15 16:28:38Z oconrad $
+ * Version $Id: saga_cmd.cpp 1716 2013-06-05 07:43:53Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -63,10 +63,6 @@
 //---------------------------------------------------------
 #include <wx/app.h>
 #include <wx/utils.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-
-#include <saga_api/saga_api.h>
 
 #include "callback.h"
 
@@ -80,35 +76,27 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define SAGA_CMD_VERSION	SG_T("2.0.5")
+bool		Run				(int argc, char *argv[]);
 
-#define SYS_ENV_PATH		SG_T("PATH")
+bool		Execute			(int argc, char *argv[]);
+bool		Execute_Script	(const CSG_String &Script);
 
-#define FLAG_SILENT			SG_T("s")
-#define FLAG_QUIET			SG_T("q")
-#define FLAG_INTERACT		SG_T("i")
-#define FLAG_PROJ			SG_T("p")
-#define FLAG_LANGUAGE		SG_T("l")
+bool		Load_Libraries	(void);
 
+bool		Check_First		(const CSG_String &Argument);
+bool		Check_Flags		(const CSG_String &Argument);
 
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-bool		Execute			(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *ModuleName, int argc, char *argv[]);
-
-void		Error_Library	(const SG_Char *MLB_Path);
-void		Error_Module	(const SG_Char *MLB_Path, const SG_Char *FileName);
+void		Print_Libraries	(void);
+void		Print_Modules	(CSG_Module_Library *pLibrary);
+void		Print_Execution	(CSG_Module_Library *pLibrary, CSG_Module *pModule);
 
 void		Print_Logo		(void);
-void		Print_Execution	(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *ModuleName, const SG_Char *Author);
+void		Print_Get_Help	(void);
 void		Print_Help		(void);
 void		Print_Version	(void);
 
 void		Create_Example	(void);
+void		Create_Docs		(void);
 
 
 ///////////////////////////////////////////////////////////
@@ -120,6 +108,17 @@ void		Create_Example	(void);
 //---------------------------------------------------------
 int		main	(int argc, char *argv[])
 {
+#if wxCHECK_VERSION(2, 8, 11)
+	if( !wxInitialize(argc, argv) )
+#else
+	if( !wxInitialize() )
+#endif
+	{
+		CMD_Print_Error(SG_T("initialisation failed"));
+
+		return( 1 );
+	}
+
 //---------------------------------------------------------
 #if !defined(_DEBUG) && defined(_SAGA_VC)
 #define _MODULE_EXCEPTION
@@ -128,140 +127,27 @@ _try
 #endif
 //---------------------------------------------------------
 
-#if wxCHECK_VERSION(2, 8, 11)
-	if( !wxInitialize( argc, argv ) )
-#else
-	if( !wxInitialize() )
-#endif
-	{
-		Print_Error(SG_T("initialisation failed"));
-
-		return( 1 );
-	}
-
-	//-----------------------------------------------------
-	wxString	Flags, CMD_Path, MLB_Path, ENV_Path;
-
-	if( argc > 1 )
-	{
-		CSG_String	s(argv[1]);
-
-		if( !s.CmpNoCase(SG_T("-h")) || !s.CmpNoCase(SG_T("--help")) )
-		{
-			Print_Help();
-
-			return( 0 );
-		}
-
-		if( !s.CmpNoCase(SG_T("-v")) || !s.CmpNoCase(SG_T("--version")) )
-		{
-			Print_Version();
-
-			return( 0 );
-		}
-
-		if( !s.CmpNoCase(SG_T("-b")) || !s.CmpNoCase(SG_T("--batch")) )
-		{
-			Create_Example();
-
-			return( 0 );
-		}
-
-		s	= s.BeforeFirst(SG_T('='));
-
-		if( !s.CmpNoCase(SG_T("-f")) || !s.CmpNoCase(SG_T("--flags")) )
-		{
-			Flags	= CSG_String(argv[1]).AfterFirst(SG_T('=')).c_str();
-
-			argc--;
-			argv++;
-		}
-	}
-
-	//-----------------------------------------------------
-	CMD_Path	= SG_File_Get_Path(SG_UI_Get_Application_Path()).c_str();
-
-	if( !wxGetEnv(SG_T("SAGA_MLB"), &MLB_Path) || MLB_Path.Length() == 0 )
-	{
-		MLB_Path	= SG_File_Make_Path(CMD_Path, SG_T("modules"))  .c_str();
-    #if defined( _SAGA_LINUX)
-        MLB_Path = wxT(MODULE_LIBRARY_PATH);
-    #endif
-	}
-
-
-	if( wxGetEnv(SYS_ENV_PATH, &ENV_Path) && ENV_Path.Length() > 0 )
-	{
-		wxSetEnv(SYS_ENV_PATH, wxString::Format(wxT(";%s;%s"), MLB_Path.c_str(), SG_File_Make_Path(CMD_Path, SG_T("dll")).c_str()));
-	}
-	else
-	{
-		wxSetEnv(SYS_ENV_PATH, wxString::Format(wxT( "%s;%s"), MLB_Path.c_str(), SG_File_Make_Path(CMD_Path, SG_T("dll")).c_str()));
-	}
-
-	//-----------------------------------------------------
-	SG_Set_UI_Callback(Get_Callback());
-
-	Set_Silent		(Flags.Find(FLAG_SILENT  ) >= 0 ? true : false);
-	Set_Quiet		(Flags.Find(FLAG_QUIET   ) >= 0 ? true : false);
-	Set_Interactive	(Flags.Find(FLAG_INTERACT) >= 0 ? true : false);
-
-	Print_Logo();
-
-	if( Flags.Find(FLAG_LANGUAGE) > 0 )
-	{
-		SG_Get_Translator() .Create(SG_File_Make_Path(CMD_Path, SG_T("saga"), SG_T("lng")), false);
-	}
-
-	if( Flags.Find(FLAG_PROJ) > 0 )
-	{
-		SG_Get_Projections().Create(SG_File_Make_Path(CMD_Path, SG_T("saga_prj"), SG_T("srs")));
-	}
-
-	//-----------------------------------------------------
-	bool	bResult	= false;
-
-	switch( argc )
-	{
-	case 1: 
-		Error_Library		(MLB_Path);
-		break;
-
-	case 2:
-		Error_Module		(MLB_Path, SG_STR_MBTOSG(argv[1]));
-		break;
-
-	default:
-		bResult	= Execute	(MLB_Path, SG_STR_MBTOSG(argv[1]), SG_STR_MBTOSG(argv[2]), argc - 2, argv + 2);
-		break;
-	}
-
-	//-----------------------------------------------------
-	if( ENV_Path.Length() > 0 )
-	{
-		wxSetEnv(SYS_ENV_PATH, ENV_Path);
-	}
-	else
-	{
-		wxUnsetEnv(SYS_ENV_PATH);
-	}
-
-	wxUninitialize();
+	bool bResult	= Run(argc, argv);
 
 //---------------------------------------------------------
 #ifdef _DEBUG
-	Set_Interactive(true);
-	Get_Pause();
+	CMD_Set_Interactive(true);
+	CMD_Get_Pause();
 #endif
 
 #ifdef _MODULE_EXCEPTION
 }
 _except(1)
 {
-	Print_Error(LNG("access violation"));
+	Print_Error(_TL("access violation"));
 }
 #endif
 //---------------------------------------------------------
+
+	fflush(stdout);
+	fflush(stderr);
+
+	wxUninitialize();
 
 	return( bResult ? 0 : 1 );
 }
@@ -274,52 +160,368 @@ _except(1)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		Execute(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *ModuleName, int argc, char *argv[])
+bool		Run(int argc, char *argv[])
 {
-	CModule_Library	Library;
+	setlocale(LC_NUMERIC, "C");
+	
+	SG_Set_UI_Callback(CMD_Get_Callback());
 
 	//-----------------------------------------------------
-	if( !Library.Create(FileName, MLB_Path) )
+	if( Check_First(argv[1]) )
 	{
-		Error_Library(MLB_Path);
-
-		return( false );
+		return( true );
 	}
 
-	if( !Library.Select(ModuleName) )
+	//-----------------------------------------------------
+	while( argc > 1 && Check_Flags(argv[1]) )
 	{
-		Library.Destroy();
-
-		Print_Error(LNG("module not found"), ModuleName);
-
-		Error_Module(MLB_Path, FileName);
-
-		return( false );
+		argc--;	argv++;
 	}
 
-	if( Library.Get_Selected()->is_Interactive() )
+	//-----------------------------------------------------
+	if( !Load_Libraries() )
 	{
-		Library.Destroy();
-
-		Print_Error(LNG("cannot execute interactive module"), ModuleName);
-
-		Error_Module(MLB_Path, FileName);
+		Print_Get_Help();
 
 		return( false );
 	}
 
 	//-----------------------------------------------------
-	Print_Execution(MLB_Path, FileName, Library.Get_Selected()->Get_Name(), Library.Get_Selected()->Get_Author());
+	if( argc <= 1 )
+	{
+		CMD_Print_Error(_TL("no arguments for saga call"));
 
-	Set_Library(&Library);
+		Print_Libraries();
 
-	bool	bResult	= Library.Execute(argc, argv);
+		return( false );
+	}
 
-	Set_Library(NULL);
+	//-----------------------------------------------------
+	Print_Logo();
+
+	if( argc == 2 && SG_File_Exists(CSG_String(argv[1])) )
+	{
+		return( Execute_Script(argv[1]) );
+	}
+	else
+	{
+		return( Execute(argc, argv) );
+	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool		Execute(int argc, char *argv[])
+{
+	CSG_Module_Library	*pLibrary;
+	CSG_Module			*pModule;
+
+	if( argc == 1 || (pLibrary = SG_Get_Module_Library_Manager().Get_Library(CSG_String(argv[1]), true)) == NULL )
+	{
+		Print_Libraries();
+
+		return( false );
+	}
+
+	if( argc == 2
+	||  (  (pModule = pLibrary->Get_Module(CSG_String(argv[2])        )) == NULL
+	    && (pModule = pLibrary->Get_Module(CSG_String(argv[2]).asInt())) == NULL) )
+	{
+		Print_Modules(pLibrary);
+
+		return( false );
+	}
+
+	if( argc == 3 && CMD_Get_XML() )
+	{	// Just output module synopsis as XML-tagged text, then return.
+		SG_PRINTF(pModule->Get_Summary(true, "", "", true).c_str());
+
+		return( true );
+	}
+
+	if( pModule->is_Interactive() )
+	{
+		CMD_Print_Error(_TL("cannot execute interactive module"), pModule->Get_Name());
+
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	Print_Execution(pLibrary, pModule);
+
+	CCMD_Module	CMD_Module(pModule);
+
+	return( CMD_Module.Execute(argc - 2, argv + 2) );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool		Set_Environment(CSG_String &Command)
+{
+	wxString	Value, Key	= Command.AfterFirst('%').BeforeFirst('%').c_str();
+
+	if( Key.IsEmpty() )
+	{
+		return( true );
+	}
+
+	if( !wxGetEnv(Key, &Value) || Command.Replace(&Key.Prepend("%").Append("%"), &Value) < 1 )
+	{
+		return( false );
+	}
+
+	return( Set_Environment(Command) );
+}
+
+//---------------------------------------------------------
+bool		Execute(CSG_String Command)
+{
+	Command.Trim();
+
+	if( Command.is_Empty() )
+	{
+		return( true );
+	}
+
+	if( !Command.Left(3).CmpNoCase("REM") || Command[0] == '#' )
+	{
+		return( true );
+	}
+
+	if( !Command.Left(4).CmpNoCase("ECHO") )
+	{
+		CMD_Print(Command.AfterFirst(' '));
+
+		return( true );
+	}
+
+	//-----------------------------------------------------
+	int		argc	= 1;
+	char	**argv	= NULL;
+
+	while( Command.Length() > 0 )
+	{
+		CSG_String	s	= Command[0] == '\"' ? Command.AfterFirst('\"').BeforeFirst('\"') : Command.BeforeFirst(' ');
+
+		argv		= (char **)SG_Realloc(argv, (argc + 1) * sizeof(char *));
+		argv[argc]	= (char  *)SG_Calloc(1 + s.Length(), sizeof(char));
+
+		memcpy(argv[argc++], s.b_str(), s.Length() * sizeof(char));
+
+		Command	= Command.AfterFirst(' ');	Command.Trim();
+	}
+
+	//-----------------------------------------------------
+	bool	bResult	= Execute(argc, argv);
+
+	for(int i=1; i<argc; i++)
+	{
+		SG_FREE_SAFE(argv[i]);
+	}
+
+	SG_FREE_SAFE(argv);
 
 	return( bResult );
 }
 
+//---------------------------------------------------------
+bool		Execute_Script(const CSG_String &Script)
+{
+	if( CMD_Get_Show_Messages() )
+	{
+		CMD_Print(CSG_String::Format(SG_T("%s: %s"), _TL("Running Script"), Script.c_str()));
+	}
+
+	CSG_File	Stream;
+
+	if( !Stream.Open(Script, SG_FILE_R, false) )
+	{
+		CMD_Print_Error(_TL("could not open file"), Script);
+
+		return( false );
+	}
+
+	CSG_String	Command;
+
+	while( Stream.Read_Line(Command) )
+	{
+		Set_Environment(Command);
+
+		if( !Execute(Command) )
+		{
+			CMD_Print_Error(_TL("invalid command"), Command);
+
+			return( false );
+		}
+	}
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool		Load_Libraries(const CSG_String &Directory)
+{
+	bool	bShow	= CMD_Get_Show_Messages();
+
+	CMD_Set_Show_Messages(false);
+	int	n	= SG_Get_Module_Library_Manager().Add_Directory(Directory, false);
+	CMD_Set_Show_Messages(bShow);
+
+	return( n > 0 );
+}
+
+//---------------------------------------------------------
+bool		Load_Libraries(void)
+{
+	wxString	Path, CMD_Path	= SG_File_Get_Path(SG_UI_Get_Application_Path()).c_str();
+
+    #if defined(_SAGA_LINUX)
+		Load_Libraries(wxT(MODULE_LIBRARY_PATH));
+	#else
+		wxString	DLL_Path	= SG_File_Make_Path(CMD_Path, SG_T("dll")).c_str();
+
+		if( wxGetEnv(wxT("PATH"), &Path) && Path.Length() > 0 )
+		{
+			wxSetEnv("PATH", DLL_Path + wxT(";") + Path);
+		}
+		else
+		{
+			wxSetEnv("PATH", DLL_Path);
+		}
+
+		wxSetEnv("GDAL_DRIVER_PATH", DLL_Path);
+
+		Load_Libraries(SG_File_Make_Path(CMD_Path, SG_T("modules")));
+    #endif
+
+	if( wxGetEnv(SG_T("SAGA_MLB"), &Path) )
+	{
+		while( Path.Length() > 0 )
+		{
+			Load_Libraries(CSG_String(&Path).BeforeFirst(';'));
+
+			Path	= Path.AfterFirst(';');
+		}
+	}
+
+	if( SG_Get_Module_Library_Manager().Get_Count() <= 0 )
+	{
+		CMD_Print_Error(SG_T("could not load any module library"));
+
+		return( false );
+	}
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool		Check_First		(const CSG_String &Argument)
+{
+	if( !Argument.CmpNoCase(SG_T("-h")) || !Argument.CmpNoCase(SG_T("--help")) )
+	{
+		Print_Help();
+
+		return( true );
+	}
+
+	if( !Argument.CmpNoCase(SG_T("-v")) || !Argument.CmpNoCase(SG_T("--version")) )
+	{
+		Print_Version();
+
+		return( true );
+	}
+
+	if( !Argument.CmpNoCase(SG_T("-b")) || !Argument.CmpNoCase(SG_T("--batch")) )
+	{
+		Create_Example();
+
+		return( true );
+	}
+
+	if( !Argument.CmpNoCase(SG_T("-d")) || !Argument.CmpNoCase(SG_T("--docs")) )
+	{
+		Create_Docs();
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool		Check_Flags		(const CSG_String &Argument)
+{
+	CSG_String	s(Argument.BeforeFirst(SG_T('=')));
+
+	if( !s.CmpNoCase(SG_T("-f")) || !s.CmpNoCase(SG_T("--flags")) )
+	{
+		s	= CSG_String(Argument).AfterFirst(SG_T('='));
+
+		CMD_Set_Show_Progress(s.Find('q') < 0 && s.Find('s') < 0);	// q, s: no progress report
+		CMD_Set_Show_Messages(s.Find('r') < 0 && s.Find('s') < 0);	// r, s: no messages report
+		CMD_Set_Interactive  (s.Find('i') >= 0                  );	// i: allow user interaction
+		CMD_Set_XML          (s.Find('x') >= 0                  );	// x: message output as xml
+
+		if( s.Find('l') >= 0 )	// l: load translation dictionary
+		{
+			SG_Get_Translator() .Create(SG_File_Make_Path(SG_File_Get_Path(SG_UI_Get_Application_Path()),
+				SG_T("saga"    ), SG_T("lng")), false);
+		}
+
+		if( s.Find('p') >= 0 )	// p: load projections dictionary
+		{
+			SG_Get_Projections().Create(SG_File_Make_Path(SG_File_Get_Path(SG_UI_Get_Application_Path()),
+				SG_T("saga_prj"), SG_T("srs")));
+		}
+
+		return( true );
+	}
+
+	else if( !s.CmpNoCase(SG_T("-c")) || !s.CmpNoCase(SG_T("--cores")) )
+	{
+		#ifdef _OPENMP
+		int	nCores	= 1;
+
+		if( !CSG_String(Argument).AfterFirst(SG_T('=')).asInt(nCores) || nCores > SG_Get_Max_Num_Procs_Omp() )
+		{
+			nCores	= SG_Get_Max_Num_Procs_Omp();
+		}
+
+		SG_Set_Max_Num_Threads_Omp(nCores);
+		#endif // _OPENMP
+
+		return( true );
+	}
+
+	return( false );
+}
+
 
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -328,88 +530,67 @@ bool		Execute(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *M
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void		Error_Library	(const SG_Char *MLB_Path)
+void		Print_Libraries	(void)
 {
-	int				nLibraries;
-	wxDir			Dir;
-	wxString		FileName;
-	CModule_Library Library;
+	CMD_Print_Error(_TL("library"));
 
-	if( !Dir.Open(MLB_Path) )
+	if( CMD_Get_Show_Messages() )
 	{
-		Print_Error(LNG("invalid module libraries path"), MLB_Path);
-	}
-	else if(	!Dir.GetFirst(&FileName, wxT("*.dll"  ), wxDIR_FILES|wxDIR_HIDDEN)
-			&&	!Dir.GetFirst(&FileName, wxT("*.so"   ), wxDIR_FILES|wxDIR_HIDDEN) 
-			&&	!Dir.GetFirst(&FileName, wxT("*.dylib"), wxDIR_FILES|wxDIR_HIDDEN) )
-	{
-		Print_Error(LNG("no valid module library found in path"), MLB_Path);
-	}
-	else
-	{
-		Print_Error(LNG("module library"));
-
-		if( !Get_Silent() )
+		if( CMD_Get_XML() )
 		{
-			SG_PRINTF(SG_T("\n%s:\n"), LNG("available module libraries"));
-
-			nLibraries	= 0;
-
-			do
-			{
-				if( Library.Create(FileName, Dir.GetName()) )
-				{
-					SG_PRINTF(SG_T("- %s\n"), FileName.c_str());
-					nLibraries++;
-				}
-			}
-			while( Dir.GetNext(&FileName) );
-
-			SG_PRINTF(SG_T("\n%d %s\n"), nLibraries, LNG("SAGA Module Libraries"));
+			SG_PRINTF(SG_Get_Module_Library_Manager().Get_Summary(SG_SUMMARY_FMT_XML_NO_INTERACTIVE).c_str());
 		}
-	}
+		else
+		{
+			CMD_Print(SG_Get_Module_Library_Manager().Get_Summary(SG_SUMMARY_FMT_FLAT_NO_INTERACTIVE));
 
-	if( !Get_Silent() )
-	{
-		SG_PRINTF(SG_T("\n"));
-		SG_PRINTF(LNG("type -h or --help for further information"));
-		SG_PRINTF(SG_T("\n"));
+			Print_Get_Help();
+		}
 	}
 }
 
 //---------------------------------------------------------
-void		Error_Module	(const SG_Char *MLB_Path, const SG_Char *FileName)
+void		Print_Modules	(CSG_Module_Library *pLibrary)
 {
-	CModule_Library	Library;
+	CMD_Print_Error(_TL("module"));
 
-	if( !Library.Create(FileName, MLB_Path) )
+	if( CMD_Get_Show_Messages() )
 	{
-		Library.Destroy();
-
-		Print_Error(LNG("module library not found"), FileName);
-
-		Error_Library(MLB_Path);
-
-		return;
-	}
-
-	Print_Error(LNG("module"));
-
-	if( !Get_Silent() )
-	{
-		SG_PRINTF(SG_T("\n%s:\n"), LNG("executable modules"));
-
-		for(int i=0; i<Library.Get_Count(); i++)
+		if( CMD_Get_XML() )
 		{
-			if( Library.Get_Module(i) && !Library.Get_Module(i)->is_Interactive() )
-			{
-				SG_PRINTF(SG_T(" %d\t- %s\n"), i, Library.Get_Module(i)->Get_Name());
-			}
+			SG_PRINTF(pLibrary->Get_Summary(SG_SUMMARY_FMT_XML_NO_INTERACTIVE).c_str());
 		}
+		else
+		{
+			CMD_Print(pLibrary->Get_Summary(SG_SUMMARY_FMT_FLAT_NO_INTERACTIVE));
 
-		SG_PRINTF(SG_T("\n"));
-		SG_PRINTF(LNG("type -h or --help for further information"));
-		SG_PRINTF(SG_T("\n"));
+			Print_Get_Help();
+		}
+	}
+}
+
+//---------------------------------------------------------
+void		Print_Execution	(CSG_Module_Library *pLibrary, CSG_Module *pModule)
+{
+	if( CMD_Get_Show_Messages() )
+	{
+		if( CMD_Get_XML() )
+		{
+			SG_PRINTF(SG_T("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n"));
+			SG_PRINTF(SG_T("<%s>\n"), SG_XML_LIBRARY);
+			SG_PRINTF(SG_T("\t<%s>%s</%s>\n"), SG_XML_LIBRARY_PATH, pLibrary->Get_File_Name().c_str(), SG_XML_LIBRARY_PATH);
+			SG_PRINTF(SG_T("\t<%s>%s</%s>\n"), SG_XML_LIBRARY_NAME, pLibrary->Get_Name()     .c_str(), SG_XML_LIBRARY_NAME);
+			SG_PRINTF(SG_T("</%s>\n"), SG_XML_LIBRARY);
+		}
+		else
+		{
+			SG_PRINTF(SG_T("_____________________________________________\n"));
+			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("library path"), pLibrary->Get_File_Name().c_str());
+			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("library name"), pLibrary->Get_Name     ().c_str());
+			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("module name "), pModule ->Get_Name     ().c_str());
+			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("author      "), pModule ->Get_Author   ().c_str());
+			SG_PRINTF(SG_T("_____________________________________________\n\n"));
+		}
 	}
 }
 
@@ -423,31 +604,41 @@ void		Error_Module	(const SG_Char *MLB_Path, const SG_Char *FileName)
 //---------------------------------------------------------
 void		Print_Logo		(void)
 {
-	if( Get_Quiet() || Get_Silent() )
-		return;
-
-	SG_PRINTF(SG_T("_____________________________________________\n"));
-	SG_PRINTF(SG_T("  #####   ##   #####    ##\n"));
-	SG_PRINTF(SG_T(" ###     ###  ##       ###\n"));
-	SG_PRINTF(SG_T("  ###   # ## ##  #### # ##\n"));
-	SG_PRINTF(SG_T("   ### ##### ##    # #####\n"));
-	SG_PRINTF(SG_T("##### #   ##  ##### #   ##\n"));
-	SG_PRINTF(SG_T("_____________________________________________\n"));
-	SG_PRINTF(SG_T("\n"));
+	if( CMD_Get_Show_Messages() )
+	{
+		CMD_Print(
+			"_____________________________________________\n"
+			"\n"
+			"   #####   ##   #####    ##\n"
+			"  ###     ###  ##       ###\n"
+			"   ###   # ## ##  #### # ##\n"
+			"    ### ##### ##    # #####\n"
+			" ##### #   ##  ##### #   ##\n"
+			"_____________________________________________\n"
+		);
+	}
 }
 
 //---------------------------------------------------------
-void		Print_Execution	(const SG_Char *MLB_Path, const SG_Char *FileName, const SG_Char *ModuleName, const SG_Char *Author)
+void		Print_Version	(void)
 {
-	if( Get_Silent() )
-		return;
+#if defined(_SAGA_MSW) && defined(_WIN64)
+	CMD_Print(SG_T("SAGA Version: ") SAGA_VERSION SG_T(" (64 bit)\n"));
+#elif defined(_SAGA_MSW)
+	CMD_Print(SG_T("SAGA Version: ") SAGA_VERSION SG_T(" (32 bit)\n"));
+#else
+	CMD_Print(SG_T("SAGA Version: ") SAGA_VERSION SG_T("\n"));
+#endif
+}
 
-	SG_PRINTF(SG_T("%s:\t%s\n"), LNG("library path"), MLB_Path);
-	SG_PRINTF(SG_T("%s:\t%s\n"), LNG("library name"), FileName);
-	SG_PRINTF(SG_T("%s:\t%s\n"), LNG("module name "), ModuleName);
-	SG_PRINTF(SG_T("%s:\t%s\n"), LNG("author      "), Author);
-	SG_PRINTF(SG_T("_____________________________________________\n"));
-	SG_PRINTF(SG_T("go...\n"));
+//---------------------------------------------------------
+void		Print_Get_Help	(void)
+{
+	if( CMD_Get_Show_Messages() )
+	{
+		CMD_Print(_TL("type -h or --help for further information"));
+		CMD_Print("");
+	} 
 }
 
 //---------------------------------------------------------
@@ -455,134 +646,189 @@ void		Print_Help		(void)
 {
 	Print_Logo();
 
-	SG_PRINTF(
-		SG_T("Version ") SAGA_VERSION SG_T("\n")
-		SG_T("under GNU General Public License (GPL)\n")
-		SG_T("O.Conrad (C) 2005-11\n")
-		SG_T("\n")
-		SG_T("Usage:\n")
-		SG_T("\n")
-		SG_T("saga_cmd [-h, --help]\n")
-		SG_T("saga_cmd [-v, --version]\n")
-		SG_T("saga_cmd [-b, --batch]\n")
-		SG_T("saga_cmd [-f, --flags][=qsilp] <LIBRARY> <MODULE> <module specific options...>\n")
-		SG_T("\n")
-		SG_T("[-h], [--help]: help on usage\n")
-		SG_T("[-v], [--version]: print version information\n")
-		SG_T("[-b], [--batch]: create a batch file example\n")
-		SG_T("[-f], [--flags]: various flags for general usage\n")
-		SG_T("  q: quiet mode (no progress report)\n")
-		SG_T("  s: silent mode (no progress and no messages report)\n")
-		SG_T("  i: allow user interaction\n")
-		SG_T("  l: load translation dictionary\n")
-		SG_T("  p: load projections dictionary\n")
-		SG_T("<LIBRARY>\t")	SG_T(": file name of the library\n")
-		SG_T("<MODULE>\t")	SG_T(": either name or index of the module\n")
-		SG_T("\n")
-		SG_T("example:\n")
-		SG_T("  saga_cmd -f=sp ta_morphometry \n")
-		SG_T("           \"Local Morphometry\"\n")
-		SG_T("           -ELEVATION c:\\dem.sgrd\n")
-		SG_T("           -SLOPE     d:\\slope.sgrd\n")
-		SG_T("           -ASPECT    d:\\aspect.sgrd\n")
-		SG_T("           -METHOD    1\n")
-		SG_T("\n")
-		SG_T("_____________________________________________\n")
-		SG_T("Module libraries are expected to be in the SAGA installation\n")
-		SG_T("directory or its \'modules\' subdirectory. If this is not found\n")
-		SG_T("the current working directory will be searched for instead.\n")
-		SG_T("Alternatively you can add the environment variable \'SAGA_MLB\'\n")
-		SG_T("and let it point to the desired directory\n")
-		SG_T("\n")
-		SG_T("SAGA CMD is particularly useful for the automated\n")
-		SG_T("execution of a series of analysis steps, because it\n")
-		SG_T("allows you to execute modules using batch files.\n")
-		SG_T("Calling saga_cmd with the option \'-b\' or \'--batch\'\n")
-		SG_T("creates a batch file example. You probably have to edit\n")
-		SG_T("the path definitions to make the batch file run on your\n")
-		SG_T("computer.\n")
-	);
-}
+	Print_Version();
 
-
-//---------------------------------------------------------
-void		Print_Version	(void)
-{
-	SG_PRINTF(
-		SG_T("SAGA Version: ") SAGA_VERSION SG_T("\n")
+	CMD_Print(
+		"under GNU General Public License (GPL)\n"
+		"\n"
+		"_____________________________________________\n"
+		"Usage:\n"
+		"\n"
+		"saga_cmd [-h, --help]\n"
+		"saga_cmd [-v, --version]\n"
+		"saga_cmd [-b, --batch]\n"
+		"saga_cmd [-d, --docs]\n"
+#ifdef _OPENMP
+		"saga_cmd [-f, --flags][=qrsilpx][-c, --cores][=#] <LIBRARY> <MODULE> <OPTIONS>\n"
+		"saga_cmd [-f, --flags][=qrsilpx][-c, --cores][=#] <SCRIPT>\n"
+#else
+		"saga_cmd [-f, --flags][=qrsilpx] <LIBRARY> <MODULE> <module specific options...>\n"
+		"saga_cmd [-f, --flags][=qrsilpx] <SCRIPT>\n"
+#endif
+		"\n"
+		"[-h], [--help]   : help on usage\n"
+		"[-v], [--version]: print version information\n"
+		"[-b], [--batch]  : create a batch file example\n"
+		"[-d], [--docs]   : create module documentation in current working directory\n"
+#ifdef _OPENMP
+		"[-c], [--cores]  : number of physical processors to use for computation\n"
+#endif
+		"[-f], [--flags]  : various flags for general usage [qrsilpx]\n"
+		"  q              : no progress report\n"
+		"  r              : no messages report\n"
+		"  s              : silent mode (no progress and no messages report)\n"
+		"  i              : allow user interaction\n"
+		"  l              : load translation dictionary\n"
+		"  p              : load projections dictionary\n"
+		"  x              : use XML markups for synopses and messages\n"
+		"\n"
+		"<LIBRARY>        : name of the library\n"
+		"<MODULE>         : either name or index of the module\n"
+		"<OPTIONS>        : module specific options\n"
+		"<SCRIPT>         : saga cmd script file with one or more module calls\n"
+		"\n"
+		"_____________________________________________\n"
+		"Example:\n"
+		"\n"
+		"  saga_cmd -f=s ta_lighting 0 -ELEVATION=c:\\dem.sgrd -SHADE=c:\\shade.sgrd\n"
+		"\n"
+		"_____________________________________________\n"
+		"Module libraries in the \'modules\' subdirectory of the SAGA installation\n"
+		"will be loaded automatically. Additional directories can be specified\n"
+		"by adding the environment variable \'SAGA_MLB\' and let it point to one\n"
+		"or more directories, just the way it is done with the DOS \'PATH\' variable.\n"
+		"\n"
+		"The SAGA command line interpreter is particularly useful for the processing\n"
+		"of complex work flows by defining a series of subsequent module calls in a\n"
+		"script file. Calling saga_cmd with the option \'-b\' or \'--batch\' will\n"
+		"create an example of a DOS batch script file, which might be a good starting\n"
+		"point for the implementation of your own specific work flows.\n"
+		"_____________________________________________\n"
 	);
 }
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 void		Create_Example	(void)
 {
-	CSG_String	FileName(CSG_String::Format(SG_T("%s\\saga_cmd_example.bat"), wxGetCwd().c_str()));
 	CSG_File	Stream;
 
-	SG_PRINTF(SG_T("\n%s...\n"), LNG("creating batch file example"));
+	CMD_Print(_TL("creating batch file example"));
 
-	if( !Stream.Open(FileName, SG_FILE_W, false) )
+	//-----------------------------------------------------
+	if( !Stream.Open(SG_File_Make_Path(SG_Dir_Get_Current(), SG_T("saga_cmd_example"), SG_T("bat")), SG_FILE_W, false) )
 	{
-		SG_PRINTF(SG_T("%s\n"), LNG("failed"));
+		CMD_Print(_TL("failed"));
 
 		return;
 	}
 
-	Stream.Printf(
-		SG_T("@echo off\n")
-		SG_T("\n")
-		SG_T("set SAGA=.\n")
-		SG_T("set SAGA_MLB=%%SAGA%%\\modules\n")
-		SG_T("PATH=PATH;%%SAGA%%;%%SAGA_MLB%%\n")
-		SG_T("\n")
-		SG_T("if exist .\\srtm.asc goto :SRTM\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo import SRTM-DEM from ESRI ASCII grid\n")
-		SG_T("saga_cmd.exe recreations_fractals 5 -GRID .\\dem.sgrd -NX 400 -NY 400 -H 0.75\n")
-		SG_T("\n")
-		SG_T("goto :GO\n")
-		SG_T("\n")
-		SG_T(":SRTM\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo import SRTM-DEM from ESRI ASCII grid\n")
-		SG_T("saga_cmd.exe io_grid              1 -FILE .\\srtm.asc -GRID .\\srtm.sgrd\n")
-		SG_T("\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo projection from geodetic to UTM zone 32\n")
-		SG_T("\n")
-		SG_T("saga_cmd.exe pj_proj4             1 -SOURCE .\\srtm.sgrd -OUT_GRID .\\dem.sgrd -PROJ_TYPE 109 -utm_zone 32 -TARGET_TYPE 1 -GET_AUTOFIT_GRIDSIZE 90.0\n")
-		SG_T("\n")
-		SG_T(":GO\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo create contour lines from DEM\n")
-		SG_T("\n")
-		SG_T("saga_cmd.exe shapes_grid          5 -INPUT .\\dem.sgrd -CONTOUR .\\contour.shp -ZSTEP 25.0\n")
-		SG_T("\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo do some terrain analysis\n")
-		SG_T("\n")
-		SG_T("saga_cmd.exe ta_preprocessor      1 -DEM .\\dem.sgrd -DEM_PREPROC .\\dem.sgrd\n")
-		SG_T("saga_cmd.exe ta_lighting          0 -ELEVATION .\\dem.sgrd -SHADE .\\shade.sgrd -METHOD 0 -AZIMUTH -45 -DECLINATION 45\n")
-		SG_T("saga_cmd.exe ta_morphometry       0 -ELEVATION .\\dem.sgrd -SLOPE .\\slope.sgrd -ASPECT .\\aspect.sgrd -HCURV .\\hcurv.sgrd -VCURV .\\vcurv.sgrd\n")
-		SG_T("saga_cmd.exe ta_hydrology         0 -ELEVATION .\\dem.sgrd -CAREA .\\carea.sgrd\n")
-		SG_T("saga_cmd.exe ta_hydrology        14 -SLOPE .\\slope.sgrd -AREA .\\carea.sgrd -WETNESS .\\wetness.sgrd -STREAMPOW .\\streampow.sgrd -LSFACTOR .\\lsfactor.sgrd\n")
-		SG_T("\n")
-		SG_T("echo _____________________________________________\n")
-		SG_T("echo perform cluster analysis\n")
-		SG_T("\n")
-		SG_T("saga_cmd.exe grid_discretisation  1 -INPUT .\\dem.sgrd;.\\slope.sgrd;.\\hcurv.sgrd;.\\vcurv.sgrd -RESULT .\\cluster.sgrd -STATISTICS .\\cluster.txt -NORMALISE -NCLUSTER 10\n")
-		SG_T("\n")
-		SG_T("pause\n")
-	);
+	Stream.Printf(CSG_String(
+		"@ECHO OFF\n"
+		"\n"
+		"SET FLAGS=-f=q\n"
+		"REM SET SAGA=.\n"
+		"REM SET SAGA_MLB=%%SAGA%%\\_private\n"
+		"REM PATH=PATH;%%SAGA%%\n"
+		"\n"
+		"IF EXIST dem.sgrd GOTO :GO\n"
+		"IF EXIST srtm.tif GOTO :SRTM\n"
+		"\n"
+		"ECHO _____________________________________________\n"
+		"ECHO create a Gaussian landscape\n"
+		"saga_cmd %%FLAGS%% recreations_fractals 5 -GRID=dem.sgrd -NX=400 -NY=400 -H=0.75\n"
+		"GOTO :GO\n"
+		"\n"
+		":SRTM\n"
+		"ECHO _____________________________________________\n"
+		"ECHO import and project srtm (geotiff)\n"
+		"saga_cmd %%FLAGS%% io_gdal              0 -FILES=srtm.tif -GRIDS=srtm -TRANSFORM\n"
+		"saga_cmd %%FLAGS%% pj_proj4             7 -SOURCE=srtm.sgrd -GET_USER_GRID=dem.sgrd -GET_USER_SIZE=1000.0 -SOURCE_PROJ=\"+proj=longlat +datum=WGS84\" -TARGET_PROJ=\"+proj=cea +datum=WGS84 +lat_ts=0\"\n"
+		"REM alternative method 4 might need to load projection data base with EPSG codes (use --flags=p)\n"
+		"REM saga_cmd -f=qp pj_proj4             4 -SOURCE=srtm.sgrd -GET_USER_GRID=dem.sgrd -GET_USER_SIZE=1000.0 -CRS_PROJ4=\"+proj=cea +datum=WGS84 +lat_ts=0\"\n"
+		"\n"
+		":GO\n"
+		"ECHO _____________________________________________\n"
+		"ECHO create contour lines from DEM\n"
+		"saga_cmd %%FLAGS%% shapes_grid          5 -INPUT=dem.sgrd -CONTOUR=contour.shp -ZSTEP=100.0\n"
+		"\n"
+		"ECHO _____________________________________________\n"
+		"ECHO do some terrain analysis\n"
+		"saga_cmd %%FLAGS%% ta_preprocessor      2 -DEM=dem.sgrd -DEM_PREPROC=dem.sgrd\n"
+		"saga_cmd %%FLAGS%% ta_lighting          0 -ELEVATION=dem.sgrd -SHADE=shade.sgrd -METHOD=0 -AZIMUTH=-45 -DECLINATION=45\n"
+		"saga_cmd %%FLAGS%% ta_morphometry       0 -ELEVATION=dem.sgrd -SLOPE=slope.sgrd -ASPECT=aspect.sgrd -HCURV=hcurv.sgrd -VCURV=vcurv.sgrd\n"
+		"saga_cmd %%FLAGS%% ta_hydrology         0 -ELEVATION=dem.sgrd -CAREA=carea.sgrd\n"
+		"\n"
+		"ECHO _____________________________________________\n"
+		"ECHO run saga cmd script\n"
+		"SET INPUT=dem.sgrd;slope.sgrd;hcurv.sgrd;vcurv.sgrd\n"
+		"saga_cmd %%FLAGS%% saga_cmd_example.txt\n"
+		"\n"
+		"PAUSE\n"
+	));
 
-	SG_PRINTF(SG_T("%s\n"), LNG("okay"));
+	//-----------------------------------------------------
+	if( !Stream.Open(SG_File_Make_Path(SG_Dir_Get_Current(), SG_T("saga_cmd_example"), SG_T("txt")), SG_FILE_W, false) )
+	{
+		CMD_Print(_TL("failed"));
+
+		return;
+	}
+
+	Stream.Printf(CSG_String(
+		"REM \'REM\' or \'#\' can be used for comments, \'ECHO\' for message output.\n"
+		"REM environment variables can be accessed using the ms-dos/window style\n"
+		"\n"
+		"ECHO _____________________________________________\n"
+		"ECHO cluster analysis and vectorisation\n"
+		"\n"
+		"# cluster analysis\n"
+		"imagery_classification 1 -GRIDS=%%INPUT%% -CLUSTER=cluster.sgrd -NORMALISE -NCLUSTER=5\n"
+		"\n"
+		"# majority filter\n"
+		"grid_filter            6 -INPUT=cluster.sgrd -RADIUS=3\n"
+		"\n"
+		"# vectorization\n"
+		"shapes_grid            6 -GRID=cluster.sgrd -POLYGONS=cluster.shp -CLASS_ALL=1\n"
+		"\n"
+		"# select cluster class 1\n"
+		"shapes_tools           3 -SHAPES=cluster.shp -FIELD=ID -EXPRESSION=\"a = 1\"\n"
+		"\n"
+		"# save selectione\n"
+		"shapes_tools           6 -INPUT=cluster.shp -OUTPUT=cluster_class1.shp\n"
+		"\n"
+		"ECHO _____________________________________________\n"
+		"ECHO\n"
+	));
+
+	//-----------------------------------------------------
+	CMD_Print(_TL("okay"));
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void		Create_Docs		(void)
+{
+	Print_Logo();
+
+	if( Load_Libraries() )
+	{
+		CMD_Print(_TL("creating module documentation files"));
+
+		CMD_Set_Show_Messages(false);
+
+		SG_Get_Module_Library_Manager().Get_Summary(SG_Dir_Get_Current());
+
+		CMD_Print(_TL("okay"));
+	}
 }
 
 

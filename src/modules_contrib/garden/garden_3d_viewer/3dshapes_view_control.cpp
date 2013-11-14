@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: 3dshapes_view_control.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: 3dshapes_view_control.cpp 1644 2013-04-02 09:41:18Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -304,8 +304,8 @@ void C3DShapes_View_Control::On_Key_Down(wxKeyEvent &event)
 	case WXK_HOME:		m_yShift	-= 10.0;				break;
 	case WXK_END:		m_yShift	+= 10.0;				break;
 
-	case WXK_PRIOR:		m_zShift	-= 10.0;				break;
-	case WXK_NEXT:		m_zShift	+= 10.0;				break;
+	case WXK_PAGEUP:	m_zShift	-= 10.0;				break;
+	case WXK_PAGEDOWN:	m_zShift	+= 10.0;				break;
 
 	case 'A':			m_bStereo	= !m_bStereo;			break;
 

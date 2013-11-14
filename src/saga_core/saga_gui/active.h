@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: active.h 1652 2013-04-12 12:15:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -97,8 +97,10 @@ public:
 	class CACTIVE_Legend *			Get_Legend				(void)	{	return( m_pLegend );		}
 
 	bool							Set_Active				(class CWKSP_Base_Item *pItem);
-	class CWKSP_Base_Item *			Get_Item				(void)	{	return( m_pItem );			}
-	class CWKSP_Layer *				Get_Layer				(void)	{	return( m_pLayer );			}
+	class CWKSP_Base_Item *			Get_Active				(void)	{	return( m_pItem );			}
+	class CWKSP_Layer *				Get_Active_Layer		(void);
+	class CWKSP_Data_Item *			Get_Active_Data_Item	(void);
+	class CWKSP_Map *				Get_Active_Map			(void);
 
 	bool							Update					(class CWKSP_Base_Item *pItem, bool bSave);
 	bool							Update_DataObjects		(void);
@@ -118,10 +120,6 @@ private:
 	class CACTIVE_Legend			*m_pLegend;
 
 	class CWKSP_Base_Item			*m_pItem;
-
-	class CWKSP_Layer				*m_pLayer;
-
-	class CSG_Data_Object			*m_pObject;
 
 
 	bool							_Show_Page				(wxWindow *pPage);

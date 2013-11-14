@@ -1,8 +1,8 @@
 /**********************************************************
- * Version $Id: dl_extrusion.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: dl_extrusion.h 1503 2012-10-26 09:49:21Z oconrad $
  *********************************************************/
 /****************************************************************************
-** $Id: dl_extrusion.h 911 2011-02-14 16:38:15Z reklov_w $
+** $Id: dl_extrusion.h 1503 2012-10-26 09:49:21Z oconrad $
 **
 ** Copyright (C) 2001-2003 RibbonSoft. All rights reserved.
 **
@@ -57,7 +57,7 @@ public:
      * Destructor.
      */
 	~DL_Extrusion() {
-		delete direction ;
+		delete [] direction ;
     }
 
 

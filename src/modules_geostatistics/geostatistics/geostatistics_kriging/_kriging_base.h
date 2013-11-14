@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: _kriging_base.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: _kriging_base.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ public:
 	C_Kriging_Base(void);
 	virtual ~C_Kriging_Base(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Without Variogram Fit") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Without Variogram Fit") );	}
 
 
 protected:

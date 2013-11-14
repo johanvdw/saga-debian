@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Convergence_Radius.cpp 940 2011-02-25 15:15:24Z oconrad $
+ * Version $Id: Convergence_Radius.cpp 1635 2013-03-23 11:05:51Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,8 +81,8 @@ CConvergence_Radius::CConvergence_Radius(void)
 
 	Set_Description	(_TW(
 		"Reference:\n"
-		"Koethe, R. / Lehmeier, F. (1996):\n'SARA – System zur Automatischen Relief-Analyse',\n"
-		"User Manual, 2. Edition [Dept. of Geography, University of Goettingen, unpublished]\n"
+		"Koethe, R. & Lehmeier, F. (1996): SARA - System zur Automatischen Relief-Analyse. "
+		"User Manual, 2. Edition [Dept. of Geography, University of Goettingen, unpublished]\n\n"
 	));
 
 	Parameters.Add_Grid(
@@ -134,8 +134,7 @@ CConvergence_Radius::CConvergence_Radius(void)
 //---------------------------------------------------------
 bool CConvergence_Radius::On_Execute(void)
 {
-	int			x, y;
-	double		d;
+	int			y;
 	CSG_Grid	*pConvergence;
 
 	//-----------------------------------------------------
@@ -160,6 +159,9 @@ bool CConvergence_Radius::On_Execute(void)
 
 	for(int i=0; i<m_Cells.Get_Count(); i++)
 	{
+		int		x;
+		double	d;
+
 		if( m_Cells.Get_Values(i, x, y, d, d, false) )
 		{
 			m_Direction[i]	= SG_Get_Angle_Of_Direction(0.0, 0.0, x, y);
@@ -173,7 +175,8 @@ bool CConvergence_Radius::On_Execute(void)
 
 	for(y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
-		for(x=0; x<Get_NX(); x++)
+		#pragma omp parallel for
+		for(int x=0; x<Get_NX(); x++)
 		{
 			double	Slope, Aspect;
 
@@ -193,8 +196,11 @@ bool CConvergence_Radius::On_Execute(void)
 	//-----------------------------------------------------
 	for(y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
-		for(x=0; x<Get_NX(); x++)
+		#pragma omp parallel for
+		for(int x=0; x<Get_NX(); x++)
 		{
+			double	d;
+
 			if( Get_Convergence(x, y, d) )
 			{
 				pConvergence->Set_Value(x, y, d);
@@ -263,7 +269,7 @@ bool CConvergence_Radius::Get_Convergence(int x, int y, double &Convergence)
 	//-----------------------------------------------------
 	if( s.Get_Count() > 0 )
 	{
-		Convergence	= s.Get_Mean() * 100.0 / M_PI_090;
+		Convergence	= (s.Get_Mean() - M_PI_090) * 100.0 / M_PI_090;
 
 		return( true );
 	}

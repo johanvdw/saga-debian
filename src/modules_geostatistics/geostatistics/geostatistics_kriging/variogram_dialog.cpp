@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: variogram_dialog.cpp 1206 2011-10-28 11:54:29Z oconrad $
+ * Version $Id: variogram_dialog.cpp 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -514,7 +514,7 @@ void CVariogram_Dialog::Set_Model(void)
 
 	if(	!m_pModel->Set_Formula(m_pFormula->GetValue().c_str()) )
 	{
-		s	+= m_pModel->Get_Error();
+		s	+= m_pModel->Get_Error().w_str();
 	}
 	else if( !m_pModel->Get_Trend() )
 	{
@@ -522,7 +522,7 @@ void CVariogram_Dialog::Set_Model(void)
 	}
 	else
 	{
-		s	+= m_pModel->Get_Formula(SG_TREND_STRING_Function).c_str();
+		s	+= m_pModel->Get_Formula(SG_TREND_STRING_Function).w_str();
 		s	+= wxString::Format(wxT("\n%s:\t%.2f%%"), _TL("Determination")		, m_pModel->Get_R2() * 100.0);
 		s	+= wxString::Format(wxT("\n%s:\t%.*f")	, _TL("Fitting range")		, SG_Get_Significant_Decimals(m_pDistance->Get_Value()), m_pDistance->Get_Value());
 		s	+= wxString::Format(wxT("\n%s:\t%d")	, _TL("Samples in range")	, m_pModel->Get_Data_Count());

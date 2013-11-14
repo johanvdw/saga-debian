@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_line.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_shapes_line.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,9 +86,8 @@ class CWKSP_Shapes_Line : public CWKSP_Shapes
 {
 public:
 	CWKSP_Shapes_Line(CSG_Shapes *pShapes);
-	virtual ~CWKSP_Shapes_Line(void);
 
-	bool						Get_Style				(wxPen &Pen, wxString *pName = NULL);
+	wxPen						Get_Def_Pen				(void)	{	return( m_Pen      );	}
 	bool						Get_Style_Size			(int &min_Size, int &max_Size, double &min_Value, double &dValue, wxString *pName);
 
 

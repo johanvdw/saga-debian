@@ -81,7 +81,14 @@ protected:
 
 	void						Initialise				(void);
 
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
 	virtual bool				On_Execute				(void);
+
+
+private:
+
+	int							Cmp_Keys				(CSG_Table_Value *pA, CSG_Table_Value *pB, bool bCmpNumeric);
 
 };
 
@@ -99,7 +106,25 @@ class CJoin_Tables_Shapes : public CJoin_Tables_Base
 public:
 	CJoin_Tables_Shapes(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Shapes|Table") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Shapes|Table") );	}
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CTable_Append_Rows : public CSG_Module  
+{
+public:
+	CTable_Append_Rows(void);
+
+
+protected:
+
+	virtual bool				On_Execute				(void);
 
 };
 

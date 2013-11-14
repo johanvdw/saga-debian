@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map.h 1039 2011-05-04 14:02:25Z oconrad $
+ * Version $Id: wksp_map.h 1742 2013-06-20 16:13:27Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -84,17 +84,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#define LEGEND_LAYOUT_HORIZONTAL	0x01
-#define LEGEND_LAYOUT_VERTICAL		0x02
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
 class CWKSP_Map_Extents : public CSG_Rects
 {
 public:
@@ -156,6 +145,9 @@ public:
 	void						Set_Synchronising		(bool bOn);
 	bool						is_Synchronising		(void)	{	return( m_bSynchronise );	}
 
+	void						Set_ScaleBar			(bool bOn);
+	bool						is_ScaleBar				(void)	{	return( m_bScaleBar );	}
+
 	bool						is_Image_Save_Mode		(void)	{	return( m_Img_bSave );		}
 
 	class CWKSP_Map_Layer *		Add_Layer				(class CWKSP_Layer *pLayer);
@@ -192,11 +184,11 @@ public:
 	void						Draw_Map				(wxDC &dc, const CSG_Rect &rWorld, double Zoom, const wxRect &rClient, bool bEdit, int Background = SG_COLOR_WHITE);
 	void						Draw_Frame				(wxDC &dc, wxRect rMap, int Width);
 	void						Draw_Frame				(wxDC &dc, const CSG_Rect &rWorld, wxRect rMap, int Width);
-	bool						Draw_Legend				(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Position, wxSize *pSize = NULL, int Layout = LEGEND_LAYOUT_VERTICAL);
+	bool						Draw_Legend				(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Position, wxSize *pSize = NULL);
 
 	const wxBitmap &			Get_Thumbnail			(int dx, int dy);
 
-	bool						Get_Legend_Size			(wxSize &Size, double Zoom_Map = 1.0, double Zoom = 1.0, int Layout = LEGEND_LAYOUT_VERTICAL);
+	bool						Get_Legend_Size			(wxSize &Size, double Zoom_Map = 1.0, double Zoom = 1.0);
 
 	int							Get_Frame_Width			(void);
 	int							Get_Print_Resolution	(void);
@@ -213,7 +205,7 @@ protected:
 
 private:
 
-	bool						m_bSynchronise, m_Img_bSave;
+	bool						m_bScaleBar, m_bSynchronise, m_Img_bSave;
 
 	int							m_Img_Type, m_Img_Count;
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_callback.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: api_callback.cpp 1710 2013-05-31 13:37:05Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -141,16 +141,16 @@ bool		SG_UI_Process_Get_Okay(bool bBlink)
 
 		return( gSG_UI_Callback(CALLBACK_PROCESS_GET_OKAY, p1, p2) != 0 );
 	}
-	else
-	{
-		if( gSG_UI_Progress_Lock && bBlink )
-		{
-			static int	iBuisy		= 0;
-			const SG_Char	Buisy[4]	= {	'|', '/', '-', '\\'	};
 
-			SG_PRINTF(SG_T("\r%c   "), Buisy[iBuisy++]);
-			iBuisy	%= 4;
-		}
+	if( gSG_UI_Progress_Lock == 0 && bBlink )
+	{
+		static const SG_Char	Buisy[4]	= {	'|', '/', '-', '\\'	};
+
+		static int	iBuisy	= 0;
+
+		SG_PRINTF(SG_T("\r%c   "), Buisy[iBuisy++]);
+
+		iBuisy	%= 4;
 	}
 
 	return( true );
@@ -174,24 +174,33 @@ bool		SG_UI_Process_Set_Progress(double Position, double Range)
 {
 	if( gSG_UI_Progress_Lock > 0 )
 	{
-		if( gSG_UI_Callback )
-		{
-			CSG_UI_Parameter	p1, p2;
-
-			return( gSG_UI_Callback(CALLBACK_PROCESS_GET_OKAY, p1, p2) != 0 );
-		}
+		return( SG_UI_Process_Get_Okay() );
 	}
-	else
-	{
-		if( gSG_UI_Callback )
-		{
-			CSG_UI_Parameter	p1(Position), p2(Range);
 
-			return( gSG_UI_Callback(CALLBACK_PROCESS_SET_PROGRESS, p1, p2) != 0 );
-		}
-		else
+	if( gSG_UI_Callback )
+	{
+		CSG_UI_Parameter	p1(Position), p2(Range);
+
+		return( gSG_UI_Callback(CALLBACK_PROCESS_SET_PROGRESS, p1, p2) != 0 );
+	}
+
+	//-----------------------------------------------------
+	static int	iPercent	= -1;
+
+	int	i	= Position < 0.0 ? -1 : Range > 0.0 ? 1 + (int)(100.0 * Position / Range) : 100;
+
+	if( iPercent != i )
+	{
+		if( iPercent < 0 || i < iPercent )
 		{
-			SG_PRINTF(SG_T("\r%3d%%"), Range != 0.0 ? 1 + (int)(100.0 * Position / Range) : 100);
+			SG_PRINTF(SG_T("\n"));
+		}
+
+		iPercent	= i;
+
+		if( iPercent >= 0 )
+		{
+			SG_PRINTF(SG_T("\r%3d%%"), iPercent > 100 ? 100 : iPercent);
 		}
 	}
 
@@ -203,8 +212,6 @@ bool		SG_UI_Process_Set_Ready(void)
 {
 	if( gSG_UI_Callback )
 	{
-		SG_UI_Process_Set_Text(LNG("ready"));
-
 		if( gSG_UI_Progress_Lock == 0 )
 		{
 			CSG_UI_Parameter	p1, p2;
@@ -213,24 +220,28 @@ bool		SG_UI_Process_Set_Ready(void)
 		}
 	}
 
+	SG_UI_Process_Set_Progress(-1, -1);
+
 	return( true );
 }
 
 //---------------------------------------------------------
-void		SG_UI_Process_Set_Text(const SG_Char *Text)
+void		SG_UI_Process_Set_Text(const CSG_String &Text)
 {
-	if( gSG_UI_Progress_Lock == 0 )
+	if( gSG_UI_Progress_Lock > 0 )
 	{
-		if( gSG_UI_Callback )
-		{
-			CSG_UI_Parameter	p1(Text), p2;
+		return;
+	}
 
-			gSG_UI_Callback(CALLBACK_PROCESS_SET_TEXT, p1, p2);
-		}
-		else
-		{
-			SG_PRINTF(SG_T("\n%s"), Text);
-		}
+	if( gSG_UI_Callback )
+	{
+		CSG_UI_Parameter	p1(Text), p2;
+
+		gSG_UI_Callback(CALLBACK_PROCESS_SET_TEXT, p1, p2);
+	}
+	else
+	{
+		SG_PRINTF(SG_T("%s\n"), Text.c_str());
 	}
 }
 
@@ -262,7 +273,7 @@ bool		SG_UI_Stop_Execution(bool bDialog)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void		SG_UI_Dlg_Message(const SG_Char *Message, const SG_Char *Caption)
+void		SG_UI_Dlg_Message(const CSG_String &Message, const CSG_String &Caption)
 {
 	if( gSG_UI_Callback )
 	{
@@ -272,12 +283,12 @@ void		SG_UI_Dlg_Message(const SG_Char *Message, const SG_Char *Caption)
 	}
 	else
 	{
-		SG_PRINTF(SG_T("\n%s: %s"), Caption, Message);
+		SG_PRINTF(SG_T("%s: %s\n"), Caption.c_str(), Message.c_str());
 	}
 }
 
 //---------------------------------------------------------
-bool		SG_UI_Dlg_Continue(const SG_Char *Message, const SG_Char *Caption)
+bool		SG_UI_Dlg_Continue(const CSG_String &Message, const CSG_String &Caption)
 {
 	if( gSG_UI_Callback )
 	{
@@ -290,7 +301,7 @@ bool		SG_UI_Dlg_Continue(const SG_Char *Message, const SG_Char *Caption)
 }
 
 //---------------------------------------------------------
-int			SG_UI_Dlg_Error(const SG_Char *Message, const SG_Char *Caption)
+int			SG_UI_Dlg_Error(const CSG_String &Message, const CSG_String &Caption)
 {
 	if( gSG_UI_Callback )
 	{
@@ -310,7 +321,7 @@ int			SG_UI_Dlg_Error(const SG_Char *Message, const SG_Char *Caption)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		SG_UI_Dlg_Parameters(CSG_Parameters *pParameters, const SG_Char *Caption)
+bool		SG_UI_Dlg_Parameters(CSG_Parameters *pParameters, const CSG_String &Caption)
 {
 	if( gSG_UI_Callback && pParameters )
 	{
@@ -348,7 +359,7 @@ int			SG_UI_Msg_Lock(bool bOn)
 }
 
 //---------------------------------------------------------
-void		SG_UI_Msg_Add(const SG_Char *Message, bool bNewLine, TSG_UI_MSG_STYLE Style)
+void		SG_UI_Msg_Add(const CSG_String &Message, bool bNewLine, TSG_UI_MSG_STYLE Style)
 {
 	if( gSG_UI_Msg_Lock )
 		return;
@@ -366,17 +377,12 @@ void		SG_UI_Msg_Add(const SG_Char *Message, bool bNewLine, TSG_UI_MSG_STYLE Styl
 	}
 	else
 	{
-		SG_PRINTF(SG_T("%s"), Message);
-
-		if( bNewLine )
-		{
-			SG_PRINTF(SG_T("\n\n"));
-		}
+		SG_PRINTF(SG_T("%s\n"), Message.c_str());
 	}
 }
 
 //---------------------------------------------------------
-void		SG_UI_Msg_Add_Error(const SG_Char *Message)
+void		SG_UI_Msg_Add_Error(const CSG_String &Message)
 {
 	if( gSG_UI_Msg_Lock )
 		return;
@@ -389,12 +395,12 @@ void		SG_UI_Msg_Add_Error(const SG_Char *Message)
 	}
 	else
 	{
-		SG_PRINTF(SG_T("\n%s: %s"), LNG("Error"), Message);
+		SG_FPRINTF(stderr, SG_T("%s: %s\n"), _TL("Error"), Message.c_str());
 	}
 }
 
 //---------------------------------------------------------
-void		SG_UI_Msg_Add_Execution(const SG_Char *Message, bool bNewLine, TSG_UI_MSG_STYLE Style)
+void		SG_UI_Msg_Add_Execution(const CSG_String &Message, bool bNewLine, TSG_UI_MSG_STYLE Style)
 {
 	if( gSG_UI_Msg_Lock )
 		return;
@@ -412,12 +418,7 @@ void		SG_UI_Msg_Add_Execution(const SG_Char *Message, bool bNewLine, TSG_UI_MSG_
 	}
 	else
 	{
-		SG_PRINTF(SG_T("%s"), Message);
-
-		if( bNewLine )
-		{
-			SG_PRINTF(SG_T("\n\n"));
-		}
+		SG_PRINTF(SG_T("%s\n"), Message.c_str());
 	}
 }
 
@@ -427,41 +428,13 @@ void		SG_UI_Msg_Add_Execution(const SG_Char *Message, bool bNewLine, TSG_UI_MSG_
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-class CSG_Data_Object *	SG_UI_DataObject_Find(const SG_Char *File_Name, int Object_Type)
-{
-	if( gSG_UI_Callback && File_Name )
-	{
-		CSG_UI_Parameter	p1(File_Name), p2(Object_Type);
-
-		gSG_UI_Callback(CALLBACK_DATAOBJECT_FIND_BY_FILE, p1, p2);
-
-		return( (class CSG_Data_Object *)p1.Pointer );
-	}
-
-	return( NULL );
-}
-
-//---------------------------------------------------------
-bool		SG_UI_DataObject_Check(CSG_Data_Object *pDataObject, int Object_Type)
-{
-	if( gSG_UI_Callback && pDataObject )
-	{
-		CSG_UI_Parameter	p1(pDataObject), p2(Object_Type);
-
-		return( gSG_UI_Callback(CALLBACK_DATAOBJECT_CHECK, p1, p2) != 0 );
-	}
-
-	return( false );
-}
 
 //---------------------------------------------------------
 bool		SG_UI_DataObject_Add(CSG_Data_Object *pDataObject, int Show)
 {
 	if( gSG_UI_Callback && pDataObject )
 	{
-		CSG_UI_Parameter	p1(pDataObject), p2(Show);
+		CSG_UI_Parameter	p1(pDataObject), p2(Show ? true : false);
 
 		return( gSG_UI_Callback(CALLBACK_DATAOBJECT_ADD, p1, p2) != 0 );
 	}
@@ -472,8 +445,6 @@ bool		SG_UI_DataObject_Add(CSG_Data_Object *pDataObject, int Show)
 //---------------------------------------------------------
 bool		SG_UI_DataObject_Update(CSG_Data_Object *pDataObject, int Show, CSG_Parameters *pParameters)
 {
-	CSG_Parameters	Parameters;
-
 	if( gSG_UI_Callback && pDataObject )
 	{
 		CSG_UI_Parameter	p1(pDataObject), p2(pParameters);
@@ -571,13 +542,13 @@ bool		SG_UI_DataObject_Params_Set	(CSG_Data_Object *pDataObject, CSG_Parameters 
 }
 
 //---------------------------------------------------------
-bool		SG_UI_DataObject_Get_All(class CSG_Parameters *pParameters)
+bool		SG_UI_ODBC_Update		(const CSG_String &Server)
 {
-	if( gSG_UI_Callback && pParameters )
+	if( gSG_UI_Callback )
 	{
-		CSG_UI_Parameter	p1(pParameters), p2;
+		CSG_UI_Parameter	p1(Server), p2;
 
-		return( gSG_UI_Callback(CALLBACK_DATAOBJECT_GET_ALL, p1, p2) != 0 );
+		return( gSG_UI_Callback(CALLBACK_ODBC_UPDATE, p1, p2) != 0 );
 	}
 
 	return( false );
@@ -608,7 +579,7 @@ void *		SG_UI_Get_Window_Main(void)
 //---------------------------------------------------------
 CSG_String	SG_UI_Get_Application_Path(void)
 {
-	return( wxStandardPaths::Get().GetExecutablePath().c_str() );
+	return( CSG_String(wxStandardPaths::Get().GetExecutablePath().wc_str()) );
 }
 
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_edges.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: vigra_edges.cpp 1282 2011-12-29 17:13:26Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ bool CViGrA_Edges::On_Execute(void)
 
 	pOutput->Set_NoData_Value(0);
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name().c_str()));
 
 	return( true );
 }

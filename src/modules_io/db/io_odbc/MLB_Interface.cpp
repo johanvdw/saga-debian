@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1514 2012-11-06 09:47:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char *	Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -90,7 +90,7 @@ const SG_Char *	Get_Info(int i)
 		return( _TL("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Database (ODBC)") );
+		return( _TL("Database") );
 	}
 }
 
@@ -124,6 +124,8 @@ CSG_Module *		Create_Module(int i)
 	case 10:	return( new CPoints_Save );
 	case 11:	return( new CPGIS_Shapes_Load );
 	case 12:	return( new CPGIS_Shapes_Save );
+	case 13:	return( new CShapes_Load );
+	case 14:	return( new CShapes_Save );
 	}
 
 	return( NULL );

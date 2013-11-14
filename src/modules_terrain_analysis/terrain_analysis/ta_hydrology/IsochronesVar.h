@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: IsochronesVar.h 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: IsochronesVar.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*******************************************************************************
     IsochronesVar.h
@@ -32,7 +32,7 @@ public:
 	CIsochronesVar(void);
 	virtual ~CIsochronesVar(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Dynamics" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Dynamics" ));	}
 
 protected:
 	virtual bool On_Execute(void);

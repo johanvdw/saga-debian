@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Curvature_Classification.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Curvature_Classification.h 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,9 +86,8 @@ class ta_morphometry_EXPORT CCurvature_Classification : public CSG_Module_Grid
 {
 public:
 	CCurvature_Classification(void);
-	virtual ~CCurvature_Classification(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Classification" ));	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("A:Terrain Analysis|Terrain Classification" ));	}
 
 
 protected:

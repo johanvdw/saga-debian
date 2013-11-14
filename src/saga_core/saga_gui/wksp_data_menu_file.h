@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_menu_file.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_data_menu_file.h 1493 2012-10-19 11:31:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,30 +72,45 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <wx/menu.h>
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class CWKSP_Data_Menu_File
 {
 public:
-	CWKSP_Data_Menu_File(int DataType);
+	CWKSP_Data_Menu_File(void);
 	virtual ~CWKSP_Data_Menu_File(void);
 
-	class wxMenu *				Create		(void);
-	void						Update		(class wxMenu *pMenu);
+	wxMenu *					Create		(TSG_Data_Object_Type DataType);
+	void						Destroy		(void);
 
-	void						Add			(const wxChar *FileName);
-	void						Del			(const wxChar *FileName);
+	void						Update		(wxMenu *pMenu);
+
+	void						Add			(const wxString &FileName);
+	void						Del			(const wxString &FileName);
 
 	bool						Open		(int Cmd_ID);
 
 
 private:
 
-	int							m_DataType, m_Recent_First, m_Recent_Count;
+	int							m_Recent_First, m_Recent_Count;
 
 	wxString					*m_Recent, m_Recent_Group;
 
+	TSG_Data_Object_Type		m_DataType;
+
 
 	void						_Create		(void);
-	void						_Destroy	(void);
+
+	void						_Del		(int Cmd_ID);
 
 };
 

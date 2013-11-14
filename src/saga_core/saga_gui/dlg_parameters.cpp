@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_parameters.cpp 1006 2011-04-20 11:57:39Z oconrad $
+ * Version $Id: dlg_parameters.cpp 1640 2013-03-25 12:56:18Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CDLG_Parameters::CDLG_Parameters(CSG_Parameters *pParameters)
-	: CDLG_Base(-1, pParameters ? pParameters->Get_Name() : LNG("[CAP] Parameters"))
+	: CDLG_Base(-1, pParameters && pParameters->Get_Name().Length() > 0 ? pParameters->Get_Name().c_str() : _TL("Parameters"))
 {
 	m_pControl		= new CParameters_Control(this, true);
 

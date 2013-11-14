@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1107 2011-06-21 14:21:10Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1619 2013-03-05 16:07:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 
 //---------------------------------------------------------
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -106,7 +106,10 @@ const SG_Char * Get_Info(int i)
 #include "wind_effect.h"
 #include "ruggedness.h"
 #include "tpi.h"
-
+#include "tc_iwahashi_pike.h"
+#include "param_scale.h"
+#include "top_hat.h"
+#include "fuzzy_landform_elements.h"
 
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
@@ -133,6 +136,12 @@ CSG_Module *		Create_Module(int i)
 	case 17:	return( new CRuggedness_VRM );
 	case 18:	return( new CTPI );
 	case 19:	return( new CTPI_Classification );
+	case 20:	return( new CTC_Texture );
+	case 21:	return( new CTC_Convexity );
+	case 22:	return( new CTC_Classification );
+	case 23:	return( new CParam_Scale );
+	case 24:	return( new CTop_Hat );
+	case 25:	return( new CFuzzy_Landform_Elements );
 	}
 
 	return( NULL );

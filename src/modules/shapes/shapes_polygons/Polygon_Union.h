@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygon_Union.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Polygon_Union.h 1595 2013-01-25 14:16:26Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -93,6 +93,7 @@ protected:
 	virtual bool			On_Execute				(void);
 
 	virtual int				On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:

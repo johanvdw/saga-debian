@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid.h 1105 2011-06-21 14:11:47Z oconrad $
+ * Version $Id: grid.h 1533 2012-11-15 12:16:55Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -474,9 +474,9 @@ public:		///////////////////////////////////////////////
 	bool						is_Compatible	(const CSG_Grid_System &System) const;
 	bool						is_Compatible	(int NX, int NY, double Cellsize, double xMin, double yMin) const;
 
-	bool						is_InGrid(int x, int y, bool bCheckNoData = true)	const	{	return( m_System.is_InGrid(x, y) && (!bCheckNoData || (bCheckNoData && !is_NoData(x, y))) );	}
-	bool						is_InGrid_byPos	(double xPos, double yPos)			const	{	return( xPos >= Get_XMin() && xPos <= Get_XMax() && yPos >= Get_YMin() && yPos <= Get_YMax() );	}
-	bool						is_InGrid_byPos	(TSG_Point Position)				const	{	return( is_InGrid_byPos(Position.x, Position.y) );	}
+	bool						is_InGrid		(int    x, int    y, bool bCheckNoData = true)	const	{	return( m_System.is_InGrid(x, y) && (!bCheckNoData || !is_NoData(x, y)) );	}
+	bool						is_InGrid_byPos	(double x, double y, bool bCheckNoData = true)	const	{	return( x >= Get_XMin() && x <= Get_XMax() && y >= Get_YMin() && y <= Get_YMax() && (!bCheckNoData || !is_NoData(m_System.Get_xWorld_to_Grid(x), m_System.Get_yWorld_to_Grid(y))) );	}
+	bool						is_InGrid_byPos	(TSG_Point Position, bool bCheckNoData = true)	const	{	return( is_InGrid_byPos(Position.x, Position.y, bCheckNoData) );	}
 
 
 	//-----------------------------------------------------
@@ -914,7 +914,7 @@ public:
 	CSG_Grid_Stack(void) : CSG_Stack(sizeof(TSG_Point_Int))	{}
 
 	//-----------------------------------------------------
-	virtual void			Push			(int  x, int  y)
+	virtual bool			Push			(int  x, int  y)
 	{
 		TSG_Point_Int	*pPoint	= (TSG_Point_Int *)Get_Record_Push();
 
@@ -922,11 +922,15 @@ public:
 		{
 			pPoint->x	= x;
 			pPoint->y	= y;
+
+			return( true );
 		}
+
+		return( false );
 	}
 
 	//-----------------------------------------------------
-	virtual void			Pop				(int &x, int &y)
+	virtual bool			Pop				(int &x, int &y)
 	{
 		TSG_Point_Int	*pPoint	= (TSG_Point_Int *)Get_Record_Pop();
 
@@ -934,7 +938,11 @@ public:
 		{
 			x	= pPoint->x;
 			y	= pPoint->y;
+
+			return( true );
 		}
+
+		return( false );
 	}
 
 };
@@ -956,7 +964,7 @@ public:
 
 	CSG_Distance_Weighting &	Get_Weighting		(void)								{	return( m_Weighting );		}
 
-	bool						Set_Radius			(double Radius);
+	bool						Set_Radius			(double Radius, bool bSquare = false);
 	bool						Set_Annulus			(double inner_Radius, double outer_Radius);
 	bool						Set_Sector			(double Radius, double Direction, double Tolerance);
 
