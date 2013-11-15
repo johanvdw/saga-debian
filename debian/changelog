@@ -1,3 +1,10 @@
+saga (2.1.0+dfsg-1) UNRELEASED; urgency=low
+
+  * Update to new upstream version
+  * Uses wxwidgets 3.0 instead of 2.8
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 14 Nov 2013 21:16:53 -0500
+
 saga (2.0.8+dfsg-4) unstable; urgency=low
 
   * Correct saga-depends
