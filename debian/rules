@@ -3,7 +3,7 @@
 	dh $@ --with python2 --with autoreconf
 
 override_dh_auto_configure:
-	dh_auto_configure -- --enable-unicode --prefix=/usr --enable-python
+	dh_auto_configure -- --enable-unicode --prefix=/usr --enable-python $(shell dpkg-buildflags --export=configure)
 
 VERSION := $(shell grep '^AC_INIT' configure.in | \
 	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
