@@ -1,0 +1,96 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Fri, 15 Nov 2013 00:06:46 -0500
+Subject: Use qhull instead of triangle
+
+---
+ src/modules/grid/grid_gridding/Makefile.am   |  3 +--
+ src/modules/grid/grid_gridding/Makefile.in   | 13 ++-----------
+ src/modules/grid/grid_gridding/nn/delaunay.c |  2 +-
+ 3 files changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/src/modules/grid/grid_gridding/Makefile.am b/src/modules/grid/grid_gridding/Makefile.am
+index 75c79c9..bc55004 100644
+--- a/src/modules/grid/grid_gridding/Makefile.am
++++ b/src/modules/grid/grid_gridding/Makefile.am
+@@ -13,7 +13,7 @@ endif
+ DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
+ CXX_INCS           = -I$(top_srcdir)/src/saga_core
+ AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
+-AM_LDFLAGS         = -fPIC -shared -avoid-version
++AM_LDFLAGS         = -fPIC -shared -avoid-version -lqhull
+ pkglib_LTLIBRARIES = libgrid_gridding.la
+ libgrid_gridding_la_SOURCES =\
+ Interpolation.cpp\
+@@ -34,7 +34,6 @@ Shepard.cpp\
+ ./nn/nnai.c\
+ ./nn/nncommon.c\
+ ./nn/nnpi.c\
+-./nn/triangle.c\
+ Interpolation.h\
+ Interpolation_AngularDistance.h\
+ Interpolation_InverseDistance.h\
+diff --git a/src/modules/grid/grid_gridding/Makefile.in b/src/modules/grid/grid_gridding/Makefile.in
+index 4ff6a48..1fdaa47 100644
+--- a/src/modules/grid/grid_gridding/Makefile.in
++++ b/src/modules/grid/grid_gridding/Makefile.in
+@@ -133,7 +133,7 @@ am_libgrid_gridding_la_OBJECTS = Interpolation.lo \
+ 	Interpolation_NearestNeighbour.lo Interpolation_Shepard.lo \
+ 	Interpolation_Triangulation.lo kernel_density.lo \
+ 	MLB_Interface.lo Shapes2Grid.lo Shepard.lo delaunay.lo hash.lo \
+-	istack.lo lpi.lo nnai.lo nncommon.lo nnpi.lo triangle.lo
++	istack.lo lpi.lo nnai.lo nncommon.lo nnpi.lo
+ libgrid_gridding_la_OBJECTS = $(am_libgrid_gridding_la_OBJECTS)
+ AM_V_lt = $(am__v_lt_@AM_V@)
+ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+@@ -371,7 +371,7 @@ top_srcdir = @top_srcdir@
+ DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
+ CXX_INCS = -I$(top_srcdir)/src/saga_core
+ AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
+-AM_LDFLAGS = -fPIC -shared -avoid-version
++AM_LDFLAGS = -fPIC -shared -avoid-version -lqhull
+ pkglib_LTLIBRARIES = libgrid_gridding.la
+ libgrid_gridding_la_SOURCES = \
+ Interpolation.cpp\
+@@ -392,7 +392,6 @@ Shepard.cpp\
+ ./nn/nnai.c\
+ ./nn/nncommon.c\
+ ./nn/nnpi.c\
+-./nn/triangle.c\
+ Interpolation.h\
+ Interpolation_AngularDistance.h\
+ Interpolation_InverseDistance.h\
+@@ -510,7 +509,6 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nnai.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nncommon.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nnpi.Plo@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/triangle.Plo@am__quote@
+ 
+ .c.o:
+ @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@@ -582,13 +580,6 @@ nnpi.lo: ./nn/nnpi.c
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nnpi.lo `test -f './nn/nnpi.c' || echo '$(srcdir)/'`./nn/nnpi.c
+ 
+-triangle.lo: ./nn/triangle.c
+-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT triangle.lo -MD -MP -MF $(DEPDIR)/triangle.Tpo -c -o triangle.lo `test -f './nn/triangle.c' || echo '$(srcdir)/'`./nn/triangle.c
+-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/triangle.Tpo $(DEPDIR)/triangle.Plo
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='./nn/triangle.c' object='triangle.lo' libtool=yes @AMDEPBACKSLASH@
+-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o triangle.lo `test -f './nn/triangle.c' || echo '$(srcdir)/'`./nn/triangle.c
+-
+ .cpp.o:
+ @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+ @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+diff --git a/src/modules/grid/grid_gridding/nn/delaunay.c b/src/modules/grid/grid_gridding/nn/delaunay.c
+index dc98875..e2952fa 100644
+--- a/src/modules/grid/grid_gridding/nn/delaunay.c
++++ b/src/modules/grid/grid_gridding/nn/delaunay.c
+@@ -24,7 +24,7 @@
+  *
+  *****************************************************************************/
+ 
+-//#define USE_QHULL
++#define USE_QHULL
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
