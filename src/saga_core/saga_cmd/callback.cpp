@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: callback.cpp 1220 2011-11-07 11:08:33Z reklov_w $
+ * Version $Id: callback.cpp 1667 2013-04-24 11:06:35Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,12 +79,12 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-static CModule_Library	*g_pLibrary	= NULL;
+static CCMD_Module	*g_pCMD_Module	= NULL;
 
 //---------------------------------------------------------
-void			Set_Library		(CModule_Library *pLibrary)
+void			CMD_Set_Module		(CCMD_Module *pCMD_Module)
 {
-	g_pLibrary	= pLibrary;
+	g_pCMD_Module	= pCMD_Module;
 }
 
 
@@ -93,25 +93,32 @@ void			Set_Library		(CModule_Library *pLibrary)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-static bool		g_bSilent		= false;
+static bool		g_bShow_Messages	= true;
 
-void			Set_Silent		(bool bOn)	{	g_bSilent		= bOn;		}
+void			CMD_Set_Show_Messages	(bool bOn)	{	g_bShow_Messages	= bOn;		}
 
-bool			Get_Silent		(void)		{	return( g_bSilent );		}
-
-//---------------------------------------------------------
-static bool		g_bQuiet		= false;
-
-void			Set_Quiet		(bool bOn)	{	g_bQuiet		= bOn;		}
-
-bool			Get_Quiet		(void)		{	return( g_bQuiet );			}
+bool			CMD_Get_Show_Messages	(void)		{	return( g_bShow_Messages );		}
 
 //---------------------------------------------------------
-static bool		g_bInteractive	= false;
+static bool		g_bShow_Progress	= true;
 
-void			Set_Interactive	(bool bOn)	{	g_bInteractive	= bOn;		}
+void			CMD_Set_Show_Progress	(bool bOn)	{	g_bShow_Progress	= bOn;		}
 
-bool			Get_Interactive	(void)		{	return( g_bInteractive );	}
+bool			CMD_Get_Show_Progress	(void)		{	return( g_bShow_Progress );		}
+
+//---------------------------------------------------------
+static bool		g_bInteractive		= false;
+
+void			CMD_Set_Interactive	(bool bOn)		{	g_bInteractive		= bOn;		}
+
+bool			CMD_Get_Interactive	(void)			{	return( g_bInteractive );		}
+
+//---------------------------------------------------------
+static bool		g_bXML				= false;
+
+void			CMD_Set_XML			(bool bOn)		{	g_bXML				= bOn;		}
+
+bool			CMD_Get_XML			(void)			{	return( g_bXML );				}
 
 
 ///////////////////////////////////////////////////////////
@@ -121,24 +128,50 @@ bool			Get_Interactive	(void)		{	return( g_bInteractive );	}
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void			Print			(const SG_Char *String)
+void			CMD_Print			(const CSG_String &Text, const SG_Char *XML_Tag)
 {
-	if( !g_bSilent && String && String[0] )
+	if( g_bXML )
 	{
-		SG_PRINTF(String);
+		if( XML_Tag && XML_Tag[0] )
+		{
+			SG_PRINTF(SG_T("<%s>%s</%s>\n"), XML_Tag, Text.c_str(), XML_Tag);
+		}
+	}
+	else
+	{
+		SG_PRINTF(SG_T("%s\n"), Text.c_str());
 	}
 }
 
 //---------------------------------------------------------
-void			Print_Error		(const SG_Char *Error)
+void			CMD_Print			(FILE *Stream, const CSG_String &Text, const SG_Char *XML_Tag)
 {
-	SG_FPRINTF(stderr, SG_T("\n%s: %s\n"), LNG("error"), Error);
+	if( Stream )
+	{
+		if( g_bXML )
+		{
+			if( XML_Tag && XML_Tag[0] )
+			{
+				SG_FPRINTF(Stream, SG_T("<%s>%s</%s>\n"), XML_Tag, Text.c_str(), XML_Tag);
+			}
+		}
+		else
+		{
+			SG_FPRINTF(Stream, SG_T("%s\n"), Text.c_str());
+		}
+	}
 }
 
 //---------------------------------------------------------
-void			Print_Error		(const SG_Char *Error, const SG_Char *Info)
+void			CMD_Print_Error		(const CSG_String &Error)
 {
-	Print_Error(CSG_String::Format(SG_T("%s [%s]"), Error, Info));
+	CMD_Print(stderr, CSG_String::Format(SG_T("%s: %s"), _TL("Error"), Error.c_str()), SG_XML_ERROR);
+}
+
+//---------------------------------------------------------
+void			CMD_Print_Error		(const CSG_String &Error, const CSG_String &Info)
+{
+	CMD_Print_Error(CSG_String::Format(SG_T("%s [%s]"), Error.c_str(), Info.c_str()));
 }
 
 
@@ -149,11 +182,11 @@ void			Print_Error		(const SG_Char *Error, const SG_Char *Info)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void			Get_Pause		(void)
+void			CMD_Get_Pause		(void)
 {
 	if( g_bInteractive )
 	{
-		SG_PRINTF(SG_T("\n%s..."), LNG("press any key"));
+		SG_PRINTF(SG_T("%s...\n"), _TL("press any key"));
 
 #ifdef _SAGA_MSW
 		_getch();
@@ -162,16 +195,16 @@ void			Get_Pause		(void)
 }
 
 //---------------------------------------------------------
-bool			Get_YesNo		(const SG_Char *caption, const SG_Char *message)
+bool			CMD_Get_YesNo		(const CSG_String &Caption, const CSG_String &Message)
 {
 	if( g_bInteractive )
 	{
 #ifdef _SAGA_MSW
 		CSG_String	sKey, sYes(SG_T("y")), sNo(SG_T("n"));
 
-		SG_PRINTF(SG_T("\n%s: %s\n"), caption, message);
+		SG_PRINTF(SG_T("%s: %s\n"), Caption.c_str(), Message.c_str());
 
-		SG_PRINTF(SG_T("%s? (%s/%s)"), LNG("continue"), sYes.c_str(), sNo.c_str());
+		SG_PRINTF(SG_T("%s? (%s/%s)\n"), _TL("continue"), sYes.c_str(), sNo.c_str());
 
 		do
 		{
@@ -219,7 +252,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_GET_OKAY:
 
-		if( !g_bQuiet || (!g_bSilent && Param_1.True) )
+		if( g_bShow_Progress && Param_1.True )
 		{
 			SG_PRINTF(SG_T("\r%c   "), Buisy[iBuisy++]);
 
@@ -238,13 +271,25 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_PROGRESS:
 
-		if( !g_bQuiet || !g_bSilent )
+		if( g_bShow_Progress )
 		{
 			int	i	= Param_2.Number != 0.0 ? 1 + (int)(100.0 * Param_1.Number / Param_2.Number) : 100;
 
 			if( i != iPercent )
 			{
-				SG_PRINTF(SG_T("\r%3d%%"), iPercent = i);
+				if( g_bXML )
+				{
+					SG_PRINTF(SG_T("<%s>%d</%s>\n"), SG_XML_PROGRESS, iPercent = i, SG_XML_PROGRESS);
+				}
+				else
+				{
+					if( iPercent < 0 || i < iPercent )
+					{
+						SG_PRINTF(SG_T("\n"));
+					}
+
+					SG_PRINTF(SG_T("\r%3d%%"), iPercent = i);
+				}
 			}
 		}
 
@@ -253,15 +298,17 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_READY:
 
+		iPercent	= -1;
+
 		break;
 
 
 	//-----------------------------------------------------
 	case CALLBACK_PROCESS_SET_TEXT:
 
-		if( !g_bSilent )
+		if( g_bShow_Messages )
 		{
-			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1.Pointer);
+			CMD_Print(Param_1.String, SG_XML_MESSAGE_PROC);
 		}
 
 		break;
@@ -274,9 +321,9 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD:
 
-		if( !g_bSilent )
+		if( g_bShow_Messages )
 		{
-			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1.Pointer);
+			CMD_Print(Param_1.String, SG_XML_MESSAGE);
 		}
 
 		break;
@@ -285,7 +332,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD_ERROR:
 
-		Print_Error((SG_Char *)Param_1.Pointer);
+		CMD_Print_Error(Param_1.String);
 
 		break;
 
@@ -293,9 +340,9 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_MESSAGE_ADD_EXECUTION:
 
-		if( !g_bSilent )
+		if( g_bShow_Messages )
 		{
-			SG_PRINTF(SG_T("\n%s\n"), (SG_Char *)Param_1.Pointer);
+			CMD_Print(Param_1.String, SG_XML_MESSAGE_EXEC);
 		}
 
 		break;
@@ -308,9 +355,9 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_DLG_MESSAGE:
 
-		if( !g_bSilent )
+		if( g_bShow_Messages )
 		{
-			SG_PRINTF(SG_T("\n%s: %s\n"), (const SG_Char *)Param_2.Pointer, (const SG_Char *)Param_1.Pointer);
+			CMD_Print(Param_2.String + ": " + Param_1.String, NULL);
 		}
 
 		break;
@@ -319,7 +366,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_DLG_CONTINUE:
 
-		Result	= Get_YesNo((const SG_Char *)Param_2.Pointer, (const SG_Char *)Param_1.Pointer);
+		Result	= CMD_Get_YesNo(Param_2.String.c_str(), Param_1.String.c_str());
 
 		break;
 
@@ -327,7 +374,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	//-----------------------------------------------------
 	case CALLBACK_DLG_ERROR:
 
-		Result	= Get_YesNo((const SG_Char *)Param_2.Pointer, (const SG_Char *)Param_1.Pointer);
+		Result	= CMD_Get_YesNo(Param_2.String.c_str(), Param_1.String.c_str());
 
 		break;
 
@@ -337,20 +384,9 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 	///////////////////////////////////////////////////////
 
 	//-----------------------------------------------------
-	case CALLBACK_DATAOBJECT_CHECK:
-
-		break;
-
-
-	//-----------------------------------------------------
 	case CALLBACK_DATAOBJECT_ADD:
 
-		Result	= 0;
-
-		if( g_pLibrary )
-		{
-			Result	= g_pLibrary->Add_DataObject((CSG_Data_Object *)Param_1.Pointer) ? 1 : 0;
-		}
+		Result	= SG_Get_Data_Manager().Add((CSG_Data_Object *)Param_1.Pointer) ? 1 : 0;
 
 		break;
 
@@ -390,20 +426,10 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 
 		break;
 
-
-	///////////////////////////////////////////////////////
-	//                                                   //
-	///////////////////////////////////////////////////////
-
 	//-----------------------------------------------------
 	case CALLBACK_DLG_PARAMETERS:
 
-		Result	= 0;
-
-		if( g_pLibrary )
-		{
-			Result	= g_pLibrary->Get_Parameters((CSG_Parameters *)Param_1.Pointer) ? 1 : 0;
-		}
+		Result	= g_pCMD_Module && g_pCMD_Module->Get_Parameters((CSG_Parameters *)Param_1.Pointer) ? 1 : 0;
 
 		break;
 
@@ -426,7 +452,7 @@ int		Callback(TSG_UI_Callback_ID ID, CSG_UI_Parameter &Param_1, CSG_UI_Parameter
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-TSG_PFNC_UI_Callback	Get_Callback	(void)
+TSG_PFNC_UI_Callback	CMD_Get_Callback	(void)
 {
 	return( &Callback );
 }

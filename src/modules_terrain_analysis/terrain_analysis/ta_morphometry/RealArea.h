@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: RealArea.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: RealArea.h 1348 2012-03-12 16:17:14Z oconrad $
  *********************************************************/
 /*******************************************************************************
     RealArea.h
@@ -19,18 +19,17 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/ 
+
 #include "MLB_Interface.h"
 
 class CRealArea : public CSG_Module_Grid
 {
 public:
 	CRealArea(void);
-	virtual ~CRealArea(void);
+
 
 protected:
 
-	bool On_Execute(void);
-
-private:
+	bool	On_Execute	(void);
 
 };

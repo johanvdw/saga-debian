@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_control.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_base_control.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ protected:
 
 	bool						_Search_Compare		(wxString A, wxString B, bool bCase);
 	bool						_Search_Item		(void);
-	bool						_Search_Get_List	(class CSG_Table *pList, class CWKSP_Base_Item *pItem, const wxChar *String, bool bName, bool bDesc, bool bCase);
+	bool						_Search_Get_List	(class CSG_Table *pList, class CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase);
 
 
 //---------------------------------------------------------

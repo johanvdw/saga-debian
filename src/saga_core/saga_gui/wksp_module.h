@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_module.h 1283 2012-01-02 16:01:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@
 class CWKSP_Module : public CWKSP_Base_Item
 {
 public:
-	CWKSP_Module(class CSG_Module *pModule, const wxChar *Menu_Path_default);
+	CWKSP_Module(class CSG_Module *pModule, const wxString &Menu_Library);
 	virtual ~CWKSP_Module(void);
 
 	virtual TWKSP_Item				Get_Type			(void)			{	return( WKSP_ITEM_Module );	}

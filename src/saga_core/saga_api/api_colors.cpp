@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_colors.cpp 1189 2011-10-10 13:08:32Z oconrad $
+ * Version $Id: api_colors.cpp 1727 2013-06-13 09:35:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,8 +77,65 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+long	SG_Color_Get_Random(void)
+{
+	return(	SG_GET_RGB(CSG_Random::Get_Uniform(0, 255), CSG_Random::Get_Uniform(0, 255), CSG_Random::Get_Uniform(0, 255)) );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #define COLORS_SERIAL_VERSION_BINARY	"SAGA_COLORPALETTE_VERSION_0.100_BINARY"
 #define COLORS_SERIAL_VERSION__ASCII	"SAGA_COLORPALETTE_VERSION_0.100__ASCII"
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CSG_String		SG_Colors_Get_Name	(int Identifier)
+{
+	switch( Identifier )
+	{
+	case SG_COLORS_DEFAULT:			return( _TL("default") );
+	case SG_COLORS_DEFAULT_BRIGHT:	return( _TL("default (same brightness)") );
+	case SG_COLORS_BLACK_WHITE:		return( _TL("greyscale") );
+	case SG_COLORS_BLACK_RED:		return( _TL("black > red") );
+	case SG_COLORS_BLACK_GREEN:		return( _TL("black > green") );
+	case SG_COLORS_BLACK_BLUE:		return( _TL("black > blue") );
+	case SG_COLORS_WHITE_RED:		return( _TL("white > red") );
+	case SG_COLORS_WHITE_GREEN:		return( _TL("white > green") );
+	case SG_COLORS_WHITE_BLUE:		return( _TL("white > blue") );
+	case SG_COLORS_YELLOW_RED:		return( _TL("yellow > red") );
+	case SG_COLORS_YELLOW_GREEN:	return( _TL("yellow > green") );
+	case SG_COLORS_YELLOW_BLUE:		return( _TL("yellow > blue") );
+	case SG_COLORS_RED_GREEN:		return( _TL("red > green") );
+	case SG_COLORS_RED_BLUE:		return( _TL("red > blue") );
+	case SG_COLORS_GREEN_BLUE:		return( _TL("green > blue") );
+	case SG_COLORS_RED_GREY_BLUE:	return( _TL("red > grey > blue") );
+	case SG_COLORS_RED_GREY_GREEN:	return( _TL("red > grey > green") );
+	case SG_COLORS_GREEN_GREY_BLUE:	return( _TL("green > grey > blue") );
+	case SG_COLORS_RED_GREEN_BLUE:	return( _TL("red > green > blue") );
+	case SG_COLORS_RED_BLUE_GREEN:	return( _TL("red > blue > green") );
+	case SG_COLORS_GREEN_RED_BLUE:	return( _TL("green > red > blue") );
+	case SG_COLORS_RAINBOW:			return( _TL("rainbow") );
+	case SG_COLORS_NEON:			return( _TL("neon") );
+	case SG_COLORS_TOPOGRAPHY:		return( _TL("topography") );
+	case SG_COLORS_ASPECT_1:		return( _TL("aspect 1") );
+	case SG_COLORS_ASPECT_2:		return( _TL("aspect 2") );
+	case SG_COLORS_ASPECT_3:		return( _TL("aspect 3") );
+	}
+
+	return( SG_T("") );
+}
 
 
 ///////////////////////////////////////////////////////////
@@ -93,7 +150,7 @@ CSG_Colors::CSG_Colors(void)
 	m_Colors	= NULL;
 	m_nColors	= 0;
 
-	Set_Count(100);
+	Set_Count(11);
 }
 
 //---------------------------------------------------------
@@ -113,7 +170,7 @@ CSG_Colors::CSG_Colors(int nColors, int Palette, bool bRevert)
 
 	if( nColors <= 1 )
 	{
-		nColors	= 100;
+		nColors	= 11;
 	}
 
 	Set_Count(nColors);
@@ -425,7 +482,10 @@ bool CSG_Colors::Set_Palette(int Index, bool bRevert, int nColors)
 		break;
 
 	case SG_COLORS_WHITE_RED:
-		Set_Ramp(SG_GET_RGB(255, 255, 255), SG_GET_RGB(255,   0,   0));
+		Set_Count(3);
+		Set_Color(0, SG_GET_RGB(255, 255, 255));
+		Set_Color(1, SG_GET_RGB(255, 127,   0));
+		Set_Color(2, SG_GET_RGB(159,   0,   0));
 		break;
 
 	case SG_COLORS_WHITE_GREEN:
@@ -433,7 +493,10 @@ bool CSG_Colors::Set_Palette(int Index, bool bRevert, int nColors)
 		break;
 
 	case SG_COLORS_WHITE_BLUE:
-		Set_Ramp(SG_GET_RGB(255, 255, 255), SG_GET_RGB(  0,   0, 191));
+		Set_Count(3);
+		Set_Color(0, SG_GET_RGB(255, 255, 255));
+		Set_Color(1, SG_GET_RGB(  0, 127, 255));
+		Set_Color(2, SG_GET_RGB(  0,   0, 159));
 		break;
 
 	case SG_COLORS_YELLOW_RED:
@@ -445,11 +508,13 @@ bool CSG_Colors::Set_Palette(int Index, bool bRevert, int nColors)
 		break;
 
 	case SG_COLORS_YELLOW_BLUE:
-		Set_Ramp(SG_GET_RGB(255, 255,   0), SG_GET_RGB(  0,   0,  255));
+		Set_Count(3);
+		Set_Color(0, SG_GET_RGB(255, 255, 127));
+		Set_Color(1, SG_GET_RGB(127, 127, 255));
+		Set_Color(2, SG_GET_RGB(  0,   0, 127));
 		break;
 
 	case SG_COLORS_RED_GREEN:
-//		Set_Ramp(SG_GET_RGB(255,   0,   0), SG_GET_RGB(  0, 255,   0));
 		Set_Count(5);
 		Set_Color(0, SG_GET_RGB(  0, 255,   0));
 		Set_Color(1, SG_GET_RGB(191, 191,   0));
@@ -504,11 +569,11 @@ bool CSG_Colors::Set_Palette(int Index, bool bRevert, int nColors)
 
 	case SG_COLORS_RED_BLUE_GREEN:
 		Set_Count(5);
-		Set_Color(0, SG_GET_RGB(127, 127,   0));
-		Set_Color(1, SG_GET_RGB(255,   0,   0));
-		Set_Color(2, SG_GET_RGB(  0,   0, 255));
-		Set_Color(3, SG_GET_RGB(  0, 255,   0));
-		Set_Color(4, SG_GET_RGB(127, 127,   0));
+		Set_Color(0, SG_GET_RGB(  0,  63, 127));
+		Set_Color(1, SG_GET_RGB(127, 255,   0));
+		Set_Color(2, SG_GET_RGB(255, 255, 127));
+		Set_Color(3, SG_GET_RGB(191, 127,   0));
+		Set_Color(4, SG_GET_RGB(127,  63,   0));
 		break;
 
 	case SG_COLORS_GREEN_RED_BLUE:
@@ -541,6 +606,42 @@ bool CSG_Colors::Set_Palette(int Index, bool bRevert, int nColors)
 		Set_Color(4, SG_GET_RGB(  0,   0,   0));
 		Set_Color(5, SG_GET_RGB(  0, 255,   0));
 		Set_Color(6, SG_GET_RGB(  0,   0,   0));
+		break;
+
+	case SG_COLORS_TOPOGRAPHY:
+		Set_Count(5);
+		Set_Color(0, SG_GET_RGB(  0,  63, 127));
+		Set_Color(1, SG_GET_RGB(127, 255,   0));
+		Set_Color(2, SG_GET_RGB(255, 255, 127));
+		Set_Color(3, SG_GET_RGB(191, 127,   0));
+		Set_Color(4, SG_GET_RGB(127,  63,   0));
+		break;
+
+	case SG_COLORS_ASPECT_1:
+		Set_Count(5);
+		Set_Color(0, SG_GET_RGB(225, 225, 225));
+		Set_Color(1, SG_GET_RGB(127, 127, 255));
+		Set_Color(2, SG_GET_RGB( 20,  20,  20));
+		Set_Color(3, SG_GET_RGB(127, 255, 127));
+		Set_Color(4, SG_GET_RGB(225, 225, 225));
+		break;
+
+	case SG_COLORS_ASPECT_2:
+		Set_Count(5);
+		Set_Color(0, SG_GET_RGB(225, 225, 225));
+		Set_Color(1, SG_GET_RGB(255, 127, 127));
+		Set_Color(2, SG_GET_RGB( 20,  20,  20));
+		Set_Color(3, SG_GET_RGB(127, 255, 127));
+		Set_Color(4, SG_GET_RGB(225, 225, 225));
+		break;
+
+	case SG_COLORS_ASPECT_3:
+		Set_Count(5);
+		Set_Color(0, SG_GET_RGB(225, 225, 225));
+		Set_Color(1, SG_GET_RGB(255, 127, 127));
+		Set_Color(2, SG_GET_RGB( 20,  20,  20));
+		Set_Color(3, SG_GET_RGB(127, 127, 255));
+		Set_Color(4, SG_GET_RGB(225, 225, 225));
 		break;
 	}
 
@@ -929,15 +1030,20 @@ bool CSG_Colors::to_Text(CSG_String &String)
 //---------------------------------------------------------
 bool CSG_Colors::from_Text(const CSG_String &String)
 {
-	Set_Count(String.Length() / 13);
+	Set_Count((int)String.Length() / 12);
 
-	for(size_t i=0, n=0; i<Get_Count(); i++)
+	CSG_String	Colors(String), Color;
+
+	for(int i=0; i<Get_Count() && Colors.Length()>0; i++)
 	{
-		int		r, g, b;
+		Color	= Colors.BeforeFirst('\n');
+		Colors	= Colors.AfterFirst ('\n');
 
-		n	+= SG_SSCANF(String.c_str() + n, SG_T("%d %d %d"), &r, &g, &b);
-
-		m_Colors[i]	= SG_GET_RGB(r, g, b);
+		m_Colors[i]	= SG_GET_RGB(
+			Color.BeforeFirst(' ').asInt(),
+			Color.BeforeLast (' ').asInt(),
+			Color.AfterLast  (' ').asInt()
+		);
 	}
 
 	return( true );

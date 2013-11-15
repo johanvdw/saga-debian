@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_3d_image.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_map_3d_image.cpp 1283 2012-01-02 16:01:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -158,18 +158,18 @@ void CVIEW_Map_3D_Image::Save(void)
 	CSG_Parameters	Parameters;
 
 	//-----------------------------------------------------
-	Parameters.Create(NULL, LNG("Save 3D Image Options"), LNG(""));
+	Parameters.Create(NULL, _TL("Save 3D Image Options"), _TL(""));
 
-	Parameters.Add_Node(NULL, "NODE_RES", LNG("Image Resolution"), LNG(""));
+	Parameters.Add_Node(NULL, "NODE_RES", _TL("Image Resolution"), _TL(""));
 
 	Parameters.Add_Value(
-		Parameters("NODE_RES")	, "WIDTH"	, LNG("Width"),
+		Parameters("NODE_RES")	, "WIDTH"	, _TL("Width"),
 		wxT(""),
 		PARAMETER_TYPE_Int		, m_img_nx, 1, true
 	);
 
 	Parameters.Add_Value(
-		Parameters("NODE_RES")	, "HEIGHT"	, LNG("Height"),
+		Parameters("NODE_RES")	, "HEIGHT"	, _TL("Height"),
 		wxT(""),
 		PARAMETER_TYPE_Int		, m_img_ny, 1, true
 	);
@@ -199,9 +199,9 @@ void CVIEW_Map_3D_Image::Save(void)
 }
 
 //---------------------------------------------------------
-void CVIEW_Map_3D_Image::Save(const wxChar *file, int type)
+void CVIEW_Map_3D_Image::Save(const wxString &file, int type)
 {
-	if( m_img.Ok() && file != NULL )
+	if( m_img.Ok() && file.Length() > 0 )
 	{
 		m_img.SaveFile(file, type);
 	}

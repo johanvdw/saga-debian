@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygon_Geometrics.cpp 1065 2011-05-18 15:58:45Z oconrad $
+ * Version $Id: Polygon_Geometrics.cpp 1334 2012-02-21 13:34:44Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     Polygon_Geometrics.cpp
@@ -121,7 +121,7 @@ bool CPolygon_Geometrics::On_Execute(void)
 	if( Parameters("OUTPUT")->asShapes() && Parameters("OUTPUT")->asShapes() != pPolygons )
 	{
 		pPolygons	= Parameters("OUTPUT")->asShapes();
-		pPolygons->Create(*Parameters("LINES")->asShapes());
+		pPolygons->Create(*Parameters("POLYGONS")->asShapes());
 	}
 
 	//-------------------------------------------------

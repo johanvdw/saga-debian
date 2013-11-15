@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_ruler.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_ruler.h 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -108,6 +108,7 @@ public:
 
 	void						On_Paint			(wxPaintEvent &event);
 
+	void						Set_Mode			(int Mode);
 	void						Set_Range			(double Min, double Max);
 	void						Set_Range_Core		(double Min, double Max);
 	void						Set_Position		(int Position);

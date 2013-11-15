@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: callback.h 1220 2011-11-07 11:08:33Z reklov_w $
+ * Version $Id: callback.h 1650 2013-04-11 11:51:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,28 +82,34 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void					Set_Library		(class CModule_Library *pLibrary);
+void					CMD_Set_Module			(class CCMD_Module *pCMD_Module);
 
 //---------------------------------------------------------
-void					Set_Silent		(bool bOn);
-bool					Get_Silent		(void);
+void					CMD_Set_Show_Messages	(bool bOn);
+bool					CMD_Get_Show_Messages	(void);
 
-void					Set_Quiet		(bool bOn);
-bool					Get_Quiet		(void);
+void					CMD_Set_Show_Progress	(bool bOn);
+bool					CMD_Get_Show_Progress	(void);
 
-void					Set_Interactive	(bool bOn);
-bool					Get_Interactive	(void);
+void					CMD_Set_Interactive		(bool bOn);
+bool					CMD_Get_Interactive		(void);
 
-//---------------------------------------------------------
-void					Print_Error		(const SG_Char *Error);
-void					Print_Error		(const SG_Char *Error, const SG_Char *Info);
-
-//---------------------------------------------------------
-void					Get_Pause		(void);
-bool					Get_YesNo		(const SG_Char *caption, const SG_Char *message);
+void					CMD_Set_XML				(bool bOn);
+bool					CMD_Get_XML				(void);
 
 //---------------------------------------------------------
-TSG_PFNC_UI_Callback	Get_Callback	(void);
+void					CMD_Print				(              const CSG_String &Text, const SG_Char *XML_Tag = NULL);
+void					CMD_Print				(FILE *Stream, const CSG_String &Text, const SG_Char *XML_Tag = NULL);
+
+void					CMD_Print_Error			(const CSG_String &Error);
+void					CMD_Print_Error			(const CSG_String &Error, const CSG_String &Info);
+
+//---------------------------------------------------------
+void					CMD_Get_Pause			(void);
+bool					CMD_Get_YesNo			(const CSG_String &Caption, const CSG_String &Message);
+
+//---------------------------------------------------------
+TSG_PFNC_UI_Callback	CMD_Get_Callback		(void);
 
 
 ///////////////////////////////////////////////////////////

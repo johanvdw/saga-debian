@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_pointcloud.h 1035 2011-05-03 15:38:58Z oconrad $
+ * Version $Id: wksp_pointcloud.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,6 +88,8 @@ public:
 
 	virtual TWKSP_Item			Get_Type				(void)	{	return( WKSP_ITEM_PointCloud );	}
 
+	CSG_PointCloud *			Get_PointCloud			(void)	{	return( (CSG_PointCloud *)m_pObject );	}
+
 	virtual wxString			Get_Description			(void);
 
 	virtual wxMenu *			Get_Menu				(void);
@@ -95,12 +97,12 @@ public:
 	virtual bool				On_Command				(int Cmd_ID);
 	virtual bool				On_Command_UI			(wxUpdateUIEvent &event);
 
-	CSG_PointCloud *			Get_PointCloud			(void)	{	return( m_pPointCloud );	}
-
 	virtual wxString			Get_Value				(CSG_Point ptWorld, double Epsilon);
 	virtual double				Get_Value_Range			(void);
 
 	bool						asImage					(CSG_Grid *pImage);
+
+	wxString					Get_Name_Attribute		(void);
 
 
 protected:
@@ -108,8 +110,6 @@ protected:
 	int							m_Color_Field, m_PointSize, m_Aggregation;
 
 	wxColour					m_Color_Pen;
-
-	CSG_PointCloud				*m_pPointCloud;
 
 	CSG_Grid					m_Z, m_N;
 
@@ -130,7 +130,7 @@ protected:
 	void						_Draw_Point				(CWKSP_Map_DC &dc_Map, int x, int y, double z, int Color, int Radius);
 	void						_Draw_Points			(CWKSP_Map_DC &dc_Map);
 
-	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description);
+	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
 	void						_AttributeList_Set		(CSG_Parameter *pFields, bool bAddNoField);
 
 };

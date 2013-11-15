@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table_diagram.cpp 1101 2011-06-17 12:52:42Z oconrad $
+ * Version $Id: view_table_diagram.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -370,7 +370,7 @@ int CVIEW_Table_Diagram_Control::_On_Parameter_Changed(CSG_Parameter *pParameter
 	{
 		CSG_Parameters	*pParameters	= pParameter->Get_Owner();
 
-		wxString	s(pParameter->Get_Identifier());
+		CSG_String	s(pParameter->Get_Identifier());
 
 		if( s.Find(wxT("FIELD_")) == 0 )
 		{
@@ -446,12 +446,12 @@ bool CVIEW_Table_Diagram_Control::_Create(void)
 		for(int iField=0; iField<m_pTable->Get_Field_Count(); iField++)
 		{
 			if(	m_pTable->Get_Field_Type(iField) != SG_DATATYPE_String
-			&&	m_Parameters(wxString::Format(wxT("FIELD_%d"), iField))->asBool() )
+			&&	m_Parameters(CSG_String::Format(SG_T("FIELD_%d"), iField))->asBool() )
 			{
 				m_Fields			= (int *)SG_Realloc(m_Fields, (m_nFields + 1) * sizeof(int));
 				m_Fields[m_nFields]	= iField;
 
-				m_Colors.Set_Color(iField, m_Parameters(wxString::Format(wxT("COLOR_%d"), iField))->asColor());
+				m_Colors.Set_Color(iField, m_Parameters(CSG_String::Format(SG_T("COLOR_%d"), iField))->asColor());
 
 				m_nFields++;
 
@@ -503,14 +503,14 @@ bool CVIEW_Table_Diagram_Control::_Initialize(void)
 
 		m_Colors.Set_Count(m_pTable->Get_Field_Count());
 
-		m_Parameters.Create(NULL, LNG("[CAP] Properties"), LNG(""));
+		m_Parameters.Create(NULL, _TL("Properties"), _TL(""));
 		m_Parameters.Set_Callback_On_Parameter_Changed(_On_Parameter_Changed);
 
-		CSG_Parameter	*pGeneral	= m_Parameters.Add_Node(NULL	, "NODE_GENERAL"	, LNG("[CAP] General")		, LNG(""));
-		CSG_Parameter	*pPoints	= m_Parameters.Add_Node(NULL	, "NODE_POINTS"		, LNG("[CAP] Points")		, LNG(""));
-		CSG_Parameter	*pXAxis		= m_Parameters.Add_Node(NULL	, "NODE_X"			, LNG("[CAP] X Axis")		, LNG(""));
-		CSG_Parameter	*pYAxis		= m_Parameters.Add_Node(NULL	, "NODE_Y"			, LNG("[CAP] Y Axis")		, LNG(""));
-		CSG_Parameter	*pFields	= m_Parameters.Add_Node(NULL	, "NODE_FIELDS"		, LNG("[CAP] Attributes")	, LNG(""));
+		CSG_Parameter	*pGeneral	= m_Parameters.Add_Node(NULL	, "NODE_GENERAL"	, _TL("General")		, _TL(""));
+		CSG_Parameter	*pPoints	= m_Parameters.Add_Node(NULL	, "NODE_POINTS"		, _TL("Points")		, _TL(""));
+		CSG_Parameter	*pXAxis		= m_Parameters.Add_Node(NULL	, "NODE_X"			, _TL("X Axis")		, _TL(""));
+		CSG_Parameter	*pYAxis		= m_Parameters.Add_Node(NULL	, "NODE_Y"			, _TL("Y Axis")		, _TL(""));
+		CSG_Parameter	*pFields	= m_Parameters.Add_Node(NULL	, "NODE_FIELDS"		, _TL("Attributes")	, _TL(""));
 
 		//-------------------------------------------------
 		for(int iField=0; iField<m_pTable->Get_Field_Count(); iField++)
@@ -518,14 +518,14 @@ bool CVIEW_Table_Diagram_Control::_Initialize(void)
 			if( m_pTable->Get_Field_Type(iField) != SG_DATATYPE_String )
 			{
 				pNode	= m_Parameters.Add_Value(
-					pFields, wxString::Format(wxT("FIELD_%d"), iField), m_pTable->Get_Field_Name(iField),
-					LNG("[CAP] Show"),
+					pFields, CSG_String::Format(SG_T("FIELD_%d"), iField), m_pTable->Get_Field_Name(iField),
+					_TL("Show"),
 					PARAMETER_TYPE_Bool, false
 				);
 
 				m_Parameters.Add_Value(
-					pNode, wxString::Format(wxT("COLOR_%d"), iField), SG_T(""),
-					LNG("[CAP] Color"),
+					pNode, CSG_String::Format(SG_T("COLOR_%d"), iField), SG_T(""),
+					_TL("Color"),
 					PARAMETER_TYPE_Color, m_Colors.Get_Color(iField)
 				);
 
@@ -535,97 +535,97 @@ bool CVIEW_Table_Diagram_Control::_Initialize(void)
 			sFields_All	+= m_pTable->Get_Field_Name(iField) + CSG_String(SG_T("|"));
 		}
 
-		sFields_Num	+= LNG("[CAP] [none]") + CSG_String(SG_T("|"));
-		sFields_All	+= LNG("[CAP] [none]") + CSG_String(SG_T("|"));
+		sFields_Num	+= _TL("<none>") + CSG_String(SG_T("|"));
+		sFields_All	+= _TL("<none>") + CSG_String(SG_T("|"));
 
 		//-------------------------------------------------
 		m_Parameters.Add_Choice(
-			pGeneral	, "_DIAGRAM_TYPE"		, LNG("[CAP] Display Type"),
-			LNG(""),
-			wxString::Format(wxT("%s|%s|%s|%s|"),
-				LNG("Bars"),
-				LNG("Lines"),
-				LNG("Lines and Points"),
-				LNG("Points")
+			pGeneral	, "_DIAGRAM_TYPE"		, _TL("Display Type"),
+			_TL(""),
+			CSG_String::Format(SG_T("%s|%s|%s|%s|"),
+				_TL("Bars"),
+				_TL("Lines"),
+				_TL("Lines and Points"),
+				_TL("Points")
 			), 1
 		);
 
 		m_Parameters.Add_Font(
-			pGeneral	, "_DIAGRAM_FONT"		, LNG("[CAP] Font"),
-			LNG("")
+			pGeneral	, "_DIAGRAM_FONT"		, _TL("Font"),
+			_TL("")
 		);
 
 		m_Parameters.Add_Value(
-			pGeneral	, "_DIAGRAM_LEGEND"		, LNG("[CAP] Legend"),
-			LNG(""),
+			pGeneral	, "_DIAGRAM_LEGEND"		, _TL("Legend"),
+			_TL(""),
 			PARAMETER_TYPE_Bool, true
 		);
 
 		m_Parameters.Add_Value(
-			pGeneral	, "_DIAGRAM_FIT_SIZE"	, LNG("[CAP] Fit Size to Window"),
-			LNG(""),
+			pGeneral	, "_DIAGRAM_FIT_SIZE"	, _TL("Fit Size to Window"),
+			_TL(""),
 			PARAMETER_TYPE_Bool, true
 		);
 
 		//-------------------------------------------------
 		m_Parameters.Add_Value(
-			pPoints		, "_POINTS_SIZE"		, LNG("[CAP] Size"),
-			LNG(""),
+			pPoints		, "_POINTS_SIZE"		, _TL("Size"),
+			_TL(""),
 			PARAMETER_TYPE_Int, 2, 1, true
 		);
 
 		m_Parameters.Add_Value(
-			pPoints		, "_POINTS_OUTLINE"		, LNG("[CAP] Outline"),
-			LNG(""),
+			pPoints		, "_POINTS_OUTLINE"		, _TL("Outline"),
+			_TL(""),
 			PARAMETER_TYPE_Bool, false
 		);
 
 		m_Parameters.Add_Choice(
-			pPoints		, "_POINTS_COLOR_FIELD"	, LNG("[CAP] Color by Attribute"),
-			LNG(""),
+			pPoints		, "_POINTS_COLOR_FIELD"	, _TL("Color by Attribute"),
+			_TL(""),
 			sFields_Num, m_pTable->Get_Field_Count()
 		);
 
 		m_Parameters.Add_Colors(
-			pPoints		, "_POINTS_COLORS"		, LNG("[CAP] Colors"),
-			LNG("")
+			pPoints		, "_POINTS_COLORS"		, _TL("Colors"),
+			_TL("")
 		);
 
 		//-------------------------------------------------
 		m_Parameters.Add_Choice(
-			pXAxis		, "_DIAGRAM_X_FIELD"	, LNG("[CAP] Values"),
-			LNG(""),
+			pXAxis		, "_DIAGRAM_X_FIELD"	, _TL("Values"),
+			_TL(""),
 			sFields_Num, m_pTable->Get_Field_Count() + 1
 		);
 
 		m_Parameters.Add_Choice(
-			pXAxis		, "_DIAGRAM_X_LABEL"	, LNG("[CAP] Label"),
-			LNG(""),
+			pXAxis		, "_DIAGRAM_X_LABEL"	, _TL("Label"),
+			_TL(""),
 			sFields_All, m_pTable->Get_Field_Count() + 1
 		);
 
 		//-------------------------------------------------
 		pNode	= m_Parameters.Add_Value(
-			pYAxis		, "_DIAGRAM_Y_MIN_FIX"	, LNG("[CAP] Fixed Minimum"),
-			LNG(""),
+			pYAxis		, "_DIAGRAM_Y_MIN_FIX"	, _TL("Fixed Minimum"),
+			_TL(""),
 			PARAMETER_TYPE_Bool, false
 		);
 
 		m_Parameters.Add_Value(
-			pNode		, "_DIAGRAM_Y_MIN_VAL"	, LNG("[CAP] Value"),
-			LNG(""),
+			pNode		, "_DIAGRAM_Y_MIN_VAL"	, _TL("Value"),
+			_TL(""),
 			PARAMETER_TYPE_Double, 0.0
 		);
 
 		pNode	= m_Parameters.Add_Value(
-			pYAxis		, "_DIAGRAM_Y_MAX_FIX"	, LNG("[CAP] Fixed Maximum"),
-			LNG(""),
+			pYAxis		, "_DIAGRAM_Y_MAX_FIX"	, _TL("Fixed Maximum"),
+			_TL(""),
 			PARAMETER_TYPE_Bool, false
 		);
 
 		m_Parameters.Add_Value(
-			pNode		, "_DIAGRAM_Y_MAX_VAL"	, LNG("[CAP] Value"),
-			LNG(""),
+			pNode		, "_DIAGRAM_Y_MAX_VAL"	, _TL("Value"),
+			_TL(""),
 			PARAMETER_TYPE_Double, 1000.0
 		);
 
@@ -726,14 +726,14 @@ void CVIEW_Table_Diagram_Control::_Draw(wxDC &dc, wxRect rDC)
 		else
 		{
 			Draw_Text(dc, TEXTALIGN_CENTER, rDC.GetLeft() + rDC.GetWidth() / 2, rDC.GetTop() + rDC.GetHeight() / 2,
-				LNG("[ERR] Invalid display size!")
+				_TL("Invalid display size!")
 			);
 		}
 	}
 	else
 	{
 		Draw_Text(dc, TEXTALIGN_CENTER, rDC.GetLeft() + rDC.GetWidth() / 2, rDC.GetTop() + rDC.GetHeight() / 2,
-			LNG("[ERR] Invalid data set!")
+			_TL("Invalid data set!")
 		);
 	}
 }
@@ -1001,7 +1001,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CVIEW_Table_Diagram::CVIEW_Table_Diagram(CWKSP_Table *pTable)
-	: CVIEW_Base(ID_VIEW_TABLE_DIAGRAM, wxString::Format(wxT("%s [%s]"), LNG("[CAP] Diagram"), pTable->Get_Name().c_str()), ID_IMG_WND_DIAGRAM, CVIEW_Table_Diagram::_Create_Menu(), LNG("[CAP] Diagram"))
+	: CVIEW_Base(ID_VIEW_TABLE_DIAGRAM, wxString::Format(wxT("%s [%s]"), _TL("Diagram"), pTable->Get_Name().c_str()), ID_IMG_WND_DIAGRAM)
 {
 	SYS_Set_Color_BG_Window(this);
 
@@ -1028,7 +1028,7 @@ CVIEW_Table_Diagram::~CVIEW_Table_Diagram(void)
 //---------------------------------------------------------
 wxMenu * CVIEW_Table_Diagram::_Create_Menu(void)
 {
-	wxMenu	*pMenu	= new wxMenu();
+	wxMenu	*pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DIAGRAM_PARAMETERS);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DIAGRAM_SIZE_FIT);
@@ -1049,7 +1049,7 @@ wxToolBarBase * CVIEW_Table_Diagram::_Create_ToolBar(void)
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_DIAGRAM_SIZE_INC);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_DIAGRAM_SIZE_DEC);
 
-	CMD_ToolBar_Add(pToolBar, LNG("[CAP] Diagram"));
+	CMD_ToolBar_Add(pToolBar, _TL("Diagram"));
 
 	return( pToolBar );
 }

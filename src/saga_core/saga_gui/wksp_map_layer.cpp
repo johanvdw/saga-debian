@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_layer.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_map_layer.cpp 1493 2012-10-19 11:31:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ wxMenu * CWKSP_Map_Layer::Get_Menu(void)
 	if( (pMenu_Edit = m_pLayer->Edit_Get_Menu()) != NULL )
 	{
 		pMenu->AppendSeparator();
-		pMenu->Append(ID_CMD_WKSP_FIRST, LNG("[MNU] Edit"), pMenu_Edit);
+		pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Edit"), pMenu_Edit);
 	}
 
 	return( pMenu );

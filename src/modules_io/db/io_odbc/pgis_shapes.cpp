@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pgis_shapes.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pgis_shapes.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -218,7 +218,7 @@ bool CPGIS_Shapes_Load::On_Execute(void)
 	{
 		CSG_Bytes_Array	BLOBs;
 
-		Select.Printf(SG_T("AsBinary(%s) AS geom"), Geo_Field.c_str());
+		Select.Printf(SG_T("ST_AsBinary(%s) AS geom"), Geo_Field.c_str());
 
 		if( !Get_Connection()->Table_Load_BLOBs(BLOBs, Geo_Table, Select, SG_T(""), SG_T("")) )
 		{
@@ -241,7 +241,7 @@ bool CPGIS_Shapes_Load::On_Execute(void)
 	{
 		CSG_Table	Shapes;
 
-		Select.Printf(SG_T("AsText(%s) AS geom"), Geo_Field.c_str());
+		Select.Printf(SG_T("ST_AsText(%s) AS geom"), Geo_Field.c_str());
 
 		if( !Get_Connection()->Table_Load(Shapes, Geo_Table, Select, SG_T(""), SG_T("")) )
 		{
@@ -272,18 +272,27 @@ bool CPGIS_Shapes_Load::On_Execute(void)
 //---------------------------------------------------------
 CPGIS_Shapes_Save::CPGIS_Shapes_Save(void)
 {
+	CSG_Parameter	*pNode;
+
+	//-----------------------------------------------------
 	Set_Name		(_TL("PostGIS Shapes Export"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2009"));
 
 	Set_Description	(_TW(
-		"Imports shapes from a PostGIS database via ODBC."
+		"Exports shapes to a PostGIS database via ODBC."
 	));
 
-	Parameters.Add_Shapes(
+	//-----------------------------------------------------
+	pNode	= Parameters.Add_Shapes(
 		NULL	, "SHAPES"		, _TL("Shapes"),
 		_TL(""),
 		PARAMETER_INPUT
+	);
+
+	Parameters.Add_Table_Fields(
+		pNode	, "PKEY"		, _TL("Primary Key"),
+		_TL("")
 	);
 
 	Parameters.Add_String(
@@ -292,14 +301,29 @@ CPGIS_Shapes_Save::CPGIS_Shapes_Save(void)
 		SG_T("")
 	);
 
-	Parameters.Add_Choice(
-		NULL	, "SRID"		, _TL("Spatial Reference"),
+	//-----------------------------------------------------
+	pNode	= Parameters.Add_Value(
+		NULL	, "CRS_EPSG"	, _TL("EPSG Code"),
 		_TL(""),
-		CSG_String::Format(SG_T("%s|"),
-			_TL("--- not available ---")
-		)
+		PARAMETER_TYPE_Int, 4326, 2000, true, 32766, true
 	);
 
+	if( SG_UI_Get_Window_Main() )
+	{
+		Parameters.Add_Choice(
+			pNode	, "CRS_EPSG_GEOGCS"	, _TL("Geographic Coordinate Systems"),
+			_TL(""),
+			SG_Get_Projections().Get_Names_List(SG_PROJ_TYPE_CS_Geographic)
+		);
+
+		Parameters.Add_Choice(
+			pNode	, "CRS_EPSG_PROJCS"	, _TL("Projected Coordinate Systems"),
+			_TL(""),
+			SG_Get_Projections().Get_Names_List(SG_PROJ_TYPE_CS_Projected)
+		);
+	}
+
+	//-----------------------------------------------------
 	Parameters.Add_Parameters(
 		NULL	, "FLAGS"		, _TL("Constraints"),
 		_TL("")
@@ -308,7 +332,7 @@ CPGIS_Shapes_Save::CPGIS_Shapes_Save(void)
 	Parameters.Add_Choice(
 		NULL	, "EXISTS"		, _TL("If table exists..."),
 		_TL(""),
-		CSG_String::Format(SG_T("%s|%s|%s"),
+		CSG_String::Format(SG_T("%s|%s|%s|"),
 			_TL("abort export"),
 			_TL("replace existing table"),
 			_TL("append records, if table structure allows")
@@ -324,6 +348,18 @@ int CPGIS_Shapes_Save::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Par
 		pParameters->Get_Parameter("NAME")->Set_Value(pParameter->asShapes() ? pParameter->asShapes()->Get_Name() : SG_T(""));
 
 		Set_Constraints(pParameters->Get_Parameter("FLAGS")->asParameters(), pParameter->asShapes());
+	}
+
+	//-----------------------------------------------------
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_GEOGCS"))
+	||	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CRS_EPSG_PROJCS")) )
+	{
+		int		i;
+
+		if( pParameter->asChoice()->Get_Data(i) && (i = SG_Get_Projections().Get_Projection(i).Get_EPSG()) >= 0 )
+		{
+			pParameters->Get_Parameter("CRS_EPSG")->Set_Value(i);
+		}
 	}
 
 	return( 0 );
@@ -351,7 +387,7 @@ bool CPGIS_Shapes_Save::On_Before_Execution(void)
 		return( false );
 	}
 
-	Parameters("SRID")->asChoice()->Set_Items(SG_Get_Projections().Get_Names_List());
+//	Parameters("SRID")->asChoice()->Set_Items(SG_Get_Projections().Get_Names_List());
 
 /*	if( Parameters("SRID")->asChoice()->Get_Count() > 1 )
 		return( true );
@@ -387,10 +423,12 @@ bool CPGIS_Shapes_Save::On_Execute(void)
 	pShapes		= Parameters("SHAPES")	->asShapes();
 	Geo_Table	= Parameters("NAME")	->asString();	if( Geo_Table.Length() == 0 )	Geo_Table	= pShapes->Get_Name();
 
-	if( !Parameters("SRID")->asChoice()->Get_Data(SRID) )
-	{
-		SRID	= -1;
-	}
+//	if( !Parameters("SRID")->asChoice()->Get_Data(SRID) )
+//	{
+//		SRID	= -1;
+//	}
+
+	SRID	= Parameters("CRS_EPSG")->asInt();
 
 	sSRID.Printf(SG_T("%d"), SRID);
 
@@ -504,7 +542,7 @@ bool CPGIS_Shapes_Save::On_Execute(void)
 
 			CSG_Shapes_OGIS_Converter::to_WKText(pShape, sWKT);
 
-			SQL	+= SG_T("GeomFromText('") + sWKT + SG_T("', ") + sSRID + SG_T(")");
+			SQL	+= SG_T("ST_GeomFromText('") + sWKT + SG_T("', ") + sSRID + SG_T(")");
 
 			for(iField=0; iField<pShapes->Get_Field_Count(); iField++)
 			{

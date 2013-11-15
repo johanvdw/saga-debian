@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: point_multi_grid_regression.cpp 1179 2011-09-30 08:21:55Z oconrad $
+ * Version $Id: point_multi_grid_regression.cpp 1633 2013-03-22 13:35:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -164,6 +164,12 @@ CPoint_Multi_Grid_Regression::CPoint_Multi_Grid_Regression(void)
 		PARAMETER_TYPE_Bool, false
 	);
 
+	Parameters.Add_Value(
+		NULL	, "INTERCEPT"	, _TL("Intercept"),
+		_TL(""),
+		PARAMETER_TYPE_Bool, true
+	);
+
 	Parameters.Add_Choice(
 		NULL	,"METHOD"		, _TL("Method"),
 		_TL(""),
@@ -186,6 +192,41 @@ CPoint_Multi_Grid_Regression::CPoint_Multi_Grid_Regression(void)
 		_TL("Level of significance for automated predictor selection, given as percentage"),
 		PARAMETER_TYPE_Double, 5.0, 0.0, true, 100.0, true
 	);
+
+	Parameters.Add_Choice(
+		NULL	,"CROSSVAL"		, _TL("Cross Validation"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|%s|%s|"),
+			_TL("none"),
+			_TL("leave one out"),
+			_TL("2-fold"),
+			_TL("k-fold")
+		), 0
+	);
+
+	Parameters.Add_Value(
+		NULL	, "CROSSVAL_K"	, _TL("Cross Validation Subsamples"),
+		_TL("number of subsamples for k-fold cross validation"),
+		PARAMETER_TYPE_Int, 10, 2, true
+	);
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+int CPoint_Multi_Grid_Regression::On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter)
+{
+	if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("CROSSVAL")) )
+	{
+		pParameters->Get_Parameter("CROSSVAL_K")->Set_Enabled(pParameter->asInt() == 3);	// k-fold
+	}
+
+	return( 0 );
 }
 
 
@@ -222,13 +263,15 @@ bool CPoint_Multi_Grid_Regression::On_Execute(void)
 	}
 
 	//-----------------------------------------------------
+	m_Regression.Set_With_Intercept(Parameters("INTERCEPT")->asBool());
+
 	switch( Parameters("METHOD")->asInt() )
 	{
 	default:
-	case 0:	bResult	= m_Regression.Calculate         (Samples             , &Names);	break;
-	case 1:	bResult	= m_Regression.Calculate_Forward (Samples, P_in       , &Names);	break;
-	case 2:	bResult	= m_Regression.Calculate_Backward(Samples,       P_out, &Names);	break;
-	case 3:	bResult	= m_Regression.Calculate_Stepwise(Samples, P_in, P_out, &Names);	break;
+	case 0:	bResult	= m_Regression.Get_Model         (Samples             , &Names);	break;
+	case 1:	bResult	= m_Regression.Get_Model_Forward (Samples, P_in       , &Names);	break;
+	case 2:	bResult	= m_Regression.Get_Model_Backward(Samples,       P_out, &Names);	break;
+	case 3:	bResult	= m_Regression.Get_Model_Stepwise(Samples, P_in, P_out, &Names);	break;
 	}
 
 	if( bResult == false )
@@ -236,29 +279,51 @@ bool CPoint_Multi_Grid_Regression::On_Execute(void)
 		return( false );
 	}
 
+	//-----------------------------------------------------
 	Message_Add(m_Regression.Get_Info(), false);
 
 	//-----------------------------------------------------
-	Set_Regression(pGrids, pRegression, CSG_String::Format(SG_T("%s (%s)"), pShapes->Get_Name(), Get_Name()));
+	int	CrossVal;
+
+	switch( Parameters("CROSSVAL")->asInt() )
+	{
+	default:	CrossVal	= 0;									break;	// none
+	case 1:		CrossVal	= 1;									break;	// leave one out (LOOVC)
+	case 2:		CrossVal	= 2;									break;	// 2-fold
+	case 3:		CrossVal	= Parameters("CROSSVAL_K")->asInt();	break;	// k-fold
+	}
+
+	if( CrossVal > 0 && m_Regression.Get_CrossValidation(CrossVal) )
+	{
+		Message_Add(CSG_String::Format(SG_T("\n%s:\n"      ), _TL("Cross Validation")), false);
+		Message_Add(CSG_String::Format(SG_T("\t%s:\t%s\n"  ), _TL("Type"   ), Parameters("CROSSVAL")->asString() ), false);
+		Message_Add(CSG_String::Format(SG_T("\t%s:\t%d\n"  ), _TL("Samples"), m_Regression.Get_CV_nSamples()     ), false);
+		Message_Add(CSG_String::Format(SG_T("\t%s:\t%f\n"  ), _TL("RMSE"   ), m_Regression.Get_CV_RMSE()         ), false);
+		Message_Add(CSG_String::Format(SG_T("\t%s:\t%.2f\n"), _TL("NRMSE"  ), m_Regression.Get_CV_NRMSE() * 100.0), false);
+		Message_Add(CSG_String::Format(SG_T("\t%s:\t%.2f\n"), _TL("R2"     ), m_Regression.Get_CV_R2()    * 100.0), false);
+	}
+
+	//-----------------------------------------------------
+	Set_Regression(pGrids, pRegression, CSG_String::Format(SG_T("%s [%s]"), Parameters("ATTRIBUTE")->asString(), _TL("Regression Model")));
 
 	Set_Residuals(pShapes, iAttribute, pRegression);
 
 	//-----------------------------------------------------
 	if( Parameters("INFO_COEFF")->asTable() )
 	{
-		Parameters("INFO_COEFF")->asTable()->Assign(m_Regression.Get_Regression());
+		Parameters("INFO_COEFF")->asTable()->Assign(m_Regression.Get_Info_Regression());
 		Parameters("INFO_COEFF")->asTable()->Set_Name(_TL("MLRA Coefficients"));
 	}
 
 	if( Parameters("INFO_MODEL")->asTable() )
 	{
-		Parameters("INFO_MODEL")->asTable()->Assign(m_Regression.Get_Model());
+		Parameters("INFO_MODEL")->asTable()->Assign(m_Regression.Get_Info_Model());
 		Parameters("INFO_MODEL")->asTable()->Set_Name(_TL("MLRA Model"));
 	}
 
 	if( Parameters("INFO_STEPS")->asTable() )
 	{
-		Parameters("INFO_STEPS")->asTable()->Assign(m_Regression.Get_Steps());
+		Parameters("INFO_STEPS")->asTable()->Assign(m_Regression.Get_Info_Steps());
 		Parameters("INFO_STEPS")->asTable()->Set_Name(_TL("MLRA Steps"));
 	}
 
@@ -366,8 +431,8 @@ bool CPoint_Multi_Grid_Regression::Set_Regression(CSG_Parameter_Grid_List *pGrid
 
 	CSG_Grid	**ppGrids	= (CSG_Grid **)SG_Malloc(m_Regression.Get_nPredictors() * sizeof(CSG_Grid *));
 
-	bool	bCoord_X		= false;
-	bool	bCoord_Y		= false;
+	int	iCoord_X	= -1;
+	int	iCoord_Y	= -1;
 
 	for(iGrid=0, nGrids=0; iGrid<m_Regression.Get_nPredictors(); iGrid++)
 	{
@@ -377,11 +442,11 @@ bool CPoint_Multi_Grid_Regression::Set_Regression(CSG_Parameter_Grid_List *pGrid
 		}
 		else if( m_Regression.Get_Predictor(iGrid) == pGrids->Get_Count() && Parameters("COORD_X")->asBool() )
 		{
-			bCoord_X = true;
+			iCoord_X = iGrid;
 		}
 		else // if( m_Regression.Get_Predictor(iGrid) > pGrids->Get_Count() || Parameters("COORD_X")->asBool() == false )
 		{
-			bCoord_Y = true;
+			iCoord_Y = iGrid;
 		}
 	}
 
@@ -412,14 +477,14 @@ bool CPoint_Multi_Grid_Regression::Set_Regression(CSG_Parameter_Grid_List *pGrid
 			//---------------------------------------------
 			if( bOkay )
 			{
-				if( bCoord_X )
+				if( iCoord_X >= 0 )
 				{
-					z	+= m_Regression.Get_RCoeff(iGrid++) * Get_System()->Get_xGrid_to_World(x);
+					z	+= m_Regression.Get_RCoeff(iCoord_X) * p.x;
 				}
 
-				if( bCoord_Y )
+				if( iCoord_Y >= 0 )
 				{
-					z	+= m_Regression.Get_RCoeff(iGrid++) * Get_System()->Get_yGrid_to_World(y);
+					z	+= m_Regression.Get_RCoeff(iCoord_Y) * p.y;
 				}
 
 				pRegression->Set_Value (x, y, z);
@@ -455,7 +520,7 @@ bool CPoint_Multi_Grid_Regression::Set_Residuals(CSG_Shapes *pShapes, int iAttri
 	}
 
 	//-----------------------------------------------------
-	pResiduals->Create(SHAPE_TYPE_Point, CSG_String::Format(SG_T("%s [%s]"), pShapes->Get_Name(), _TL("Residuals")));
+	pResiduals->Create(SHAPE_TYPE_Point, CSG_String::Format(SG_T("%s [%s]"), Parameters("ATTRIBUTE")->asString(), _TL("Residuals")));
 	pResiduals->Add_Field(pShapes->Get_Field_Name(iAttribute), SG_DATATYPE_Double);
 	pResiduals->Add_Field("TREND"	, SG_DATATYPE_Double);
 	pResiduals->Add_Field("RESIDUAL", SG_DATATYPE_Double);

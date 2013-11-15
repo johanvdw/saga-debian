@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1465 2012-08-23 09:20:00Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -10,7 +10,7 @@ endif
 DEP_LIBS = `gdal-config --libs`
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core `gdal-config --cflags`
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version $(DEP_LIBS)
 pkglib_LTLIBRARIES = libio_gdal.la
 libio_gdal_la_SOURCES =\
@@ -18,17 +18,21 @@ gdal_driver.cpp\
 gdal_export.cpp\
 gdal_export_geotiff.cpp\
 gdal_import.cpp\
+gdal_import_netcdf.cpp\
 MLB_Interface.cpp\
 ogr_driver.cpp\
 ogr_export.cpp\
+ogr_export_kml.cpp\
 ogr_import.cpp\
 gdal_driver.h\
 gdal_export.h\
 gdal_export_geotiff.h\
 gdal_import.h\
+gdal_import_netcdf.h\
 MLB_Interface.h\
 ogr_driver.h\
 ogr_export.h\
+ogr_export_kml.h\
 ogr_import.h
 
 libio_gdal_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

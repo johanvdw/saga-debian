@@ -78,17 +78,20 @@ class CGW_Multi_Regression_Points : public CSG_Module
 public:
 	CGW_Multi_Regression_Points(void);
 
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:GWR") );	}
+
 
 protected:
 
 	virtual bool				On_Execute				(void);
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:
 
-	int							m_nPredictors, m_nPoints_Min, m_nPoints_Max, m_Mode;
+	int							m_nPredictors, m_nPoints_Min, m_nPoints_Max, m_Direction;
 
 	double						m_Radius;
 

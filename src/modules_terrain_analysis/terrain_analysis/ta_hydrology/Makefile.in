@@ -81,8 +81,8 @@ am_libta_hydrology_la_OBJECTS = CellBalance.lo EdgeContamination.lo \
 	Flow_RecursiveUp.lo flow_massflux.lo flow_width.lo \
 	FlowDepth.lo Helper.lo IsochronesConst.lo IsochronesVar.lo \
 	LakeFlood.lo LakeFloodInteractive.lo MLB_Interface.lo \
-	SAGA_Wetness_Index.lo Sinuosity.lo SlopeLength.lo \
-	TopographicIndices.lo
+	melton_ruggedness.lo SAGA_Wetness_Index.lo Sinuosity.lo \
+	SlopeLength.lo TopographicIndices.lo
 libta_hydrology_la_OBJECTS = $(am_libta_hydrology_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -141,6 +141,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -171,7 +172,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -252,13 +252,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1016 2011-04-27 18:40:36Z oconrad $
+# $Id: Makefile.am 1447 2012-07-16 13:01:47Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libta_hydrology.la
 libta_hydrology_la_SOURCES = \
@@ -280,6 +280,7 @@ IsochronesVar.cpp\
 LakeFlood.cpp\
 LakeFloodInteractive.cpp\
 MLB_Interface.cpp\
+melton_ruggedness.cpp\
 SAGA_Wetness_Index.cpp\
 Sinuosity.cpp\
 SlopeLength.cpp\
@@ -302,6 +303,7 @@ IsochronesConst.h\
 IsochronesVar.h\
 LakeFlood.h\
 MLB_Interface.h\
+melton_ruggedness.h\
 SAGA_Wetness_Index.h\
 Sinuosity.h\
 SlopeLength.h\
@@ -404,6 +406,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TopographicIndices.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flow_massflux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flow_width.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/melton_ruggedness.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

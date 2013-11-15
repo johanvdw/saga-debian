@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_pointcloud.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: dlg_list_pointcloud.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ void CDLG_List_PointCloud::_Set_Objects(void)
 	{
 		for(i=0; i<m_pList->Get_Count(); i++)
 		{
-			CWKSP_Base_Item	*pItem	= g_pData->Get_PointClouds()->Get_PointCloud(m_pList->asDataObject(i)->asPointCloud());
+			CWKSP_Base_Item	*pItem	= g_pData->Get(m_pList->asDataObject(i)->asPointCloud());
 
 			if( pItem )
 			{
@@ -133,7 +133,7 @@ void CDLG_List_PointCloud::_Set_Objects(void)
 		//-------------------------------------------------
 		for(i=0; i<pPointClouds->Get_Count(); i++)
 		{
-			pPointCloud	= pPointClouds->Get_PointCloud(i);
+			pPointCloud	= pPointClouds->Get_Data(i);
 
 			for(j=0, bList=true; j<(int)m_pAdd->GetCount() && bList; j++)
 			{

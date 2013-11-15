@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1738 2013-06-20 11:15:45Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -12,11 +12,12 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEP_DEFS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_gridding.la
 libgrid_gridding_la_SOURCES =\
 Interpolation.cpp\
+Interpolation_AngularDistance.cpp\
 Interpolation_InverseDistance.cpp\
 Interpolation_NaturalNeighbour.cpp\
 Interpolation_NearestNeighbour.cpp\
@@ -35,6 +36,7 @@ Shepard.cpp\
 ./nn/nnpi.c\
 ./nn/triangle.c\
 Interpolation.h\
+Interpolation_AngularDistance.h\
 Interpolation_InverseDistance.h\
 Interpolation_NaturalNeighbour.h\
 Interpolation_NearestNeighbour.h\

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Value_Replace.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Value_Replace.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public:
 	CGrid_Value_Replace(void);
 	virtual ~CGrid_Value_Replace(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Values") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Values") );	}
 
 
 protected:

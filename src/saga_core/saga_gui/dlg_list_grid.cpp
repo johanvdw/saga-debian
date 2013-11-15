@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_grid.cpp 1226 2011-11-16 09:23:47Z reklov_w $
+ * Version $Id: dlg_list_grid.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ CDLG_List_Grid::CDLG_List_Grid(CSG_Parameter_Grid_List *pList, wxString Caption)
 	{
 		if( pList->Get_System() )
 		{
-			m_pSystem	= pManager->Get_System(pList->Get_System());
+			m_pSystem	= pManager->Get_System(*pList->Get_System());
 			m_pSystems	= NULL;
 		}
 		else
@@ -116,10 +116,8 @@ CDLG_List_Grid::CDLG_List_Grid(CSG_Parameter_Grid_List *pList, wxString Caption)
 				m_pSystems->Append(pManager->Get_System(i)->Get_Name());
 			}
 
-			m_pSystems->Append( LNG("[VAL] [all grid systems]") );
+			m_pSystems->Append( _TL("<all grid systems>") );
 			m_pSystems->SetSelection(m_pSystems->GetCount() - 1);
-
-			Set_Positions();
 		}
 
 		_Set_Objects();
@@ -146,20 +144,17 @@ CDLG_List_Grid::~CDLG_List_Grid(void)
 //---------------------------------------------------------
 void CDLG_List_Grid::Set_Position(wxRect r)
 {
-	int		Width, Height;
-
 	CDLG_List_Base::Set_Position(r);
 
 	if( m_pSystems )
 	{
 		r.Deflate(5);
 
-		Height	= m_pSystems->GetSize().GetHeight();
-		Width	= r.GetWidth() / 2 - (DLG_LIST_BTN_WIDTH / 2 + DLG_LIST_BTN_DIST);
+		int	Height	= m_pSystems->GetSize().GetHeight();
+		int	Width	= r.GetWidth() / 2 - (DLG_LIST_BTN_WIDTH / 2 + DLG_LIST_BTN_DIST);
 
-		m_pSystems	->SetSize(wxRect(r.GetLeft(), r.GetTop(), Width, Height));
-		m_pSelect	->SetSize(wxRect(r.GetLeft(), r.GetTop() + Height, Width, r.GetHeight() - Height));
-		m_pSelect	->Refresh();
+		m_pSystems	->SetSize(r.GetLeft(), r.GetTop()         , Width,                 Height);
+		m_pSelect	->SetSize(r.GetLeft(), r.GetTop() + Height, Width, r.GetHeight() - Height);
 	}
 }
 
@@ -189,7 +184,7 @@ void CDLG_List_Grid::_Set_Objects(void)
 	//-----------------------------------------------------
 	for(int i=0; i<m_pList->Get_Count(); i++)
 	{
-		CWKSP_Base_Item	*pItem	= g_pData->Get_Grids()->Get_Grid(m_pList->asDataObject(i)->asGrid());
+		CWKSP_Base_Item	*pItem	= g_pData->Get(m_pList->asDataObject(i)->asGrid());
 
 		if( pItem )
 		{
@@ -241,7 +236,7 @@ void CDLG_List_Grid::_Set_Grids(CWKSP_Grid_System *pSystem)
 		for(int i=0; i<pSystem->Get_Count(); i++)
 		{
 			bool		bList	= true;
-			CWKSP_Grid	*pGrid	= pSystem->Get_Grid(i);
+			CWKSP_Grid	*pGrid	= pSystem->Get_Data(i);
 
 			for(int j=0; j<(int)m_pAdd->GetCount() && bList; j++)
 			{

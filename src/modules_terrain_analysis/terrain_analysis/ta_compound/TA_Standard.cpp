@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: TA_Standard.cpp 1218 2011-11-07 10:22:11Z reklov_w $
+ * Version $Id: TA_Standard.cpp 1629 2013-03-20 13:13:09Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -126,6 +126,12 @@ CTA_Standard::CTA_Standard(void)
 	);
 
 	Parameters.Add_Grid(
+		NULL	, "SINKS"		, _TL("Closed Depressions"),
+		_TL(""),
+		PARAMETER_OUTPUT
+	);
+
+	Parameters.Add_Grid(
 		NULL	, "CAREA"		, _TL("Catchment Area"),
 		_TL(""),
 		PARAMETER_OUTPUT
@@ -156,15 +162,33 @@ CTA_Standard::CTA_Standard(void)
 	);
 
 	Parameters.Add_Grid(
-		NULL	, "CHNL_ALTI"	, _TL("Altitude above Channel Network"),
+		NULL	, "CHNL_BASE"	, _TL("Channel Network Base Level"),
 		_TL(""),
 		PARAMETER_OUTPUT
 	);
 
 	Parameters.Add_Grid(
-		NULL	, "CHNL_BASE"	, _TL("Channel Network Base Level"),
+		NULL	, "CHNL_ALTI"	, _TL("Vertical Distance to Channel Network"),
 		_TL(""),
 		PARAMETER_OUTPUT
+	);
+
+	Parameters.Add_Grid(
+		NULL	, "VALL_DEPTH"	, _TL("Valley Depth"),
+		_TL(""),
+		PARAMETER_OUTPUT
+	);
+
+	Parameters.Add_Grid(
+		NULL	, "RSP"			, _TL("Relative Slope Position"),
+		_TL(""),
+		PARAMETER_OUTPUT
+	);
+
+	Parameters.Add_Value(
+		NULL	, "THRESHOLD"	, _TL("Channel Density"), 
+		_TL("Strahler order to begin a channel."), 
+		PARAMETER_TYPE_Int, 5, 1, true
 	);
 }
 
@@ -187,13 +211,9 @@ CTA_Standard::CTA_Standard(void)
 //---------------------------------------------------------
 bool CTA_Standard::On_Execute(void)
 {
+	CSG_Grid	DEMP(*Get_System(), SG_DATATYPE_Float);
 	CSG_Grid	TMP1(*Get_System(), SG_DATATYPE_Float);
 	CSG_Grid	TMP2(*Get_System(), SG_DATATYPE_Float);
-
-	//-----------------------------------------------------
-	RUN_MODULE("ta_preprocessor"		, 2,
-			SET_PARAMETER("DEM"			, Parameters("ELEVATION"))
-	)
 
 	//-----------------------------------------------------
 	RUN_MODULE("ta_lighting"			, 0,
@@ -231,25 +251,33 @@ bool CTA_Standard::On_Execute(void)
 	)
 
 	//-----------------------------------------------------
-	RUN_MODULE("ta_hydrology"			, 0,
-			SET_PARAMETER("ELEVATION"	, Parameters("ELEVATION"))
-		&&	SET_PARAMETER("CAREA"		, Parameters("CAREA"))
-		&&	SET_PARAMETER("Method"		, 4)
+	RUN_MODULE("ta_preprocessor"		, 2,
+			SET_PARAMETER("DEM"			, Parameters("ELEVATION"))
+		&&	SET_PARAMETER("DEM_PREPROC"	, &DEMP)	// >> preprocessed DEM
 	)
+
+	RUN_MODULE("ta_hydrology"			, 0,
+			SET_PARAMETER("ELEVATION"	, &DEMP)	// << preprocessed DEM
+		&&	SET_PARAMETER("CAREA"		, Parameters("CAREA"))
+		&&	SET_PARAMETER("Method"		, 4)		// MFD
+	)
+
+	Parameters("SINKS")->asGrid()->Assign(&(TMP2 = DEMP - *Parameters("ELEVATION")->asGrid()));
+	Parameters("SINKS")->asGrid()->Set_NoData_Value(0.0);
 
 	//-----------------------------------------------------
 	RUN_MODULE("ta_hydrology"			, 19,
 			SET_PARAMETER("DEM"			, Parameters("ELEVATION"))
 		&&	SET_PARAMETER("TCA"			, Parameters("CAREA"))
 		&&	SET_PARAMETER("WIDTH"		, &TMP2)
-		&&	SET_PARAMETER("SCA"			, &TMP1)
+		&&	SET_PARAMETER("SCA"			, &TMP1)	// >> specific catchment area
 		&&	SET_PARAMETER("METHOD"		, 1)
 	)
 
 	//-----------------------------------------------------
 	RUN_MODULE("ta_hydrology"			, 20,
 			SET_PARAMETER("SLOPE"		, Parameters("SLOPE"))
-		&&	SET_PARAMETER("AREA"		, &TMP1)
+		&&	SET_PARAMETER("AREA"		, &TMP1)	// << specific catchment area
 		&&	SET_PARAMETER("TWI"			, Parameters("WETNESS"))
 		&&	SET_PARAMETER("CONV"		, 0)
 	)
@@ -257,17 +285,18 @@ bool CTA_Standard::On_Execute(void)
 	//-----------------------------------------------------
 	RUN_MODULE("ta_hydrology"			, 22,
 			SET_PARAMETER("SLOPE"		, Parameters("SLOPE"))
-		&&	SET_PARAMETER("AREA"		, &TMP1)
+		&&	SET_PARAMETER("AREA"		, &TMP1)	// << specific catchment area
 		&&	SET_PARAMETER("LS"			, Parameters("LSFACTOR"))
 		&&	SET_PARAMETER("CONV"		, 0)
 	)
 
 	//-----------------------------------------------------
 	RUN_MODULE("ta_channels"			, 5,
-			SET_PARAMETER("DEM"			, Parameters("ELEVATION"))
+			SET_PARAMETER("DEM"			, &DEMP)	// << preprocessed DEM
 		&&	SET_PARAMETER("SEGMENTS"	, Parameters("CHANNELS"))
 		&&	SET_PARAMETER("BASINS"		, Parameters("BASINS"))
 		&&	SET_PARAMETER("ORDER"		, &TMP1)
+		&&	SET_PARAMETER("THRESHOLD"	, Parameters("THRESHOLD"))
 	)
 
 	//-----------------------------------------------------
@@ -277,6 +306,30 @@ bool CTA_Standard::On_Execute(void)
 		&&	SET_PARAMETER("DISTANCE"	, Parameters("CHNL_ALTI"))
 		&&	SET_PARAMETER("BASELEVEL"	, Parameters("CHNL_BASE"))
 	)
+
+	//-----------------------------------------------------
+	RUN_MODULE("grid_tools"				, 19,	// grid orientation
+			SET_PARAMETER("INPUT"		, Parameters("ELEVATION"))
+		&&	SET_PARAMETER("RESULT"		, &TMP1)
+		&&	SET_PARAMETER("METHOD"		, 3)	// invert
+	)
+
+	RUN_MODULE("ta_channels"			, 6,	// strahler order
+			SET_PARAMETER("DEM"			, &TMP1)
+		&&	SET_PARAMETER("STRAHLER"	, &TMP2)
+	)
+
+	TMP2.Set_NoData_Value_Range(0, 4);
+
+	RUN_MODULE("ta_channels"			, 3,	// vertical channel network distance
+			SET_PARAMETER("ELEVATION"	, &TMP1)
+		&&	SET_PARAMETER("CHANNELS"	, &TMP2)
+		&&	SET_PARAMETER("DISTANCE"	, Parameters("VALL_DEPTH"))
+	)
+
+	Parameters("RSP")->asGrid()->Assign(&(TMP1 =
+		*Parameters("CHNL_ALTI")->asGrid() / (*Parameters("CHNL_ALTI")->asGrid() + *Parameters("VALL_DEPTH")->asGrid())
+	));
 
 	//-----------------------------------------------------
 	return( true );

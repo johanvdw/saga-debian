@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1025 2011-04-28 16:16:37Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1758 2013-06-27 13:35:47Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -77,7 +77,7 @@ const SG_Char * Get_Info(int i)
 		return( _TL("Shapes - Grid") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad (c) 2002") );
+		return( SG_T("O. Conrad, V.Wichmann (c) 2002-13") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools related to gridded and vector data (conversions, combinations, etc.).") );
@@ -105,6 +105,7 @@ const SG_Char * Get_Info(int i)
 #include "Grid_To_Gradient.h"
 #include "grid_local_extremes_to_points.h"
 #include "grid_extent.h"
+#include "grid_rectangle_clip.h"
 
 
 //---------------------------------------------------------
@@ -125,6 +126,7 @@ CSG_Module *		Create_Module(int i)
 
 	case  9:	return( new CGrid_Local_Extremes_to_Points );
 	case 10:	return( new CGrid_Extent );
+	case 11:	return( new CGrid_Rectangle_Clip );
 
 	case 15:	return( new CGrid_To_Gradient(0) );
 	case 16:	return( new CGrid_To_Gradient(1) );

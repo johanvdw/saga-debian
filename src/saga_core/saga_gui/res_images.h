@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.h 1119 2011-06-29 12:13:43Z oconrad $
+ * Version $Id: res_images.h 1507 2012-10-31 18:49:02Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -199,6 +199,10 @@ enum ID_IMAGES
 	ID_IMG_WKSP_MODULE_LIBRARY,
 	ID_IMG_WKSP_MODULE_MANAGER,
 	ID_IMG_WKSP_NOITEMS,
+	ID_IMG_WKSP_ODBC_SOURCES,
+	ID_IMG_WKSP_ODBC_SOURCE_ON,
+	ID_IMG_WKSP_ODBC_SOURCE_OFF,
+	ID_IMG_WKSP_ODBC_TABLE,
 	ID_IMG_WKSP_SHAPES_LINE,
 	ID_IMG_WKSP_SHAPES_MANAGER,
 	ID_IMG_WKSP_SHAPES_POINT,

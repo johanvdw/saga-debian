@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_TPS_Local.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Gridding_Spline_TPS_Local.h 1482 2012-10-08 16:15:45Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,12 +90,14 @@ public:
 
 protected:
 
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
 	virtual bool			On_Execute				(void);
 
 
 private:
 
-	int						m_nPoints_Max, m_Mode;
+	int						m_nPoints_Max, m_Direction;
 
 	double					m_Radius;
 

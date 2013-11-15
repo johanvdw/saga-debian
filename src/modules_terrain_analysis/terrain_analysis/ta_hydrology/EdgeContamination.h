@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: EdgeContamination.h 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: EdgeContamination.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*******************************************************************************
     EdgeContamination.h
@@ -43,7 +43,7 @@ class CEdgeContamination : public CSG_Module_Grid
 public:
 	CEdgeContamination(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Catchment Area" ));	}
 
 
 protected:

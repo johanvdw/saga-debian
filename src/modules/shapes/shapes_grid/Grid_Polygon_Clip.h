@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Polygon_Clip.h 1025 2011-04-28 16:16:37Z oconrad $
+ * Version $Id: Grid_Polygon_Clip.h 1422 2012-06-01 08:43:45Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,17 +76,24 @@ public:
 	// constructor
 	CGrid_Polygon_Clip(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Spatial Extent") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Spatial Extent") );	}
+
 
 protected:
 	// execute module
 	virtual bool			On_Execute		(void);
 
+
 private:
+
+	bool					m_bNoData;
+
 
 	// estimates the Extent of the new grid
 	bool					Get_Extent		(int &xMin, int &xCount,
-											 int &yMin, int &yCount, CSG_Grid *pMask);
+											 int &yMin, int &yCount, CSG_Grid *pMask, CSG_Parameter_Grid_List *pGrids);
+
+	bool					is_InGrid		(int x, int y, CSG_Grid *pMask, CSG_Parameter_Grid_List *pGrids);
 
 	// This function has been copied from Module: 'Grid_Statistics_AddTo_Polygon'
 	// Function: Get_ShapeIDs

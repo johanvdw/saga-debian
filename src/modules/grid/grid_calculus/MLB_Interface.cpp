@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1211 2011-11-03 10:19:19Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1549 2012-11-29 16:38:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -110,8 +110,6 @@ const SG_Char * Get_Info(int i)
 #include "grid_metric_conversion.h"
 #include "gradient_cartes_polar.h"
 
-#include "grids_trend_polynom.h"
-
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -144,8 +142,6 @@ CSG_Module *		Create_Module(int i)
 
 	case 15:		return( new CGradient_Cartes_To_Polar );
 	case 16:		return( new CGradient_Polar_To_Cartes );
-
-	case 17:		return( new CGrids_Trend );
 
 	//-----------------------------------------------------
 	case 19:		return( NULL );

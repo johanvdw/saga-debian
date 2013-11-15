@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Value_Reclassify.h 1122 2011-07-03 18:19:18Z reklov_w $
+ * Version $Id: Grid_Value_Reclassify.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ public:
 	CGrid_Value_Reclassify(void);
 	virtual ~CGrid_Value_Reclassify(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Values") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Values") );	}
 
 
 protected:

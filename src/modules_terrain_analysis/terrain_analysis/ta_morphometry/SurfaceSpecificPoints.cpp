@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SurfaceSpecificPoints.cpp 1081 2011-06-08 08:05:26Z reklov_w $
+ * Version $Id: SurfaceSpecificPoints.cpp 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -116,10 +116,6 @@ CSurfaceSpecificPoints::CSurfaceSpecificPoints(void)
 		PARAMETER_TYPE_Double	, 2
 	);
 }
-
-//---------------------------------------------------------
-CSurfaceSpecificPoints::~CSurfaceSpecificPoints(void)
-{}
 
 
 ///////////////////////////////////////////////////////////

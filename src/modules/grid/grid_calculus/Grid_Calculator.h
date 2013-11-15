@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Calculator.h 1195 2011-10-14 11:29:50Z oconrad $
+ * Version $Id: Grid_Calculator.h 1627 2013-03-19 16:39:22Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ protected:
 
 private:
 
-	CSG_String		Get_Formula				(CSG_String sFormula, int nGrids, int nXGrids);
+	bool			Get_Formula				(CSG_Formula &Formula, CSG_String sFormula, int nGrids, int nXGrids);
 
 };
 

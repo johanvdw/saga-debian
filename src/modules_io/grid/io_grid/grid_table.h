@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_table.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: grid_table.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public:
 	CGrid_Table_Import(void);
 	virtual ~CGrid_Table_Import(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)		{	return( _TL("R:Import") );	}
+	virtual CSG_String		Get_MenuPath	(void)		{	return( _TL("R:Import") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
+# $Id: Makefile.am 1352 2012-03-14 10:03:01Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,14 +9,16 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_polygons.la
 libshapes_polygons_la_SOURCES =\
 MLB_Interface.cpp\
 Polygon_Centroids.cpp\
+Polygon_Clip.cpp\
 Polygon_Geometrics.cpp\
 Polygon_Intersection.cpp\
+Polygon_SelfIntersection.cpp\
 Polygon_StatisticsFromPoints.cpp\
 Polygon_Union.cpp\
 Polygons_From_Lines.cpp\
@@ -27,8 +29,10 @@ polygon_to_points.cpp\
 shape_index.cpp\
 MLB_Interface.h\
 Polygon_Centroids.h\
+Polygon_Clip.h\
 Polygon_Geometrics.h\
 Polygon_Intersection.h\
+Polygon_SelfIntersection.h\
 Polygon_StatisticsFromPoints.h\
 Polygon_Union.h\
 Polygons_From_Lines.h\

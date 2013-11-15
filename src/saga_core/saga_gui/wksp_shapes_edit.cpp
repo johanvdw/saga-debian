@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_edit.cpp 1133 2011-07-14 10:14:12Z reklov_w $
+ * Version $Id: wksp_shapes_edit.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -61,6 +61,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <wx/dcclient.h>
+
 #include "res_commands.h"
 #include "res_images.h"
 #include "res_dialogs.h"
@@ -119,12 +121,12 @@ TSG_Rect CWKSP_Shapes::On_Edit_Get_Extent(void)
 		return( m_Edit_pShape->Get_Extent() );
 	}
 
-	if( m_pShapes->Get_Selection_Count() > 0 )
+	if( Get_Shapes()->Get_Selection_Count() > 0 )
 	{
-		return( m_pShapes->Get_Selection_Extent().m_rect );
+		return( Get_Shapes()->Get_Selection_Extent().m_rect );
 	}
 
-	return( m_pShapes->Get_Extent() );
+	return( Get_Shapes()->Get_Extent() );
 }
 
 
@@ -187,7 +189,7 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Down(CSG_Point Point, double ClientToWorld, 
 				m_Edit_iPart	= iPart;
 				m_Edit_iPoint	= iPoint;
 
-				Update_Views(true);
+				Update_Views(false);
 			}
 
 			return( true );
@@ -199,7 +201,7 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Down(CSG_Point Point, double ClientToWorld, 
 			m_Edit_iPart	= iPart;
 			m_Edit_iPoint	= iPoint;
 
-			Update_Views(true);
+			Update_Views(false);
 
 			return( true );
 		}
@@ -224,7 +226,7 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, in
 		{
 			m_Edit_iPart	= -1;
 
-			Update_Views(true);
+			Update_Views(false);
 
 			return( true );
 		}
@@ -243,7 +245,7 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, in
 
 					m_Edit_pShape->Set_Point(Point, m_Edit_iPoint, m_Edit_iPart);
 
-					Update_Views(true);
+					Update_Views(false);
 
 					return( true );
 				}
@@ -254,7 +256,7 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, in
 
 				m_Edit_pShape->Add_Point(Point, m_Edit_iPart);
 
-				Update_Views(true);
+				Update_Views(false);
 
 				return( true );
 			}
@@ -273,23 +275,23 @@ bool CWKSP_Shapes::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, in
 
 		g_pACTIVE->Get_Attributes()->Set_Attributes();
 
-		pRecord	= m_pShapes->Get_Selection();
+		pRecord	= Get_Shapes()->Get_Selection();
 		
-		m_pShapes->Select(rWorld, (Key & MODULE_INTERACTIVE_KEY_CTRL) != 0);
+		Get_Shapes()->Select(rWorld, (Key & MODULE_INTERACTIVE_KEY_CTRL) != 0);
 
 		if( m_pTable->Get_View() )
 		{
 			m_pTable->Get_View()->Update_Selection();
 		}
 
-		if( pRecord != m_pShapes->Get_Selection() )
+		if( pRecord != Get_Shapes()->Get_Selection() )
 		{
 			_Edit_Set_Attributes();
 		}
 
-		pRecord	= m_pShapes->Get_Selection();
+		pRecord	= Get_Shapes()->Get_Selection();
 
-		Update_Views(true);
+		Update_Views(false);
 
 		return( true );
 	}
@@ -361,9 +363,9 @@ bool CWKSP_Shapes::_Edit_Set_Attributes(void)
 
 	m_Edit_Attributes.Del_Records();
 
-	if( (pRecord = m_pShapes->Get_Selection()) != NULL )
+	if( (pRecord = Get_Shapes()->Get_Selection()) != NULL )
 	{
-		for(int i=0; i<m_pShapes->Get_Field_Count(); i++)
+		for(int i=0; i<Get_Shapes()->Get_Field_Count(); i++)
 		{
 			pAttribute	= m_Edit_Attributes.Add_Record();
 			pAttribute->Set_Value(0, pRecord->Get_Table()->Get_Field_Name(i));
@@ -381,14 +383,14 @@ bool CWKSP_Shapes::On_Edit_Set_Attributes(void)
 {
 	CSG_Table_Record	*pRecord;
 
-	if( (pRecord = m_pShapes->Get_Selection()) != NULL )
+	if( (pRecord = Get_Shapes()->Get_Selection()) != NULL )
 	{
 		for(int i=0; i<m_Edit_Attributes.Get_Record_Count(); i++)
 		{
 			pRecord->Set_Value(i, m_Edit_Attributes.Get_Record(i)->asString(1));
 		}
 
-		Update_Views(true);
+		Update_Views(false);
 
 		return( true );
 	}
@@ -412,15 +414,15 @@ bool CWKSP_Shapes::_Edit_Shape(void)
 //---------------------------------------------------------
 bool CWKSP_Shapes::_Edit_Shape_Start(void)
 {
-	if( m_Edit_pShape == NULL && m_pShapes->Get_Selection(0) != NULL )
+	if( m_Edit_pShape == NULL && Get_Shapes()->Get_Selection(0) != NULL )
 	{
 		m_Edit_pShape	= m_Edit_Shapes.Add_Shape();
-		m_Edit_pShape->Assign(m_pShapes->Get_Selection(0), false);
+		m_Edit_pShape->Assign(Get_Shapes()->Get_Selection(0), false);
 
 		m_Edit_iPart	= -1;
 		m_Edit_iPoint	= -1;
 
-		Update_Views(true);
+		Update_Views(false);
 
 		return( true );
 	}
@@ -431,7 +433,7 @@ bool CWKSP_Shapes::_Edit_Shape_Start(void)
 //---------------------------------------------------------
 bool CWKSP_Shapes::_Edit_Shape_Stop(void)
 {
-	return( _Edit_Shape_Stop(DLG_Message_Confirm(LNG("[DLG] Apply changes?"), LNG("[CAP] Edit Shapes"))) );
+	return( _Edit_Shape_Stop(DLG_Message_Confirm(_TL("Apply changes?"), _TL("Edit Shapes"))) );
 }
 
 bool CWKSP_Shapes::_Edit_Shape_Stop(bool bSave)
@@ -442,11 +444,11 @@ bool CWKSP_Shapes::_Edit_Shape_Stop(bool bSave)
 		{
 			CSG_Shape	*pShape;
 
-			if( (pShape = m_pShapes->Get_Selection(0)) == NULL )
+			if( (pShape = Get_Shapes()->Get_Selection(0)) == NULL )
 			{
-				if( (pShape = m_pShapes->Add_Shape()) != NULL )
+				if( (pShape = Get_Shapes()->Add_Shape()) != NULL )
 				{
-					m_pShapes->Select(pShape);
+					Get_Shapes()->Select(pShape);
 				}
 			}
 
@@ -459,7 +461,7 @@ bool CWKSP_Shapes::_Edit_Shape_Stop(bool bSave)
 		m_Edit_Shapes.Del_Shapes();
 		m_Edit_pShape	= NULL;
 
-		Update_Views(false);
+		Update_Views();
 		_Edit_Set_Attributes();
 
 		return( true );
@@ -473,9 +475,9 @@ bool CWKSP_Shapes::_Edit_Shape_Add(void)
 {
 	if( !m_Edit_pShape )
 	{
-		if( m_pShapes->Get_Selection_Count() > 0 )
+		if( Get_Shapes()->Get_Selection_Count() > 0 )
 		{
-			m_pShapes->Select((CSG_Shape*)NULL);
+			Get_Shapes()->Select((CSG_Shape*)NULL);
 		}
 
 		m_Edit_pShape	= m_Edit_Shapes.Add_Shape();
@@ -494,7 +496,7 @@ bool CWKSP_Shapes::_Edit_Part_Add(void)
 		m_Edit_iPart	= m_Edit_pShape->Get_Part_Count();
 		m_Edit_iPoint	= -1;
 
-		Update_Views(true);
+		Update_Views(false);
 
 		return( true );
 	}
@@ -505,22 +507,22 @@ bool CWKSP_Shapes::_Edit_Part_Add(void)
 //---------------------------------------------------------
 bool CWKSP_Shapes::_Edit_Shape_Del(void)
 {
-	if( DLG_Message_Confirm(LNG("[DLG] Delete selected shape(s)."), LNG("[CAP] Edit Shapes")) )
+	if( DLG_Message_Confirm(_TL("Delete selected shape(s)."), _TL("Edit Shapes")) )
 	{
-		if( m_pShapes->Get_Selection_Count() > 0 )
+		if( Get_Shapes()->Get_Selection_Count() > 0 )
 		{
 			if( m_Edit_pShape )
 			{
 				_Edit_Shape_Stop(false);
 
-				m_pShapes->Del_Shape(m_pShapes->Get_Selection(0));
+				Get_Shapes()->Del_Shape(Get_Shapes()->Get_Selection(0));
 			}
 			else
 			{
-				m_pShapes->Del_Selection();
+				Get_Shapes()->Del_Selection();
 			}
 
-			Update_Views(false);
+			Update_Views();
 
 			return( true );
 		}
@@ -543,7 +545,7 @@ bool CWKSP_Shapes::_Edit_Part_Del(void)
 			m_Edit_iPart	= -1;
 			m_Edit_iPoint	= -1;
 
-			Update_Views(true);
+			Update_Views(false);
 
 			return( true );
 		}
@@ -572,13 +574,13 @@ bool CWKSP_Shapes::_Edit_Point_Del(void)
 
 			if( m_Edit_pShape->Get_Point_Count(m_Edit_iPart) <= 1 )
 			{
-				if( m_pShapes->Get_Type() == SHAPE_TYPE_Line || m_pShapes->Get_Type() == SHAPE_TYPE_Polygon )
+				if( Get_Shapes()->Get_Type() == SHAPE_TYPE_Line || Get_Shapes()->Get_Type() == SHAPE_TYPE_Polygon )
 				{
 					m_Edit_iPoint	= -1;
 				}
 			}
 
-			Update_Views(true);
+			Update_Views(false);
 
 			return( true );
 		}
@@ -698,7 +700,7 @@ void CWKSP_Shapes::_Edit_Snap_Point(CSG_Point &Point, double ClientToWorld)
 			{
 				Point	= snap_Point;
 			}
-			else if( m_pShapes->Get_Type() == SHAPE_TYPE_Line || m_pShapes->Get_Type() == SHAPE_TYPE_Polygon )
+			else if( Get_Shapes()->Get_Type() == SHAPE_TYPE_Line || Get_Shapes()->Get_Type() == SHAPE_TYPE_Polygon )
 			{
 				for(i=0; i<pList->Get_Count(); i++)
 				{
@@ -723,7 +725,7 @@ void CWKSP_Shapes::_Edit_Snap_Point(CSG_Point Point, CSG_Point &snap_Point, doub
 	{
 		for(int i=0; i<pShapes->Get_Selection_Count(); i++)
 		{
-			if( pShapes != m_pShapes || pSelected != pShapes->Get_Selection(i) )
+			if( pShapes != Get_Shapes() || pSelected != pShapes->Get_Selection(i) )
 			{
 				if( bLine )
 				{

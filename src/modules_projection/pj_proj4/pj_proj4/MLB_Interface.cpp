@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1443 2012-07-10 10:29:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -104,6 +104,8 @@ const SG_Char * Get_Info(int i)
 #include "PROJ4_Shapes.h"
 #include "PROJ4_Grid.h"
 
+#include "gcs_lon_range.h"
+
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -126,6 +128,8 @@ CSG_Module *		Create_Module(int i)
 	case 10:	return( new CPROJ4_Shapes	(PROJ4_INTERFACE_DIALOG, true) );
 	case 11:	return( new CPROJ4_Grid		(PROJ4_INTERFACE_SIMPLE, true) );
 	case 12:	return( new CPROJ4_Grid		(PROJ4_INTERFACE_DIALOG, true) );
+
+	case 13:	return( new CGCS_Grid_Longitude_Range() );
 	}
 
 	return( NULL );

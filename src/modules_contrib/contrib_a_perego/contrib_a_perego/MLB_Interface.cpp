@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1514 2012-11-06 09:47:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -44,24 +44,28 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
 	case MLB_INFO_Name:	default:
-		return( _TL("Contributions - A. Perego") );
+		return( _TL("Grid - Filter (Perego 2009)") );
 
 	case MLB_INFO_Author:
 		return( _TL("Alessandro Perego") );
 
 	case MLB_INFO_Description:
-		return( _TL("Contributions from Alessandro Perego.") );
+		return( _TW(
+			"Contributions from Alessandro Perego. Go to "
+			"<a target=\"_blank\" href=\"http://www.webalice.it/alper78/saga_mod/saga_mod.html\">"
+			"www.webalice.it/alper78/saga_mod</a> for further information."
+		));
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Contributions|A. Perego") );
+		return( _TL("Grid|Filter") );
 	}
 }
 

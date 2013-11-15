@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 1210 2011-11-03 10:17:46Z oconrad $
+ * Version $Id: module_library.h 1650 2013-04-11 11:51:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -84,6 +84,23 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+enum
+{
+	SG_SUMMARY_FMT_FLAT	= 0,
+	SG_SUMMARY_FMT_FLAT_NO_INTERACTIVE,
+	SG_SUMMARY_FMT_HTML,
+	SG_SUMMARY_FMT_XML,
+	SG_SUMMARY_FMT_XML_NO_INTERACTIVE
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Module_Library
 {
 public:
@@ -100,13 +117,14 @@ public:
 	const CSG_String &				Get_File_Name		(void)	const	{	return( m_File_Name );		}
 	const CSG_String &				Get_Library_Name	(void)	const	{	return( m_Library_Name );	}
 
-	const SG_Char *					Get_Info			(int Type)				const;
-	CSG_String						Get_Summary			(bool bHTML = false)	const;
+	const SG_Char *					Get_Info			(int Type)	const;
 	CSG_String						Get_Name			(void)	const	{	return( Get_Info(MLB_INFO_Name       ) );	}
 	CSG_String						Get_Description		(void)	const	{	return( Get_Info(MLB_INFO_Description) );	}
 	CSG_String						Get_Author			(void)	const	{	return( Get_Info(MLB_INFO_Author     ) );	}
 	CSG_String						Get_Version			(void)	const	{	return( Get_Info(MLB_INFO_Version    ) );	}
 	CSG_String						Get_Menu			(void)	const	{	return( Get_Info(MLB_INFO_Menu_Path  ) );	}
+	CSG_String						Get_Summary			(int Format = SG_SUMMARY_FMT_HTML)	const;
+	bool							Get_Summary			(const CSG_String &Path)			const;
 
 	int								Get_Count			(void)	const	{	return( m_pInterface ? m_pInterface->Get_Count() : 0 );	}
 
@@ -166,6 +184,9 @@ public:
 	CSG_Module *					Get_Module			(const SG_Char *Library, int            Module)	const;
 	CSG_Module *					Get_Module			(const SG_Char *Library, const SG_Char *Module)	const;
 
+	CSG_String						Get_Summary			(int Format = SG_SUMMARY_FMT_HTML)	const;
+	bool							Get_Summary			(const CSG_String &Path)			const;
+
 
 private:
 
@@ -194,23 +215,23 @@ SAGA_API_DLL_EXPORT CSG_Module_Library_Manager &	SG_Get_Module_Library_Manager	(
 	\
 	if(	pModule == NULL )\
 	{\
-		Error_Set(CSG_String::Format(SG_T("%s: %s"), LNG("could not find module"), SG_T(LIBRARY)));\
+		Error_Set(CSG_String::Format(SG_T("%s: %s"), _TL("could not find module"), SG_T(LIBRARY)));\
 	}\
 	else\
 	{\
 		Process_Set_Text(pModule->Get_Name());\
 		\
-		pModule->Set_Managed(false);\
-		\
 		CSG_Parameters	P; P.Assign(pModule->Get_Parameters());\
+		\
+		pModule->Set_Manager(NULL);\
 		\
 		if( !(CONDITION) )\
 		{\
-			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), LNG("could not initialize module"), SG_T(LIBRARY), pModule->Get_Name()));\
+			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not initialize module"), SG_T(LIBRARY), pModule->Get_Name().c_str()));\
 		}\
 		else if( !pModule->Execute() )\
 		{\
-			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), LNG("could not execute module"), SG_T(LIBRARY), pModule->Get_Name()));\
+			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not execute module")   , SG_T(LIBRARY), pModule->Get_Name().c_str()));\
 		}\
 		else\
 		{\
@@ -218,8 +239,7 @@ SAGA_API_DLL_EXPORT CSG_Module_Library_Manager &	SG_Get_Module_Library_Manager	(
 		}\
 		\
 		pModule->Get_Parameters()->Assign_Values(&P);\
-		\
-		pModule->Set_Managed(true);\
+		pModule->Set_Manager(P.Get_Manager());\
 	}\
 }
 

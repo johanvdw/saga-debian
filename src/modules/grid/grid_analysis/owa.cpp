@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: owa.cpp 961 2011-03-24 23:56:28Z johanvdw $
+ * Version $Id: owa.cpp 1394 2012-05-07 14:23:12Z manfred-e $
  *********************************************************/
 /*******************************************************************************
     OWA.cpp
@@ -113,7 +113,7 @@ bool COWA::On_Execute(void){
 				if (bAllValuesAreOK){
 					Sort(pOrderedValues, pGridsList->Get_Count());
 					for (i = 0; i<pGridsList->Get_Count(); i++){
-						dValue = pCoefs[i] * pOrderedValues[i];
+						dValue += pCoefs[i] * pOrderedValues[i];
 					}//for
 					pOutputGrid->Set_Value(x,y,dValue);
 				}//if

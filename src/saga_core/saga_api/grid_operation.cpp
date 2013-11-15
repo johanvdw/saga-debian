@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_operation.cpp 1081 2011-06-08 08:05:26Z reklov_w $
+ * Version $Id: grid_operation.cpp 1259 2011-12-15 15:57:49Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ bool CSG_Grid::Assign(double Value)
 
 		//-------------------------------------------------
 		Get_History().Destroy();
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Assign"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), _TL("Assign"));
 
 		//-------------------------------------------------
 		m_zStats.Invalidate();
@@ -206,15 +206,18 @@ bool CSG_Grid::Assign(CSG_Grid *pGrid, TSG_Grid_Interpolation Interpolation)
 bool CSG_Grid::_Assign_Interpolated(CSG_Grid *pGrid, TSG_Grid_Interpolation Interpolation)
 {
 	int		x, y;
-	double	xPosition, yPosition, z;
+	double	yPosition;
 
 	Set_NoData_Value_Range(pGrid->Get_NoData_Value(), pGrid->Get_NoData_hiValue());
 
 	for(y=0, yPosition=Get_YMin(); y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++, yPosition+=Get_Cellsize())
 	{
-		for(x=0, xPosition=Get_XMin(); x<Get_NX(); x++, xPosition+=Get_Cellsize())
+		#pragma omp parallel for private(x)
+		for(x=0; x<Get_NX(); x++)
 		{
-			if( pGrid->Get_Value(xPosition, yPosition, z, Interpolation) )
+			double	z;
+
+			if( pGrid->Get_Value(Get_XMin() + x * Get_Cellsize(), yPosition, z, Interpolation) )
 			{
 				Set_Value (x, y, z);
 			}
@@ -226,7 +229,7 @@ bool CSG_Grid::_Assign_Interpolated(CSG_Grid *pGrid, TSG_Grid_Interpolation Inte
 	}
 
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), _TL("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -279,7 +282,7 @@ bool CSG_Grid::_Assign_ExtremeValue(CSG_Grid *pGrid, bool bMaximum)
 
 	//-----------------------------------------------------
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), _TL("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -408,7 +411,7 @@ bool CSG_Grid::_Assign_MeanValue(CSG_Grid *pGrid, bool bAreaProportional)
 
 	//-----------------------------------------------------
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), _TL("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -501,7 +504,7 @@ bool CSG_Grid::_Assign_Majority(CSG_Grid *pGrid)
 
 	//-----------------------------------------------------
 	Get_History()	= pGrid->Get_History();
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), LNG("Resampling"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), CSG_String::Format(SG_T("%f -> %f"), pGrid->Get_Cellsize(), Get_Cellsize()))->Add_Property(SG_T("NAME"), _TL("Resampling"));
 
 	SG_UI_Process_Set_Ready();
 
@@ -733,19 +736,19 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(const CSG_Grid &Grid, TSG_Grid_Operat
 		switch( Operation )
 		{
 		case GRID_OPERATION_Addition:
-			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Addition"));
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), _TL("Addition"));
 			break;
 
 		case GRID_OPERATION_Subtraction:
-			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Subtraction"));
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), _TL("Subtraction"));
 			break;
 
 		case GRID_OPERATION_Multiplication:
-			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Multiplication"));
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), _TL("Multiplication"));
 			break;
 
 		case GRID_OPERATION_Division:
-			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), LNG("Division"));
+			Get_History().Add_Child(SG_T("GRID_OPERATION"), Grid.Get_Name())->Add_Property(SG_T("NAME"), _TL("Division"));
 			break;
 		}
 
@@ -765,14 +768,14 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(double Value, TSG_Grid_Operation Oper
 		if( Value == 0.0 )
 			return( *this );
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Addition"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), _TL("Addition"));
 		break;
 
 	case GRID_OPERATION_Subtraction:
 		if( Value == 0.0 )
 			return( *this );
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Subtraction"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), _TL("Subtraction"));
 		Value	= -Value;
 		break;
 
@@ -780,14 +783,14 @@ CSG_Grid & CSG_Grid::_Operation_Arithmetic(double Value, TSG_Grid_Operation Oper
 		if( Value == 1.0 )
 			return( *this );
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Multiplication"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), _TL("Multiplication"));
 		break;
 
 	case GRID_OPERATION_Division:
 		if( Value == 0.0 )
 			return( *this );
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), LNG("Division"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), Value)->Add_Property(SG_T("NAME"), _TL("Division"));
 		Value	= 1.0 / Value;
 		break;
 	}
@@ -851,7 +854,7 @@ void CSG_Grid::Invert(void)
 
 		SG_UI_Process_Set_Ready();
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Inversion"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Inversion"));
 	}
 }
 
@@ -889,7 +892,7 @@ void CSG_Grid::Flip(void)
 
 		SG_Free(Line);
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Vertically mirrored"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Vertically mirrored"));
 	}
 }
 
@@ -913,7 +916,7 @@ void CSG_Grid::Mirror(void)
 
 		SG_UI_Process_Set_Ready();
 
-		Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Horizontally mirrored"));
+		Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Horizontally mirrored"));
 	}
 }
 
@@ -932,13 +935,14 @@ bool CSG_Grid::Normalise(void)
 		return( false );
 	}
 
-	SG_UI_Process_Set_Text(LNG("Normalisation"));
+	SG_UI_Process_Set_Text(_TL("Normalisation"));
 
 	double	zMin	= Get_ZMin();
 	double	zRange	= Get_ZRange();
 
 	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( !is_NoData(x, y) )
@@ -950,7 +954,7 @@ bool CSG_Grid::Normalise(void)
 
 	SG_UI_Process_Set_Ready();
 
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Normalisation"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Normalisation"));
 
 	return( true );
 }
@@ -963,10 +967,11 @@ bool CSG_Grid::DeNormalise(double Minimum, double Maximum)
 		return( false );
 	}
 
-	SG_UI_Process_Set_Text(LNG("Denormalisation"));
+	SG_UI_Process_Set_Text(_TL("Denormalisation"));
 
 	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( !is_NoData(x, y) )
@@ -978,7 +983,7 @@ bool CSG_Grid::DeNormalise(double Minimum, double Maximum)
 
 	SG_UI_Process_Set_Ready();
 
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Denormalisation"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Denormalisation"));
 
 	return( true );
 }
@@ -991,13 +996,14 @@ bool CSG_Grid::Standardise(void)
 		return( false );
 	}
 
-	SG_UI_Process_Set_Text(LNG("Standardisation"));
+	SG_UI_Process_Set_Text(_TL("Standardisation"));
 
 	double	Mean	= Get_ArithMean();
 	double	StdDev	= Get_StdDev();
 
 	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( !is_NoData(x, y) )
@@ -1009,7 +1015,7 @@ bool CSG_Grid::Standardise(void)
 
 	SG_UI_Process_Set_Ready();
 
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Standardisation"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Standardisation"));
 
 	return( false );
 }
@@ -1022,10 +1028,11 @@ bool CSG_Grid::DeStandardise(double Mean, double StdDev)
 		return( false );
 	}
 
-	SG_UI_Process_Set_Text(LNG("Destandardisation"));
+	SG_UI_Process_Set_Text(_TL("Destandardisation"));
 
 	for(int y=0; y<Get_NY() && SG_UI_Process_Set_Progress(y, Get_NY()); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( !is_NoData(x, y) )
@@ -1037,7 +1044,7 @@ bool CSG_Grid::DeStandardise(double Mean, double StdDev)
 
 	SG_UI_Process_Set_Ready();
 
-	Get_History().Add_Child(SG_T("GRID_OPERATION"), LNG("Destandardisation"));
+	Get_History().Add_Child(SG_T("GRID_OPERATION"), _TL("Destandardisation"));
 
 	return( true );
 }

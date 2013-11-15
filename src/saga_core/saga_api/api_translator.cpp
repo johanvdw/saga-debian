@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_translator.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: api_translator.cpp 1495 2012-10-19 14:03:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ CSG_Translator &	SG_Get_Translator(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-const SG_Char *	SG_Translate(const SG_Char *Text)
+const SG_Char *		SG_Translate(const CSG_String &Text)
 {
 	return( gSG_Translator.Get_Translation(Text) );
 }
@@ -237,7 +237,7 @@ bool CSG_Translator::Create(class CSG_Table *pTranslations, int iText, int iTran
 #define COMPARE(Index, Text)	(m_bCmpNoCase ? m_Translations[Index]->m_Text.CmpNoCase(Text) : m_Translations[Index]->m_Text.Cmp(Text))
 
 //---------------------------------------------------------
-int CSG_Translator::_Get_Index(const SG_Char *Text) const
+int CSG_Translator::_Get_Index(const CSG_String &Text) const
 {
 	int		a, b, i, c;
 
@@ -327,12 +327,6 @@ const SG_Char * CSG_Translator::Get_Translation(const SG_Char *Text, bool bRetur
 			do	{	Text++;	}	while( *Text != '}' && *Text != '\0' );
 			do	{	Text++;	}	while( *Text == ' ' && *Text != '\0' );
 		}
-
-		if( *Text == '[' )
-		{
-			do	{	Text++;	}	while( *Text != ']' && *Text != '\0' );
-			do	{	Text++;	}	while( *Text == ' ' && *Text != '\0' );
-		}
 	}
 
 	return( Text );
@@ -365,12 +359,6 @@ bool CSG_Translator::Get_Translation(const SG_Char *Text, CSG_String &Translatio
 		if( *Text == '{' )
 		{
 			do	{	Text++;	}	while( *Text != '}' && *Text != '\0' );
-			do	{	Text++;	}	while( *Text == ' ' && *Text != '\0' );
-		}
-
-		if( *Text == '[' )
-		{
-			do	{	Text++;	}	while( *Text != ']' && *Text != '\0' );
 			do	{	Text++;	}	while( *Text == ' ' && *Text != '\0' );
 		}
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: table.cpp 1508 2012-11-01 16:13:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -125,7 +125,8 @@ bool CTable_Info::On_Execute(void)
 	CSG_Parameter_Choice	*pTables	= Parameters("TABLES")	->asChoice();
 	CSG_Table				*pTable		= Parameters("TABLE")	->asTable();
 
-	pTable->Assign(&Get_Connection()->Get_Field_Desc(pTables->asString()));
+	CSG_Table				tmpTable	= Get_Connection()->Get_Field_Desc(pTables->asString());
+	pTable->Assign(&tmpTable);
 
 	return( true );
 }
@@ -171,12 +172,12 @@ bool CTable_Load::On_Before_Execution(void)
 		return( false );
 	}
 
-	CSG_String	Table(Parameters("TABLES")->asString());
+	CSG_String	Tables(Get_Connection()->Get_Tables());
 
-	Parameters("TABLES")->asChoice()->Set_Items(Get_Connection()->Get_Tables());
-	Parameters("TABLES")->Set_Value(Table);
+	Parameters("TABLES")->asChoice()->Set_Items(Tables);
+	Parameters("TABLES")->Set_Value(Parameters("TABLES")->asString());
 
-	return( true );
+	return( Tables.Length() > 0 );
 }
 
 //---------------------------------------------------------
@@ -260,8 +261,9 @@ bool CTable_Save::On_Execute(void)
 		return( false );
 	}
 
-	CSG_Table	*pTable	= Parameters("TABLE")	->asTable();
-	CSG_String	Name	= Parameters("NAME")	->asString();	if( Name.Length() == 0 )	Name	= pTable->Get_Name();
+	bool		bResult	= false;
+	CSG_Table	*pTable	= Parameters("TABLE")->asTable();
+	CSG_String	Name	= Parameters("NAME" )->asString();	if( Name.Length() == 0 )	Name	= pTable->Get_Name();
 
 	//-----------------------------------------------------
 	if( Get_Connection()->Table_Exists(Name) )
@@ -271,7 +273,7 @@ bool CTable_Save::On_Execute(void)
 		switch( Parameters("EXISTS")->asInt() )
 		{
 		case 0:	// abort export
-			return( false );
+			break;
 
 		case 1:	// replace existing table
 			Message_Add(CSG_String::Format(SG_T("%s: %s"), _TL("dropping table"), Name.c_str()));
@@ -279,31 +281,35 @@ bool CTable_Save::On_Execute(void)
 			if( !Get_Connection()->Table_Drop(Name, false) )
 			{
 				Message_Add(CSG_String::Format(SG_T(" ...%s!"), _TL("failed")));
-
-				return( false );
 			}
-
-			return( Get_Connection()->Table_Save(Name, *pTable, Get_Constraints(Parameters("FLAGS")->asParameters(), pTable)) );
+			else
+			{
+				bResult	= Get_Connection()->Table_Save(Name, *pTable, Get_Constraints(Parameters("FLAGS")->asParameters(), pTable));
+			}
+			break;
 
 		case 2:	// append records, if table structure allows
 			Message_Add(CSG_String::Format(SG_T("%s: %s"), _TL("appending to existing table"), Name.c_str()));
 
-			if( !Get_Connection()->Table_Insert(Name, *pTable) )
+			if( !(bResult = Get_Connection()->Table_Insert(Name, *pTable)) )
 			{
 				Message_Add(CSG_String::Format(SG_T(" ...%s!"), _TL("failed")));
-
-				return( false );
 			}
-
-			return( true );
+			break;
 		}
 	}
 	else
 	{
-		return( Get_Connection()->Table_Save(Name, *pTable, Get_Constraints(Parameters("FLAGS")->asParameters(), pTable)) );
+		bResult	= Get_Connection()->Table_Save(Name, *pTable, Get_Constraints(Parameters("FLAGS")->asParameters(), pTable));
 	}
 
-	return( false );
+	//-----------------------------------------------------
+	if( bResult )
+	{
+		SG_UI_ODBC_Update(Get_Connection()->Get_Server());
+	}
+
+	return( bResult );
 }
 
 
@@ -358,12 +364,14 @@ bool CTable_Drop::On_Before_Execution(void)
 //---------------------------------------------------------
 bool CTable_Drop::On_Execute(void)
 {
-	if( !Get_Connection() )
+	if( Get_Connection() && Get_Connection()->Table_Drop(Parameters("TABLES")->asChoice()->asString()) )
 	{
-		return( false );
+		SG_UI_ODBC_Update(Get_Connection()->Get_Server());
+
+		return( true );
 	}
 
-	return( Get_Connection()->Table_Drop(Parameters("TABLES")->asChoice()->asString()) );
+	return( false );
 }
 
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1540 2012-11-22 13:40:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -96,6 +96,7 @@ const SG_Char * Get_Info(int i)
 #include "Georef_Grid.h"
 #include "Georef_Shapes.h"
 #include "georef_grid_move.h"
+#include "direct_georeferencing.h"
 
 
 //---------------------------------------------------------
@@ -109,6 +110,7 @@ CSG_Module *		Create_Module(int i)
 	case 1:		return( new CGeoref_Grid );
 	case 2:		return( new CGeoref_Shapes );
 	case 3:		return( new CGeoref_Grid_Move );
+	case 4:		return( new CDirect_Georeferencing );
 	}
 
 	return( NULL );

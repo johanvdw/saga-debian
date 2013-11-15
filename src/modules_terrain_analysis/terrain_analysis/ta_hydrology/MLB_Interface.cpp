@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1016 2011-04-27 18:40:36Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1525 2012-11-09 15:09:34Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 
 //---------------------------------------------------------
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -115,6 +115,8 @@ const SG_Char * Get_Info(int i)
 #include "flow_massflux.h"
 #include "flow_width.h"
 
+#include "melton_ruggedness.h"
+
 
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
@@ -144,6 +146,8 @@ CSG_Module *		Create_Module(int i)
 	case 20:	return( new CTWI );
 	case 21:	return( new CStream_Power );
 	case 22:	return( new CLS_Factor );
+	case 23:	return( new CMelton_Ruggedness );
+	case 24:	return( new CTCI_Low );
 	}
 
 	return( NULL );

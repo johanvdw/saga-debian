@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_cut.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: shapes_cut.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ class CShapes_Cut : public CSG_Module
 public:
 	CShapes_Cut(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: esri_arcinfo.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: esri_arcinfo.cpp 1725 2013-06-11 12:52:39Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ double CESRI_ArcInfo_Import::Read_Value(CSG_File &Stream)
 	int			c;
 	CSG_String	s;
 
-	while( !Stream.is_EOF() && !SG_is_Numeric(c = Stream.Get_Character()) );	// ignore leading white space...
+	while( !Stream.is_EOF() && !SG_is_Numeric(c = Stream.Read_Char()) );	// ignore leading white space...
 
 	if( !Stream.is_EOF() && SG_is_Numeric(c) )
 	{
@@ -303,9 +303,9 @@ double CESRI_ArcInfo_Import::Read_Value(CSG_File &Stream)
 				c	= '.';
 			}
 
-			s	+= c;
+			s	+= (char)c;
 		}
-		while( !Stream.is_EOF() && SG_is_Numeric(c = Stream.Get_Character()) );
+		while( !Stream.is_EOF() && SG_is_Numeric(c = Stream.Read_Char()) );
 	}
 
 	return( s.asDouble() );
@@ -318,11 +318,11 @@ bool CESRI_ArcInfo_Import::Read_Header_Line(CSG_File &Stream, CSG_String &sLine)
 
 	sLine.Clear();
 
-	while( !Stream.is_EOF() && (c = Stream.Get_Character()) != 0x0A )
+	while( !Stream.is_EOF() && (c = Stream.Read_Char()) != 0x0A )
 	{
 		if( c != 0x0D )
 		{
-			sLine	+= c;
+			sLine	+= (char)c;
 		}
 	}
 
@@ -597,7 +597,7 @@ bool CESRI_ArcInfo_Export::On_Execute(void)
 					fprintf(Stream.Get_Stream(), " ");
 				}
 
-				fprintf(Stream.Get_Stream(), Write_Value(pGrid->asFloat(x, y), Precision, bComma).b_str());
+				fprintf(Stream.Get_Stream(), Write_Value(pGrid->asDouble(x, y), Precision, bComma).b_str());
 			}
 
 			fprintf(Stream.Get_Stream(), "\n");

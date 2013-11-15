@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 980 2011-04-05 13:55:57Z oconrad $
+# $Id: Makefile.am 1758 2013-06-27 13:35:47Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_grid.la
 libshapes_grid_la_SOURCES =\
@@ -17,6 +17,7 @@ Grid_Classes_To_Shapes.cpp\
 grid_extent.cpp\
 grid_local_extremes_to_points.cpp\
 Grid_Polygon_Clip.cpp\
+grid_rectangle_clip.cpp\
 Grid_Statistics_AddTo_Polygon.cpp\
 Grid_To_Contour.cpp\
 Grid_To_Gradient.cpp\
@@ -29,6 +30,7 @@ Grid_Classes_To_Shapes.h\
 grid_extent.h\
 grid_local_extremes_to_points.h\
 Grid_Polygon_Clip.h\
+grid_rectangle_clip.h\
 Grid_Statistics_AddTo_Polygon.h\
 Grid_To_Contour.h\
 Grid_To_Gradient.h\

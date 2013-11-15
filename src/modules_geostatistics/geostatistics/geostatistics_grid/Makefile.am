@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1554 2012-12-05 18:29:04Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,14 +9,15 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgeostatistics_grid.la
 libgeostatistics_grid_la_SOURCES =\
 fast_representativeness.cpp\
 grid_autocorrelation.cpp\
-multiband_variation.cpp\
+grid_latlon_statistics.cpp\
 grid_pca.cpp\
+multiband_variation.cpp\
 GSGrid_Directional_Statistics.cpp\
 GSGrid_Residuals.cpp\
 GSGrid_Statistics.cpp\
@@ -25,9 +26,10 @@ GSGrid_Variance_Radius.cpp\
 GSGrid_Zonal_Statistics.cpp\
 MLB_Interface.cpp\
 fast_representativeness.h\
-multiband_variation.h\
 grid_autocorrelation.h\
+grid_latlon_statistics.h\
 grid_pca.h\
+multiband_variation.h\
 GSGrid_Directional_Statistics.h\
 GSGrid_Residuals.h\
 GSGrid_Statistics.h\

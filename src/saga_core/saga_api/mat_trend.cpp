@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_trend.cpp 1199 2011-10-21 12:22:20Z oconrad $
+ * Version $Id: mat_trend.cpp 1548 2012-11-29 16:36:52Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -166,8 +166,6 @@ bool CSG_Trend::CFncParams::Destroy(void)
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -186,8 +184,6 @@ CSG_Trend::~CSG_Trend(void)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -218,8 +214,6 @@ bool CSG_Trend::Set_Formula(const SG_Char *Formula)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -285,8 +279,6 @@ void CSG_Trend::Add_Data(double x, double y)
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -317,8 +309,6 @@ bool CSG_Trend::Set_Max_Lambda(double Lambda)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -351,59 +341,63 @@ bool CSG_Trend::Get_Trend(const CSG_Points &Data, const SG_Char *Formula)
 //---------------------------------------------------------
 bool CSG_Trend::Get_Trend(void)
 {
-	if( !m_Formula.Get_Error() )
+	CSG_String	sError;
+
+	if( m_Formula.Get_Error(sError) )
 	{
-		int		i;
+		return( false );
+	}
 
-		m_bOkay	= true;
+	//-------------------------------------------------
+	int		i;
 
-		//-------------------------------------------------
-		if( m_Data.Get_Count() > 1 )
+	m_bOkay	= true;
+
+	if( m_Data.Get_Count() > 1 )
+	{
+		if( m_Params.m_Count > 0 )
 		{
-			if( m_Params.m_Count > 0 )
+			m_Lambda	= 0.001;
+
+			_Get_mrqcof(m_Params.m_A, m_Params.m_Alpha, m_Params.m_Beta);
+
+			m_ChiSqr_o	= m_ChiSqr;
+
+			for(i=0; i<m_Params.m_Count; i++)
 			{
-				m_Lambda	= 0.001;
-
-				_Get_mrqcof(m_Params.m_A, m_Params.m_Alpha, m_Params.m_Beta);
-
-				m_ChiSqr_o	= m_ChiSqr;
-
-				for(i=0; i<m_Params.m_Count; i++)
-				{
-					m_Params.m_Atry[i]	= m_Params.m_A[i];
-				}
-
-				//-----------------------------------------
-				for(i=0; i<m_Iter_Max && m_Lambda<m_Lambda_Max && m_bOkay && SG_UI_Process_Get_Okay(false); i++)
-				{
-					m_bOkay	= _Fit_Function();
-				}
-
-				//-----------------------------------------
-				for(i=0; i<m_Params.m_Count; i++)
-				{
-					m_Formula.Set_Variable(m_Params.m_Variables[i], m_Params.m_A[i]);
-				}
+				m_Params.m_Atry[i]	= m_Params.m_A[i];
 			}
 
-			//---------------------------------------------
-			double	y_m, y_o, y_t;
-
-			for(i=0, y_m=0.0; i<m_Data.Get_Count(); i++)
+			//-----------------------------------------
+			for(i=0; i<m_Iter_Max && m_Lambda<m_Lambda_Max && m_bOkay && SG_UI_Process_Get_Okay(false); i++)
 			{
-				y_m	+= m_Data.Get_Y(i);
+				m_bOkay	= _Fit_Function();
 			}
 
-			y_m	/= m_Data.Get_Count();
-
-			for(i=0, y_o=0.0, y_t=0.0; i<m_Data.Get_Count(); i++)
+			//-----------------------------------------
+			for(i=0; i<m_Params.m_Count; i++)
 			{
-				y_o	+= SG_Get_Square(y_m - m_Data.Get_Y(i));
-				y_t	+= SG_Get_Square(y_m - m_Formula.Get_Value(m_Data.Get_X(i)));
+				m_Formula.Set_Variable(m_Params.m_Variables[i], m_Params.m_A[i]);
 			}
-
-			m_ChiSqr_o	= y_o > 0.0 ? y_t / y_o : 1.0;
 		}
+
+		//---------------------------------------------
+		double	y_m, y_o, y_t;
+
+		for(i=0, y_m=0.0; i<m_Data.Get_Count(); i++)
+		{
+			y_m	+= m_Data.Get_Y(i);
+		}
+
+		y_m	/= m_Data.Get_Count();
+
+		for(i=0, y_o=0.0, y_t=0.0; i<m_Data.Get_Count(); i++)
+		{
+			y_o	+= SG_Get_Square(y_m - m_Data.Get_Y(i));
+			y_t	+= SG_Get_Square(y_m - m_Formula.Get_Value(m_Data.Get_X(i)));
+		}
+
+		m_ChiSqr_o	= y_o > 0.0 ? y_t / y_o : 1.0;
 	}
 
 	return( m_bOkay );
@@ -411,8 +405,6 @@ bool CSG_Trend::Get_Trend(void)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -429,7 +421,7 @@ CSG_String CSG_Trend::Get_Error(void)
 	}
 	else
 	{
-		Message.Printf(SG_T("%s"), LNG("Error in Trend Calculation"));
+		Message.Printf(SG_T("%s"), _TL("Error in Trend Calculation"));
 	}
 
 	return( Message );
@@ -536,8 +528,6 @@ double CSG_Trend::Get_Value(double x)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -800,8 +790,6 @@ bool CSG_Trend::_Get_mrqcof(double *Parameters, double **Alpha, double *Beta)
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -828,6 +816,147 @@ void CSG_Trend::_Get_Function(double x, double *Parameters, double &y, double *d
 
 		m_Formula.Set_Variable(m_Params.m_Variables[i], Parameters[i] - EPSILON);
 	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CSG_Trend_Polynom::CSG_Trend_Polynom(void)
+{
+	Destroy();
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Destroy(void)
+{
+	m_Order	= 0;
+
+	Clr_Data();
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Set_Order(int Order)
+{
+	m_a.Destroy();
+
+	if( Order > 0 )
+	{
+		m_Order	= Order;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Clr_Data(void)
+{
+	m_a.Destroy();
+	m_y.Destroy();
+	m_x.Destroy();
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Set_Data(double *x, double *y, int n, bool bAdd)
+{
+	if( !bAdd )
+	{
+		Clr_Data();
+	}
+
+	m_x.Add_Rows(n);
+	m_y.Add_Rows(n);
+
+	for(int i=0, j=m_x.Get_N()-1; i<n; i++)
+	{
+		m_x[j]	= x[i];
+		m_y[j]	= y[i];
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Add_Data(double x, double y)
+{
+	return( m_x.Add_Row(x) && m_y.Add_Row(y) );
+}
+
+//---------------------------------------------------------
+bool CSG_Trend_Polynom::Get_Trend(void)
+{
+	if( m_Order < 1 || m_x.Get_N() <= m_Order )
+	{
+		return( false );
+	}
+
+	//-----------------------------------------------------
+	int			i;
+	double		d, Ym, SSE, SSR;
+	CSG_Matrix	X, Xt, C;
+
+	//-----------------------------------------------------
+	X .Create(m_Order + 1, m_y.Get_N());
+	Xt.Create(m_y.Get_N(), m_Order + 1);
+
+	for(i=0, Ym=0.0; i<m_y.Get_N(); i++)
+	{
+		X[i][0] = Xt[0][i] = d = 1.0;
+
+		for(int j=1; j<=m_Order; j++)
+		{
+			X[i][j] = Xt[j][i] = (d = d * m_x[i]);
+		}
+
+		Ym	+= m_y[i];
+	}
+
+	Ym	/= m_y.Get_N();
+
+	m_a	= (Xt * X).Get_Inverse() * (Xt * m_y);
+
+	//-----------------------------------------------------
+	CSG_Vector	Yr	= X * m_a;
+
+	for(i=0, SSE=0.0, SSR=0.0; i<m_y.Get_N(); i++)
+	{
+		SSE	+= SG_Get_Square(Yr[i] - m_y[i]);
+		SSR	+= SG_Get_Square(Yr[i] - Ym    );
+	}
+
+	m_r2	= SSR / (SSR + SSE);
+
+	return( true );
+}
+
+//---------------------------------------------------------
+double CSG_Trend_Polynom::Get_Value(double x)	const
+{
+	if( m_a.Get_N() > 0 )
+	{
+		double	y	= m_a(0);
+		double	d	= 1.0;
+
+		for(int i=1; i<m_a.Get_N(); i++)
+		{
+			d	*= x;
+			y	+= d * m_a(i);
+		}
+
+		return( y );
+	}
+
+	return( 0.0 );
 }
 
 

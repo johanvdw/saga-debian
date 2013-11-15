@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_control.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_data_control.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ inline int CWKSP_Data_Control::_Get_Image_ID(CWKSP_Base_Item *pItem)
 		case WKSP_ITEM_Shapes:
 			switch( pItem->Get_Type() == WKSP_ITEM_Shapes
 				?	((CWKSP_Shapes *)pItem)->Get_Shapes()->Get_Type()
-				:	((CWKSP_Shapes_Type *)pItem)->Get_Shapes_Type() )
+				:	((CWKSP_Shapes_Type *)pItem)->Get_Shape_Type() )
 			{
 			default:
 			case SHAPE_TYPE_Point:			return( IMG_SHAPES_POINT );

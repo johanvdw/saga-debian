@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.cpp 1169 2011-09-21 16:56:01Z oconrad $
+ * Version $Id: table.cpp 1728 2013-06-13 09:37:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -149,11 +149,6 @@ CSG_Table::CSG_Table(const CSG_Table &Table)
 
 bool CSG_Table::Create(const CSG_Table &Table)
 {
-	return( is_Private() ? false : _Create(Table) );
-}
-
-bool CSG_Table::_Create(const CSG_Table &Table)
-{
 	if( Assign((CSG_Data_Object *)&Table) )
 	{
 		Set_Name(Table.Get_Name());
@@ -174,7 +169,7 @@ CSG_Table::CSG_Table(const CSG_String &File_Name, TSG_Table_File_Type Format)
 
 bool CSG_Table::Create(const CSG_String &File_Name, TSG_Table_File_Type Format)
 {
-	return( is_Private() ? false : _Create(File_Name, Format, NULL) );
+	return( _Load(File_Name, Format, NULL) );
 }
 
 //---------------------------------------------------------
@@ -187,11 +182,6 @@ CSG_Table::CSG_Table(const CSG_String &File_Name, TSG_Table_File_Type Format, co
 }
 
 bool CSG_Table::Create(const CSG_String &File_Name, TSG_Table_File_Type Format, const SG_Char *Separator)
-{
-	return( is_Private() ? false : _Create(File_Name, Format, Separator) );
-}
-
-bool CSG_Table::_Create(const CSG_String &File_Name, TSG_Table_File_Type Format, const SG_Char *Separator)
 {
 	return( _Load(File_Name, Format, Separator) );
 }
@@ -207,12 +197,7 @@ CSG_Table::CSG_Table(CSG_Table *pTemplate)
 
 bool CSG_Table::Create(CSG_Table *pTemplate)
 {
-	return( is_Private() ? false : _Create(pTemplate) );
-}
-
-bool CSG_Table::_Create(CSG_Table *pTemplate)
-{
-	_Destroy();
+	Destroy();
 
 	if( pTemplate && pTemplate->Get_Field_Count() > 0 )
 	{
@@ -237,8 +222,6 @@ bool CSG_Table::_Create(CSG_Table *pTemplate)
 //---------------------------------------------------------
 void CSG_Table::_On_Construction(void)
 {
-	m_pOwner		= NULL;
-
 	m_nFields		= 0;
 	m_Field_Name	= NULL;
 	m_Field_Type	= NULL;
@@ -266,20 +249,15 @@ void CSG_Table::_On_Construction(void)
 //---------------------------------------------------------
 CSG_Table::~CSG_Table(void)
 {
-	_Destroy();
+	Destroy();
 }
 
 //---------------------------------------------------------
 bool CSG_Table::Destroy(void)
 {
-	return( is_Private() ? false : _Destroy() );
-}
-
-bool CSG_Table::_Destroy(void)
-{
 	_Destroy_Selection();
 
-	_Del_Records();
+	Del_Records();
 
 	if( m_nFields > 0 )
 	{
@@ -315,77 +293,49 @@ bool CSG_Table::_Destroy(void)
 //---------------------------------------------------------
 bool CSG_Table::Assign(CSG_Data_Object *pObject)
 {
-	return( is_Private() ? false : _Assign(pObject) );
-}
-
-bool CSG_Table::_Assign(CSG_Data_Object *pObject)
-{
-	int			i;
-	CSG_Table	*pTable;
-
-	if( pObject && pObject->is_Valid()
-	&&	(	pObject->Get_ObjectType() == DATAOBJECT_TYPE_Table
-		||	pObject->Get_ObjectType() == DATAOBJECT_TYPE_Shapes
-		||	pObject->Get_ObjectType() == DATAOBJECT_TYPE_PointCloud
-		) )
+	if( !pObject || !pObject->is_Valid()
+	||	(	pObject->Get_ObjectType() != DATAOBJECT_TYPE_Table
+		&&	pObject->Get_ObjectType() != DATAOBJECT_TYPE_Shapes
+		&&	pObject->Get_ObjectType() != DATAOBJECT_TYPE_PointCloud	) )
 	{
-		_Destroy();
-
-		pTable	= (CSG_Table *)pObject;
-
-		for(i=0; i<pTable->m_nFields; i++)
-		{
-			Add_Field(pTable->m_Field_Name[i]->c_str(), pTable->m_Field_Type[i]);
-		}
-
-		for(i=0; i<pTable->m_nRecords; i++)
-		{
-			_Add_Record(pTable->m_Records[i]);
-		}
-
-		Get_History()	= pTable->Get_History();
-
-		return( true );
+		return( false );
 	}
 
-	return( false );
+	Destroy();
+
+	CSG_Table	*pTable	= (CSG_Table *)pObject;
+
+	int		i;
+
+	for(i=0; i<pTable->m_nFields; i++)
+	{
+		Add_Field(pTable->m_Field_Name[i]->c_str(), pTable->m_Field_Type[i]);
+	}
+
+	for(i=0; i<pTable->m_nRecords; i++)
+	{
+		Add_Record(pTable->m_Records[i]);
+	}
+
+	Get_History()	= pTable->Get_History();
+
+	return( true );
 }
 
 //---------------------------------------------------------
 bool CSG_Table::Assign_Values(CSG_Table *pTable)
 {
-	int		i;
-
-	if( is_Compatible(pTable) )
+	if( !is_Compatible(pTable) || !Set_Record_Count(pTable->Get_Count()) )
 	{
-		if( is_Private() )
-		{
-			if( Get_Record_Count() == pTable->Get_Record_Count() )
-			{
-				_Index_Destroy();
-
-				for(i=0; i<pTable->Get_Record_Count(); i++)
-				{
-					Get_Record(i)->Assign(pTable->Get_Record(i));
-				}
-
-				return( true );
-			}
-		}
-		else
-		{
-			Del_Records();
-
-			for(i=0; i<pTable->Get_Record_Count(); i++)
-			{
-				Add_Record(pTable->Get_Record(i));
-			}
-
-			return( true );
-		}
+		return( false );
 	}
 
-	return( false );
+	for(int i=0; i<pTable->Get_Record_Count(); i++)
+	{
+		Get_Record(i)->Assign(pTable->Get_Record(i));
+	}
+
+	return( true );
 }
 
 
@@ -441,7 +391,7 @@ bool CSG_Table::is_Compatible(CSG_Table *pTable, bool bExactMatch) const
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field)
+bool CSG_Table::Add_Field(const CSG_String &Name, TSG_Data_Type Type, int add_Field)
 {
 	int		iField, iRecord;
 
@@ -467,7 +417,7 @@ bool CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field
 	}
 
 	//-----------------------------------------------------
-	m_Field_Name [add_Field]	= new CSG_String(Name);
+	m_Field_Name [add_Field]	= new CSG_String(!Name.is_Empty() ? Name : CSG_String::Format(SG_T("%s_%d"), SG_T("FIELD"), m_nFields));
 	m_Field_Type [add_Field]	= Type;
 	m_Field_Stats[add_Field]	= new CSG_Simple_Statistics();
 
@@ -481,12 +431,6 @@ bool CSG_Table::Add_Field(const SG_Char *Name, TSG_Data_Type Type, int add_Field
 
 	return( true );
 }
-
-//---------------------------------------------------------
-#ifdef _SAGA_UNICODE
-bool CSG_Table::Add_Field(const char *Name, TSG_Data_Type Type, int iField)
-{	return( Add_Field(CSG_String(Name), Type, iField) );	}
-#endif
 
 //---------------------------------------------------------
 bool CSG_Table::Del_Field(int del_Field)
@@ -580,9 +524,12 @@ bool CSG_Table::Set_Field_Type(int iField, TSG_Data_Type Type)
 				}
 
 				m_Records[i]->m_Values[iField]	= pNew;
+				m_Records[i]->Set_Modified();
 
 				delete(pOld);
 			}
+
+			Set_Modified();
 		}
 
 		return( true );
@@ -706,11 +653,6 @@ CSG_Table_Record * CSG_Table::_Get_New_Record(int Index)
 //---------------------------------------------------------
 CSG_Table_Record * CSG_Table::Add_Record(CSG_Table_Record *pCopy)
 {
-	return( is_Private() ? NULL : _Add_Record(pCopy) );
-}
-
-CSG_Table_Record * CSG_Table::_Add_Record(CSG_Table_Record *pCopy)
-{
 	CSG_Table_Record	*pRecord;
 
 	if( _Inc_Array() && (pRecord = _Get_New_Record(m_nRecords)) != NULL )
@@ -750,14 +692,9 @@ CSG_Table_Record * CSG_Table::_Add_Record(CSG_Table_Record *pCopy)
 //---------------------------------------------------------
 CSG_Table_Record * CSG_Table::Ins_Record(int iRecord, CSG_Table_Record *pCopy)
 {
-	return( is_Private() ? NULL : _Ins_Record(iRecord, pCopy) );
-}
-
-CSG_Table_Record * CSG_Table::_Ins_Record(int iRecord, CSG_Table_Record *pCopy)
-{
 	if( iRecord >= m_nRecords )
 	{
-		return( _Add_Record(pCopy) );
+		return( Add_Record(pCopy) );
 	}
 	else if( iRecord < 0 )
 	{
@@ -807,11 +744,6 @@ CSG_Table_Record * CSG_Table::_Ins_Record(int iRecord, CSG_Table_Record *pCopy)
 
 //---------------------------------------------------------
 bool CSG_Table::Del_Record(int iRecord)
-{
-	return( is_Private() ? false : _Del_Record(iRecord) );
-}
-
-bool CSG_Table::_Del_Record(int iRecord)
 {
 	int		i, j;
 
@@ -866,11 +798,6 @@ bool CSG_Table::_Del_Record(int iRecord)
 //---------------------------------------------------------
 bool CSG_Table::Del_Records(void)
 {
-	return( is_Private() ? false : _Del_Records() );
-}
-
-bool CSG_Table::_Del_Records(void)
-{
 	if( m_Records > 0 )
 	{
 		_Index_Destroy();
@@ -891,6 +818,21 @@ bool CSG_Table::_Del_Records(void)
 	return( false );
 }
 
+//---------------------------------------------------------
+bool CSG_Table::Set_Record_Count(int nRecords)
+{
+	if( m_nRecords < nRecords )
+	{
+		while( m_nRecords < nRecords && Add_Record() != NULL )	{}
+	}
+	else if( nRecords >= 0 && m_nRecords > nRecords )
+	{
+		while( m_nRecords > nRecords && Del_Record(m_nRecords - 1) )	{}
+	}
+
+	return( m_nRecords == nRecords );
+}
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -905,16 +847,12 @@ void CSG_Table::Set_Modified(bool bModified)
 	{
 		CSG_Data_Object::Set_Modified(bModified);
 
-		if( m_pOwner )
-		{
-			m_pOwner->Set_Modified(bModified);
-		}
-
 		if( bModified == false )
 		{
-			for(int iRecord=0; iRecord<Get_Count() && SG_UI_Process_Set_Progress(iRecord, Get_Count()); iRecord++)
+			#pragma omp parallel for
+			for(int iRecord=0; iRecord<m_nRecords; iRecord++)
 			{
-				Get_Record(iRecord)->Set_Modified(false);
+				m_Records[iRecord]->Set_Modified(false);
 			}
 		}
 	}

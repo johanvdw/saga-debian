@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_polygon.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_shapes_polygon.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,9 +86,10 @@ class CWKSP_Shapes_Polygon : public CWKSP_Shapes
 {
 public:
 	CWKSP_Shapes_Polygon(CSG_Shapes *pShapes);
-	virtual ~CWKSP_Shapes_Polygon(void);
 
-	bool						Get_Style				(wxPen &Pen, wxBrush &Brush, bool &bOutline, wxString *pName = NULL);
+	bool						Get_Outline				(void)	{	return( m_bOutline );	}
+	wxPen						Get_Def_Pen				(void)	{	return( m_Pen      );	}
+	wxBrush						Get_Def_Brush			(void)	{	return( m_Brush    );	}
 
 
 protected:

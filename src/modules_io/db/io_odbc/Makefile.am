@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1100 2011-06-17 00:47:16Z johanvdw $
+# $Id: Makefile.am 1277 2011-12-22 15:48:59Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ DEP_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) -fpermissive
+AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) -fpermissive $(GOMPFLAGS)
 AM_LDFLAGS         = $(DEP_LFLG) $(DEP_LIBS) -avoid-version
 pkglib_LTLIBRARIES = libio_odbc.la
 libio_odbc_la_SOURCES =\

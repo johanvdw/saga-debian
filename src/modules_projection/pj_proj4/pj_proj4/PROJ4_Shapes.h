@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: PROJ4_Shapes.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: PROJ4_Shapes.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ class pj_proj4_EXPORT CPROJ4_Shapes : public CPROJ4_Base
 public:
 	CPROJ4_Shapes(int Interface, bool bInputList);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("R:Alternatives") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:Alternatives") );	}
 
 
 protected:

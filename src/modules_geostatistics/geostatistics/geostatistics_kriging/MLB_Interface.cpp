@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1363 2012-03-30 14:19:21Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,12 +69,12 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
 	case MLB_INFO_Name:	default:
-		return( _TL("Geostatistics - Kriging") );
+		return( _TL("Spatial and Geostatistics - Kriging") );
 
 	case MLB_INFO_Author:
 		return( SG_T("O.Conrad (c) 2003-10") );
@@ -86,7 +86,7 @@ const SG_Char * Get_Info(int i)
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Geostatistics|Kriging" ));
+		return( _TL("Spatial and Geostatistics|Kriging" ));
 	}
 }
 

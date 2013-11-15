@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_ogis.cpp 1158 2011-09-14 14:55:32Z oconrad $
+ * Version $Id: shapes_ogis.cpp 1373 2012-04-13 09:54:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ inline bool CSG_Shapes_OGIS_Converter::_WKT_Read_Point(const CSG_String &Text, C
 	switch( ((CSG_Shapes *)pShape->Get_Table())->Get_Vertex_Type() )
 	{
 	case SG_VERTEX_TYPE_XY:
-		if( SG_SSCANF(Text.c_str(), SG_T("%f %f"), &x, &y) == 2 )
+		if( SG_SSCANF(Text.c_str(), SG_T("%lf %lf"), &x, &y) == 2 )
 		{
 			pShape->Add_Point(x, y, iPart);
 			
@@ -87,7 +87,7 @@ inline bool CSG_Shapes_OGIS_Converter::_WKT_Read_Point(const CSG_String &Text, C
 		break;
 
 	case SG_VERTEX_TYPE_XYZ:
-		if( SG_SSCANF(Text.c_str(), SG_T("%f %f %f"), &x, &y, &z) == 3 )
+		if( SG_SSCANF(Text.c_str(), SG_T("%lf %lf %lf"), &x, &y, &z) == 3 )
 		{
 			pShape->Add_Point(x, y, iPart);
 			pShape->Set_Z    (z, pShape->Get_Point_Count(iPart) - 1, iPart);
@@ -97,7 +97,7 @@ inline bool CSG_Shapes_OGIS_Converter::_WKT_Read_Point(const CSG_String &Text, C
 		break;
 
 	case SG_VERTEX_TYPE_XYZM:
-		if( SG_SSCANF(Text.c_str(), SG_T("%f %f %f %f"), &x, &y, &z, &m) == 4 )
+		if( SG_SSCANF(Text.c_str(), SG_T("%lf %lf %lf %lf"), &x, &y, &z, &m) == 4 )
 		{
 			pShape->Add_Point(x, y, iPart);
 			pShape->Set_Z    (z, pShape->Get_Point_Count(iPart) - 1, iPart);
@@ -182,41 +182,46 @@ bool CSG_Shapes_OGIS_Converter::from_WKText(const CSG_String &Text, CSG_Shape *p
 {
 	pShape->Del_Parts();
 
+	CSG_String	Type	= Text.BeforeFirst('(');
+
+	Type.Trim(true);
+	Type.Trim(false);
+
 	switch( pShape->Get_Type() )
 	{
 	case SHAPE_TYPE_Point:
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_Point) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Point) )
 		{
 			return( _WKT_Read_Point(Text.AfterFirst('(').BeforeFirst(')'), pShape, 0) );
 		}
 		break;
 
 	case SHAPE_TYPE_Points:
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint) )
 		{
 			return( _WKT_Read_Parts(Text, pShape) );
 		}
 		break;
 
 	case SHAPE_TYPE_Line:
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_Line) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Line) )
 		{
 			return( _WKT_Read_Points(Text, pShape) );
 		}
 
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_MultiLine) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiLine) )
 		{
 			return( _WKT_Read_Parts(Text, pShape) );
 		}
 		break;
 
 	case SHAPE_TYPE_Polygon:
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_Polygon) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Polygon) )
 		{
 			return( _WKT_Read_Parts(Text, pShape) );
 		}
 
-		if( !Text.BeforeFirst('(').CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon) )
+		if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon) )
 		{
 			return( _WKT_Read_Polygon(Text, pShape) );
 		}

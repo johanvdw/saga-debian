@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1230 2011-11-22 11:12:10Z oconrad $
+# $Id: Makefile.am 1404 2012-05-14 10:04:07Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libshapes_tools.la
 libshapes_tools_la_SOURCES =\
@@ -19,7 +19,6 @@ MLB_Interface.cpp\
 NewLayerFromSelectedShapes.cpp\
 quadtree_structure.cpp\
 QueryBuilder.cpp\
-QueryParser.cpp\
 SearchInTable.cpp\
 SelectByTheme.cpp\
 SeparateShapes.cpp\
@@ -30,6 +29,7 @@ shapes_buffer.cpp\
 shapes_cut.cpp\
 shapes_cut_interactive.cpp\
 shapes_extents.cpp\
+shapes_generate.cpp\
 shapes_polar_to_cartes.cpp\
 shapes_split.cpp\
 shapes_split_by_attribute.cpp\
@@ -40,7 +40,6 @@ MLB_Interface.h\
 NewLayerFromSelectedShapes.h\
 quadtree_structure.h\
 QueryBuilder.h\
-QueryParser.h\
 SearchInTable.h\
 SelectByTheme.h\
 SeparateShapes.h\
@@ -51,6 +50,7 @@ shapes_buffer.h\
 shapes_cut.h\
 shapes_cut_interactive.h\
 shapes_extents.h\
+shapes_generate.h\
 shapes_polar_to_cartes.h\
 shapes_split.h\
 shapes_split_by_attribute.h\

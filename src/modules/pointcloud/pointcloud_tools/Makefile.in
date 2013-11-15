@@ -78,8 +78,8 @@ libpointcloud_tools_la_DEPENDENCIES =  \
 am_libpointcloud_tools_la_OBJECTS = MLB_Interface.lo \
 	pc_attribute_calculator.lo pc_cluster_analysis.lo pc_cut.lo \
 	pc_drop_attribute.lo pc_from_grid.lo pc_from_shapes.lo \
-	pc_reclass_extract.lo pc_thinning_simple.lo pc_to_grid.lo \
-	pc_to_shapes.lo pc_transform.lo
+	pc_merge.lo pc_reclass_extract.lo pc_thinning_simple.lo \
+	pc_to_grid.lo pc_to_shapes.lo pc_transform.lo
 libpointcloud_tools_la_OBJECTS = $(am_libpointcloud_tools_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -138,6 +138,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -168,7 +169,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -255,7 +255,7 @@ top_srcdir = @top_srcdir@
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LFLG)
 pkglib_LTLIBRARIES = libpointcloud_tools.la
 libpointcloud_tools_la_SOURCES = \
@@ -266,6 +266,7 @@ pc_cut.cpp\
 pc_drop_attribute.cpp\
 pc_from_grid.cpp\
 pc_from_shapes.cpp\
+pc_merge.cpp\
 pc_reclass_extract.cpp\
 pc_thinning_simple.cpp\
 pc_to_grid.cpp\
@@ -278,6 +279,7 @@ pc_cut.h\
 pc_drop_attribute.h\
 pc_from_grid.h\
 pc_from_shapes.h\
+pc_merge.h\
 pc_reclass_extract.h\
 pc_thinning_simple.h\
 pc_to_grid.h\
@@ -366,6 +368,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_drop_attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_from_grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_from_shapes.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_merge.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_reclass_extract.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_thinning_simple.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_to_grid.Plo@am__quote@

@@ -152,6 +152,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -182,7 +183,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -263,13 +263,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1285 2012-01-03 10:59:55Z manfred-e $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
-MLIBPATH = "MODULE_LIBRARY_PATH=\"$(prefix)/lib/saga\""
+MLIBPATH = "MODULE_LIBRARY_PATH=\"$(libdir)/saga\""
 BASEFLAGS = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD $(DBGFLAGS) -I.. -D$(MLIBPATH)
-@SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC `wx-config --unicode=no --cxxflags` $(BASEFLAGS)
-@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC `wx-config --unicode=yes --cxxflags` $(BASEFLAGS) -D_SAGA_UNICODE
+@SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC `wx-config --unicode=no --cxxflags` $(BASEFLAGS) $(GOMPFLAGS)
+@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC `wx-config --unicode=yes --cxxflags` $(BASEFLAGS) -D_SAGA_UNICODE $(GOMPFLAGS)
 @SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs` -lm
 @SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs` -lm
 saga_cmd_LDADD = ../saga_api/libsaga_api.la

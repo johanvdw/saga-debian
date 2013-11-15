@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_menu_file.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_data_menu_file.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -67,6 +67,8 @@
 
 #include "res_commands.h"
 
+#include "project.h"
+
 #include "wksp_data_manager.h"
 #include "wksp_data_menu_file.h"
 
@@ -83,19 +85,33 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CWKSP_Data_Menu_File::CWKSP_Data_Menu_File(int DataType)
+CWKSP_Data_Menu_File::CWKSP_Data_Menu_File(void)
 {
-	m_DataType	= DataType;
-
 	m_Recent	= NULL;
-
-	_Create();
+	m_DataType	= DATAOBJECT_TYPE_Undefined;
 }
 
 //---------------------------------------------------------
 CWKSP_Data_Menu_File::~CWKSP_Data_Menu_File(void)
 {
-	_Destroy();
+	Destroy();
+}
+
+//---------------------------------------------------------
+void CWKSP_Data_Menu_File::Destroy(void)
+{
+	if( m_Recent )
+	{
+		for(int i=0; i<m_Recent_Count; i++)
+		{
+			CONFIG_Write(wxString::Format(wxT("RECENT_FILES/%s"), m_Recent_Group.c_str()), wxString::Format(wxT("FILE_%02d"), i + 1), m_Recent[i]);
+		}
+
+		delete[](m_Recent);
+	}
+
+	m_Recent	= NULL;
+	m_DataType	= DATAOBJECT_TYPE_Undefined;
 }
 
 
@@ -106,8 +122,13 @@ CWKSP_Data_Menu_File::~CWKSP_Data_Menu_File(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Data_Menu_File::_Create(void)
+wxMenu * CWKSP_Data_Menu_File::Create(TSG_Data_Object_Type DataType)
 {
+	Destroy();
+
+	m_DataType	= DataType;
+
+	//-----------------------------------------------------
 	switch( m_DataType )
 	{
 	default:
@@ -162,32 +183,8 @@ void CWKSP_Data_Menu_File::_Create(void)
 			CONFIG_Read(wxString::Format(wxT("RECENT_FILES/%s"), m_Recent_Group.c_str()), wxString::Format(wxT("FILE_%02d"), i + 1), m_Recent[i]);
 		}
 	}
-}
 
-//---------------------------------------------------------
-void CWKSP_Data_Menu_File::_Destroy(void)
-{
-	if( m_Recent )
-	{
-		for(int i=0; i<m_Recent_Count; i++)
-		{
-			CONFIG_Write(wxString::Format(wxT("RECENT_FILES/%s"), m_Recent_Group.c_str()), wxString::Format(wxT("FILE_%02d"), i + 1), m_Recent[i]);
-		}
-
-		delete[](m_Recent);
-	}
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-wxMenu * CWKSP_Data_Menu_File::Create(void)
-{
+	//-----------------------------------------------------
 	wxMenu	*pMenu	= new wxMenu;
 
 	Update(pMenu);
@@ -276,65 +273,51 @@ void CWKSP_Data_Menu_File::Update(wxMenu *pMenu)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CWKSP_Data_Menu_File::Add(const wxChar *FileName)
+void CWKSP_Data_Menu_File::Add(const wxString &FileName)
 {
-	int		i, j;
-
-	if( m_Recent )
+	if( m_Recent && m_Recent_Count > 0 )
 	{
-		for(i=0, j=-1; i<m_Recent_Count && j<0; i++)
+		wxString	s_tmp(FileName);
+
+		Del(FileName);
+
+		for(int i=m_Recent_Count-1; i>0; i--)
 		{
-			if( m_Recent[i].Cmp(FileName) == 0 )
-			{
-				j	= i;
-			}
+			m_Recent[i]	= m_Recent[i - 1];
 		}
 
-		if( j > 0 )
-		{
-			for(i=j; i>0; i--)
-			{
-				m_Recent[i]	= m_Recent[i - 1];
-			}
+		m_Recent[0]	= s_tmp;
+	}
+}
 
-			m_Recent[0]	= FileName;
-		}
-		else if( j < 0 )
-		{
-			for(i=m_Recent_Count-1; i>0; i--)
-			{
-				m_Recent[i]	= m_Recent[i - 1];
-			}
+//---------------------------------------------------------
+void CWKSP_Data_Menu_File::Del(const wxString &FileName)
+{
+	if( m_Recent && m_Recent_Count > 0 )
+	{
+		wxString	s_tmp(FileName);
 
-			m_Recent[0]	= FileName;
+		for(int i=m_Recent_Count-1; i>=0; i--)
+		{
+			if( m_Recent[i].Cmp(s_tmp) == 0 )
+			{
+				_Del(m_Recent_First + i);
+			}
 		}
 	}
 }
 
 //---------------------------------------------------------
-void CWKSP_Data_Menu_File::Del(const wxChar *FileName)
+void CWKSP_Data_Menu_File::_Del(int Cmd_ID)
 {
-	int		i, j;
-
-	if( m_Recent )
+	if( m_Recent && m_Recent_First <= Cmd_ID && Cmd_ID < m_Recent_First + m_Recent_Count )
 	{
-		for(i=0, j=-1; i<m_Recent_Count && j<0; i++)
+		for(int i=Cmd_ID-m_Recent_First; i<m_Recent_Count-1; i++)
 		{
-			if( m_Recent[i].Cmp(FileName) == 0 )
-			{
-				j	= i;
-			}
+			m_Recent[i]	= m_Recent[i + 1];
 		}
 
-		if( j >= 0 )
-		{
-			for(i=j; i<m_Recent_Count-1; i++)
-			{
-				m_Recent[i]	= m_Recent[i + 1];
-			}
-
-			m_Recent[m_Recent_Count - 1].Clear();
-		}
+		m_Recent[m_Recent_Count - 1].Clear();
 	}
 }
 
@@ -348,15 +331,16 @@ void CWKSP_Data_Menu_File::Del(const wxChar *FileName)
 //---------------------------------------------------------
 bool CWKSP_Data_Menu_File::Open(int Cmd_ID)
 {
+	bool	bSuccess	= false;
+
 	if( m_Recent && m_Recent_First <= Cmd_ID && Cmd_ID < m_Recent_First + m_Recent_Count )
 	{
+		wxString	File(m_Recent[Cmd_ID - m_Recent_First]);
+
 		switch( m_DataType )
 		{
-		default:
-			return( false );
-
 		case DATAOBJECT_TYPE_Undefined:
-			g_pData->Open(m_Recent[Cmd_ID - m_Recent_First]);
+			bSuccess	= g_pData->Get_Project()->Load(File, false, true);
 			break;
 
 		case DATAOBJECT_TYPE_Table:
@@ -364,14 +348,12 @@ bool CWKSP_Data_Menu_File::Open(int Cmd_ID)
 		case DATAOBJECT_TYPE_TIN:
 		case DATAOBJECT_TYPE_PointCloud:
 		case DATAOBJECT_TYPE_Grid:
-			g_pData->Open(m_DataType, m_Recent[Cmd_ID - m_Recent_First]);
+			bSuccess	= g_pData->Open(File, m_DataType) != NULL;
 			break;
 		}
-
-		return( true );
 	}
 
-	return( false );
+	return( bSuccess );
 }
 
 

@@ -1,12 +1,12 @@
-# $Id: configure.in 1236 2011-11-22 16:21:12Z oconrad $
+# $Id: configure.in 1580 2012-12-26 15:31:58Z reklov_w $
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(saga, 2.0.8, BUG-REPORT-ADDRESS)
+AC_INIT(saga, 2.1.0, BUG-REPORT-ADDRESS)
 AC_CONFIG_SRCDIR([src/saga_core/saga_gui/wksp_data_menu_files.cpp])
 AC_CONFIG_HEADER([config.h])
-#AM_INIT_AUTOMAKE(saga, 2.0beta)
+AM_INIT_AUTOMAKE(saga, 2.1.0beta)
 AM_INIT_AUTOMAKE(tar-ustar)
 
 # Checks for programs.
@@ -25,6 +25,7 @@ AC_CHECK_LIB(hpdf, HPDF_Pages_New, HARUFOUND=1,,)
 AC_CHECK_LIB([odbc], [SQLFetch], ODBCFOUND=1,[ODBC \(libodbc\) library not found])
 AC_CHECK_LIB([proj], [pj_is_latlong], PROJFOUND=1,,)
 AC_CHECK_LIB([vigraimpex], [VIGRA_RGBE_ReadPixels_Raw],VIGRAFOUND=1,)
+AC_CHECK_LIB([gomp], [omp_get_num_threads], GOMPFOUND=1,,)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -38,6 +39,9 @@ AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
+
+# Checks for platform characteristics.
+AC_C_BIGENDIAN
 
 # Checks for library functions.
 AC_FUNC_MALLOC
@@ -73,6 +77,15 @@ else
 fi
 
 # conditionals
+# the test could be extended to check for wx-config --version too
+if test "`wx-config --list | grep unicode`" != "" ; then
+  AM_CONDITIONAL(SAGA_UNICODE, true)
+else
+  AC_MSG_ERROR(SAGA requires a unicode build of wxGTK)
+  exit
+fi
+
+
 AC_ARG_ENABLE(debug,
      [  --enable-debug	  Turn on debugging],
      [case "${enableval}" in
@@ -81,16 +94,7 @@ AC_ARG_ENABLE(debug,
         *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
       esac],[debug=false])
       AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
-
-AC_ARG_ENABLE(unicode,
-     [  --enable-unicode	  Build with unicode support (wx has to be built with unicode support, too) ],
-     [case "${enableval}" in
-     	yes) unicode=true ;;
-	no)  unicode=false ;;
-	*) AC_MSG_ERROR(bad value ${enableval} for --enable-unicode) ;;
-      esac],[unicode=false])
-      AM_CONDITIONAL(SAGA_UNICODE, test "`wx-config --list | grep unicode`" != "" -a x$unicode = xtrue )
-
+ 
 AC_ARG_ENABLE(gui,
      [  --disable-gui		  Do not build GUI and interactive modules],
      [case "${enableval}" in
@@ -123,6 +127,30 @@ AC_ARG_ENABLE(odbc,
     AC_MSG_RESULT([        ODBC support will be built])    
   fi
 
+AC_ARG_ENABLE(openmp,
+     [  --disable-openmp	  Build without OpenMP support],
+     [case "${enableval}" in
+        yes) openmp=true ;;
+        no)  openmp=false ;;
+        *) AC_MSG_ERROR(bad value ${enableval} for --disable-openmp) ;;
+      esac],[openmp=true])
+      AM_CONDITIONAL(OPENMP, test x$openmp = xtrue)
+  
+  if test $openmp = "false" ; then
+    AC_MSG_RESULT([        OpenMP support disabled]) 
+      GOMPFLAGS=""
+  else
+    if test -n "$GOMPFOUND" ; then 
+      AC_MSG_RESULT([        Building with OpenMP support using libgomp])
+      GOMPFLAGS="-fopenmp"
+    else 
+      AC_MSG_RESULT([        libgomp not found, OpenMP support disabled]) 
+      GOMPFLAGS=""
+    fi
+  fi
+
+AC_SUBST(GOMPFLAGS)
+
 #AM_CONDITIONAL(X86_64, test "`uname -m`" = "x86_64")
     AM_CONDITIONAL(HAVE_CV, test -n "$CVFOUND")
     AM_CONDITIONAL(HAVE_LLAS, test -n "$LASFOUND")
@@ -153,6 +181,8 @@ AC_ARG_ENABLE(python,
       AM_CONDITIONAL(SAGA_PYTHON, test x$python = xtrue)
 if test x$python = xtrue; then
 AM_PATH_PYTHON
+# PYTHON_EXTRA_LIBS='-lgomp'
+# PYTHON_EXTRA_LDFLAGS='-lgomp'
 AX_PYTHON_DEVEL([])
 
 AX_PKG_SWIG(1.3.17,[],[])
@@ -171,6 +201,8 @@ AC_OUTPUT(Makefile \
 	src/saga_core/saga_cmd/Makefile \
 	src/saga_core/saga_cmd/man/Makefile \
 	src/modules/Makefile \
+	src/modules/climate/Makefile \
+	src/modules/climate/climate_tools/Makefile \
 	src/modules/grid/Makefile \
 	src/modules/grid/grid_analysis/Makefile \
 	src/modules/grid/grid_calculus/Makefile \
@@ -215,6 +247,7 @@ AC_OUTPUT(Makefile \
 	src/modules_images/modules_imagery/imagery_classification/Makefile \
 	src/modules_images/modules_imagery/imagery_rga/Makefile \
 	src/modules_images/modules_imagery/imagery_segmentation/Makefile \
+	src/modules_images/modules_imagery/imagery_svm/Makefile \
 	src/modules_images/modules_imagery/imagery_tools/Makefile \
 	src/modules_images/modules_opencv/Makefile \
 	src/modules_images/modules_opencv/opencv/Makefile \
@@ -255,6 +288,8 @@ AC_OUTPUT(Makefile \
 	src/modules_recreations/recreations/recreations_fractals/Makefile \
 	src/modules_recreations/recreations/recreations_games/Makefile \
 	src/modules_simulation/Makefile \
+	src/modules_simulation/erosion/Makefile \
+	src/modules_simulation/erosion/sim_erosion/Makefile \
 	src/modules_simulation/hydrology/Makefile \
 	src/modules_simulation/hydrology/sim_hydrology/Makefile \
 	src/modules_simulation/cellular_automata/Makefile \

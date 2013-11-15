@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Points_From_Lines.h 1070 2011-05-27 08:37:29Z oconrad $
+ * Version $Id: Points_From_Lines.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 /*******************************************************************************
@@ -54,7 +54,7 @@ class CPoints_From_Lines : public CSG_Module
 public:
 	CPoints_From_Lines(void);
 
-	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:
@@ -74,7 +74,7 @@ class CPoints_From_MultiPoints : public CSG_Module
 public:
 	CPoints_From_MultiPoints(void);
 
-	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Shapes|Conversion") );	}
 
 
 protected:

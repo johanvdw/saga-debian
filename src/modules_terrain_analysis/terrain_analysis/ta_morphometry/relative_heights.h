@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: relative_heights.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: relative_heights.h 1254 2011-12-15 15:47:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,9 +90,11 @@ private:
 
 	bool						Get_Heights				(CSG_Grid *pDEM, CSG_Grid *pH, bool bInverse, double w, double t, double e);
 	bool						Get_Heights_Catchment	(CSG_Grid *pDEM, CSG_Grid *pH, double w);
+
 	bool						Get_Heights_Modified	(CSG_Grid *pDEM, CSG_Grid *pH, double t, double e);
 	double						Get_Local_Maximum		(CSG_Grid *pGrid, int x, int y);
-	bool						Get_Results				(CSG_Grid *pDEM, CSG_Grid *pHO, CSG_Grid *pHU, CSG_Grid *pNH, CSG_Grid *pSH);
+
+	bool						Get_Results				(CSG_Grid *pDEM, CSG_Grid *pHO, CSG_Grid *pHU);
 
 };
 

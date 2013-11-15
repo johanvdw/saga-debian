@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1104 2011-06-20 20:50:18Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1383 2012-04-26 15:44:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -101,8 +101,10 @@ const SG_Char * Get_Info(int i)
 #include "Grid_Cut.h"
 #include "Grid_Merge.h"
 #include "Grid_Completion.h"
-#include "Grid_Gaps_OneCell.h"
 #include "Grid_Gaps.h"
+#include "Grid_Gaps_OneCell.h"
+#include "Grid_Gaps_Resampling.h"
+#include "Grid_Gaps_Spline_Fill.h"
 #include "Grid_CombineGrids.h"
 #include "Grid_ConstantGrid.h"
 #include "Grid_CropToData.h"
@@ -126,7 +128,6 @@ const SG_Char * Get_Info(int i)
 #include "CreateGridSystem.h"
 
 #include "Grid_Mask.h"
-#include "Grid_Gaps_Spline_Fill.h"
 #include "Grid_Proximity.h"
 #include "Grid_Tiling.h"
 #include "Grid_Shrink_Expand.h"
@@ -168,6 +169,7 @@ CSG_Module *		Create_Module(int i)
 	case 26: 	return( new CGrid_Proximity );
 	case 27: 	return( new CGrid_Tiling );
 	case 28: 	return( new CGrid_Shrink_Expand );
+	case 29: 	return( new CGrid_Gaps_Resampling );
 	}
 
 	return( NULL );

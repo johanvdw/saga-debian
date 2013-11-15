@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gw_regression_grid.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: gw_regression_grid.h 1549 2012-11-29 16:38:50Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,15 +78,19 @@ class CGW_Regression_Grid : public CSG_Module_Grid
 public:
 	CGW_Regression_Grid(void);
 
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("R:GWR") );	}
+
 
 protected:
 
 	virtual bool				On_Execute				(void);
 
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
 
 private:
 
-	int							m_iDependent, m_nPoints_Min, m_nPoints_Max, m_Mode;
+	int							m_iDependent, m_nPoints_Min, m_nPoints_Max, m_Direction;
 
 	double						m_Radius;
 

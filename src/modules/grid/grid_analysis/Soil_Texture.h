@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Soil_Texture.h 949 2011-03-14 13:21:03Z oconrad $
+ * Version $Id: Soil_Texture.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ class CSoil_Texture : public CSG_Module_Grid
 public:
 	CSoil_Texture(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Soil Analysis") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Soil Analysis") );	}
 
 
 protected:

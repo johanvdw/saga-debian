@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1027 2011-04-28 16:21:07Z oconrad $
+# $Id: Makefile.am 1597 2013-01-28 17:02:55Z reklov_w $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgrid_analysis.la
 libgrid_analysis_la_SOURCES =\
@@ -21,9 +21,11 @@ fragmentation_base.cpp\
 fragmentation_classify.cpp\
 fragmentation_resampling.cpp\
 fragmentation_standard.cpp\
+Grid_Accumulation_Functions.cpp\
 Grid_AggregationIndex.cpp\
 Grid_AHP.cpp\
 Grid_CVA.cpp\
+Grid_IMCORR.cpp\
 Grid_LayerOfMaximumValue.cpp\
 Grid_Pattern.cpp\
 LeastCostPathProfile.cpp\
@@ -40,9 +42,11 @@ fragmentation_base.h\
 fragmentation_classify.h\
 fragmentation_resampling.h\
 fragmentation_standard.h\
+Grid_Accumulation_Functions.h\
 Grid_AggregationIndex.h\
 Grid_AHP.h\
 Grid_CVA.h\
+Grid_IMCORR.h\
 Grid_LayerOfMaximumValue.h\
 Grid_Pattern.h\
 LeastCostPathProfile.h\

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_io.cpp 1169 2011-09-21 16:56:01Z oconrad $
+ * Version $Id: table_io.cpp 1728 2013-06-13 09:37:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -63,8 +63,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <string.h>
-
 #include "table.h"
 #include "table_dbase.h"
 
@@ -86,9 +84,9 @@ bool CSG_Table::_Load(const CSG_String &File_Name, TSG_Table_File_Type Format, c
 	bool		bResult;
 	CSG_String	fName, sSeparator(Separator && *Separator ? Separator : SG_T("\t"));
 
-	_Destroy();
+	Destroy();
 
-	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), LNG("[MSG] Load table"), File_Name.c_str()), true);
+	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), _TL("Load table"), File_Name.c_str()), true);
 
 	//-----------------------------------------------------
 	if( Format == TABLE_FILETYPE_Undefined )
@@ -101,7 +99,7 @@ bool CSG_Table::_Load(const CSG_String &File_Name, TSG_Table_File_Type Format, c
 		{
 			Format	= TABLE_FILETYPE_Text;
 
-			if( !Separator || *Separator == NULL )
+			if( !Separator || *Separator == '\0' )
 			{
 				sSeparator	= SG_T(",");	// comma separated values
 			}
@@ -142,12 +140,12 @@ bool CSG_Table::_Load(const CSG_String &File_Name, TSG_Table_File_Type Format, c
 
 		Load_MetaData(File_Name);
 
-		SG_UI_Msg_Add(LNG("[MSG] okay"), false, SG_UI_MSG_STYLE_SUCCESS);
+		SG_UI_Msg_Add(_TL("okay"), false, SG_UI_MSG_STYLE_SUCCESS);
 
 		return( true );
 	}
 
-	SG_UI_Msg_Add(LNG("[MSG] failed"), false, SG_UI_MSG_STYLE_FAILURE);
+	SG_UI_Msg_Add(_TL("failed"), false, SG_UI_MSG_STYLE_FAILURE);
 
 	return( false );
 }
@@ -164,7 +162,7 @@ bool CSG_Table::Save(const CSG_String &File_Name, int Format, const SG_Char *Sep
 	bool		bResult;
 	CSG_String	sSeparator(Separator && *Separator ? Separator : SG_T("\t"));
 
-	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), LNG("[MSG] Save table"), File_Name.c_str()), true);
+	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), _TL("Save table"), File_Name.c_str()), true);
 
 	//-----------------------------------------------------
 	if( Format <= TABLE_FILETYPE_Undefined || Format > TABLE_FILETYPE_DBase )
@@ -177,7 +175,7 @@ bool CSG_Table::Save(const CSG_String &File_Name, int Format, const SG_Char *Sep
 		{
 			Format	= TABLE_FILETYPE_Text;
 
-			if( Separator == NULL || *Separator == NULL )
+			if( Separator == NULL || *Separator == '\0' )
 			{
 				sSeparator	= SG_T(",");	// comma separated values
 			}
@@ -217,12 +215,12 @@ bool CSG_Table::Save(const CSG_String &File_Name, int Format, const SG_Char *Sep
 
 		Save_MetaData(File_Name);
 
-		SG_UI_Msg_Add(LNG("[MSG] okay"), false, SG_UI_MSG_STYLE_SUCCESS);
+		SG_UI_Msg_Add(_TL("okay"), false, SG_UI_MSG_STYLE_SUCCESS);
 
 		return( true );
 	}
 
-	SG_UI_Msg_Add(LNG("[MSG] failed"), false, SG_UI_MSG_STYLE_FAILURE);
+	SG_UI_Msg_Add(_TL("failed"), false, SG_UI_MSG_STYLE_FAILURE);
 
 	return( false );
 }
@@ -301,7 +299,7 @@ bool CSG_Table::_Load_Text(const CSG_String &File_Name, bool bHeadline, const SG
 
 	while( Stream.Read_Line(sLine) && sLine.Length() > 0 && SG_UI_Process_Set_Progress(Stream.Tell(), fLength) )
 	{
-		CSG_Table_Record	*pRecord	= Table._Add_Record();
+		CSG_Table_Record	*pRecord	= Table.Add_Record();
 
 		sLine	+= Separator;
 
@@ -318,7 +316,7 @@ bool CSG_Table::_Load_Text(const CSG_String &File_Name, bool bHeadline, const SG
 					Type[iField]	= SG_DATATYPE_String;
 				}
 
-				if( Type[iField] != SG_DATATYPE_String )
+				if( Type[iField] != SG_DATATYPE_String && sField.Length() > 0 )
 				{
 					double	Value;
 
@@ -353,15 +351,22 @@ bool CSG_Table::_Load_Text(const CSG_String &File_Name, bool bHeadline, const SG
 
 		for(int iRecord=0; iRecord<Table.Get_Count() && SG_UI_Process_Set_Progress(iRecord, Table.Get_Count()); iRecord++)
 		{
-			CSG_Table_Record	*pRecord	= _Add_Record();
+			CSG_Table_Record	*pRecord	= Add_Record();
 
 			for(iField=0; iField<Get_Field_Count(); iField++)
 			{
-				switch( Get_Field_Type(iField) )
+				if( *Table[iRecord].asString(iField) )
 				{
-				default:					pRecord->Set_Value(iField, Table[iRecord].asString(iField));	break;
-				case SG_DATATYPE_Int:		pRecord->Set_Value(iField, Table[iRecord].asInt   (iField));	break;
-				case SG_DATATYPE_Double:	pRecord->Set_Value(iField, Table[iRecord].asDouble(iField));	break;
+					switch( Get_Field_Type(iField) )
+					{
+					default:					pRecord->Set_Value(iField, Table[iRecord].asString(iField));	break;
+					case SG_DATATYPE_Int:		pRecord->Set_Value(iField, Table[iRecord].asInt   (iField));	break;
+					case SG_DATATYPE_Double:	pRecord->Set_Value(iField, Table[iRecord].asDouble(iField));	break;
+					}
+				}
+				else
+				{
+					pRecord->Set_NoData(iField);
 				}
 			}
 		}
@@ -393,16 +398,19 @@ bool CSG_Table::_Save_Text(const CSG_String &File_Name, bool bHeadline, const SG
 			{
 				for(iField=0; iField<Get_Field_Count(); iField++)
 				{
-					switch( Get_Field_Type(iField) )
+					if( !Get_Record(iRecord)->is_NoData(iField) )
 					{
-					case SG_DATATYPE_String:
-					case SG_DATATYPE_Date:
-						Stream.Printf(SG_T("\"%s\""), Get_Record(iRecord)->asString(iField));
-						break;
+						switch( Get_Field_Type(iField) )
+						{
+						case SG_DATATYPE_String:
+						case SG_DATATYPE_Date:
+							Stream.Printf(SG_T("\"%s\""), Get_Record(iRecord)->asString(iField));
+							break;
 
-					default:
-						Stream.Printf(SG_T("%s")    , Get_Record(iRecord)->asString(iField));
-						break;
+						default:
+							Stream.Printf(SG_T("%s")    , Get_Record(iRecord)->asString(iField));
+							break;
+						}
 					}
 
 					Stream.Printf(SG_T("%s"), iField < Get_Field_Count() - 1 ? Separator : SG_T("\n"));
@@ -428,213 +436,17 @@ bool CSG_Table::_Save_Text(const CSG_String &File_Name, bool bHeadline, const SG
 //---------------------------------------------------------
 bool CSG_Table::_Load_DBase(const CSG_String &File_Name)
 {
-	int					iField;
 	CSG_Table_DBase		dbf;
-	CSG_Table_Record	*pRecord;
 
-	//-----------------------------------------------------
-	if( dbf.Open(File_Name) )
-	{
-		Destroy();
-
-		for(iField=0; iField<dbf.Get_FieldCount(); iField++)
-		{
-			TSG_Data_Type	Type;
-
-			switch( dbf.Get_FieldType(iField) )
-			{
-			case DBF_FT_LOGICAL:
-				Type	= SG_DATATYPE_Char;
-				break;
-
-			case DBF_FT_CHARACTER:	default:
-				Type	= SG_DATATYPE_String;
-				break;
-
-			case DBF_FT_DATE:
-				Type	= SG_DATATYPE_Date;
-				break;
-
-			case DBF_FT_NUMERIC:
-				Type	= dbf.Get_FieldDecimals(iField) > 0
-						? SG_DATATYPE_Double
-						: SG_DATATYPE_Long;
-				break;
-			}
-
-			Add_Field(SG_STR_MBTOSG(dbf.Get_FieldName(iField)), Type);
-		}
-
-		//-------------------------------------------------
-		if( dbf.Move_First() && dbf.Get_Record_Count() > 0 )
-		{
-			m_nRecords		= m_nBuffer	= dbf.Get_Record_Count();
-			m_Records		= (CSG_Table_Record **)SG_Malloc(m_nRecords * sizeof(CSG_Table_Record *));
-
-			for(int iRecord=0; iRecord<m_nRecords && SG_UI_Process_Set_Progress(iRecord, m_nRecords); iRecord++)
-			{
-				m_Records[iRecord]	= pRecord	= _Get_New_Record(iRecord);
-
-				for(iField=0; iField<Get_Field_Count(); iField++)
-				{
-					switch( Get_Field_Type(iField) )
-					{
-					case SG_DATATYPE_Char:
-						pRecord->Set_Value(iField, SG_STR_MBTOSG(dbf.asString(iField)) );
-						break;
-
-					case SG_DATATYPE_String:	default:
-						pRecord->Set_Value(iField, SG_STR_MBTOSG(dbf.asString(iField)) );
-						break;
-
-					case SG_DATATYPE_Date:
-						{
-							int		Value;
-
-							if( dbf.asInt(iField, Value) )
-								pRecord->Set_Value(iField, Value);
-							else
-								pRecord->Set_NoData(iField);
-						}
-						break;
-
-					case SG_DATATYPE_Long:
-						{
-							int		Value;
-
-							if( dbf.asInt(iField, Value) )
-								pRecord->Set_Value(iField, Value);
-							else
-								pRecord->Set_NoData(iField);
-						}
-						break;
-
-					case SG_DATATYPE_Double:
-						{
-							double	Value;
-
-							if( dbf.asDouble(iField, Value) )
-								pRecord->Set_Value(iField, Value);
-							else
-								pRecord->Set_NoData(iField);
-						}
-						break;
-					}
-				}
-
-				dbf.Move_Next();
-			}
-
-			SG_UI_Process_Set_Ready();
-
-			Set_Modified(false);
-
-			Set_Update_Flag();
-
-			_Stats_Invalidate();
-		}
-
-		return( true );
-	}
-
-	return( false );
+	return( dbf.Open_Read(File_Name, this) );
 }
 
 //---------------------------------------------------------
 bool CSG_Table::_Save_DBase(const CSG_String &File_Name)
 {
-	int				iField, iRecord, nBytes;
-	CSG_Table_DBase	dbf;
-	CSG_String		sFile_Name	= SG_File_Make_Path(NULL, File_Name, SG_T("dbf"));
+	CSG_Table_DBase		dbf;
 
-	//-----------------------------------------------------
-	CSG_Table_DBase::TFieldDesc	*dbfFields	= new CSG_Table_DBase::TFieldDesc[Get_Field_Count()];
-
-	for(iField=0; iField<Get_Field_Count(); iField++)
-	{
-		strncpy(dbfFields[iField].Name, SG_STR_SGTOMB(Get_Field_Name(iField)), 11);
-
-		switch( Get_Field_Type(iField) )
-		{
-		case SG_DATATYPE_String: default:
-			dbfFields[iField].Type		= DBF_FT_CHARACTER;
-			dbfFields[iField].Width		= (BYTE)((nBytes = Get_Field_Length(iField)) > 255 ? 255 : nBytes);
-			break;
-
-		case SG_DATATYPE_Date:
-			dbfFields[iField].Type		= DBF_FT_DATE;
-			dbfFields[iField].Width		= (BYTE)8;
-			break;
-
-		case SG_DATATYPE_Char:
-			dbfFields[iField].Type		= DBF_FT_CHARACTER;
-			dbfFields[iField].Width		= (BYTE)1;
-			break;
-
-		case SG_DATATYPE_Short:
-		case SG_DATATYPE_Int:
-		case SG_DATATYPE_Long:
-		case SG_DATATYPE_Color:
-			dbfFields[iField].Type		= DBF_FT_NUMERIC;
-			dbfFields[iField].Width		= (BYTE)16;
-			dbfFields[iField].Decimals	= (BYTE)0;
-			break;
-
-		case SG_DATATYPE_Float:
-		case SG_DATATYPE_Double:
-			dbfFields[iField].Type		= DBF_FT_NUMERIC;
-			dbfFields[iField].Width		= (BYTE)16;
-			dbfFields[iField].Decimals	= (BYTE)8;
-			break;
-		}
-	}
-
-	if( !dbf.Open(sFile_Name, Get_Field_Count(), dbfFields) )
-	{
-		delete[](dbfFields);
-
-		SG_UI_Msg_Add_Error(LNG("[ERR] dbase file could not be opened"));
-
-		return( false );
-	}
-
-	delete[](dbfFields);
-
-	//-----------------------------------------------------
-	for(iRecord=0; iRecord<Get_Record_Count() && SG_UI_Process_Set_Progress(iRecord, Get_Record_Count()); iRecord++)
-	{
-		CSG_Table_Record	*pRecord	= Get_Record(iRecord);
-
-		dbf.Add_Record();
-
-		for(iField=0; iField<Get_Field_Count(); iField++)
-		{
-			switch( dbf.Get_FieldType(iField) )
-			{
-			case DBF_FT_DATE:
-			case DBF_FT_CHARACTER:
-				dbf.Set_Value(iField, SG_STR_SGTOMB(pRecord->asString(iField)));
-				break;
-
-			case DBF_FT_NUMERIC:
-				if( pRecord->is_NoData(iField) )
-				{
-					dbf.Set_NoData(iField);
-				}
-				else
-				{
-					dbf.Set_Value(iField, pRecord->asDouble(iField));
-				}
-				break;
-			}
-		}
-
-		dbf.Flush_Record();
-	}
-
-	SG_UI_Process_Set_Ready();
-
-	return( true );
+	return( dbf.Open_Write(File_Name, this) );
 }
 
 
@@ -676,7 +488,7 @@ bool CSG_Table::Serialize(CSG_File &Stream, bool bSave)
 	//-----------------------------------------------------
 	else if( Stream.Read_Line(sLine) && SG_SSCANF(sLine, SG_T("%d %d"), &nFields, &nRecords) == 2 && nFields > 0 )
 	{
-		_Destroy();
+		Destroy();
 
 		for(iField=0; iField<nFields; iField++)
 		{
@@ -690,7 +502,7 @@ bool CSG_Table::Serialize(CSG_File &Stream, bool bSave)
 		{
 			if( Stream.Read_Line(sLine) )
 			{
-				pRecord	= _Add_Record();
+				pRecord	= Add_Record();
 
 				for(iField=0; iField<m_nFields; iField++)
 				{

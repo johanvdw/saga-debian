@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga.h 1225 2011-11-15 16:28:38Z oconrad $
+ * Version $Id: saga.h 1331 2012-02-13 20:38:54Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -119,6 +119,8 @@ private:
 	int							m_Process_Frequency;
 
 	wxString					m_App_Path;
+	
+	wxLocale					m_wxLocale;
 
 
 	void						_Init_Config			(void);

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_shapes.h 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,6 +90,9 @@ public:
 
 	virtual TWKSP_Item			Get_Type				(void)	{	return( WKSP_ITEM_Shapes );	}
 
+	CSG_Shapes *				Get_Shapes				(void)	{	return( (CSG_Shapes *)m_pObject );	}
+	class CWKSP_Table *			Get_Table				(void)	{	return( m_pTable );		}
+
 	virtual wxString			Get_Description			(void);
 
 	virtual wxMenu *			Get_Menu				(void);
@@ -97,27 +100,24 @@ public:
 	virtual bool				On_Command				(int Cmd_ID);
 	virtual bool				On_Command_UI			(wxUpdateUIEvent &event);
 
-	CSG_Shapes *				Get_Shapes				(void)	{	return( m_pShapes );	}
-	class CWKSP_Table *			Get_Table				(void)	{	return( m_pTable );		}
-
 	virtual wxString			Get_Value				(CSG_Point ptWorld, double Epsilon);
 	virtual double				Get_Value_Range			(void);
 
-	bool						asImage					(CSG_Grid *pImage);
-
 	int							Get_Color_Field			(void)	{	return( m_iColor );		}
 	int							Get_Label_Field			(void)	{	return( m_iLabel );		}
+
+	wxString					Get_Name_Attribute		(void);
 
 	bool						is_Editing				(void)	{	return( m_Edit_pShape != NULL );	}
 
 
 protected:
 
-	int							m_iColor, m_iLabel, m_iLabel_Size, m_Label_Prec, m_iExtraInfo, m_Edit_iPart, m_Edit_iPoint, m_Chart_Type, m_Chart_sField, m_Chart_sType;
+	int							m_iColor, m_iLabel, m_iLabel_Size, m_Label_Prec, m_Label_Eff, m_iExtraInfo, m_Edit_iPart, m_Edit_iPoint, m_Chart_Type, m_Chart_sField, m_Chart_sType;
 
 	double						m_Chart_sSize, m_Chart_sRange;
 
-	wxColour					m_Def_Color, m_Edit_Color, m_Sel_Color;
+	wxColour					m_Def_Color, m_Edit_Color, m_Sel_Color, m_Label_Eff_Color;
 
 	CSG_Points_Int				m_Chart;
 
@@ -125,7 +125,7 @@ protected:
 
 	CSG_Shape					*m_Edit_pShape;
 
-	CSG_Shapes					*m_pShapes, m_Edit_Shapes;
+	CSG_Shapes					m_Edit_Shapes;
 
 	class CWKSP_Table			*m_pTable;
 
@@ -140,18 +140,20 @@ protected:
 
 	virtual void				On_Draw					(CWKSP_Map_DC &dc_Map, bool bEdit);
 
-	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description);
+	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
 	void						_AttributeList_Set		(CSG_Parameter *pFields, bool bAddNoField);
 
-	CSG_Parameter *				_BrushList_Add			(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description);
+	CSG_Parameter *				_BrushList_Add			(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
 	int							_BrushList_Get_Style	(int Index);
 
-	CSG_Parameter *				_PenList_Add			(CSG_Parameter *pNode, const char *Identifier, const wxChar *Name, const wxChar *Description);
+	CSG_Parameter *				_PenList_Add			(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
 	int							_PenList_Get_Style		(int Index);
 
-	virtual void				_Draw_Initialize		(CWKSP_Map_DC &dc_Map)									= 0;
+	virtual void				_Draw_Initialize		(CWKSP_Map_DC &dc_Map)										= 0;
 	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection)	= 0;
 	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)					= 0;
+
+	bool						_Get_Class_Color		(CSG_Shape *pShape, int &Color);
 
 	void						_Draw_Chart				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
 	void						_Draw_Chart_Pie			(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pRecord, bool bOutline, int x, int y, int size);

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1242 2011-11-23 18:33:52Z johanvdw $
+# $Id: Makefile.am 1648 2013-04-11 08:55:01Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -8,10 +8,10 @@ if SAGA_PYTHON
 SAGAPYTHONFLAGS= -D_SAGA_PYTHON
 endif
 if SAGA_UNICODE
-AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS)
+AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB) $(SAGAPYTHONFLAGS)
 else
-AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` $(HARU_LIB)
 endif
 libsaga_api_la_LDFLAGS =$(AM_LDFLAGS) -release $(VERSION)
@@ -27,6 +27,7 @@ api_memory.cpp\
 api_string.cpp\
 api_translator.cpp\
 clipper.cpp\
+data_manager.cpp\
 dataobject.cpp\
 geo_classes.cpp\
 geo_functions.cpp\
@@ -82,6 +83,7 @@ tin_elements.cpp\
 tin_triangulation.cpp\
 api_core.h\
 clipper.hpp\
+data_manager.h\
 dataobject.h\
 geo_tools.h\
 grid.h\

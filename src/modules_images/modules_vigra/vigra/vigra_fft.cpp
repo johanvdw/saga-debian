@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_fft.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: vigra_fft.cpp 1578 2012-12-20 08:29:37Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ bool	Copy_ComplexGrid_SAGA_to_VIGRA	(CSG_Grid &Real, CSG_Grid &Imag, FFTWComplex
 	{
 		for(int x=0; x<Real.Get_NX(); x++)
 		{
-			Image(x, y)	= FFTWComplex(Real.asDouble(x, y), Imag.asDouble(x, y));
+			Image(x, y)	= FFTWComplex<>(Real.asDouble(x, y), Imag.asDouble(x, y));
 		}
 	}
 
@@ -296,7 +296,7 @@ bool CViGrA_FFT_Inverse::On_Execute(void)
 		fourierTransformInverse(srcImageRange(tmp)  , destImage(Output));
 	}
  
-	transformImage(srcImageRange(Output), destImage(Output), std::bind1st(std::multiplies<FFTWComplex>(), 1.0 / Get_NX() / Get_NY()));
+	transformImage(srcImageRange(Output), destImage(Output), std::bind1st(std::multiplies<FFTWComplex<> >(), 1.0 / Get_NX() / Get_NY()));
 
 	//-----------------------------------------------------
 	pReal	= Parameters("REAL_OUT")->asGrid();
@@ -304,8 +304,8 @@ bool CViGrA_FFT_Inverse::On_Execute(void)
 
 	Copy_ComplexGrid_VIGRA_to_SAGA(*pReal, *pImag, Output, false);
 
-	pReal->Set_Name(CSG_String::Format(SG_T("%s [FFT - %s]"), Get_Name(), _TL("Real")));
-	pImag->Set_Name(CSG_String::Format(SG_T("%s [FFT - %s]"), Get_Name(), _TL("Imaginary")));
+	pReal->Set_Name(CSG_String::Format(SG_T("%s [FFT - %s]"), Get_Name().c_str(), _TL("Real")));
+	pImag->Set_Name(CSG_String::Format(SG_T("%s [FFT - %s]"), Get_Name().c_str(), _TL("Imaginary")));
 
 	return( true );
 }
@@ -367,7 +367,7 @@ bool CViGrA_FFT_Real::On_Execute(void)
 	//-----------------------------------------------------
 	Copy_Grid_VIGRA_to_SAGA(*pOutput, Output, false);
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s - %s]"), Get_Name(), pInput->Get_Name()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s - %s]"), Get_Name().c_str(), pInput->Get_Name()));
 
 	return( true );
 
@@ -519,7 +519,7 @@ bool CViGrA_FFT_Filter::On_Execute(void)
 
 	vigra::applyFourierFilter(srcImageRange(Input), srcImage(Filter_), destImage(Output));
  
-	transformImage(srcImageRange(Output), destImage(Output), std::bind1st(std::multiplies<FFTWComplex>(), 1.0 / Get_NX() / Get_NY()));
+	transformImage(srcImageRange(Output), destImage(Output), std::bind1st(std::multiplies<FFTWComplex<> >(), 1.0 / Get_NX() / Get_NY()));
 
 	//-----------------------------------------------------
 	Copy_ComplexGrid_VIGRA_to_SAGA(*pReal, *pImag, Output, false);

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: metadata.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: metadata.h 1641 2013-03-25 12:57:33Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -151,6 +151,9 @@ public:
 	bool						Set_Property		(const CSG_String &Name, double            Value, bool bAddIfNotExists = true);
 	bool						Set_Property		(const CSG_String &Name, int               Value, bool bAddIfNotExists = true);
 	bool						Cmp_Property		(const CSG_String &Name, const CSG_String &String, bool bNoCase = false)	const;
+
+	CSG_String					asText				(int Flags = 0) const;
+	class CSG_Table				asTable				(int Flags = 0) const;
 
 
 private:

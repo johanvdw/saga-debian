@@ -75,10 +75,10 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libpj_georeference_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libpj_georeference_la_OBJECTS = Collect_Points.lo Georef_Engine.lo \
-	Georef_Grid.lo georef_grid_move.lo Georef_Shapes.lo \
-	MLB_Interface.lo enorm.lo fdjac2.lo lmdif.lo lmdif0.lo \
-	lmpar.lo qrfac.lo qrsolv.lo
+am_libpj_georeference_la_OBJECTS = Collect_Points.lo \
+	direct_georeferencing.lo Georef_Engine.lo Georef_Grid.lo \
+	georef_grid_move.lo Georef_Shapes.lo MLB_Interface.lo enorm.lo \
+	fdjac2.lo lmdif.lo lmdif0.lo lmpar.lo qrfac.lo qrsolv.lo
 libpj_georeference_la_OBJECTS = $(am_libpj_georeference_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -137,6 +137,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -167,7 +168,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -248,17 +248,18 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1540 2012-11-22 13:40:57Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@DEP_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libpj_georeference.la
 libpj_georeference_la_SOURCES = \
 Collect_Points.cpp\
+direct_georeferencing.cpp\
 Georef_Engine.cpp\
 Georef_Grid.cpp\
 georef_grid_move.cpp\
@@ -272,6 +273,7 @@ lmpar.c\
 qrfac.c\
 qrsolv.c\
 Collect_Points.h\
+direct_georeferencing.h\
 Georef_Engine.h\
 Georef_Grid.h\
 georef_grid_move.h\
@@ -360,6 +362,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Georef_Grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Georef_Shapes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/direct_georeferencing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/enorm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fdjac2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/georef_grid_move.Plo@am__quote@

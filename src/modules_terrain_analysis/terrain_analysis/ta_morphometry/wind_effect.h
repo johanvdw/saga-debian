@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wind_effect.h 975 2011-04-01 10:38:14Z oconrad $
+ * Version $Id: wind_effect.h 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ class CWind_Effect : public CSG_Module_Grid
 public:
 	CWind_Effect(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Wind" ));	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Terrain Analysis|Climate and Weather" ));	}
 
 
 protected:

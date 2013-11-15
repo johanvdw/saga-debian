@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_points.cpp 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: wksp_shapes_points.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -61,17 +61,9 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <saga_api/saga_api.h>
-
-#include "res_commands.h"
-#include "res_dialogs.h"
-
-#include "helper.h"
-
-#include "wksp_map_control.h"
+#include "dc_helper.h"
 
 #include "wksp_shapes_points.h"
-#include "wksp_table.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -84,55 +76,6 @@
 CWKSP_Shapes_Points::CWKSP_Shapes_Points(CSG_Shapes *pShapes)
 	: CWKSP_Shapes_Point(pShapes)
 {}
-
-//---------------------------------------------------------
-CWKSP_Shapes_Points::~CWKSP_Shapes_Points(void)
-{}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-void CWKSP_Shapes_Points::On_Create_Parameters(void)
-{
-	CWKSP_Shapes_Point::On_Create_Parameters();
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-void CWKSP_Shapes_Points::On_DataObject_Changed(void)
-{
-	CWKSP_Shapes_Point::On_DataObject_Changed();
-}
-
-//---------------------------------------------------------
-void CWKSP_Shapes_Points::On_Parameters_Changed(void)
-{
-	CWKSP_Shapes_Point::On_Parameters_Changed();
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-int CWKSP_Shapes_Points::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags)
-{
-	return( CWKSP_Shapes_Point::On_Parameter_Changed(pParameters, pParameter, Flags) );
-}
 
 
 ///////////////////////////////////////////////////////////
@@ -175,7 +118,7 @@ void CWKSP_Shapes_Points::_Draw_Label(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 {
 	TSG_Point_Int	p(dc_Map.World2DC(pShape->Get_Extent().Get_Center()));
 
-	dc_Map.dc.DrawText(pShape->asString(m_iLabel, m_Label_Prec), p.x, p.y);
+	Draw_Text(dc_Map.dc, TEXTALIGN_CENTER, p.x, p.y, pShape->asString(m_iLabel, m_Label_Prec), m_Label_Eff, m_Label_Eff_Color);
 }
 
 

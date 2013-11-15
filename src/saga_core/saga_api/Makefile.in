@@ -85,17 +85,17 @@ _saga_api_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 libsaga_api_la_LIBADD =
 am_libsaga_api_la_OBJECTS = api_callback.lo api_colors.lo api_core.lo \
 	api_file.lo api_memory.lo api_string.lo api_translator.lo \
-	clipper.lo dataobject.lo geo_classes.lo geo_functions.lo \
-	grid.lo grid_io.lo grid_memory.lo grid_operation.lo \
-	grid_pyramid.lo grid_system.lo mat_formula.lo \
-	mat_grid_radius.lo mat_indexing.lo mat_matrix.lo \
-	mat_regression.lo mat_regression_multiple.lo mat_spline.lo \
-	mat_tools.lo mat_trend.lo metadata.lo module.lo module_grid.lo \
-	module_grid_interactive.lo module_interactive.lo \
-	module_interactive_base.lo module_library.lo \
-	module_library_interface.lo parameter.lo parameter_data.lo \
-	parameters.lo pointcloud.lo projections.lo quadtree.lo \
-	saga_api.lo shape.lo shape_line.lo shape_part.lo \
+	clipper.lo data_manager.lo dataobject.lo geo_classes.lo \
+	geo_functions.lo grid.lo grid_io.lo grid_memory.lo \
+	grid_operation.lo grid_pyramid.lo grid_system.lo \
+	mat_formula.lo mat_grid_radius.lo mat_indexing.lo \
+	mat_matrix.lo mat_regression.lo mat_regression_multiple.lo \
+	mat_spline.lo mat_tools.lo mat_trend.lo metadata.lo module.lo \
+	module_grid.lo module_grid_interactive.lo \
+	module_interactive.lo module_interactive_base.lo \
+	module_library.lo module_library_interface.lo parameter.lo \
+	parameter_data.lo parameters.lo pointcloud.lo projections.lo \
+	quadtree.lo saga_api.lo shape.lo shape_line.lo shape_part.lo \
 	shape_point.lo shape_points.lo shape_polygon.lo shapes.lo \
 	shapes_io.lo shapes_ogis.lo shapes_polygons.lo \
 	shapes_search.lo shapes_selection.lo table.lo table_dbase.lo \
@@ -163,6 +163,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -193,7 +194,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -274,12 +274,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1242 2011-11-23 18:33:52Z johanvdw $
+# $Id: Makefile.am 1648 2013-04-11 08:55:01Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_PYTHON_TRUE@SAGAPYTHONFLAGS = -D_SAGA_PYTHON
-@SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS)
-@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS)
+@SAGA_UNICODE_FALSE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=no --cxxflags` -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(GOMPFLAGS)
+@SAGA_UNICODE_TRUE@AM_CXXFLAGS = -fPIC -Wall `wx-config --unicode=yes --cxxflags` -D_SAGA_LINUX -D_SAGA_UNICODE -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_API_EXPORTS $(DISABLELIBHARU) $(DBGFLAGS) $(SAGAPYTHONFLAGS) $(GOMPFLAGS)
 @SAGA_UNICODE_FALSE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=no --libs` $(HARU_LIB)
 @SAGA_UNICODE_TRUE@AM_LDFLAGS = -fPIC -shared -Wall `wx-config --unicode=yes --libs` $(HARU_LIB) $(SAGAPYTHONFLAGS)
 libsaga_api_la_LDFLAGS = $(AM_LDFLAGS) -release $(VERSION)
@@ -293,6 +293,7 @@ api_memory.cpp\
 api_string.cpp\
 api_translator.cpp\
 clipper.cpp\
+data_manager.cpp\
 dataobject.cpp\
 geo_classes.cpp\
 geo_functions.cpp\
@@ -348,6 +349,7 @@ tin_elements.cpp\
 tin_triangulation.cpp\
 api_core.h\
 clipper.hpp\
+data_manager.h\
 dataobject.h\
 geo_tools.h\
 grid.h\
@@ -489,6 +491,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api_translator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clipper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dataobject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geo_classes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geo_functions.Plo@am__quote@

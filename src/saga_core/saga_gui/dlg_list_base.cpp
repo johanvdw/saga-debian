@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_base.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: dlg_list_base.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -123,21 +123,9 @@ CDLG_List_Base::CDLG_List_Base(CSG_Parameter_List *pList, wxString Caption)
 	m_btn_height	= m_pBtn_Add->GetDefaultSize().y;
 
 	//-----------------------------------------------------
-	int		i, Type;
-
-	switch( m_pList->Get_Type() )
+	for(int i=m_pList->Get_Count()-1; i>=0; i--)
 	{
-	case PARAMETER_TYPE_Grid_List:			Type	= DATAOBJECT_TYPE_Grid;			break;
-	case PARAMETER_TYPE_Table_List:			Type	= DATAOBJECT_TYPE_Table;		break;
-	case PARAMETER_TYPE_Shapes_List:		Type	= DATAOBJECT_TYPE_Shapes;		break;
-	case PARAMETER_TYPE_TIN_List:			Type	= DATAOBJECT_TYPE_TIN;			break;
-	case PARAMETER_TYPE_PointCloud_List:	Type	= DATAOBJECT_TYPE_PointCloud;	break;
-	default:	return;
-	}
-
-	for(i=m_pList->Get_Count()-1; i>=0; i--)
-	{
-		if( !g_pData->Exists(m_pList->asDataObject(i), Type) )
+		if( !SG_Get_Data_Manager().Exists(m_pList->asDataObject(i)) )
 		{
 			m_pList->Del_Item(i);
 		}

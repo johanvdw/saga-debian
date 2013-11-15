@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Tiling.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Tiling.h 1380 2012-04-26 12:02:19Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ class CGrid_Tiling : public CSG_Module_Grid
 public:
 	CGrid_Tiling(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Grid|Construction") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Construction") );	}
 
 
 protected:
@@ -86,6 +86,8 @@ protected:
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	virtual bool				On_Execute				(void);
+
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 };
 

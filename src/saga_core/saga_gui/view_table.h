@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_table.h 1358 2012-03-28 17:17:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -101,6 +101,8 @@ public:
 	void							On_Field_Sort_UI	(wxUpdateUIEvent &event);
 	void							On_Field_Rename		(wxCommandEvent  &event);
 	void							On_Field_Rename_UI	(wxUpdateUIEvent &event);
+	void							On_Field_Type		(wxCommandEvent  &event);
+	void							On_Field_Type_UI	(wxUpdateUIEvent &event);
 
 	void							On_Record_Add		(wxCommandEvent  &event);
 	void							On_Record_Add_UI	(wxUpdateUIEvent &event);

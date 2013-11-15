@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_item.cpp 1056 2011-05-17 12:51:27Z oconrad $
+ * Version $Id: wksp_base_item.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,51 +81,38 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CWKSP_Base_Item *	Get_Active_Item(void)
-{
-	return( g_pACTIVE ? g_pACTIVE->Get_Item() : NULL );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
 wxString CWKSP_Base_Item::Get_Type_Name(TWKSP_Item Type)
 {
 	switch( Type )
 	{
-	case WKSP_ITEM_Module_Manager:		return( LNG("Module Manager") );
-	case WKSP_ITEM_Module_Library:		return( LNG("Module Library") );
-	case WKSP_ITEM_Module:				return( LNG("Module") );
+	case WKSP_ITEM_Module_Manager:		return( _TL("Module Manager") );
+	case WKSP_ITEM_Module_Library:		return( _TL("Module Library") );
+	case WKSP_ITEM_Module:				return( _TL("Module") );
 
-	case WKSP_ITEM_Data_Manager:		return( LNG("Data Manager") );
+	case WKSP_ITEM_Data_Manager:		return( _TL("Data Manager") );
 
-	case WKSP_ITEM_Table_Manager:		return( LNG("Table Manager") );
-	case WKSP_ITEM_Table:				return( LNG("Table") );
+	case WKSP_ITEM_Table_Manager:		return( _TL("Table Manager") );
+	case WKSP_ITEM_Table:				return( _TL("Table") );
 
-	case WKSP_ITEM_Shapes_Manager:		return( LNG("Shapes Manager") );
-	case WKSP_ITEM_Shapes_Type:			return( LNG("Shape Type Manager") );
-	case WKSP_ITEM_Shapes:				return( LNG("Shapes") );
+	case WKSP_ITEM_Shapes_Manager:		return( _TL("Shapes Manager") );
+	case WKSP_ITEM_Shapes_Type:			return( _TL("Shape Type Manager") );
+	case WKSP_ITEM_Shapes:				return( _TL("Shapes") );
 
-	case WKSP_ITEM_TIN_Manager:			return( LNG("TIN Manager") );
-	case WKSP_ITEM_TIN:					return( LNG("TIN") );
+	case WKSP_ITEM_TIN_Manager:			return( _TL("TIN Manager") );
+	case WKSP_ITEM_TIN:					return( _TL("TIN") );
 
-	case WKSP_ITEM_PointCloud_Manager:	return( LNG("Point Cloud Manager") );
-	case WKSP_ITEM_PointCloud:			return( LNG("Point Cloud") );
+	case WKSP_ITEM_PointCloud_Manager:	return( _TL("Point Cloud Manager") );
+	case WKSP_ITEM_PointCloud:			return( _TL("Point Cloud") );
 
-	case WKSP_ITEM_Grid_Manager:		return( LNG("Grid Manager") );
-	case WKSP_ITEM_Grid_System:			return( LNG("Grid System") );
-	case WKSP_ITEM_Grid:				return( LNG("Grid") );
+	case WKSP_ITEM_Grid_Manager:		return( _TL("Grid Manager") );
+	case WKSP_ITEM_Grid_System:			return( _TL("Grid System") );
+	case WKSP_ITEM_Grid:				return( _TL("Grid") );
 
-	case WKSP_ITEM_Map_Manager:			return( LNG("Map Manager") );
-	case WKSP_ITEM_Map:					return( LNG("Map") );
-	case WKSP_ITEM_Map_Layer:			return( LNG("Map Layer") );
+	case WKSP_ITEM_Map_Manager:			return( _TL("Map Manager") );
+	case WKSP_ITEM_Map:					return( _TL("Map") );
+	case WKSP_ITEM_Map_Layer:			return( _TL("Map Layer") );
 
-	default:							return( LNG("unkown") );
+	default:							return( _TL("unkown") );
 	}
 }
 
@@ -143,14 +130,14 @@ CWKSP_Base_Item::CWKSP_Base_Item(void)
 	m_pManager	= NULL;
 	m_ID		= 0;
 
-	m_Parameters.Create(this, LNG(""), LNG(""));
+	m_Parameters.Create(this, _TL(""), _TL(""));
 	m_Parameters.Set_Callback_On_Parameter_Changed(&_On_Parameter_Changed);
 }
 
 //---------------------------------------------------------
 CWKSP_Base_Item::~CWKSP_Base_Item(void)
 {
-	if( g_pACTIVE && g_pACTIVE->Get_Item() == this )
+	if( g_pACTIVE && g_pACTIVE->Get_Active() == this )
 	{
 		g_pACTIVE->Set_Active(NULL);
 	}
@@ -260,6 +247,12 @@ bool CWKSP_Base_Item::On_Command_UI(wxUpdateUIEvent &event)
 CSG_Parameters * CWKSP_Base_Item::Get_Parameters(void)
 {
 	return( m_Parameters.Get_Count() > 0 ? &m_Parameters : NULL );
+}
+
+//---------------------------------------------------------
+CSG_Parameter * CWKSP_Base_Item::Get_Parameter(const CSG_String &Identifier)
+{
+	return( Get_Parameters() ? Get_Parameters()->Get_Parameter(Identifier) : NULL );
 }
 
 //---------------------------------------------------------

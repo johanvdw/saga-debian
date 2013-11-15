@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1104 2011-06-20 20:50:18Z reklov_w $
+# $Id: Makefile.am 1383 2012-04-26 15:44:11Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_tools.la
 libgrid_tools_la_SOURCES =\
@@ -25,6 +25,7 @@ Grid_Cut.cpp\
 Grid_Fill.cpp\
 Grid_Gaps.cpp\
 Grid_Gaps_OneCell.cpp\
+Grid_Gaps_Resampling.cpp\
 Grid_Gaps_Spline_Fill.cpp\
 Grid_InvertNoData.cpp\
 Grid_Mask.cpp\
@@ -55,6 +56,7 @@ Grid_Cut.h\
 Grid_Fill.h\
 Grid_Gaps.h\
 Grid_Gaps_OneCell.h\
+Grid_Gaps_Resampling.h\
 Grid_Gaps_Spline_Fill.h\
 Grid_InvertNoData.h\
 Grid_Mask.h\

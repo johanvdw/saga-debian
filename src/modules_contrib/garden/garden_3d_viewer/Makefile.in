@@ -77,8 +77,9 @@ libgarden_3d_viewer_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la \
 	$(top_srcdir)/src/saga_core/saga_gdi/libsaga_gdi.la
 am_libgarden_3d_viewer_la_OBJECTS = MLB_Interface.lo \
-	3dshapes_view_control.lo 3dshapes_view_dialog.lo \
-	3dshapes_view_module.lo
+	3d_multigrid_view_control.lo 3d_multigrid_view_dialog.lo \
+	3d_multigrid_view_module.lo 3dshapes_view_control.lo \
+	3dshapes_view_dialog.lo 3dshapes_view_module.lo
 libgarden_3d_viewer_la_OBJECTS = $(am_libgarden_3d_viewer_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -137,6 +138,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -167,7 +169,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -253,15 +254,21 @@ top_srcdir = @top_srcdir@
 @SAGA_UNICODE_TRUE@DEP_LFLG = -fPIC -shared `wx-config --unicode=yes --static=no --libs`
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = $(DEP_LFLG) -avoid-version
 pkglib_LTLIBRARIES = libgarden_3d_viewer.la
 libgarden_3d_viewer_la_SOURCES = \
 MLB_Interface.cpp\
+3d_multigrid_view_control.cpp\
+3d_multigrid_view_dialog.cpp\
+3d_multigrid_view_module.cpp\
 3dshapes_view_control.cpp\
 3dshapes_view_dialog.cpp\
 3dshapes_view_module.cpp\
 MLB_Interface.h\
+3d_multigrid_view_control.h\
+3d_multigrid_view_dialog.h\
+3d_multigrid_view_module.h\
 3dshapes_view_control.h\
 3dshapes_view_dialog.h\
 3dshapes_view_module.h
@@ -341,6 +348,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3d_multigrid_view_control.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3d_multigrid_view_dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3d_multigrid_view_module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3dshapes_view_control.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3dshapes_view_dialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3dshapes_view_module.Plo@am__quote@

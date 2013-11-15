@@ -78,9 +78,11 @@ libgeostatistics_regression_la_DEPENDENCIES =  \
 am_libgeostatistics_regression_la_OBJECTS =  \
 	grid_multi_grid_regression.lo gw_multi_regression.lo \
 	gw_multi_regression_grid.lo gw_multi_regression_points.lo \
-	gw_regression.lo gw_regression_grid.lo MLB_Interface.lo \
+	gw_regression.lo gw_regression_grid.lo gwr_grid_downscaling.lo \
+	grids_trend_polynom.lo MLB_Interface.lo \
 	point_grid_regression.lo point_multi_grid_regression.lo \
-	point_trend_surface.lo
+	point_trend_surface.lo table_regression_multiple.lo \
+	table_trend.lo
 libgeostatistics_regression_la_OBJECTS =  \
 	$(am_libgeostatistics_regression_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -140,6 +142,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -170,7 +173,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -251,13 +253,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1179 2011-09-30 08:21:55Z oconrad $
+# $Id: Makefile.am 1738 2013-06-20 11:15:45Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libgeostatistics_regression.la
 libgeostatistics_regression_la_SOURCES = \
@@ -267,20 +269,28 @@ gw_multi_regression_grid.cpp\
 gw_multi_regression_points.cpp\
 gw_regression.cpp\
 gw_regression_grid.cpp\
+gwr_grid_downscaling.cpp\
+grids_trend_polynom.cpp\
 MLB_Interface.cpp\
 point_grid_regression.cpp\
 point_multi_grid_regression.cpp\
 point_trend_surface.cpp\
+table_regression_multiple.cpp\
+table_trend.cpp\
 grid_multi_grid_regression.h\
 gw_multi_regression.h\
 gw_multi_regression_grid.h\
 gw_multi_regression_points.h\
 gw_regression.h\
 gw_regression_grid.h\
+gwr_grid_downscaling.h\
+grids_trend_polynom.h\
 MLB_Interface.h\
 point_grid_regression.h\
 point_multi_grid_regression.h\
-point_trend_surface.h
+point_trend_surface.h\
+table_regression_multiple.h\
+table_trend.h
 
 libgeostatistics_regression_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -359,14 +369,18 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_multi_grid_regression.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grids_trend_polynom.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression_grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_multi_regression_points.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gw_regression_grid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gwr_grid_downscaling.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_grid_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_multi_grid_regression.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_trend_surface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_regression_multiple.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_trend.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

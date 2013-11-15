@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1527 2012-11-09 15:11:22Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@
 
 
 //---------------------------------------------------------
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -100,44 +100,19 @@ const SG_Char * Get_Info(int i)
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
 {
-	CSG_Module	*pModule;
-
 	switch( i )
 	{
-	case 0:
-		pModule	= new CChannelNetwork;
-		break;
+	case  0:	return( new CChannelNetwork );
+	case  1:	return( new CWatersheds );
+	case  2:	return( new CWatersheds_ext );
+	case  3:	return( new CChannelNetwork_Altitude );
+	case  4:	return( new CChannelNetwork_Distance );
+	case  5:	return( new CD8_Flow_Analysis );
+	case  6:	return( new CStrahler );
+	case  7:	return( new CValley_Depth );
 
-	case 1:
-		pModule	= new CWatersheds;
-		break;
-	
-	case 2:
-		pModule	= new CWatersheds_ext;
-		break;
-
-	case 3:
-		pModule	= new CChannelNetwork_Altitude;
-		break;
-
-	case 4:
-		pModule	= new CChannelNetwork_Distance;
-		break;
-
-	case 5:
-		pModule	= new CD8_Flow_Analysis;
-		break;
-
-	case 6:
-		pModule	= new CStrahler;
-		break;
-
-	default:
-		pModule	= NULL;
-		break;
+	default:	return( NULL );
 	}
-
-	return( pModule );
 }
 
 

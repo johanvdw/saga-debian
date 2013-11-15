@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 957 2011-03-24 17:20:37Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1597 2013-01-28 17:02:55Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 //      System for Automated Geoscientific Analyses      //
 //                                                       //
 //                    Module Library:                    //
-//                      grid analysis                     //
+//                     grid analysis                     //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //
@@ -64,7 +64,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -109,6 +109,8 @@ const SG_Char * Get_Info(int i)
 #include "fragmentation_resampling.h"
 #include "fragmentation_classify.h"
 
+#include "Grid_Accumulation_Functions.h"
+#include "Grid_IMCORR.h"
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -138,6 +140,10 @@ CSG_Module *		Create_Module(int i)
 	case 15:	return( new CFragmentation_Standard );
 	case 16:	return( new CFragmentation_Resampling );
 	case 17:	return( new CFragmentation_Classify );
+
+	case 18:	return( new CGrid_Accumulation_Functions );
+	
+	case 19:	return( new CGrid_IMCORR );
 	}
 
 	return( NULL );

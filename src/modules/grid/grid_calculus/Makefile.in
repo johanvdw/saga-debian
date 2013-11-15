@@ -80,7 +80,7 @@ am_libgrid_calculus_la_OBJECTS = Fuzzify.lo FuzzyAND.lo FuzzyOR.lo \
 	Grid_Calculator.lo grid_difference.lo \
 	Grid_Geometric_Figures.lo Grid_Normalise.lo Grid_Plotter.lo \
 	Grid_Random_Field.lo Grid_Random_Terrain.lo Grid_Volume.lo \
-	grids_trend_polynom.lo MLB_Interface.lo
+	MLB_Interface.lo
 libgrid_calculus_la_OBJECTS = $(am_libgrid_calculus_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -139,6 +139,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -169,7 +170,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -250,13 +250,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 982 2011-04-06 15:30:05Z oconrad $
+# $Id: Makefile.am 1549 2012-11-29 16:38:50Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_calculus.la
 libgrid_calculus_la_SOURCES = \
@@ -273,7 +273,6 @@ Grid_Plotter.cpp\
 Grid_Random_Field.cpp\
 Grid_Random_Terrain.cpp\
 Grid_Volume.cpp\
-grids_trend_polynom.cpp\
 MLB_Interface.cpp\
 Fuzzify.h\
 FuzzyAND.h\
@@ -288,7 +287,6 @@ Grid_Plotter.h\
 Grid_Random_Field.h\
 Grid_Random_Terrain.h\
 Grid_Volume.h\
-grids_trend_polynom.h\
 MLB_Interface.h
 
 libgrid_calculus_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
@@ -380,7 +378,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gradient_cartes_polar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_difference.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_metric_conversion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grids_trend_polynom.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

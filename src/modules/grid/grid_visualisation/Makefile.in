@@ -79,7 +79,7 @@ am_libgrid_visualisation_la_OBJECTS = Grid_3D_Image.lo \
 	Grid_Color_Blend.lo Grid_Color_Triangle.lo \
 	Grid_Color_Rotate.lo Grid_Colors_Fit.lo \
 	Grid_Histogram_Surface.lo Grid_RGB_Composite.lo \
-	MLB_Interface.lo
+	Grid_Aspect_Slope_Map.lo MLB_Interface.lo
 libgrid_visualisation_la_OBJECTS =  \
 	$(am_libgrid_visualisation_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -139,6 +139,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -169,7 +170,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -250,13 +250,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1456 2012-08-15 10:31:10Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libgrid_visualisation.la
 libgrid_visualisation_la_SOURCES = \
@@ -267,6 +267,7 @@ Grid_Color_Rotate.cpp\
 Grid_Colors_Fit.cpp\
 Grid_Histogram_Surface.cpp\
 Grid_RGB_Composite.cpp\
+Grid_Aspect_Slope_Map.cpp\
 MLB_Interface.cpp\
 Grid_3D_Image.h\
 Grid_Color_Blend.h\
@@ -275,6 +276,7 @@ Grid_Color_Triangle.h\
 Grid_Colors_Fit.h\
 Grid_Histogram_Surface.h\
 Grid_RGB_Composite.h\
+Grid_Aspect_Slope_Map.h\
 MLB_Interface.h
 
 libgrid_visualisation_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
@@ -353,6 +355,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_3D_Image.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Aspect_Slope_Map.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Color_Blend.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Color_Rotate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Grid_Color_Triangle.Plo@am__quote@

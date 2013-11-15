@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1137 2011-07-21 13:18:03Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1373 2012-04-13 09:54:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -106,6 +106,7 @@ const SG_Char * Get_Info(int i)
 #include "pointcloud_from_text_file.h"
 #include "svg.h"
 #include "pointcloud_to_text_file.h"
+#include "wktb.h"
 
 
 //---------------------------------------------------------
@@ -134,6 +135,8 @@ CSG_Module *		Create_Module(int i)
 	case 16:	return( new CPointCloud_From_Text_File );
 	case 17:	return( new CSVG_Export );
 	case 18:	return( new CPointcloud_To_Text_File );
+	case 19:	return( new CWKT_Import );
+	case 20:	return( new CWKT_Export );
 	}
 
 	return( NULL );

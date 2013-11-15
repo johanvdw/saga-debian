@@ -91,11 +91,14 @@ public:
 	class CData_Source_Files *		Get_Files				(void)	{	return( m_pFiles );	}
 
 	bool							Set_Data_Source			(class CWKSP_Base_Item *pItem);
+	bool							Update_ODBC_Source		(const wxString &Server);
 
 
 private:
 
 	class CData_Source_Files		*m_pFiles;
+
+	class CData_Source_ODBC			*m_pODBC;
 
 
 	bool							_Show_Page				(wxWindow *pPage);

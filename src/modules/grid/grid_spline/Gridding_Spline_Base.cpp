@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_Base.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Gridding_Spline_Base.cpp 1633 2013-03-22 13:35:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ bool CGridding_Spline_Base::_Get_Grid(void)
 	//-------------------------------------------------
 	if( m_pGrid )
 	{
-		m_pGrid->Set_Name(CSG_String::Format(SG_T("%s (%s)"), m_bGridPoints ? pGrid->Get_Name() : pShapes->Get_Name(), Get_Name()));
+		m_pGrid->Set_Name(CSG_String::Format(SG_T("%s [%s]"), m_bGridPoints ? pGrid->Get_Name() : Parameters("FIELD")->asString(), Get_Name().c_str()));
 		m_pGrid->Assign_NoData();
 	}
 
@@ -210,7 +210,7 @@ bool CGridding_Spline_Base::_Get_Points(CSG_Points_Z &Points, bool bInGridOnly)
 		{
 			for(x=0, p.x=pGrid->Get_XMin(); x<pGrid->Get_NX(); x++, p.x+=pGrid->Get_Cellsize())
 			{
-				if( !pGrid->is_NoData(x, y) && (!bInGridOnly || m_pGrid->is_InGrid_byPos(p)) )
+				if( !pGrid->is_NoData(x, y) && (!bInGridOnly || m_pGrid->is_InGrid_byPos(p, false)) )
 				{
 					Points.Add(p.x, p.y, pGrid->asDouble(x, y));
 				}
@@ -236,7 +236,7 @@ bool CGridding_Spline_Base::_Get_Points(CSG_Points_Z &Points, bool bInGridOnly)
 					{
 						TSG_Point	p	= pShape->Get_Point(iPoint, iPart);
 
-						if( !bInGridOnly || m_pGrid->is_InGrid_byPos(p) )
+						if( !bInGridOnly || m_pGrid->is_InGrid_byPos(p, false) )
 						{
 							Points.Add(p.x, p.y, zValue);
 						}

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_local_extremes_to_points.h 1025 2011-04-28 16:16:37Z oconrad $
+ * Version $Id: grid_local_extremes_to_points.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ class CGrid_Local_Extremes_to_Points : public CSG_Module_Grid
 public:
 	CGrid_Local_Extremes_to_Points(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Grid Values") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Grid Values") );	}
 
 
 protected:

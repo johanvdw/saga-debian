@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dataobject.cpp 1017 2011-04-27 18:42:58Z oconrad $
+ * Version $Id: dataobject.cpp 1692 2013-05-15 16:59:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-const SG_Char *	SG_Get_DataObject_Identifier(TSG_Data_Object_Type Type)
+CSG_String	SG_Get_DataObject_Identifier(TSG_Data_Object_Type Type)
 {
 	switch( Type )
 	{
@@ -88,17 +88,17 @@ const SG_Char *	SG_Get_DataObject_Identifier(TSG_Data_Object_Type Type)
 }
 
 //---------------------------------------------------------
-const SG_Char *	SG_Get_DataObject_Name(TSG_Data_Object_Type Type)
+CSG_String	SG_Get_DataObject_Name(TSG_Data_Object_Type Type)
 {
 	switch( Type )
 	{
 	default:
-	case DATAOBJECT_TYPE_Undefined:		return( LNG("[DAT] Undefined") );
-	case DATAOBJECT_TYPE_Grid:			return( LNG("[DAT] Grid") );
-	case DATAOBJECT_TYPE_Table:			return( LNG("[DAT] Table") );
-	case DATAOBJECT_TYPE_Shapes:		return( LNG("[DAT] Shapes") );
-	case DATAOBJECT_TYPE_TIN:			return( LNG("[DAT] TIN") );
-	case DATAOBJECT_TYPE_PointCloud:	return( LNG("[DAT] Point Cloud") );
+	case DATAOBJECT_TYPE_Undefined:		return( _TL("Undefined") );
+	case DATAOBJECT_TYPE_Grid:			return( _TL("Grid") );
+	case DATAOBJECT_TYPE_Table:			return( _TL("Table") );
+	case DATAOBJECT_TYPE_Shapes:		return( _TL("Shapes") );
+	case DATAOBJECT_TYPE_TIN:			return( _TL("TIN") );
+	case DATAOBJECT_TYPE_PointCloud:	return( _TL("Point Cloud") );
 	}
 }
 
@@ -148,7 +148,7 @@ CSG_Data_Object::CSG_Data_Object(void)
 	m_bModified			= true;
 
 	m_NoData_Value		= -99999.0;
-	m_NoData_hiValue	= -999.0;
+	m_NoData_hiValue	= -99999.0;
 
 	m_Name				.Clear();
 	m_Description		.Clear();
@@ -181,65 +181,27 @@ bool CSG_Data_Object::Destroy(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CSG_Data_Object::Set_Name(const SG_Char *Name)
+void CSG_Data_Object::Set_Name(const CSG_String &Name)
 {
-	m_Name	= Name ? CSG_String(Name).c_str() : LNG("[DAT] new");
-}
-
-const SG_Char * CSG_Data_Object::Get_Name(void) const
-{
-	return( m_Name.c_str() );
+	m_Name			= Name.Length() > 0 ? Name.c_str() : _TL("new");
 }
 
 //---------------------------------------------------------
-void CSG_Data_Object::Set_Description(const SG_Char *Description)
+void CSG_Data_Object::Set_Description(const CSG_String &Description)
 {
-	m_Description	= Description ? Description : SG_T("");
-}
-
-const SG_Char * CSG_Data_Object::Get_Description(void) const
-{
-	return( m_Description.c_str() );
+	m_Description	= Description;
 }
 
 //---------------------------------------------------------
-void CSG_Data_Object::Set_File_Name(const SG_Char *File_Name)
+void CSG_Data_Object::Set_File_Name(const CSG_String &File_Name)
 {
-	if( File_Name )
-	{
-		m_File_Name	= File_Name;
+	m_File_Name		= File_Name;
 
-		m_Name		= SG_File_Get_Name(File_Name, false);
+	m_Name			= SG_File_Get_Name(File_Name, false);
 
-		m_bModified	= false;
-	}
-	else
-	{
-		m_File_Name.Clear();
-
-		Set_Name(NULL);
-	}
+	m_bModified		= false;
 
 	m_pFile->Set_Content(m_File_Name);
-}
-
-const SG_Char * CSG_Data_Object::Get_File_Name(bool bNullAsString)	const
-{
-	return(	m_File_Name.Length() > 0
-		?	m_File_Name.c_str()
-		:	(bNullAsString ? (SG_Char *)LNG("[DAT] [not set]") : (SG_Char *)NULL)
-	);
-}
-
-//---------------------------------------------------------
-void CSG_Data_Object::Set_File_Type(int File_Type)
-{
-	m_File_Type	= File_Type;
-}
-
-int CSG_Data_Object::Get_File_Type(void) const
-{
-	return( m_File_Type );
 }
 
 
@@ -297,12 +259,17 @@ bool CSG_Data_Object::Load_MetaData(const SG_Char *File_Name)
 
 	switch( Get_ObjectType() )
 	{
-	default:							return( false );;
+	default:							return( false );
 	case DATAOBJECT_TYPE_Grid:			m.Load(File_Name, SG_META_EXT_GRID);		break;
 	case DATAOBJECT_TYPE_Table:			m.Load(File_Name, SG_META_EXT_TABLE);		break;
 	case DATAOBJECT_TYPE_Shapes:		m.Load(File_Name, SG_META_EXT_SHAPES);		break;
 	case DATAOBJECT_TYPE_TIN:			m.Load(File_Name, SG_META_EXT_TIN);			break;
 	case DATAOBJECT_TYPE_PointCloud:	m.Load(File_Name, SG_META_EXT_POINTCLOUD);	break;
+	}
+
+	if( (p = m.Get_Child("DESCRIPTION")) != NULL && !p->Get_Content().is_Empty() )
+	{
+		Set_Description(p->Get_Content());
 	}
 
 	if( (p = m.Get_Child(SG_META_SRC)) != NULL )
@@ -339,6 +306,10 @@ bool CSG_Data_Object::Load_MetaData(const SG_Char *File_Name)
 //---------------------------------------------------------
 bool CSG_Data_Object::Save_MetaData(const SG_Char *File_Name)
 {
+	CSG_MetaData	*p	= m_MetaData.Get_Child("DESCRIPTION");	if( !p )	p	= m_MetaData.Add_Child("DESCRIPTION");
+
+	p->Set_Content(Get_Description());
+
 	if( m_Projection.Get_Type() == SG_PROJ_TYPE_CS_Undefined )
 	{
 		m_pProjection->Destroy();

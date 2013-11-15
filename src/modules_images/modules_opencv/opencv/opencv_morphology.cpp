@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: opencv_morphology.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: opencv_morphology.cpp 1573 2012-12-18 08:47:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ bool COpenCV_Morphology::On_Execute(void)
 		cvReleaseImage(&cv_pTmp);
 	}
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name().c_str()));
 
 	return( true );
 }

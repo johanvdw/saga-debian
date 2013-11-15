@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_cluster_analysis.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: pc_cluster_analysis.cpp 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@ bool CPC_Cluster_Analysis::On_Execute(void)
 
 		while( tkz_fields.HasMoreTokens() )
 		{
-			token	= tkz_fields.GetNextToken();
+			token	= tkz_fields.GetNextToken().wc_str();
 
 			if( token.Length() == 0 )
 				break;

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map.h 1039 2011-05-04 14:02:25Z oconrad $
+ * Version $Id: view_map.h 1742 2013-06-20 16:13:27Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -112,6 +112,7 @@ public:
 	void							On_Map_Zoom_Selection		(wxCommandEvent  &event);
 	void							On_Map_Zoom_Extent			(wxCommandEvent  &event);
 	void							On_Map_Zoom_Synchronize		(wxCommandEvent  &event);
+	void							On_Map_ScaleBar				(wxCommandEvent  &event);
 
 	void							On_Map_Mode_Zoom			(wxCommandEvent  &event);
 	void							On_Map_Mode_Pan				(wxCommandEvent  &event);

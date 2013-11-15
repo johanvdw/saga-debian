@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_buttons.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_map_buttons.cpp 1652 2013-04-12 12:15:30Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ CWKSP_Map_Button::CWKSP_Map_Button(wxWindow *pParent, class CWKSP_Map *pMap)
 }
 
 //---------------------------------------------------------
-CWKSP_Map_Button::CWKSP_Map_Button(wxWindow *pParent, const wxChar *Title)
+CWKSP_Map_Button::CWKSP_Map_Button(wxWindow *pParent, const wxString &Title)
 	: wxPanel(pParent, -1, wxDefaultPosition, wxDefaultSize, 0)
 {
 	m_pMap		= NULL;
@@ -167,7 +167,7 @@ void CWKSP_Map_Button::On_Paint(wxPaintEvent &event)
 
 			dc.DrawBitmap(m_pMap->Get_Thumbnail(r.GetWidth() - 1, r.GetHeight() - 1), r.GetLeft(), r.GetTop(), true);
 
-			if( g_pACTIVE->Get_Item() == m_pMap )
+			if( g_pACTIVE->Get_Active_Map() == m_pMap )
 			{
 				dc.SetPen(wxPen(((CWKSP_Map_Buttons *)GetParent())->Get_Active_Color()));
 				Draw_Edge(dc, EDGE_STYLE_SIMPLE, r);	r.Deflate(1);
@@ -282,17 +282,17 @@ CWKSP_Map_Buttons::CWKSP_Map_Buttons(wxWindow *pParent)
 	m_Active_Color	= CONFIG_Read(wxT("/BUTTONS_MAPS"), wxT("SELCOLOR")	, lValue) ?      lValue : Get_Color_asInt(SYS_Get_Color(wxSYS_COLOUR_BTNSHADOW));
 
 	//-----------------------------------------------------
-	m_Parameters.Create(this, LNG("Options for Map Thumbnails"), LNG(""));
+	m_Parameters.Create(this, _TL("Options for Map Thumbnails"), _TL(""));
 
 	m_Parameters.Add_Value(
-		NULL, "SIZE"		, LNG("Thumbnail Size"),
-		LNG(""),
+		NULL, "SIZE"		, _TL("Thumbnail Size"),
+		_TL(""),
 		PARAMETER_TYPE_Int, m_Size, 10, true
 	);
 
 	m_Parameters.Add_Value(
-		NULL, "SELCOLOR"	, LNG("Selection Color"),
-		LNG(""),
+		NULL, "SELCOLOR"	, _TL("Selection Color"),
+		_TL(""),
 		PARAMETER_TYPE_Color, m_Active_Color
 	);
 }
@@ -478,9 +478,9 @@ bool CWKSP_Map_Buttons::_Add_Item(CWKSP_Map *pMap)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Map_Buttons::_Add_Item(const wxChar *Title)
+bool CWKSP_Map_Buttons::_Add_Item(const wxString &Title)
 {
-	if( Title )
+	if( Title.Length() > 0 )
 	{
 		m_Items	= (CWKSP_Map_Button **)SG_Realloc(m_Items, (m_nItems + 1) * sizeof(CWKSP_Map_Button *));
 		m_Items[m_nItems++]	= new CWKSP_Map_Button(this, Title);

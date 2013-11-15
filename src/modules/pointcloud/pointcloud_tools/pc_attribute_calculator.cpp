@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_attribute_calculator.cpp 944 2011-02-27 00:58:30Z reklov_w $
+ * Version $Id: pc_attribute_calculator.cpp 1519 2012-11-06 14:13:35Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -154,7 +154,6 @@ bool CPC_Attribute_Calculator::On_Execute(void)
 {
 	CSG_PointCloud	*pInput, *pResult;
 	int				iFields;
-	int				err_pos;
 	double			dValue;
 	double			*pFieldValues;
 	const SG_Char	*pFormula;
@@ -190,18 +189,18 @@ bool CPC_Attribute_Calculator::On_Execute(void)
 
 	Formula.Set_Formula(pFormula);
 
-	if( Formula.Get_Error(&err_pos, &Msg) )
+	if( Formula.Get_Error(Msg) )
 	{
-		SG_UI_Msg_Add_Error(CSG_String::Format(SG_T("%s: #%d\n%s"), _TL("syntax error in formula at position"), err_pos, pFormula));
-		SG_UI_Msg_Add_Error(CSG_String::Format(SG_T("%s"), Msg.c_str()));
-		return (false);
+		SG_UI_Msg_Add_Error(Msg);
+
+		return( false );
 	}
 
 	
 	//---------------------------------------------------------
 	pFieldValues	= new double[iFields];
 
-	for( int i=0; i<pInput->Get_Record_Count(); i++ )
+	for( int i=0; i<pInput->Get_Point_Count() && Set_Progress(i, pInput->Get_Point_Count()); i++ )
 	{
 		pResult->Add_Point(pInput->Get_X(i), pInput->Get_Y(i), pInput->Get_Z(i));
 		

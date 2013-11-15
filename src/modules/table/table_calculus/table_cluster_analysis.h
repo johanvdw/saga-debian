@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_cluster_analysis.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: table_cluster_analysis.h 1592 2013-01-23 16:58:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,8 +80,6 @@ public:
 
 
 protected:
-
-	virtual int				On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	virtual bool			On_Execute				(void);
 

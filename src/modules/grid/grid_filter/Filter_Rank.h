@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Filter_Rank.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Filter_Rank.h 1365 2012-03-30 14:21:53Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -93,9 +93,9 @@ protected:
 
 private:
 
-	int						m_Radius;
+	CSG_Grid_Cell_Addressor	m_Kernel;
 
-	CSG_Grid				m_Kernel, *m_pInput;
+	CSG_Grid				*m_pInput;
 
 
 	bool					Get_Value		(int x, int y, double Rank, double &Value);

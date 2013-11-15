@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_table_manager.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: wksp_table_manager.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,13 +79,7 @@
 
 //---------------------------------------------------------
 CWKSP_Table_Manager::CWKSP_Table_Manager(void)
-{
-}
-
-//---------------------------------------------------------
-CWKSP_Table_Manager::~CWKSP_Table_Manager(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -97,7 +91,7 @@ CWKSP_Table_Manager::~CWKSP_Table_Manager(void)
 //---------------------------------------------------------
 wxString CWKSP_Table_Manager::Get_Name(void)
 {
-	return( LNG("[CAP] Tables") );
+	return( _TL("Tables") );
 }
 
 //---------------------------------------------------------
@@ -105,7 +99,7 @@ wxString CWKSP_Table_Manager::Get_Description(void)
 {
 	wxString	s;
 
-	s.Printf(wxT("<b>%s</b>: %d<br>"), LNG("[CAP] Tables"), Get_Count());
+	s.Printf(wxT("<b>%s</b>: %d<br>"), _TL("Tables"), Get_Count());
 
 	return( s );
 }
@@ -113,9 +107,7 @@ wxString CWKSP_Table_Manager::Get_Description(void)
 //---------------------------------------------------------
 wxMenu * CWKSP_Table_Manager::Get_Menu(void)
 {
-	wxMenu	*pMenu;
-
-	pMenu	= new wxMenu(LNG("[CAP] Tables"));
+	wxMenu	*pMenu	= new wxMenu(_TL("Tables"));
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_TABLES_OPEN);
 
@@ -135,35 +127,13 @@ wxMenu * CWKSP_Table_Manager::Get_Menu(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CWKSP_Table_Manager::On_Command(int Cmd_ID)
-{
-	switch( Cmd_ID )
-	{
-	default:
-		return( CWKSP_Base_Item::On_Command(Cmd_ID) );
-
-	case ID_CMD_WKSP_ITEM_RETURN:
-		break;
-	}
-
-	return( true );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-CWKSP_Table * CWKSP_Table_Manager::Get_Table(CSG_Table *pTable)
+CWKSP_Table * CWKSP_Table_Manager::Get_Data(CSG_Table *pObject)
 {
 	for(int i=0; i<Get_Count(); i++)
 	{
-		if( pTable == Get_Table(i)->Get_Table() )
+		if( pObject == Get_Data(i)->Get_Object() )
 		{
-			return( Get_Table(i) );
+			return( Get_Data(i) );
 		}
 	}
 
@@ -171,86 +141,16 @@ CWKSP_Table * CWKSP_Table_Manager::Get_Table(CSG_Table *pTable)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Table_Manager::Exists(CSG_Table *pTable)
+CWKSP_Table * CWKSP_Table_Manager::Add_Data(CSG_Table *pObject)
 {
-	return( Get_Table(pTable) != NULL );
-}
+	CWKSP_Table	*pItem	= Get_Data(pObject);
 
-//---------------------------------------------------------
-CWKSP_Table * CWKSP_Table_Manager::Add(CSG_Table *pTable)
-{
-	CWKSP_Table	*pItem;
-
-	if( pTable && !Exists(pTable) && Add_Item(pItem = new CWKSP_Table(pTable, this)) )
+	if( pItem == NULL && pObject != NULL )
 	{
-		return( pItem );
+		Add_Item(pItem = new CWKSP_Table(pObject));
 	}
 
-	return( NULL );
-}
-
-//---------------------------------------------------------
-CSG_Table * CWKSP_Table_Manager::Get_byFileName(const wxChar *File_Name)
-{
-	CSG_String	s(File_Name);
-
-	for(int i=0; i<Get_Count(); i++)
-	{
-		if( !s.Cmp(Get_Table(i)->Get_Table()->Get_File_Name()) )
-		{
-			return( Get_Table(i)->Get_Table() );
-		}
-	}
-
-	return( NULL );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-bool CWKSP_Table_Manager::Update(CSG_Table *pTable, CSG_Parameters *pParameters)
-{
-	CWKSP_Table	*pItem;
-
-	if( (pItem = Get_Table(pTable)) != NULL )
-	{
-		return( pItem->DataObject_Changed(pParameters) );
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-bool CWKSP_Table_Manager::Update_Views(CSG_Table *pTable)
-{
-	CWKSP_Table	*pItem;
-
-	if( (pItem = Get_Table(pTable)) != NULL )
-	{
-		pItem->Update_Views();
-
-		return( true );
-	}
-
-	return( false );
-}
-
-//---------------------------------------------------------
-bool CWKSP_Table_Manager::Show(CSG_Table *pTable)
-{
-	CWKSP_Table	*pItem;
-
-	if( (pItem = Get_Table(pTable)) != NULL )
-	{
-		pItem->Set_View(true);
-	}
-
-	return( false );
+	return( pItem );
 }
 
 

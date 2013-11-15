@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1540 2012-11-22 13:40:57Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,11 +9,12 @@ DEP_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libpj_georeference.la
 libpj_georeference_la_SOURCES =\
 Collect_Points.cpp\
+direct_georeferencing.cpp\
 Georef_Engine.cpp\
 Georef_Grid.cpp\
 georef_grid_move.cpp\
@@ -27,6 +28,7 @@ lmpar.c\
 qrfac.c\
 qrsolv.c\
 Collect_Points.h\
+direct_georeferencing.h\
 Georef_Engine.h\
 Georef_Grid.h\
 georef_grid_move.h\

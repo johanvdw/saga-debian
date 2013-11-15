@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map.cpp 1076 2011-06-01 13:26:06Z oconrad $
+ * Version $Id: wksp_map.cpp 1753 2013-06-26 12:39:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -191,13 +191,14 @@ CWKSP_Map::CWKSP_Map(void)
 {
 	static int	iMap	= 0;
 
-	m_Name.Printf(wxT("%02d. %s"), ++iMap, LNG("[CAP] Map"));
+	m_Name.Printf(wxT("%02d. %s"), ++iMap, _TL("Map"));
 
 	m_pView			= NULL;
 	m_pView_3D		= NULL;
 	m_pLayout		= NULL;
 	m_pLayout_Info	= new CVIEW_Layout_Info(this);
 
+	m_bScaleBar		= g_pMaps->Get_Parameter("SCALE_BAR")->asBool();
 	m_bSynchronise	= false;
 	m_Img_bSave		= false;
 
@@ -233,15 +234,15 @@ wxString CWKSP_Map::Get_Description(void)
 	wxString	s;
 
 	s.Append(wxString::Format(wxT("<b>%s</b><table border=\"0\">"),
-		LNG("[CAP] Map")
+		_TL("Map")
 	));
 
 	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%s</td></tr>"),
-		LNG("[CAP] Name")					, m_Name.c_str()
+		_TL("Name")					, m_Name.c_str()
 	));
 
 	s.Append(wxString::Format(wxT("<tr><td>%s</td><td>%d</td></tr>"),
-		LNG("[CAP] Layers")					, Get_Count()
+		_TL("Layers")					, Get_Count()
 	));
 
 	s.Append(wxT("</table>"));
@@ -254,7 +255,7 @@ wxMenu * CWKSP_Map::Get_Menu(void)
 {
 	wxMenu	*pMenu;
 
-	pMenu	= new wxMenu(LNG("[CAP] Map"));
+	pMenu	= new wxMenu(_TL("Map"));
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
 	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_MAPS_SHOW);
@@ -264,7 +265,8 @@ wxMenu * CWKSP_Map::Get_Menu(void)
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_MAPS_SAVE_TO_CLIPBOARD_LEGEND);
 	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_MAPS_3D_SHOW);
 	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_MAPS_LAYOUT_SHOW);
-	CMD_Menu_Add_Item(pMenu, false, ID_CMD_MAPS_SYNCHRONIZE);
+	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_MAP_SYNCHRONIZE);
+	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_MAP_SCALEBAR);
 
 	return( pMenu );
 }
@@ -304,7 +306,11 @@ bool CWKSP_Map::On_Command(int Cmd_ID)
 		SaveAs_Image_Clipboard(true);
 		break;
 
-	case ID_CMD_MAPS_SYNCHRONIZE:
+	case ID_CMD_MAP_SCALEBAR:
+		Set_ScaleBar(!m_bScaleBar);
+		break;
+
+	case ID_CMD_MAP_SYNCHRONIZE:
 		Set_Synchronising(!m_bSynchronise);
 		break;
 
@@ -347,6 +353,10 @@ bool CWKSP_Map::On_Command_UI(wxUpdateUIEvent &event)
 	case ID_CMD_MAPS_SAVE_IMAGE_ON_CHANGE:
 		event.Check(is_Image_Save_Mode());
 		break;
+
+	case ID_CMD_MAP_SCALEBAR:
+		event.Check(is_ScaleBar());
+		break;
 	}
 
 	return( true );
@@ -366,130 +376,130 @@ void CWKSP_Map::On_Create_Parameters(void)
 
 	//-----------------------------------------------------
 	pNode_0	= m_Parameters.Add_Node(
-		NULL	, "NODE_GENERAL"	, LNG("[CAP] General"),
-		LNG("")
+		NULL	, "NODE_GENERAL"	, _TL("General"),
+		_TL("")
 	);
 
 	m_Parameters.Add_String(
-		pNode_0	, "NAME"			, LNG("[CAP] Name"),
-		LNG(""),
-		m_Name.c_str()
+		pNode_0	, "NAME"			, _TL("Name"),
+		_TL(""),
+		&m_Name
 	);
 
 	m_Parameters.Add_Value(
-		pNode_0	, "GOTO_NEWLAYER"	, LNG("[CAP] Zoom to added layer"),
-		LNG(""),
-		PARAMETER_TYPE_Bool, g_pMaps->Get_Parameters()->Get_Parameter("GOTO_NEWLAYER")->asBool()
+		pNode_0	, "GOTO_NEWLAYER"	, _TL("Zoom to added layer"),
+		_TL(""),
+		PARAMETER_TYPE_Bool, g_pMaps->Get_Parameter("GOTO_NEWLAYER")->asBool()
 	);
 
 	//-----------------------------------------------------
 	pNode_0	= m_Parameters.Add_Node(
-		NULL	, "NODE_FRAME"		, LNG("[CAP] Frame"),
-		LNG("")
+		NULL	, "NODE_FRAME"		, _TL("Frame"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Value(
-		pNode_0	, "FRAME_SHOW"		, LNG("[CAP] Show"),
-		LNG(""),
-		PARAMETER_TYPE_Bool, g_pMaps->Get_Parameters()->Get_Parameter("FRAME_SHOW")->asBool()
+		pNode_0	, "FRAME_SHOW"		, _TL("Show"),
+		_TL(""),
+		PARAMETER_TYPE_Bool, g_pMaps->Get_Parameter("FRAME_SHOW")->asBool()
 	);
 
 	m_Parameters.Add_Value(
-		pNode_0	, "FRAME_WIDTH"		, LNG("[CAP] Width"),
-		LNG(""),
-		PARAMETER_TYPE_Int, g_pMaps->Get_Parameters()->Get_Parameter("FRAME_WIDTH")->asInt(), 5, true
+		pNode_0	, "FRAME_WIDTH"		, _TL("Width"),
+		_TL(""),
+		PARAMETER_TYPE_Int, g_pMaps->Get_Parameter("FRAME_WIDTH")->asInt(), 5, true
 	);
 
 	//-----------------------------------------------------
 	pNode_0	= m_Parameters.Add_Node(
-		NULL	, "NODE_PRINT"		, LNG("[CAP] Print Layout"),
-		LNG("")
+		NULL	, "NODE_PRINT"		, _TL("Print Layout"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Choice(
-		pNode_0	, "PRINT_LEGEND"	, LNG("[CAP] Show Legend"),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("no"),
-			LNG("yes")
+		pNode_0	, "PRINT_LEGEND"	, _TL("Show Legend"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("no"),
+			_TL("yes")
 		), 1
 	);
 
 	m_Parameters.Add_Value(
-		pNode_0	, "PRINT_RESOLUTION"	, LNG("[CAP] Display Resolution"),
-		LNG(""),
+		pNode_0	, "PRINT_RESOLUTION"	, _TL("Display Resolution"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 2, 1, true
 	);
 
 	pNode_1	= m_Parameters.Add_Node(
-		pNode_0	, "NODE_PRINT_FRAME"	, LNG("[CAP] Frame"),
-		LNG("")
+		pNode_0	, "NODE_PRINT_FRAME"	, _TL("Frame"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Value(
-		pNode_1	, "PRINT_FRAME_SHOW"	, LNG("[CAP] Show"),
-		LNG(""),
+		pNode_1	, "PRINT_FRAME_SHOW"	, _TL("Show"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
 	m_Parameters.Add_Value(
-		pNode_1	, "PRINT_FRAME_WIDTH"	, LNG("[CAP] Width"),
-		LNG(""),
+		pNode_1	, "PRINT_FRAME_WIDTH"	, _TL("Width"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 7, 5, true
 	);
 
 	m_Parameters.Add_Value(
-		pNode_0	, "PRINT_SCALE_SHOW"	, LNG("[CAP] Show Scale"),
-		LNG(""),
+		pNode_0	, "PRINT_SCALE_SHOW"	, _TL("Show Scale"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, true
 	);
 
 	//-----------------------------------------------------
-	m_Img_Parms.Set_Name(LNG("[CAP] Save Map as Image..."));
+	m_Img_Parms.Set_Name(_TL("Save Map as Image..."));
 
-	pNode_0	= m_Img_Parms.Add_Node(NULL, "NODE_MAP", LNG("Map"), LNG(""));
+	pNode_0	= m_Img_Parms.Add_Node(NULL, "NODE_MAP", _TL("Map"), _TL(""));
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "NX"	, LNG("[PRM] Map Width [Pixels]"),
-		LNG(""),
+		pNode_0	, "NX"	, _TL("Map Width [Pixels]"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 800	, 1, true
 	);
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "NY"	, LNG("[PRM] Map Height [Pixels]"),
-		LNG(""),
+		pNode_0	, "NY"	, _TL("Map Height [Pixels]"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 600	, 1, true
 	);
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "FR"	, LNG("[PRM] Frame Width [Pixels]"),
-		LNG(""),
+		pNode_0	, "FR"	, _TL("Frame Width [Pixels]"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 20	, 0, true
 	);
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "REF"	, LNG("[PRM] Save Georeference (world file)"),
-		LNG(""),
+		pNode_0	, "REF"	, _TL("Save Georeference (world file)"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, 1
 	);
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "KML"	, LNG("[PRM] Save KML file"),
-		LNG(""),
+		pNode_0	, "KML"	, _TL("Save KML file"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, 1
 	);
 
-	pNode_0	= m_Img_Parms.Add_Node(NULL, "NODE_LEGEND", LNG("[PRM] Legend"), LNG(""));
+	pNode_0	= m_Img_Parms.Add_Node(NULL, "NODE_LEGEND", _TL("Legend"), _TL(""));
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "LG"	, LNG("[PRM] Save"),
-		LNG(""),
+		pNode_0	, "LG"	, _TL("Save"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, 1
 	);
 
 	m_Img_Parms.Add_Value(
-		pNode_0	, "LZ"	, LNG("[PRM] Zoom"),
-		LNG(""),
+		pNode_0	, "LZ"	, _TL("Zoom"),
+		_TL(""),
 		PARAMETER_TYPE_Double, 1.0, 0, true
 	);
 }
@@ -595,7 +605,7 @@ CWKSP_Map_Layer * CWKSP_Map::Add_Layer(CWKSP_Layer *pLayer)
 
 		if( Get_Count() == 0 )
 		{
-			m_Parameters("NAME")->Set_Value(pLayer->Get_Name());
+			m_Parameters("NAME")->Set_Value(pLayer->Get_Name().wx_str());
 
 			Parameters_Changed();
 		}
@@ -690,10 +700,10 @@ void CWKSP_Map::Set_Extent(const CSG_Rect &Extent, bool bReset)
 //---------------------------------------------------------
 void CWKSP_Map::Set_Extent(void)
 {
-	CSG_Parameters	p(NULL, LNG("[CAP] Map Extent"), LNG(""));
+	CSG_Parameters	p(NULL, _TL("Map Extent"), _TL(""));
 
-	p.Add_Range(NULL, "X", LNG("West-East")		, LNG(""), Get_Extent().Get_XMin(), Get_Extent().Get_XMax());
-	p.Add_Range(NULL, "Y", LNG("South-North")	, LNG(""), Get_Extent().Get_YMin(), Get_Extent().Get_YMax());
+	p.Add_Range(NULL, "X", _TL("West-East")		, _TL(""), Get_Extent().Get_XMin(), Get_Extent().Get_XMax());
+	p.Add_Range(NULL, "Y", _TL("South-North")	, _TL(""), Get_Extent().Get_YMin(), Get_Extent().Get_YMax());
 
 	if( DLG_Parameters(&p) )
 	{
@@ -770,6 +780,18 @@ bool CWKSP_Map::Set_Extent_Forward(bool bCheck_Only)
 	}
 
 	return( false );
+}
+
+//---------------------------------------------------------
+void CWKSP_Map::Set_ScaleBar(bool bOn)
+{
+	m_bScaleBar	= bOn;
+
+	if( m_pView )
+	{
+		m_pView->Refresh_Map();
+		m_pView->Ruler_Refresh();
+	}
 }
 
 //---------------------------------------------------------
@@ -1039,9 +1061,9 @@ void CWKSP_Map::SaveAs_Image_Clipboard(bool bLegend)
 	if( bLegend == false )
 	{
 		SaveAs_Image_Clipboard(
-			Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_NX")	->asInt(),
-			Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_NY")	->asInt(),
-			Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_FRAME")->asInt()
+			Get_Manager()->Get_Parameter("CLIP_NX"   )->asInt(),
+			Get_Manager()->Get_Parameter("CLIP_NY"   )->asInt(),
+			Get_Manager()->Get_Parameter("CLIP_FRAME")->asInt()
 		);
 
 		return;
@@ -1052,8 +1074,8 @@ void CWKSP_Map::SaveAs_Image_Clipboard(bool bLegend)
 
 	Set_Buisy_Cursor(true);
 
-	int			Frame	= Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_LEGEND_FRAME")->asInt();
-	double		Scale	= Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_LEGEND_SCALE")->asDouble();
+	int			Frame	= Get_Manager()->Get_Parameter("CLIP_LEGEND_FRAME")->asInt();
+	double		Scale	= Get_Manager()->Get_Parameter("CLIP_LEGEND_SCALE")->asDouble();
 	wxSize		s;
 	wxBitmap	BMP;
 	wxMemoryDC	dc;
@@ -1070,7 +1092,7 @@ void CWKSP_Map::SaveAs_Image_Clipboard(bool bLegend)
 
 		if( Frame > 0 )
 		{
-			dc.SetPen(Get_Color_asWX(Get_Manager()->Get_Parameters()->Get_Parameter("CLIP_LEGEND_COLOR")->asInt()));
+			dc.SetPen(Get_Color_asWX(Get_Manager()->Get_Parameter("CLIP_LEGEND_COLOR")->asInt()));
 			Draw_Edge(dc, EDGE_STYLE_SIMPLE, 0, 0, s.x - 1, s.y - 1);
 		}
 
@@ -1139,9 +1161,9 @@ void CWKSP_Map::SaveAs_Image_To_Memory(int nx, int ny)
 
 	CSG_Rect		Extent(Get_Extent());
 
-	CSG_Parameters	P(NULL, LNG("Save To Memory Grid"), LNG(""));
+	CSG_Parameters	P(NULL, _TL("Save To Memory Grid"), _TL(""));
 
-	P.Add_Value(NULL, "CELLSIZE", LNG("Cellsize"), LNG(""), PARAMETER_TYPE_Double, Extent.Get_XRange() / (double)nx, 0.0, true);
+	P.Add_Value(NULL, "CELLSIZE", _TL("Cellsize"), _TL(""), PARAMETER_TYPE_Double, Extent.Get_XRange() / (double)nx, 0.0, true);
 
 	if( !DLG_Parameters(&P) || P("CELLSIZE")->asDouble() <= 0.0 )
 		return;
@@ -1155,7 +1177,7 @@ void CWKSP_Map::SaveAs_Image_To_Memory(int nx, int ny)
 	{
 		CSG_Grid	*pGrid	= SG_Create_Grid(SG_DATATYPE_Int, Image.GetWidth(), Image.GetHeight(), Extent.Get_XRange() / (double)Image.GetWidth(), Extent.Get_XMin(), Extent.Get_YMin());
 
-		pGrid->Set_Name(Get_Name());
+		pGrid->Set_Name(Get_Name().wx_str());
 		pGrid->Set_NoData_Value(16711935);
 
 		for(int y=0, yy=pGrid->Get_NY()-1; y<pGrid->Get_NY(); y++, yy--)
@@ -1249,12 +1271,12 @@ void CWKSP_Map::_Img_Save(wxString file, int type)
 		case wxBITMAP_TYPE_TIF:		fn.SetExt(wxT("tfw"));		break; 
 		}
 
-		if( Stream.Open(fn.GetFullPath().c_str(), SG_FILE_W, false) )
+		if( Stream.Open(fn.GetFullPath().wx_str(), SG_FILE_W, false) )
 		{
 			CSG_Rect	rWorld(Get_World(r));
 			double		d	= rWorld.Get_XRange() / r.GetWidth();
 
-			Stream.Printf(wxT("%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n"),
+			Stream.Printf(SG_T("%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n%.10f\n"),
 				d, 0.0, 0.0,-d,
 				rWorld.Get_XMin() - Frame * d,
 				rWorld.Get_YMax() + Frame * d
@@ -1269,7 +1291,7 @@ void CWKSP_Map::_Img_Save(wxString file, int type)
 
 		fn.SetExt(wxT("kml"));
 
-		if( Stream.Open(fn.GetFullPath().c_str(), SG_FILE_W, false) )
+		if( Stream.Open(fn.GetFullPath().wx_str(), SG_FILE_W, false) )
 		{
 			CSG_Rect	rWorld(Get_World(r));
 			double		d	= rWorld.Get_XRange() / r.GetWidth();
@@ -1282,10 +1304,10 @@ void CWKSP_Map::_Img_Save(wxString file, int type)
 			Stream.Printf(SG_T("    <name>Maps exported from SAGA</name>\n"));
 			Stream.Printf(SG_T("    <description>System for Automated Geoscientific Analyses - www.saga-gis.org</description>\n"));
 			Stream.Printf(SG_T("    <GroundOverlay>\n"));
-			Stream.Printf(SG_T("      <name>%s</name>\n")				, Get_Name().c_str());
-			Stream.Printf(SG_T("      <description>%s</description>\n")	, Get_Description().c_str());
+			Stream.Printf(SG_T("      <name>%s</name>\n")				, Get_Name().wx_str());
+			Stream.Printf(SG_T("      <description>%s</description>\n")	, Get_Description().wx_str());
 			Stream.Printf(SG_T("      <Icon>\n"));
-			Stream.Printf(SG_T("        <href>%s</href>\n")				, fn.GetFullName().c_str());
+			Stream.Printf(SG_T("        <href>%s</href>\n")				, fn.GetFullName().wx_str());
 			Stream.Printf(SG_T("      </Icon>\n"));
 			Stream.Printf(SG_T("      <LatLonBox>\n"));
 			Stream.Printf(SG_T("        <north>%f</north>\n")			, rWorld.Get_YMax() + Frame * d);
@@ -1332,8 +1354,7 @@ void CWKSP_Map::_Img_Save(wxString file, int type)
 //---------------------------------------------------------
 const wxBitmap & CWKSP_Map::Get_Thumbnail(int dx, int dy)
 {
-	if( dx > 0 && m_Thumbnail.GetWidth()  != dx
-	&&	dy > 0 && m_Thumbnail.GetHeight() != dy )
+	if( dx > 0 && dy > 0 && (!m_Thumbnail.IsOk() || m_Thumbnail.GetWidth() != dx || m_Thumbnail.GetHeight() != dy) )
 	{
 		m_Thumbnail.Create(dx, dy);
 
@@ -1346,7 +1367,7 @@ const wxBitmap & CWKSP_Map::Get_Thumbnail(int dx, int dy)
 //---------------------------------------------------------
 bool CWKSP_Map::_Set_Thumbnail(void)
 {
-	if( m_Thumbnail.GetWidth() > 0 && m_Thumbnail.GetHeight() > 0 )
+	if( m_Thumbnail.IsOk() && m_Thumbnail.GetWidth() > 0 && m_Thumbnail.GetHeight() > 0 )
 	{
 		wxMemoryDC		dc;
 		wxRect			r(0, 0, m_Thumbnail.GetWidth(), m_Thumbnail.GetHeight());
@@ -1391,6 +1412,29 @@ void CWKSP_Map::Draw_Map(wxDC &dc, const CSG_Rect &rWorld, double Zoom, const wx
 		}
 	}
 
+	if( m_bScaleBar )
+	{
+		double	dScale	= 0.4 * rWorld.Get_XRange();
+		wxRect	r, rScale(10, rClient.GetHeight() - 25, (int)(0.5 + dc_Map.xWorld2DC(rWorld.Get_XMin() + dScale)), 20);
+
+		dc_Map.dc.SetPen(wxPen(*wxWHITE));
+		dc_Map.dc.SetTextForeground(*wxWHITE);
+
+		r	= rScale; r.Offset( 0,  1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset( 1,  1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset( 1,  0); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset( 1, -1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset( 0, -1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset(-1, -1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset(-1,  0); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+		r	= rScale; r.Offset(-1,  1); Draw_Scale(dc_Map.dc, r, 0.0, dScale, true, true, true, true);
+
+		dc_Map.dc.SetPen(wxPen(*wxBLACK));
+		dc_Map.dc.SetTextForeground(*wxBLACK);
+
+		Draw_Scale(dc_Map.dc, rScale, 0.0, dScale, true, true, true, true);
+	}
+
 	dc_Map.Draw(dc);
 }
 
@@ -1424,16 +1468,13 @@ void CWKSP_Map::Draw_Frame(wxDC &dc, const CSG_Rect &rWorld, wxRect rMap, int Wi
 }
 
 //---------------------------------------------------------
-bool CWKSP_Map::Draw_Legend(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Position, wxSize *pSize, int Layout)
+bool CWKSP_Map::Draw_Legend(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Position, wxSize *pSize)
 {
-	bool	bVertical;
 	int		i, n;
 	wxSize	s, Size;
 
 	Size.x		= 0;
 	Size.y		= 0;
-
-	bVertical	= (Layout & LEGEND_LAYOUT_VERTICAL) != 0;
 
 	for(i=0, n=0; i<Get_Count(); i++)
 	{
@@ -1441,9 +1482,9 @@ bool CWKSP_Map::Draw_Legend(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Posi
 		{
 			n++;
 
-			Get_Layer(i)->Get_Layer()->Get_Legend()->Draw(dc, Zoom, Zoom_Map, Position, &s, bVertical);
+			Get_Layer(i)->Get_Layer()->Get_Legend()->Draw(dc, Zoom, Zoom_Map, Position, &s);
 
-			if( bVertical )
+			if( Get_Layer(i)->Get_Layer()->Get_Legend()->Get_Orientation() == LEGEND_VERTICAL )
 			{
 				s.y			+= (int)(Zoom * LEGEND_SPACE);
 				Position.y	+= s.y;
@@ -1473,11 +1514,12 @@ bool CWKSP_Map::Draw_Legend(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Posi
 }
 
 //---------------------------------------------------------
-bool CWKSP_Map::Get_Legend_Size(wxSize &Size, double Zoom_Map, double Zoom, int Layout)
+bool CWKSP_Map::Get_Legend_Size(wxSize &Size, double Zoom_Map, double Zoom)
 {
-	wxMemoryDC	dc;
+	wxBitmap	bmp(10, 10);
+	wxMemoryDC	dc(bmp);
 
-	return( Draw_Legend(dc, Zoom_Map, Zoom, wxPoint(0, 0), &Size, Layout) );
+	return( Draw_Legend(dc, Zoom_Map, Zoom, wxPoint(0, 0), &Size) );
 }
 
 

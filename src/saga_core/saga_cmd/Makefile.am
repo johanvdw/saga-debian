@@ -1,17 +1,17 @@
 #
-# $Id: Makefile.am 911 2011-02-14 16:38:15Z reklov_w $
+# $Id: Makefile.am 1285 2012-01-03 10:59:55Z manfred-e $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
 
-MLIBPATH = "MODULE_LIBRARY_PATH=\"$(prefix)/lib/saga\""
+MLIBPATH = "MODULE_LIBRARY_PATH=\"$(libdir)/saga\""
 BASEFLAGS = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD $(DBGFLAGS) -I.. -D$(MLIBPATH)
 if SAGA_UNICODE
-AM_CXXFLAGS = -fPIC `wx-config --unicode=yes --cxxflags` $(BASEFLAGS) -D_SAGA_UNICODE
+AM_CXXFLAGS = -fPIC `wx-config --unicode=yes --cxxflags` $(BASEFLAGS) -D_SAGA_UNICODE $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs` -lm
 else
-AM_CXXFLAGS = -fPIC `wx-config --unicode=no --cxxflags` $(BASEFLAGS)
+AM_CXXFLAGS = -fPIC `wx-config --unicode=no --cxxflags` $(BASEFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs` -lm
 endif
 

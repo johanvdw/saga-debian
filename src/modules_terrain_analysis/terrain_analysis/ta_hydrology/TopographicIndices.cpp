@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: TopographicIndices.cpp 1021 2011-04-27 19:07:10Z oconrad $
+ * Version $Id: TopographicIndices.cpp 1637 2013-03-23 11:52:10Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ CTWI::CTWI(void)
 		"\n"
 		"Boehner, J., Selige, T. (2006):\n"
 		"Spatial Prediction of Soil Attributes Using Terrain Analysis and Climate Regionalisation'\n"
-		"In: Boehner, J., McCloy, K.R., Strobl, J.: 'SAGA – Analysis and Modelling Applications', "
+		"In: Boehner, J., McCloy, K.R., Strobl, J.: 'SAGA - Analysis and Modelling Applications', "
 		"Goettinger Geographische Abhandlungen, Vol.115, p.13-27\n"
 		"\n"
 		"Moore, I.D., Grayson, R.B., Ladson, A.R. (1991):\n"
@@ -144,8 +144,6 @@ CTWI::CTWI(void)
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -321,8 +319,6 @@ CStream_Power::CStream_Power(void)
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -342,6 +338,7 @@ bool CStream_Power::On_Execute(void)
 	//-----------------------------------------------------
 	for(int y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( pArea->is_NoData(x, y) || pSlope->is_NoData(x, y) )
@@ -383,7 +380,7 @@ CLS_Factor::CLS_Factor(void)
 		"\n"
 		"Boehner, J., Selige, T. (2006):\n"
 		"Spatial Prediction of Soil Attributes Using Terrain Analysis and Climate Regionalisation'\n"
-		"In: Boehner, J., McCloy, K.R., Strobl, J.: 'SAGA – Analysis and Modelling Applications', "
+		"In: Boehner, J., McCloy, K.R., Strobl, J.: 'SAGA - Analysis and Modelling Applications', "
 		"Goettinger Geographische Abhandlungen, Vol.115, p.13-27\n"
 		"\n"
 		"Desmet & Govers (1996):\n"
@@ -399,7 +396,7 @@ CLS_Factor::CLS_Factor(void)
 		"Hydrological Processes, Vol.5, No.1\n"
 		"\n"
 		"Wischmeier, W.H., Smith, D.D. (1978):\n"
-		"'Predicting rainfall erosion losses – A guide to conservation planning'\n"
+		"'Predicting rainfall erosion losses - A guide to conservation planning'\n"
 		"Agriculture Handbook No. 537: US Department of Agriculture, Washington DC.\n"
 	));
 
@@ -468,8 +465,6 @@ CLS_Factor::CLS_Factor(void)
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -492,6 +487,7 @@ bool CLS_Factor::On_Execute(void)
 	//-----------------------------------------------------
 	for(int y=0; y<Get_NY() && Set_Progress(y); y++)
 	{
+		#pragma omp parallel for
 		for(int x=0; x<Get_NX(); x++)
 		{
 			if( pArea->is_NoData(x, y) || pSlope->is_NoData(x, y) )
@@ -595,6 +591,97 @@ double CLS_Factor::Get_LS(double Slope, double Area)
 	}
 
 	return( LS );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CTCI_Low::CTCI_Low(void)
+{
+	//-----------------------------------------------------
+	Set_Name		(_TL("TCI Low"));
+
+	Set_Author		(SG_T("O.Conrad (c) 2012"));
+
+	Set_Description	(_TW(
+		"Terrain Classification Index for Lowlands (TCI Low).\n"
+		"\n"
+		"Reference:\n"
+		"Bock, M., Boehner, J., Conrad, O., Koethe, R., Ringeler, A. (2007): "
+		"Methods for creating Functional Soil Databases and applying Digital Soil Mapping with SAGA GIS. "
+		"In: Hengl, T., Panagos, P., Jones, A., Toth, G. [Eds.]: "
+		"Status and prospect of soil information in south-eastern Europe: soil databases, projects and applications. "
+		"EUR 22646 EN Scientific and Technical Research series, Office for Official Publications of the European Communities, Luxemburg, p.149-162. "
+		"<a target=\"_blank\" href=\"http://eusoils.jrc.ec.europa.eu/ESDB_Archive/eusoils_docs/esb_rr/EUR22646EN.pdf\">online</a>.\n"
+	));
+
+	//-----------------------------------------------------
+	Parameters.Add_Grid(
+		NULL	, "DISTANCE"	, _TL("Vertical Distance to Channel Network"),
+		_TL(""),
+		PARAMETER_INPUT
+	);
+
+	Parameters.Add_Grid(
+		NULL	, "TWI"			, _TL("Topographic Wetness Index"),
+		_TL(""),
+		PARAMETER_INPUT
+	);
+
+	Parameters.Add_Grid(
+		NULL	, "TCILOW"		, _TL("TCI Low"),
+		_TL(""),
+		PARAMETER_OUTPUT
+	);
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CTCI_Low::On_Execute(void)
+{
+	//-----------------------------------------------------
+	CSG_Grid	*pDistance	= Parameters("DISTANCE")->asGrid();
+	CSG_Grid	*pTWI		= Parameters("TWI"     )->asGrid();
+	CSG_Grid	*pTCI_Low	= Parameters("TCILOW"  )->asGrid();
+
+	DataObject_Set_Colors(pTCI_Low, 100, SG_COLORS_RED_GREY_BLUE, false);
+
+	double	dMax	= pDistance->Get_ZMax();
+	double	dRange	= pDistance->Get_ZRange();
+	double	wMin	= pTWI->Get_ZMin();
+	double	wRange	= log(1.0 + pTWI->Get_ZRange());
+
+	//-----------------------------------------------------
+	for(int y=0; y<Get_NY() && Set_Progress(y); y++)
+	{
+		#pragma omp parallel for
+		for(int x=0; x<Get_NX(); x++)
+		{
+			if( pDistance->is_NoData(x, y) || pTWI->is_NoData(x, y) )
+			{
+				pTCI_Low->Set_NoData(x, y);
+			}
+			else
+			{
+				double	d	= (dMax - pDistance->asDouble(x, y)) / dRange;			// inverted, normalized [0...1]
+				double	w	= log(1.0 + (pTWI->asDouble(x, y) - wMin)) / wRange;	// natural logarithm, normalized [0...1]
+
+				pTCI_Low->Set_Value(x, y, (2.0 * d + w) / 3.0);
+			}
+		}
+	}
+
+	//-----------------------------------------------------
+	return( true );
 }
 
 

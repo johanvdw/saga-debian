@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Shapes_Create_Empty.h 1097 2011-06-16 16:04:25Z oconrad $
+ * Version $Id: Shapes_Create_Empty.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ class CShapes_Create_Empty : public CSG_Module
 public:
 	CShapes_Create_Empty(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
 
 
 protected:

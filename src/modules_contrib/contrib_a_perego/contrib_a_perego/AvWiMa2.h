@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: AvWiMa2.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: AvWiMa2.h 1514 2012-11-06 09:47:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ public: ////// public members and functions: //////////////
 	CAvWiMa2(void);							// constructor
 	virtual ~CAvWiMa2(void);				// destructor
 
-	virtual const SG_Char *	Get_MenuPath			(void)	{	return( _TL("R:Filter for Grids") );	}
+	virtual CSG_String		Get_MenuPath			(void)	{	return( _TL("Averages") );	}
 
 
 protected: /// protected members and functions: ///////////

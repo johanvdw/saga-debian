@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: anisotropic_heating.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: anisotropic_heating.cpp 1632 2013-03-22 13:31:44Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -102,10 +102,6 @@ CAnisotropic_Heating::CAnisotropic_Heating(void)
 		PARAMETER_TYPE_Double	, 202.5, 0.0, true, 360.0, true
 	);
 }
-
-//---------------------------------------------------------
-CAnisotropic_Heating::~CAnisotropic_Heating(void)
-{}
 
 
 ///////////////////////////////////////////////////////////

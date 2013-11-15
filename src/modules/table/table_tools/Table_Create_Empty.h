@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Create_Empty.h 1098 2011-06-16 16:06:32Z oconrad $
+ * Version $Id: Table_Create_Empty.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ class CTable_Create_Empty : public CSG_Module
 public:
 	CTable_Create_Empty(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( _TL("A:Table|Construction") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Table|Construction") );	}
 
 
 protected:

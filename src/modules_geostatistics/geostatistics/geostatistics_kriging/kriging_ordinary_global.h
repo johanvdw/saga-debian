@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: kriging_ordinary_global.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: kriging_ordinary_global.h 1339 2012-02-28 16:31:17Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,23 +82,26 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class geostatistics_kriging_EXPORT CKriging_Ordinary_Global : public CKriging_Base
+class CKriging_Ordinary_Global : public CKriging_Base
 {
 public:
 	CKriging_Ordinary_Global(void);
-	virtual ~CKriging_Ordinary_Global(void);
 
 
 protected:
 
-	virtual bool			On_Initialise	(void);
+	virtual bool			On_Initialize		(void);
+	virtual bool			On_Finalize			(void);
 
-	virtual bool			Get_Value		(double x, double y, double &z, double &Variance);
+	virtual bool			Get_Value			(const TSG_Point &p, double &z, double &v);
 
 
 private:
 
-	bool					Get_Weights		(void);
+	CSG_Points_Z			m_Points;
+
+	CSG_Matrix				m_W;
+
 
 };
 

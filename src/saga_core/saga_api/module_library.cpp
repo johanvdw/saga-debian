@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.cpp 1201 2011-10-26 16:33:34Z oconrad $
+ * Version $Id: module_library.cpp 1683 2013-05-07 11:15:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@
 #include <wx/filename.h>
 #include <wx/utils.h>
 
-#include "module_library.h"
+#include "saga_api.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -147,8 +147,8 @@ bool CSG_Module_Library::Create(const CSG_String &File_Name)
 	wxFileName	fName(File_Name.c_str());
 
 	fName.MakeAbsolute();
-	m_File_Name		= fName.GetFullPath().c_str();
-	m_Library_Name	= fName.GetName().c_str();
+	m_File_Name		= fName.GetFullPath().wc_str();
+	m_Library_Name	= fName.GetName    ().wc_str();
 
 #if !defined(_SAGA_MSW)
 	if( m_Library_Name.Find(SG_T("lib")) == 0 )
@@ -160,11 +160,11 @@ bool CSG_Module_Library::Create(const CSG_String &File_Name)
 	//-----------------------------------------------------
 	if( wxGetEnv(ENV_LIB_PATH, &sPath) && sPath.Length() > 0 )
 	{
-		wxSetEnv(ENV_LIB_PATH, CSG_String::Format(SG_T("%s%c%s"), sPath.c_str(), ENV_LIB_SEPA, SG_File_Get_Path(m_File_Name).c_str()));
+		wxSetEnv(ENV_LIB_PATH, wxString::Format(SG_T("%s%c%s"), sPath, ENV_LIB_SEPA, SG_File_Get_Path(m_File_Name).w_str()));
 	}
 	else
 	{
-		wxSetEnv(ENV_LIB_PATH, SG_File_Get_Path(m_File_Name).c_str());
+		wxSetEnv(ENV_LIB_PATH, SG_File_Get_Path(m_File_Name).w_str());
 	}
 
 	//-----------------------------------------------------
@@ -189,14 +189,6 @@ bool CSG_Module_Library::Create(const CSG_String &File_Name)
 	//-----------------------------------------------------
 	if( Get_Count() > 0 )
 	{
-		for(int i=0; i<Get_Count(); i++)
-		{
-			if( Get_Module(i) )
-			{
-				Get_Module(i)->Set_Managed(false);
-			}
-		}
-
 		return( true );
 	}
 
@@ -242,58 +234,104 @@ const SG_Char * CSG_Module_Library::Get_Info(int Type) const
 }
 
 //---------------------------------------------------------
-CSG_String CSG_Module_Library::Get_Summary(bool bHTML) const
+CSG_String CSG_Module_Library::Get_Summary(int Format) const
 {
+	int			i;
 	CSG_String	s;
 
-	if( bHTML )
+	switch( Format )
 	{
-		s.Printf(
-			SG_T("%s: <b>%s</b><br>%s: <i>%s</i><br>%s: <i>%s</i><br>%s: <i>%s</i><hr>%s"),
-			LNG("[CAP] Module Library")	, Get_Info(MLB_INFO_Name),
-			LNG("[CAP] Author")			, Get_Info(MLB_INFO_Author),
-			LNG("[CAP] Version")		, Get_Info(MLB_INFO_Version),
-			LNG("[CAP] File")			, Get_File_Name().c_str(),
-			Get_Info(MLB_INFO_Description)
-		);
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_FLAT: case SG_SUMMARY_FMT_FLAT_NO_INTERACTIVE:
+		s	+= CSG_String::Format(SG_T("\n%s:\n"), _TL("modules"));
 
-		s.Append(CSG_String::Format(SG_T("<hr><b>%s:<ul>"), LNG("[CAP] Modules")));
-
-		for(int i=0; i<Get_Count(); i++)
+		for(i=0; i<Get_Count(); i++)
 		{
-			if( Get_Module(i) )
+			if( Get_Module(i) && (Format == SG_SUMMARY_FMT_FLAT || !Get_Module(i)->is_Interactive()) )
 			{
-				s.Append(CSG_String::Format(SG_T("<li>%s</li>"), Get_Module(i)->Get_Name()));
+				s	+= CSG_String::Format(SG_T(" %d\t- %s\n"), i, Get_Module(i)->Get_Name().c_str());
 			}
 		}
 
-		s.Append(SG_T("</ul>"));
+		break;
+
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_HTML: default:
+		s	+= CSG_String::Format(SG_T("%s: <b>%s</b><br>%s: <i>%s</i><br>%s: <i>%s</i><br>%s: <i>%s</i><hr>%s"),
+				_TL("Module Library"), Get_Info(MLB_INFO_Name),
+				_TL("Author"        ), Get_Info(MLB_INFO_Author),
+				_TL("Version"       ), Get_Info(MLB_INFO_Version),
+				_TL("File"          ), Get_File_Name().c_str(),
+				Get_Info(MLB_INFO_Description)
+			);
+
+		s	+= CSG_String::Format(SG_T("<hr><b>%s:<ul>"), _TL("Modules"));
+
+		for(i=0; i<Get_Count(); i++)
+		{
+			if( Get_Module(i) )
+			{
+				s	+= CSG_String::Format(SG_T("<li>%s</li>"), Get_Module(i)->Get_Name().c_str());
+			}
+		}
+
+		s	+= SG_T("</ul>");
 
 		s.Replace(SG_T("\n"), SG_T("<br>"));
-	}
-	else
-	{
-		s.Printf(
-			SG_T("%s: %s\n%s: %s\n%s: %s\n%s: %s\n\n%s"),
-			LNG("[CAP] Module Library")	, Get_Info(MLB_INFO_Name),
-			LNG("[CAP] Author")			, Get_Info(MLB_INFO_Author),
-			LNG("[CAP] Version")		, Get_Info(MLB_INFO_Version),
-			LNG("[CAP] File")			, Get_File_Name().c_str(),
-			Get_Info(MLB_INFO_Description)
-		);
 
-		s.Append(CSG_String::Format(SG_T("\n\n%s:\n"), LNG("[CAP] Modules")));
+		break;
 
-		for(int i=0; i<Get_Count(); i++)
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_XML: case SG_SUMMARY_FMT_XML_NO_INTERACTIVE:
+		s	+= SG_T("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
+		s	+= CSG_String::Format(SG_T("<%s>\n"), SG_XML_LIBRARY);
+		s	+= CSG_String::Format(SG_T("\t<%s>%s</%s>\n"), SG_XML_LIBRARY_PATH, Get_File_Name().c_str(), SG_XML_LIBRARY_PATH);
+		s	+= CSG_String::Format(SG_T("\t<%s>%s</%s>\n"), SG_XML_LIBRARY_NAME, Get_Name     ().c_str(), SG_XML_LIBRARY_NAME);
+
+		for(i=0; i<Get_Count(); i++)
 		{
-			if( Get_Module(i) )
+			if( Get_Module(i) && (Format == SG_SUMMARY_FMT_XML || !Get_Module(i)->is_Interactive()) )
 			{
-				s.Append(CSG_String::Format(SG_T("- %s\n"), Get_Module(i)->Get_Name()));
+				s	+= CSG_String::Format(SG_T("\t<%s %s=\"%d\" %s=\"%s\">\n"), SG_XML_MODULE,
+					SG_XML_MODULE_ATT_ID, i, SG_XML_MODULE_ATT_NAME, Get_Module(i)->Get_Name().c_str()
+				);
 			}
 		}
+
+		s	+= CSG_String::Format(SG_T("</%s>\n"), SG_XML_LIBRARY);
+
+		break;
 	}
 
 	return( s );
+}
+
+//---------------------------------------------------------
+bool CSG_Module_Library::Get_Summary(const CSG_String &Path)	const
+{
+	CSG_File	f;
+
+	if( f.Open(SG_File_Make_Path(Path, Get_Library_Name(), SG_T("html")), SG_FILE_W) )
+	{
+		f.Write(Get_Summary());
+	}
+
+	for(int j=0; j<Get_Count(); j++)
+	{
+		CSG_Module	*pModule	= Get_Module(j);
+
+		if( pModule )
+		{
+			CSG_String	fName	= CSG_String::Format(SG_T("%s_%02d"), Get_Library_Name().c_str(), pModule->Get_ID());
+
+			if( f.Open(SG_File_Make_Path(Path, fName, SG_T("html")), SG_FILE_W) )
+			{
+				f.Write(Get_Module(j)->Get_Summary());
+			}
+		}
+	}
+
+	return( true );
 }
 
 
@@ -485,14 +523,14 @@ CSG_Module_Library * CSG_Module_Library_Manager::Add_Library(const SG_Char *File
 		return( NULL );
 	}
 
-	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), LNG("[MSG] Load library"), File_Name), true);
+	SG_UI_Msg_Add(CSG_String::Format(SG_T("%s: %s..."), _TL("Load library"), File_Name), true);
 
 	//-----------------------------------------------------
 	for(int i=0; i<Get_Count(); i++)
 	{
 		if( SG_STR_CMP(File_Name, Get_Library(i)->Get_File_Name()) == 0 )
 		{
-			SG_UI_Msg_Add(LNG("[MSG] has already been loaded"), false);
+			SG_UI_Msg_Add(_TL("has already been loaded"), false);
 
 			return( NULL );
 		}
@@ -506,22 +544,14 @@ CSG_Module_Library * CSG_Module_Library_Manager::Add_Library(const SG_Char *File
 		m_pLibraries	= (CSG_Module_Library **)SG_Realloc(m_pLibraries, (m_nLibraries + 1) * sizeof(CSG_Module_Library *));
 		m_pLibraries[m_nLibraries++]	= pLibrary;
 
-		SG_UI_Msg_Add(LNG("[MSG] okay"), false, SG_UI_MSG_STYLE_SUCCESS);
-
-		for(int j=0; j<pLibrary->Get_Count(); j++)
-		{
-			if( pLibrary->Get_Module(j) )
-			{
-				pLibrary->Get_Module(j)->Set_Managed();
-			}
-		}
+		SG_UI_Msg_Add(_TL("okay"), false, SG_UI_MSG_STYLE_SUCCESS);
 
 		return( pLibrary );
 	}
 
 	delete(pLibrary);
 
-	SG_UI_Msg_Add(LNG("[MSG] failed"), false, SG_UI_MSG_STYLE_FAILURE);
+	SG_UI_Msg_Add(_TL("failed"), false, SG_UI_MSG_STYLE_FAILURE);
 
 	return( false );
 }
@@ -660,6 +690,113 @@ CSG_Module * CSG_Module_Library_Manager::Get_Module(const SG_Char *Library, cons
 	CSG_Module_Library	*pLibrary	= Get_Library(Library, true);
 
 	return( pLibrary ? pLibrary->Get_Module(Module) : NULL );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+#define SUMMARY_HTML_ADD_INT(label, value)	s += CSG_String::Format(SG_T("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value)
+
+//---------------------------------------------------------
+CSG_String CSG_Module_Library_Manager::Get_Summary(int Format)	const
+{
+	//-----------------------------------------------------
+	int			i, nModules;
+
+	for(i=0, nModules=0; i<Get_Count(); i++)
+	{
+		nModules	+= Get_Library(i)->Get_Count();
+	}
+
+	//-----------------------------------------------------
+	CSG_String	s;
+
+	switch( Format )
+	{
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_FLAT: case SG_SUMMARY_FMT_FLAT_NO_INTERACTIVE:
+		s	+= CSG_String::Format(SG_T("\n%d %s (%d %s):\n"), Get_Count(), _TL("loaded module libraries"), nModules, _TL("modules"));
+
+		for(i=0; i<Get_Count(); i++)
+		{
+			s	+= CSG_String::Format(SG_T("- %s\n"), Get_Library(i)->Get_Library_Name().c_str());
+		}
+
+		break;
+
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_HTML: default:
+		s	+= CSG_String::Format(SG_T("<b>%s</b>"), _TL("Module Libraries"));
+
+		s	+= SG_T("<table border=\"0\">");
+		SUMMARY_HTML_ADD_INT(_TL("Available Libraries"), Get_Count());
+		SUMMARY_HTML_ADD_INT(_TL("Available Modules"  ), nModules);
+		s	+= SG_T("</table>");
+
+		s	+= CSG_String::Format(SG_T("<hr><b>%s:</b><table border=\"1\">"), _TL("Module Libraries"));
+
+		s	+= CSG_String::Format(SG_T("<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>"),
+				_TL("Library"),
+				_TL("Modules"),
+				_TL("Name"),
+				_TL("Location")
+			);
+
+		for(i=0; i<Get_Count(); i++)
+		{
+			s	+= CSG_String::Format(SG_T("<tr><td>%s</td><td>%d</td><td>%s</td><td>%s</td></tr>"),
+					SG_File_Get_Name(Get_Library(i)->Get_File_Name(), false).c_str(),
+					Get_Library(i)->Get_Count(),
+					Get_Library(i)->Get_Name().c_str(),
+					SG_File_Get_Path(Get_Library(i)->Get_File_Name()).c_str()
+				);
+		}
+
+		s	+= SG_T("</table>");
+
+		break;
+
+	//-----------------------------------------------------
+	case SG_SUMMARY_FMT_XML: case SG_SUMMARY_FMT_XML_NO_INTERACTIVE:
+		s	+= SG_T("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n");
+		s	+= CSG_String::Format(SG_T("\n<%s>"), SG_XML_SYSTEM);
+		s	+= CSG_String::Format(SG_T("\n<%s>%s</%s>"), SG_XML_SYSTEM_VER, SAGA_VERSION, SG_XML_SYSTEM_VER);
+
+		for(int i=0; i<SG_Get_Module_Library_Manager().Get_Count(); i++)
+		{
+			s	+= CSG_String::Format(SG_T("\n\t<%s %s=\"%s\"/>"), SG_XML_LIBRARY, SG_XML_LIBRARY_NAME,
+				SG_Get_Module_Library_Manager().Get_Library(i)->Get_Library_Name().c_str()
+			);
+		}
+
+		s	+= CSG_String::Format(SG_T("\n</%s>"), SG_XML_SYSTEM);
+
+		break;
+	}
+
+	//-----------------------------------------------------
+	return( s );
+}
+
+//---------------------------------------------------------
+bool CSG_Module_Library_Manager::Get_Summary(const CSG_String &Path)	const
+{
+	for(int i=0; i<Get_Count(); i++)
+	{
+		CSG_Module_Library	*pLibrary	= Get_Library(i);
+
+		CSG_String	Directory	= SG_File_Make_Path(Path, pLibrary->Get_Library_Name());
+
+		if( SG_Dir_Create(Directory) )
+		{
+			pLibrary->Get_Summary(Directory);
+		}
+	}
+
+	return( true );
 }
 
 

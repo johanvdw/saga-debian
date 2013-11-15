@@ -1,20 +1,20 @@
 #
-# $Id: Makefile.am 1119 2011-06-29 12:13:43Z oconrad $
+# $Id: Makefile.am 1648 2013-04-11 08:55:01Z oconrad $
 #
 INCS = -I.. -I.
 if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
-MLIBPATH = "MODULE_LIBRARY_PATH=\"$(prefix)/lib/saga\""
+MLIBPATH = "MODULE_LIBRARY_PATH=\"$(libdir)/saga\""
 MSHAREPATH = "SHARE_PATH=\"$(prefix)/share/saga\""
 
 BASEFLAGS = -fPIC -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -D_SAGA_DONOTUSE_HARU -D$(MLIBPATH) -D$(MSHAREPATH) $(DBGFLAGS) $(INCS)
 if SAGA_UNICODE
-AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=yes --cxxflags` -D_SAGA_UNICODE
-AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs` -lm 
+AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=yes --cxxflags` -D_SAGA_UNICODE $(GOMPFLAGS)
+AM_LDFLAGS = -fPIC `wx-config --unicode=yes --libs adv,aui,base,core,html,net,propgrid,xml`
 else
-AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=no --cxxflags`
-AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs` -lm
+AM_CXXFLAGS = $(BASEFLAGS) `wx-config --unicode=no --cxxflags` $(GOMPFLAGS)
+AM_LDFLAGS = -fPIC `wx-config --unicode=no --libs adv,aui,base,core,html,net,propgrid,xml`
 endif
 
 bin_PROGRAMS = saga_gui
@@ -30,6 +30,7 @@ active_parameters.cpp\
 callback.cpp\
 data_source.cpp\
 data_source_files.cpp\
+data_source_odbc.cpp\
 dc_helper.cpp\
 dlg_about.cpp\
 dlg_about_logo.cpp\
@@ -78,6 +79,7 @@ wksp_base_control.cpp\
 wksp_base_item.cpp\
 wksp_base_manager.cpp\
 wksp_data_control.cpp\
+wksp_data_item.cpp\
 wksp_data_layers.cpp\
 wksp_data_manager.cpp\
 wksp_data_menu_file.cpp\
@@ -123,6 +125,7 @@ active_parameters.h\
 callback.h\
 data_source.h\
 data_source_files.h\
+data_source_odbc.h\
 dc_helper.h\
 dlg_about.h\
 dlg_about_logo.h\
@@ -171,6 +174,7 @@ wksp_base_control.h\
 wksp_base_item.h\
 wksp_base_manager.h\
 wksp_data_control.h\
+wksp_data_item.h\
 wksp_data_layers.h\
 wksp_data_manager.h\
 wksp_data_menu_file.h\
@@ -204,22 +208,7 @@ wksp_shapes_type.h\
 wksp_table.h\
 wksp_table_manager.h\
 wksp_tin.h\
-wksp_tin_manager.h\
-wx/propgrid/advprops.cpp\
-wx/propgrid/advprops.h\
-wx/propgrid/editors.cpp\
-wx/propgrid/editors.h\
-wx/propgrid/extras.cpp\
-wx/propgrid/extras.h\
-wx/propgrid/manager.cpp\
-wx/propgrid/manager.h\
-wx/propgrid/odcombo.cpp\
-wx/propgrid/odcombo.h\
-wx/propgrid/propdev.h\
-wx/propgrid/propgrid.cpp\
-wx/propgrid/propgrid.h\
-wx/propgrid/props.cpp\
-wx/propgrid/props.h
+wksp_tin_manager.h
 
 saga_gui_LDADD = ../saga_api/libsaga_api.la ../saga_odbc/libsaga_odbc.la
 

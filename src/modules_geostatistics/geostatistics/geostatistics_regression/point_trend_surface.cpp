@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: point_trend_surface.cpp 989 2011-04-12 15:56:10Z oconrad $
+ * Version $Id: point_trend_surface.cpp 1633 2013-03-22 13:35:15Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ bool CPoint_Trend_Surface::On_Execute(void)
 	}
 
 	//-----------------------------------------------------
-	pRegression->Set_Name(CSG_String::Format(SG_T("%s (%s)"), pPoints->Get_Name(), Get_Name()));
+	pRegression->Set_Name(CSG_String::Format(SG_T("%s [%s]"), Parameters("ATTRIBUTE")->asString(), _TL("Trend Surface")));
 
 	Set_Regression(pRegression);
 

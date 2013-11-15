@@ -67,7 +67,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -84,7 +84,7 @@ const SG_Char * Get_Info(int i)
 		return( SG_T("1.0" ));
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Contributions|Garden|Web Service Data Access" ));
+		return( _TL("Garden|Web Service Data Access" ));
 	}
 }
 

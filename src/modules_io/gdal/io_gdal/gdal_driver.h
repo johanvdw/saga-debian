@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_driver.h 1108 2011-06-22 11:16:21Z johanvdw $
+ * Version $Id: gdal_driver.h 1680 2013-05-04 12:06:43Z benducke $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ public:
 	virtual ~CSG_GDAL_DataSet(void);
 
 	bool						Open_Read			(const CSG_String &File_Name);
-	bool						Open_Write			(const CSG_String &File_Name, const CSG_String &Driver, TSG_Data_Type Type, int NBands, const CSG_Grid_System &System, const CSG_Projection &Projection);
+	bool						Open_Write			(const CSG_String &File_Name, const CSG_String &Driver, const CSG_String &Options, TSG_Data_Type Type, int NBands, const CSG_Grid_System &System, const CSG_Projection &Projection);
 	bool						Close				(void);
 
 	bool						is_Okay				(void)	const	{	return( m_pDataSet != NULL );	}
@@ -133,22 +133,34 @@ public:
 
 	int							Get_NX				(void)	const	{	return( m_NX );			}
 	int							Get_NY				(void)	const	{	return( m_NY );			}
+	double						Get_Cellsize		(void)	const	{	return( m_Cellsize );	}
 	double						Get_xMin			(void)	const	{	return( m_xMin );		}
 	double						Get_yMin			(void)	const	{	return( m_yMin );		}
-	double						Get_Cellsize		(void)	const	{	return( m_Cellsize );	}
+	double						Get_xMax			(void)	const	{	return( m_xMin + m_NX * m_Cellsize );	}
+	double						Get_yMax			(void)	const	{	return( m_yMin + m_NY * m_Cellsize );	}
 
 	bool						Needs_Transform		(void)	const	{	return( m_bTransform );	}
 	void						Get_Transform		(CSG_Vector &A, CSG_Matrix &B)	const	{	A	= m_TF_A;	B	= m_TF_B;	}
 
 	class GDALDriver *			Get_Driver			(void)	const;
-	const CSG_String			Get_Name			(void)	const;
-	const CSG_String			Get_Description		(void)	const;
+	CSG_String					Get_DriverID		(void)	const;
+	CSG_String					Get_Name			(void)	const;
+	CSG_String					Get_Description		(void)	const;
 	const char *				Get_Projection		(void)	const;
-	const char **				Get_MetaData		(const char *pszDomain = "")	const;
-	const char *				Get_MetaData_Item	(const char *pszName, const char *pszDomain = "")	const;
+	const char *				Get_MetaData_Item	(const char *pszName, const char *pszDomain = "")							const;
+	const char **				Get_MetaData		(const char *pszDomain = "")												const;
+	bool						Get_MetaData_Item	(CSG_String   &MetaData, const char *pszName, const char *pszDomain = "")	const;
+	bool						Get_MetaData		(CSG_MetaData &MetaData)													const;
+	bool						Get_MetaData		(CSG_MetaData &MetaData, const char *pszDomain)								const;
 
 	int							Get_Count			(void)	const;
+	CSG_String					Get_Name			(int i)	const;
+	CSG_String					Get_Description		(int i)	const;
+	bool						Get_MetaData		(int i, CSG_MetaData &MetaData)	const;
+	const char *				Get_MetaData_Item	(int i, const char *pszName)	const;
+	bool						Get_MetaData_Item	(int i, const char *pszName, CSG_String &MetaData)	const;
 	CSG_Grid *					Read				(int i);
+	bool						Write				(int i, CSG_Grid *pGrid, double NoDataValue);
 	bool						Write				(int i, CSG_Grid *pGrid);
 
 

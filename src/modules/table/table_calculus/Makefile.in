@@ -75,10 +75,10 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libtable_calculus_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
-am_libtable_calculus_la_OBJECTS = etp_hargreave.lo Fit.lo LMFit.lo \
-	MLB_Interface.lo Table_Calculator.lo table_cluster_analysis.lo \
-	table_fill_record_gaps.lo table_pca.lo \
-	table_running_average.lo Table_Trend.lo
+am_libtable_calculus_la_OBJECTS = Fit.lo LMFit.lo MLB_Interface.lo \
+	Table_Calculator.lo table_cluster_analysis.lo \
+	table_field_analyzer.lo table_fill_record_gaps.lo table_pca.lo \
+	table_running_average.lo
 libtable_calculus_la_OBJECTS = $(am_libtable_calculus_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -137,6 +137,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -167,7 +168,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -248,36 +248,34 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1171 2011-09-23 14:37:31Z oconrad $
+# $Id: Makefile.am 1601 2013-01-31 13:14:20Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libtable_calculus.la
 libtable_calculus_la_SOURCES = \
-etp_hargreave.cpp\
 Fit.cpp\
 LMFit.cpp\
 MLB_Interface.cpp\
 Table_Calculator.cpp\
 table_cluster_analysis.cpp\
+table_field_analyzer.cpp\
 table_fill_record_gaps.cpp\
 table_pca.cpp\
 table_running_average.cpp\
-Table_Trend.cpp\
-etp_hargreave.h\
 Fit.h\
 LMFit.h\
 MLB_Interface.h\
 Table_Calculator.h\
 table_cluster_analysis.h\
+table_field_analyzer.h\
 table_fill_record_gaps.h\
 table_pca.h\
-table_running_average.h\
-Table_Trend.h
+table_running_average.h
 
 libtable_calculus_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -358,9 +356,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LMFit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MLB_Interface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Calculator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Trend.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/etp_hargreave.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_cluster_analysis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_field_analyzer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_fill_record_gaps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_pca.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_running_average.Plo@am__quote@

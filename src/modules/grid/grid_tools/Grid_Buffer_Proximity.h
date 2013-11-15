@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Buffer_Proximity.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_Buffer_Proximity.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -65,7 +65,7 @@ public:
 	CGrid_Proximity_Buffer(void);
 	virtual ~CGrid_Proximity_Buffer(void);
 
-	virtual const SG_Char *	Get_MenuPath	(void)	{	return( _TL("R:Buffers") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Buffers") );	}
 
 
 protected:

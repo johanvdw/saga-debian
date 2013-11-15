@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_scatterplot.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: view_scatterplot.h 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -98,10 +98,8 @@ void		Add_ScatterPlot(CSG_Table *pTable);
 class CVIEW_ScatterPlot : public CVIEW_Base
 {
 public:
-	CVIEW_ScatterPlot(CSG_Grid *pGrid_A, CSG_Grid *pGrid_B);
-	CVIEW_ScatterPlot(CSG_Grid *pGrid, CSG_Shapes *pShapes, int Field);
-	CVIEW_ScatterPlot(CSG_Table *pTable, int Field_A, int Field_B);
-	virtual ~CVIEW_ScatterPlot(void);
+	CVIEW_ScatterPlot(CSG_Grid  *pGrid);
+	CVIEW_ScatterPlot(CSG_Table *pTable);
 
 	static class wxToolBarBase *	_Create_ToolBar				(void);
 	static class wxMenu *			_Create_Menu				(void);
@@ -110,21 +108,17 @@ public:
 	void							On_Paint					(wxPaintEvent   &event);
 
 	void							On_Parameters				(wxCommandEvent &event);
+	void							On_Options					(wxCommandEvent &event);
 	void							On_Update					(wxCommandEvent &event);
 	void							On_AsTable					(wxCommandEvent &event);
+	void							On_ToClipboard				(wxCommandEvent &event);
 
 	void							Draw						(wxDC &dc, wxRect r);
-
-	void							Update_ScatterPlot			(void);
 
 
 private:
 
-	int								m_Method, m_maxSamples, m_xField, m_yField;
-
-	CSG_Grid						*m_pGrid_X, *m_pGrid_Y;
-
-	CSG_Shapes						*m_pShapes;
+	CSG_Grid						*m_pGrid, m_Count;
 
 	CSG_Table						*m_pTable;
 
@@ -132,20 +126,22 @@ private:
 
 	CSG_Parameters					m_Parameters;
 
-	wxString						m_sTitle, m_sX, m_sY;
+	CSG_String						m_sTitle, m_sX, m_sY;
 
 
 	void							_On_Construction			(void);
 
 	bool							_Initialize					(void);
+	bool							_Initialize_Count			(void);
 	bool							_Initialize_Grids			(void);
 	bool							_Initialize_Shapes			(void);
 	bool							_Initialize_Table			(void);
 
 	wxRect							_Draw_Get_rDiagram			(wxRect r);
-	void							_Draw_Image					(wxDC &dc, wxRect r, double dx, double dy);
-	void							_Draw_Points				(wxDC &dc, wxRect r, double dx, double dy);
-	void							_Draw_Regression			(wxDC &dc, wxRect r, double dx, double dy);
+	void							_Draw_Legend				(wxDC &dc, wxRect r);
+	void							_Draw_Image					(wxDC &dc, wxRect r);
+	void							_Draw_Points				(wxDC &dc, wxRect r);
+	void							_Draw_Regression			(wxDC &dc, wxRect r);
 	void							_Draw_Frame					(wxDC &dc, wxRect r);
 
 

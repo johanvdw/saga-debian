@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_import.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: gdal_import.h 1642 2013-03-25 12:59:06Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -79,7 +79,9 @@ public:
 
 protected:
 
-	virtual bool				On_Execute			(void);
+	virtual bool				On_Execute				(void);
+
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:
@@ -87,10 +89,10 @@ private:
 	CSG_Parameter_Grid_List		*m_pGrids;
 
 
-	bool						Load_Sub			(CSG_GDAL_DataSet &DataSet, const CSG_String &Name);
-	bool						Load				(CSG_GDAL_DataSet &DataSet, const CSG_String &Name);
+	bool						Load_Sub				(CSG_GDAL_DataSet &DataSet);
+	bool						Load					(CSG_GDAL_DataSet &DataSet, const CSG_String &Name);
 
-	void						Set_Transformation	(CSG_Grid **ppGrid, const CSG_Vector &A, const CSG_Matrix &B);
+	void						Set_Transformation		(CSG_Grid **ppGrid, const CSG_Grid_System &System, const CSG_Vector &A, const CSG_Matrix &B);
 
 };
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1016 2011-04-27 18:40:36Z oconrad $
+# $Id: Makefile.am 1447 2012-07-16 13:01:47Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,7 +9,7 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version 
 pkglib_LTLIBRARIES = libta_hydrology.la
 libta_hydrology_la_SOURCES =\
@@ -31,6 +31,7 @@ IsochronesVar.cpp\
 LakeFlood.cpp\
 LakeFloodInteractive.cpp\
 MLB_Interface.cpp\
+melton_ruggedness.cpp\
 SAGA_Wetness_Index.cpp\
 Sinuosity.cpp\
 SlopeLength.cpp\
@@ -53,6 +54,7 @@ IsochronesConst.h\
 IsochronesVar.h\
 LakeFlood.h\
 MLB_Interface.h\
+melton_ruggedness.h\
 SAGA_Wetness_Index.h\
 Sinuosity.h\
 SlopeLength.h\

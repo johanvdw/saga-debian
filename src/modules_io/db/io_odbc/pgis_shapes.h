@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pgis_shapes.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: pgis_shapes.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ class CPGIS_Shapes_Load : public CSG_ODBC_Module
 public:
 	CPGIS_Shapes_Load(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( SG_T("R:PostGIS") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:PostGIS") );	}
 
 
 protected:
@@ -107,7 +107,7 @@ class CPGIS_Shapes_Save : public CSG_ODBC_Module
 public:
 	CPGIS_Shapes_Save(void);
 
-	virtual const SG_Char *		Get_MenuPath			(void)	{	return( SG_T("R:PostGIS") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:PostGIS") );	}
 
 
 protected:

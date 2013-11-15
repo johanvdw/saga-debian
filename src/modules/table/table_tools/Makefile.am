@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1169 2011-09-21 16:56:01Z oconrad $
+# $Id: Makefile.am 1358 2012-03-28 17:17:15Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,19 +9,21 @@ UC_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS         = -fPIC -shared -avoid-version
 pkglib_LTLIBRARIES = libtable_tools.la
 libtable_tools_la_SOURCES =\
 Join_Tables.cpp\
 MLB_Interface.cpp\
 table_change_date_format.cpp\
+table_change_field_type.cpp\
 Table_Create_Empty.cpp\
 Table_Enumerate.cpp\
 Table_Rotate.cpp\
 Join_Tables.h\
 MLB_Interface.h\
 table_change_date_format.h\
+table_change_field_type.h\
 Table_Create_Empty.h\
 Table_Enumerate.h\
 Table_Rotate.h

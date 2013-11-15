@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_control.cpp 1074 2011-05-31 15:04:56Z oconrad $
+ * Version $Id: wksp_base_control.cpp 1743 2013-06-21 10:01:07Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ bool CWKSP_Base_Control::_Set_Manager(CWKSP_Base_Manager *pManager)
 		m_pManager	= pManager;
 
 		AddRoot		(m_pManager->Get_Name(), IMG_ROOT, IMG_ROOT, m_pManager);
-		AppendItem	(m_pManager->GetId(), LNG("[CAP] [no items]"), IMG_NO_ITEMS, IMG_NO_ITEMS, NULL);
+		AppendItem	(m_pManager->GetId(), _TL("<no items>"), IMG_NO_ITEMS, IMG_NO_ITEMS, NULL);
 		Expand		(m_pManager->GetId());
 
 		return( true );
@@ -308,7 +308,7 @@ bool CWKSP_Base_Control::_Del_Item(CWKSP_Base_Item *pItem, bool bSilent)
 		return( false );
 	}
 
-	if( pItem->Get_Type() == WKSP_ITEM_Table &&	(((CWKSP_Table *)pItem)->Get_Owner()->Get_Type() == WKSP_ITEM_Shapes ||	((CWKSP_Table *)pItem)->Get_Owner()->Get_Type() == WKSP_ITEM_TIN) )
+	if( pItem->Get_Type() == WKSP_ITEM_Table &&	((CWKSP_Table *)pItem)->Get_Object()->Get_ObjectType() != DATAOBJECT_TYPE_Table )
 	{
 		return( false );
 	}
@@ -337,12 +337,12 @@ bool CWKSP_Base_Control::_Del_Item(CWKSP_Base_Item *pItem, bool bSilent)
 
 			//---------------------------------------------
 			DeleteChildren	(m_pManager->GetId());
-			AppendItem		(m_pManager->GetId(), LNG("[CAP] [no items]"), 0, 0, NULL);
+			AppendItem		(m_pManager->GetId(), _TL("<no items>"), 0, 0, NULL);
 			Expand			(m_pManager->GetId());
 
 			if( g_pModule_Ctrl && m_pManager->Get_Type() == WKSP_ITEM_Module_Manager )
 			{
-				g_pModules->Get_Modules_Menu()->Update();
+				g_pModules->Get_Menu_Modules()->Update();
 			}
 
 			//---------------------------------------------
@@ -392,7 +392,7 @@ bool CWKSP_Base_Control::_Del_Item(CWKSP_Base_Item *pItem, bool bSilent)
 
 		if( m_pManager->Get_Type() == WKSP_ITEM_Module_Manager )
 		{
-			g_pModules->Get_Modules_Menu()->Update();
+			g_pModules->Get_Menu_Modules()->Update();
 		}
 
 		if( pItem_Manager != NULL && pItem_Manager->Get_Type() == WKSP_ITEM_Map )
@@ -588,7 +588,6 @@ bool CWKSP_Base_Control::_Del_Active(bool bSilent)
 				}
 			}
 
-			SelectItem(GetRootItem());
 			SetFocus();
 		}
 	}
@@ -686,7 +685,7 @@ bool CWKSP_Base_Control::_Load_Settings(void)
 	wxString		File_Path;
 	CSG_MetaData	Data;
 
-	if( Get_Selection_Count() > 0 && DLG_Open(File_Path, ID_DLG_PARAMETERS_OPEN) && Data.Load(File_Path.c_str()) )
+	if( Get_Selection_Count() > 0 && DLG_Open(File_Path, ID_DLG_PARAMETERS_OPEN) && Data.Load(&File_Path) )
 	{
 		if(	GetWindowStyle() & wxTR_MULTIPLE )
 		{
@@ -743,7 +742,7 @@ void	DLG_Copy_Settings(CSG_Table &List, CWKSP_Base_Item *pItem)
 		{
 			CSG_Table_Record	*pEntry	= List.Add_Record();
 
-			pEntry->Set_Value(0, CSG_String::Format(SG_T("[%s] %s"), pItem->Get_Manager()->Get_Name().c_str(), pItem->Get_Name().c_str()).c_str());
+			pEntry->Set_Value(0, CSG_String(wxString::Format(SG_T("[%s] %s"), pItem->Get_Manager()->Get_Name(), pItem->Get_Name()).wc_str()));
 			pEntry->Set_Value(1, (long)pItem->Get_Parameters());
 		}
 	}
@@ -763,25 +762,20 @@ CSG_Parameters *	DLG_Copy_Settings(void)
 
 	if( List.Get_Count() > 0 )
 	{
-		int			i;
-		wxString	*pItems;
+		wxArrayString	Items;
 
-		pItems	= new wxString[List.Get_Count()];
-
-		for(i=0; i<List.Get_Count(); i++)
+		for(int i=0; i<List.Get_Count(); i++)
 		{
-			pItems[i]	= List.Get_Record(i)->asString(0);
+			Items.Add(List.Get_Record(i)->asString(0));
 		}
 
 		wxSingleChoiceDialog	dlg(MDI_Get_Top_Window(),
-			LNG("Copy Settings from..."),
-			LNG("[DLG] Select a layer to copy settings from it."),
-			List.Get_Count(), pItems
+			_TL("Copy Settings from..."),
+			_TL("Select a layer to copy settings from it."),
+			Items
 		);
 
 		bool	bOk	= dlg.ShowModal() == wxID_OK;
-
-		delete[](pItems);
 
 		if( bOk )
 		{
@@ -807,7 +801,7 @@ bool CWKSP_Base_Control::_Copy_Settings(CSG_Parameters *pParameters, CWKSP_Base_
 		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("LABEL_ATTRIB"))
 		//	&&	SG_STR_CMP(pSource->Get_Identifier(), SG_T("LABEL_ATTRIB_SIZE_BY"))	)
 			{
-				CSG_Parameter	*pTarget	= pItem->Get_Parameters()->Get_Parameter(pSource->Get_Identifier());
+				CSG_Parameter	*pTarget	= pItem->Get_Parameter(pSource->Get_Identifier());
 
 				if( pTarget && pTarget->Get_Type() == pSource->Get_Type() )
 				{
@@ -864,7 +858,7 @@ bool CWKSP_Base_Control::_Search_Compare(wxString A, wxString B, bool bCase)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pItem, const wxChar *String, bool bName, bool bDesc, bool bCase)
+bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase)
 {
 	if( pItem == NULL )
 	{
@@ -876,8 +870,8 @@ bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pIt
 	{
 		CSG_Table_Record	*pRecord	= pList->Add_Record();
 
-		pRecord->Set_Value(0, pItem->Get_Name().c_str());
-		pRecord->Set_Value(1, pItem->Get_Type_Name(pItem->Get_Type()).c_str());
+		pRecord->Set_Value(0, pItem->Get_Name().wx_str());
+		pRecord->Set_Value(1, pItem->Get_Type_Name(pItem->Get_Type()).wx_str());
 		pRecord->Set_Value(2, (long)pItem);
 	}
 
@@ -895,14 +889,14 @@ bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pIt
 //---------------------------------------------------------
 bool CWKSP_Base_Control::_Search_Item(void)
 {
-	static CSG_Parameters	Search(NULL, LNG("Search for..."), LNG(""));
+	static CSG_Parameters	Search(NULL, _TL("Search for..."), _TL(""));
 
 	if( Search.Get_Count() == 0 )
 	{
-		Search.Add_String	(NULL, "STRING"	, LNG("Search for...")	, LNG(""), SG_T(""));
-		Search.Add_Value	(NULL, "NAME"	, LNG("Name")			, LNG(""), PARAMETER_TYPE_Bool, true);
-		Search.Add_Value	(NULL, "DESC"	, LNG("Description")	, LNG(""), PARAMETER_TYPE_Bool, false);
-		Search.Add_Value	(NULL, "CASE"	, LNG("Case Sensitive")	, LNG(""), PARAMETER_TYPE_Bool, false);
+		Search.Add_String	(NULL, "STRING"	, _TL("Search for...")	, _TL(""), SG_T(""));
+		Search.Add_Value	(NULL, "NAME"	, _TL("Name")			, _TL(""), PARAMETER_TYPE_Bool, true);
+		Search.Add_Value	(NULL, "DESC"	, _TL("Description")	, _TL(""), PARAMETER_TYPE_Bool, false);
+		Search.Add_Value	(NULL, "CASE"	, _TL("Case Sensitive")	, _TL(""), PARAMETER_TYPE_Bool, false);
 	}
 
 	if( !DLG_Parameters(&Search) )
@@ -913,41 +907,37 @@ bool CWKSP_Base_Control::_Search_Item(void)
 	//-----------------------------------------------------
 	CSG_Table	List;
 
-	List.Add_Field(LNG("NAME")	, SG_DATATYPE_String);
-	List.Add_Field(LNG("TYPE")	, SG_DATATYPE_String);
-	List.Add_Field(LNG("ADDR")	, SG_DATATYPE_Long);
+	List.Add_Field(_TL("NAME")	, SG_DATATYPE_String);
+	List.Add_Field(_TL("TYPE")	, SG_DATATYPE_String);
+	List.Add_Field(_TL("ADDR")	, SG_DATATYPE_Long);
 
 	_Search_Get_List(&List, m_pManager, Search("STRING")->asString(), Search("NAME")->asBool(), Search("DESC")->asBool(), Search("CASE")->asBool());
 
 	if( List.Get_Count() <= 0 )
 	{
-		wxMessageBox(LNG("Search text not found"), LNG("Search for..."), wxOK|wxICON_EXCLAMATION);
+		wxMessageBox(_TL("Search text not found"), _TL("Search for..."), wxOK|wxICON_EXCLAMATION);
 
 		return( false );
 	}
 
 	//-----------------------------------------------------
-	wxString	*pItems	= new wxString[List.Get_Count()];
+	wxArrayString	Items;
 
 	for(int i=0; i<List.Get_Count(); i++)
 	{
-		pItems[i].Printf(wxT("[%s] %s"), List[i].asString(1), List[i].asString(0));
+		Items.Add(wxString::Format(wxT("[%s] %s"), List[i].asString(1), List[i].asString(0)));
 	}
 
 	wxSingleChoiceDialog	dlg(MDI_Get_Top_Window(),
-		LNG("Locate..."),
-		wxString::Format(wxT("%s: %s"), LNG("Search Text"), Search("STRING")->asString()),
-		List.Get_Count(), pItems
+		_TL("Locate..."),
+		wxString::Format(wxT("%s: %s"), _TL("Search Text"), Search("STRING")->asString()),
+		Items
 	);
 
 	if( dlg.ShowModal() != wxID_OK )
 	{
-		delete[](pItems);
-
 		return( false );
 	}
-
-	delete[](pItems);
 
 	//-----------------------------------------------------
 	CWKSP_Base_Item	*pItem	= (CWKSP_Base_Item *)List.Get_Record(dlg.GetSelection())->asInt(2);

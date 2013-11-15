@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Lines_From_Points.cpp 915 2011-02-15 08:43:36Z oconrad $
+ * Version $Id: Lines_From_Points.cpp 1512 2012-11-05 16:58:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -108,6 +108,12 @@ CLines_From_Points::CLines_From_Points(void)
 		_TL(""),
 		true
 	);
+
+	Parameters.Add_Table_Field(
+		pNode	, "ELEVATION"	, _TL("Elevation"),
+		_TL(""),
+		true
+	);
 }
 
 
@@ -120,15 +126,16 @@ CLines_From_Points::CLines_From_Points(void)
 //---------------------------------------------------------
 bool CLines_From_Points::On_Execute(void)
 {
-	int			Order, Separate;
+	int			Order, Separate, Elevation;
 	CSG_String	s;
 	CSG_Shape	*pLine , *pPoint;
 	CSG_Shapes	*pLines, *pPoints;
 
-	pPoints		= Parameters("POINTS")		->asShapes();
-	pLines		= Parameters("LINES")		->asShapes();
-	Order		= Parameters("ORDER")		->asInt();
-	Separate	= Parameters("SEPARATE")	->asInt();
+	pPoints		= Parameters("POINTS"   )->asShapes();
+	pLines		= Parameters("LINES"    )->asShapes();
+	Order		= Parameters("ORDER"    )->asInt();
+	Separate	= Parameters("SEPARATE" )->asInt();
+	Elevation	= Parameters("ELEVATION")->asInt();
 
 	//-------------------------------------------------
 	if(	pPoints->Get_Count() < 1 )
@@ -137,7 +144,7 @@ bool CLines_From_Points::On_Execute(void)
 	}
 
 	//-------------------------------------------------
-	pLines->Create(SHAPE_TYPE_Line, pPoints->Get_Name());
+	pLines->Create(SHAPE_TYPE_Line, pPoints->Get_Name(), NULL, Elevation >= 0 ? SG_VERTEX_TYPE_XYZ : SG_VERTEX_TYPE_XY);
 
 	pLines->Add_Field(SG_T("ID"), SG_DATATYPE_Int);
 
@@ -170,6 +177,11 @@ bool CLines_From_Points::On_Execute(void)
 		}
 
 		pLine->Add_Point(pPoint->Get_Point(0));
+
+		if( Elevation >= 0 )
+		{
+			pLine->Set_Z(pPoint->asDouble(Elevation), iPoint);
+		}
 	}
 
 	return( true );

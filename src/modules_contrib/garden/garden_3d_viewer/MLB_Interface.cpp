@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1644 2013-04-02 09:41:18Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
@@ -84,7 +84,7 @@ const SG_Char * Get_Info(int i)
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Contributions|Garden|Visualisation" ));
+		return( _TL("Garden|Visualisation" ));
 	}
 }
 
@@ -93,6 +93,7 @@ const SG_Char * Get_Info(int i)
 // 3. Include the headers of your modules here...
 
 #include "3dshapes_view_module.h"
+#include "3d_multigrid_view_module.h"
 
 
 //---------------------------------------------------------
@@ -103,11 +104,10 @@ CSG_Module *		Create_Module(int i)
 	switch( i )
 	{
 	case 0:		return( new C3DShapes_View_Module );
+	case 1:		return( new C3D_MultiGrid_View_Module );
 
 	default:	return( NULL );
 	}
-
-	return( NULL );
 }
 
 

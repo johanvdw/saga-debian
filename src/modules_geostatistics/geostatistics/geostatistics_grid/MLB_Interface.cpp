@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1598 2013-01-29 08:53:46Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,24 +69,24 @@
 //---------------------------------------------------------
 // 2. Place general module library informations here...
 
-const SG_Char * Get_Info(int i)
+CSG_String Get_Info(int i)
 {
 	switch( i )
 	{
 	case MLB_INFO_Name:	default:
-		return( _TL("Geostatistics - Grids") );
+		return( _TL("Spatial and Geostatistics - Grids") );
 
 	case MLB_INFO_Author:
 		return( SG_T("O.Conrad, V.Wichmann (c) 2002-10" ));
 
 	case MLB_INFO_Description:
-		return( _TL("Tools for (geo)statistical analyses.") );
+		return( _TL("Tools for spatial and geostatistical analyses.") );
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Geostatistics|Grids") );
+		return( _TL("Spatial and Geostatistics|Grids") );
 	}
 }
 
@@ -104,6 +104,7 @@ const SG_Char * Get_Info(int i)
 #include "grid_autocorrelation.h"
 #include "grid_pca.h"
 #include "multiband_variation.h"
+#include "grid_latlon_statistics.h"
 
 
 //---------------------------------------------------------
@@ -123,6 +124,10 @@ CSG_Module *		Create_Module(int i)
 	case  7:	return( new CGrid_Autocorrelation );
 	case  8:	return( new CGrid_PCA );
 	case  9:	return( new CMultiBand_Variation );
+	case 10:	return( new CGrid_PCA_Inverse );
+	case 11:	return( new CGrid_Statistics_Latitudinal );
+	case 12:	return( new CGrid_Statistics_Meridional );
+	case 13:	return( new CGSGrid_Statistics_To_Table );
 	}
 
 	return( NULL );

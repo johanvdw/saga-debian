@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: SeparateShapes.h 931 2011-02-21 16:03:49Z oconrad $
+ * Version $Id: SeparateShapes.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 /*******************************************************************************
     SeparateShapes.h
@@ -42,7 +42,7 @@ class CSeparateShapes : public CSG_Module
 public:
 	CSeparateShapes(void);
 
-	virtual const SG_Char *		Get_MenuPath	(void)	{	return( _TL("A:Shapes|Construction") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Shapes|Construction") );	}
 
 
 protected:

@@ -78,7 +78,7 @@ libio_shapes_la_DEPENDENCIES =  \
 am_libio_shapes_la_OBJECTS = atlas_bna.lo generate.lo gpx.lo gstat.lo \
 	MLB_Interface.lo pointcloud_from_file.lo \
 	pointcloud_from_text_file.lo pointcloud_to_text_file.lo stl.lo \
-	surfer_bln.lo svg.lo xyz.lo wasp_map.lo
+	surfer_bln.lo svg.lo wasp_map.lo wktb.lo xyz.lo
 libio_shapes_la_OBJECTS = $(am_libio_shapes_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -137,6 +137,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+GOMPFLAGS = @GOMPFLAGS@
 GREP = @GREP@
 HARU_LIB = @HARU_LIB@
 INSTALL = @INSTALL@
@@ -167,7 +168,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
@@ -248,7 +248,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1224 2011-11-11 09:23:11Z reklov_w $
+# $Id: Makefile.am 1373 2012-04-13 09:54:30Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_FALSE@DEP_DEFS = -fPIC `wx-config --unicode=no --static=no --cxxflags` $(DBGFLAGS)
@@ -258,7 +258,7 @@ top_srcdir = @top_srcdir@
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
 DEF_SAGA = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS)
+AM_CXXFLAGS = -fPIC $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
 AM_LDFLAGS = -fPIC -shared -avoid-version $(DEP_LFLG)
 pkglib_LTLIBRARIES = libio_shapes.la
 libio_shapes_la_SOURCES = \
@@ -273,8 +273,9 @@ pointcloud_to_text_file.cpp\
 stl.cpp\
 surfer_bln.cpp\
 svg.cpp\
-xyz.cpp\
 wasp_map.cpp\
+wktb.cpp\
+xyz.cpp\
 atlas_bna.h\
 generate.h\
 gpx.h\
@@ -287,6 +288,7 @@ stl.h\
 surfer_bln.h\
 svg.h\
 wasp_map.h\
+wktb.h\
 xyz.h
 
 libio_shapes_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la $(ADD_MLBS)
@@ -376,6 +378,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/surfer_bln.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wasp_map.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wktb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xyz.Plo@am__quote@
 
 .cpp.o:

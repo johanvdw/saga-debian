@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_morphology.cpp 1081 2011-06-08 08:05:26Z reklov_w $
+ * Version $Id: vigra_morphology.cpp 1282 2011-12-29 17:13:26Z manfred-e $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ bool CViGrA_Morphology::On_Execute(void)
 	//-----------------------------------------------------
 	Copy_Grid_VIGRA_to_SAGA(*pOutput, Output, false);
 
-	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name()));
+	pOutput->Set_Name(CSG_String::Format(SG_T("%s [%s]"), pInput->Get_Name(), Get_Name().c_str()));
 
 	return( true );
 }

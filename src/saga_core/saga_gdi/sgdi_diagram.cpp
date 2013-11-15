@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: sgdi_diagram.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: sgdi_diagram.cpp 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -101,8 +101,8 @@ CSGDI_Diagram::CSGDI_Diagram(wxWindow *pParent)
 {
 	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
-	m_xName		= LNG("X");
-	m_yName		= LNG("Y");
+	m_xName		= _TL("X");
+	m_yName		= _TL("Y");
 }
 
 //---------------------------------------------------------

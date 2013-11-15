@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_To_Points_Random.h 1025 2011-04-28 16:16:37Z oconrad $
+ * Version $Id: Grid_To_Points_Random.h 1246 2011-11-25 13:42:38Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ public:
 	CGrid_To_Points_Random(void);
 	virtual ~CGrid_To_Points_Random(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Vectorization") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Vectorization") );	}
 
 
 protected:

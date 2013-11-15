@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_line.cpp 1030 2011-05-02 16:04:44Z oconrad $
+ * Version $Id: wksp_shapes_line.cpp 1646 2013-04-10 16:29:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -61,6 +61,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include "dc_helper.h"
+
 #include "wksp_layer_classify.h"
 
 #include "wksp_shapes_line.h"
@@ -76,12 +78,10 @@
 CWKSP_Shapes_Line::CWKSP_Shapes_Line(CSG_Shapes *pShapes)
 	: CWKSP_Shapes(pShapes)
 {
-	Initialise();
-}
+	On_Create_Parameters();
 
-//---------------------------------------------------------
-CWKSP_Shapes_Line::~CWKSP_Shapes_Line(void)
-{}
+	DataObject_Changed();
+}
 
 
 ///////////////////////////////////////////////////////////
@@ -95,64 +95,62 @@ void CWKSP_Shapes_Line::On_Create_Parameters(void)
 {
 	CWKSP_Shapes::On_Create_Parameters();
 
-
 	//-----------------------------------------------------
 	// Display...
 
 	m_Parameters.Add_Value(
-		m_Parameters("NODE_DISPLAY"), "DISPLAY_POINTS"	, LNG("[CAP] Show Vertices"),
-		LNG(""),
+		m_Parameters("NODE_DISPLAY"), "DISPLAY_POINTS"	, _TL("Show Vertices"),
+		_TL(""),
 		PARAMETER_TYPE_Bool, false
 	);
 
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_DISPLAY"), "LINE_STYLE"		, LNG("[CAP] Line Style"),
-		LNG(""),
+		m_Parameters("NODE_DISPLAY"), "LINE_STYLE"		, _TL("Line Style"),
+		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|"),
-			LNG("Solid style"),
-			LNG("Dotted style"),
-			LNG("Long dashed style"),
-			LNG("Short dashed style"), 
-			LNG("Dot and dash style"),
-			LNG("Backward diagonal hatch"),
-			LNG("Cross-diagonal hatch"),
-			LNG("Forward diagonal hatch"),
-			LNG("Cross hatch"),
-			LNG("Horizontal hatch"),
-			LNG("Vertical hatch")
-		//	LNG("Use the stipple bitmap")
-		//	LNG("Use the user dashes")
-		//	LNG("No pen is used")
+			_TL("Solid style"),
+			_TL("Dotted style"),
+			_TL("Long dashed style"),
+			_TL("Short dashed style"), 
+			_TL("Dot and dash style"),
+			_TL("Backward diagonal hatch"),
+			_TL("Cross-diagonal hatch"),
+			_TL("Forward diagonal hatch"),
+			_TL("Cross hatch"),
+			_TL("Horizontal hatch"),
+			_TL("Vertical hatch")
+		//	_TL("Use the stipple bitmap")
+		//	_TL("Use the user dashes")
+		//	_TL("No pen is used")
 		), 0
 	);
-
 
 	//-----------------------------------------------------
 	// Size...
 
 	m_Parameters.Add_Choice(
-		m_Parameters("NODE_SIZE")		, "SIZE_TYPE"		, LNG("[CAP] Size relates to..."),
-		LNG(""),
-		wxString::Format(wxT("%s|%s|"),
-			LNG("[VAL] Screen"),
-			LNG("[VAL] Map Units")
+		m_Parameters("NODE_SIZE")		, "SIZE_TYPE"		, _TL("Size relates to..."),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("Screen"),
+			_TL("Map Units")
 		), 0
 	);
 
 	_AttributeList_Add(
-		m_Parameters("NODE_SIZE")		, "SIZE_ATTRIB"		, LNG("[CAP] Attribute"),
-		LNG("")
+		m_Parameters("NODE_SIZE")		, "SIZE_ATTRIB"		, _TL("Attribute"),
+		_TL("")
 	);
 
 	m_Parameters.Add_Range(
-		m_Parameters("SIZE_ATTRIB")		, "SIZE_RANGE"		, LNG("[CAP] Size Range"),
-		LNG(""),
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_RANGE"		, _TL("Size Range"),
+		_TL(""),
 		0, 10, 0, true
 	);
 
 	m_Parameters.Add_Value(
-		m_Parameters("SIZE_ATTRIB")		, "SIZE_DEFAULT"	, LNG("[CAP] Default Size"),
-		LNG(""),
+		m_Parameters("SIZE_ATTRIB")		, "SIZE_DEFAULT"	, _TL("Default Size"),
+		_TL(""),
 		PARAMETER_TYPE_Int, 0, 0, true
 	);
 }
@@ -180,8 +178,8 @@ void CWKSP_Shapes_Line::On_Parameters_Changed(void)
 	//-----------------------------------------------------
 	m_Size_Type		= m_Parameters("SIZE_TYPE")->asInt();
 
-	if(	(m_iSize	= m_Parameters("SIZE_ATTRIB")->asInt()) >= m_pShapes->Get_Field_Count()
-	||	(m_dSize	= m_pShapes->Get_Maximum(m_iSize) - (m_Size_Min = m_pShapes->Get_Minimum(m_iSize))) <= 0.0 )
+	if(	(m_iSize	= m_Parameters("SIZE_ATTRIB")->asInt()) >= Get_Shapes()->Get_Field_Count()
+	||	(m_dSize	= Get_Shapes()->Get_Maximum(m_iSize) - (m_Size_Min = Get_Shapes()->Get_Minimum(m_iSize))) <= 0.0 )
 	{
 		m_iSize		= -1;
 		m_Size		= m_Parameters("SIZE_DEFAULT")->asInt();
@@ -193,7 +191,7 @@ void CWKSP_Shapes_Line::On_Parameters_Changed(void)
 	}
 
 	//-----------------------------------------------------
-	Get_Style(m_Pen);
+	m_Pen		= wxPen(m_Def_Color, (int)m_Size, m_Line_Style);
 
 	m_bPoints	= m_Parameters("DISPLAY_POINTS")->asBool();
 }
@@ -213,7 +211,7 @@ int CWKSP_Shapes_Line::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Par
 	{
 		if(	!SG_STR_CMP(pParameter->Get_Identifier(), SG_T("SIZE_ATTRIB")) )
 		{
-			bool	Value	= pParameter->asInt() < m_pShapes->Get_Field_Count();
+			bool	Value	= pParameter->asInt() < Get_Shapes()->Get_Field_Count();
 
 			pParameters->Get_Parameter("SIZE_RANGE"  )->Set_Enabled(Value == true);
 			pParameters->Get_Parameter("SIZE_DEFAULT")->Set_Enabled(Value == false);
@@ -231,38 +229,18 @@ int CWKSP_Shapes_Line::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Par
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CWKSP_Shapes_Line::Get_Style(wxPen &Pen, wxString *pName)
-{
-	Pen		= wxPen(m_Def_Color, (int)m_Size, m_Line_Style);
-
-	if( pName )
-	{
-		if(	m_iColor < 0 || m_pClassify->Get_Mode() == CLASSIFY_UNIQUE )
-		{
-			pName->Clear();
-		}
-		else
-		{
-			pName->Printf(m_pShapes->Get_Field_Name(m_iColor));
-		}
-	}
-
-	return( true );
-}
-
-//---------------------------------------------------------
 bool CWKSP_Shapes_Line::Get_Style_Size(int &min_Size, int &max_Size, double &min_Value, double &dValue, wxString *pName)
 {
 	if( m_iSize >= 0 )
 	{
 		min_Size	= (int)(m_Size);
-		max_Size	= (int)(m_Size + ((m_pShapes->Get_Maximum(m_iSize) - m_Size_Min) * m_dSize));
+		max_Size	= (int)(m_Size + ((Get_Shapes()->Get_Maximum(m_iSize) - m_Size_Min) * m_dSize));
 		min_Value	= m_Size_Min;
 		dValue		= m_dSize;
 
 		if( pName )
 		{
-			pName->Printf(m_pShapes->Get_Field_Name(m_iSize));
+			pName->Printf(Get_Shapes()->Get_Field_Name(m_iSize));
 		}
 
 		return( true );
@@ -315,15 +293,15 @@ void CWKSP_Shapes_Line::_Draw_Shape(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, boo
 	//-----------------------------------------------------
 	if( bSelection )
 	{
-		dc_Map.dc.SetPen(wxPen(m_Sel_Color, m_Size + (pShape == m_pShapes->Get_Selection(0) ? 2 : 0), m_Line_Style));
+		dc_Map.dc.SetPen(wxPen(m_Sel_Color, m_Size + (pShape == Get_Shapes()->Get_Selection(0) ? 2 : 0), m_Line_Style));
 	}
 	else if( m_iColor >= 0 || m_iSize >= 0 )
 	{
+		int		Color;
 		wxPen	Pen(m_Pen);
 
-		if( m_iColor >= 0 )
+		if( _Get_Class_Color(pShape, Color) )
 		{
-			int		Color	= m_pClassify->Get_Class_Color_byValue(pShape->asDouble(m_iColor));
 			Pen.SetColour(SG_GET_R(Color), SG_GET_G(Color), SG_GET_B(Color));
 		}
 
@@ -436,8 +414,9 @@ void CWKSP_Shapes_Line::_Draw_Label(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)
 						bLabel	= false;
 						d		= 0.0;
 
-						dc_Map.dc.DrawRotatedText(s, B.x, B.y, GET_ANGLE(A, B));
+						Draw_Text(dc_Map.dc, TEXTALIGN_TOPLEFT, B.x, B.y, GET_ANGLE(A, B), s, m_Label_Eff, m_Label_Eff_Color);
 
+					//	dc_Map.dc.DrawRotatedText(s, B.x, B.y, GET_ANGLE(A, B));
 					//	dc_Map.dc.DrawCircle(A.x, A.y, 3);	dc_Map.dc.DrawCircle(B.x, B.y, 3);
 					}
 				}

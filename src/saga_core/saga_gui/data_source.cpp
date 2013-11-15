@@ -72,6 +72,7 @@
 
 #include "data_source.h"
 #include "data_source_files.h"
+#include "data_source_odbc.h"
 
 #include "wksp_layer.h"
 #include "wksp_map_layer.h"
@@ -128,7 +129,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CData_Source::CData_Source(wxWindow *pParent)
-	: wxNotebook(pParent, ID_WND_DATA_SOURCE, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE, LNG("[CAP] Data Source"))
+	: wxNotebook(pParent, ID_WND_DATA_SOURCE, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE, _TL("Data Source"))
 {
 	g_pData_Source	= this;
 
@@ -140,10 +141,12 @@ CData_Source::CData_Source(wxWindow *pParent)
 	IMG_ADD_TO_NOTEBOOK(ID_IMG_NB_DATA_SOURCE_WEBSERVICE);
 
 	//-----------------------------------------------------
-	m_pFiles	= new CData_Source_Files	(this);	m_pFiles	->SetName(LNG("[CAP] File System"));
+	m_pFiles	= new CData_Source_Files(this);	m_pFiles->SetName(_TL("File System"));
+	m_pODBC		= new CData_Source_ODBC (this);	m_pODBC ->SetName(_TL("ODBC"));
 
 #if defined(_SAGA_MSW)
-	m_pFiles	->Hide();
+	m_pFiles->Hide();
+	m_pODBC ->Hide();
 #endif
 }
 
@@ -151,6 +154,7 @@ CData_Source::CData_Source(wxWindow *pParent)
 void CData_Source::Add_Pages(void)
 {
 	_Show_Page(m_pFiles);
+	_Show_Page(m_pODBC);
 }
 
 //---------------------------------------------------------
@@ -215,12 +219,28 @@ bool CData_Source::Set_Data_Source(CWKSP_Base_Item *pItem)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+bool CData_Source::Update_ODBC_Source(const wxString &Server)
+{
+	m_pODBC->Update_Source(Server);
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 bool CData_Source::_Show_Page(wxWindow *pPage)
 {
 	int		Image_ID	= -1;
 
 	//-----------------------------------------------------
-	if( pPage == m_pFiles )		Image_ID	= IMG_FILES;
+	if( pPage == m_pFiles )	Image_ID	= IMG_FILES;
+	if( pPage == m_pODBC  )	Image_ID	= IMG_DATABASE;
 
 	//-----------------------------------------------------
 	if( pPage )

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pointcloud_to_text_file.h 1223 2011-11-11 09:11:22Z reklov_w $
+ * Version $Id: pointcloud_to_text_file.h 1397 2012-05-10 11:25:21Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -91,14 +91,13 @@ public:
 	CPointcloud_To_Text_File(void);
 	virtual ~CPointcloud_To_Text_File(void);
 
-	virtual const SG_Char *	Get_MenuPath		(void)	{	return( _TL("R:Export") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("R:Export") );	}
 
 
 protected:
 
 	virtual bool			On_Execute	(void);
 
-	CSG_String				Double2String(double value, int precision);
 };
 
 

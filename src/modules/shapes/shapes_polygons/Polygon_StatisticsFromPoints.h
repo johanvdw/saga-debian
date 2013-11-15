@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygon_StatisticsFromPoints.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Polygon_StatisticsFromPoints.h 1449 2012-07-16 13:04:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     PolygonStatisticsFromPoints.h
@@ -54,6 +54,8 @@ protected:
 
 
 private:
+
+	CSG_String		Get_Field_Name	(const CSG_String &Type, const CSG_String &Name);
 
 
 };
