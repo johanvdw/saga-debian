@@ -16,6 +16,10 @@ debian/% :: debian/%.in
 override_dh_python2:
 	dh_python2 --no-guessing-versions
 
+override_dh_clean:
+	dh_clean
+	rm -f src/saga_core/saga_api/saga_api.py
+
 get-orig-source:
 	wget $(UPSTREAM_URL)
 	gunzip *.tar.gz
