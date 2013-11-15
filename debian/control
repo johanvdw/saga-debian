@@ -5,7 +5,7 @@ Maintainer: Debian GIS Project <pkg-grass-devel@lists.alioth.debian.org>
 Uploaders: Johan Van de Wauw <johan.vandewauw@gmail.com>, Francesco Paolo Lovergine <frankie@debian.org>
 Build-Depends: libwxgtk3.0-dev, wx-common, libgdal-dev, libexpat-dev,
  libogdi3.2-dev, libproj-dev, libgrib2c-dev, debhelper (>=8), swig,
- libqhull-dev, libhpdf-dev, python-dev, liblas-dev
+ libqhull-dev, libhpdf-dev, python-dev, liblas-dev, dh-autoreconf
 Standards-Version: 3.9.4
 Homepage: http://www.saga-gis.org/
 Vcs-Git: git://git.debian.org/pkg-grass/saga.git
