@@ -1,7 +1,15 @@
-saga (2.1.0+dfsg-1) UNRELEASED; urgency=low
+saga (2.1.0+dfsg-1) unstable; urgency=low
 
+  [ Johan Van de Wauw ]
   * Update to new upstream version
+    (closes: #717624)
   * Uses wxwidgets 3.0 instead of 2.8
+
+  [ Francesco Paolo Lovergine ]
+  * Tagged for sid.
+  * Changed path to relative ones in *.install file for dh_install.
+  * Truly annotate the previous fix.
+    (closes: #715109)
 
  -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 14 Nov 2013 21:16:53 -0500
 
