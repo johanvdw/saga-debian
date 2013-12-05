@@ -1,8 +1,7 @@
 saga (2.1.0+dfsg-1) unstable; urgency=low
 
   [ Johan Van de Wauw ]
-  * Update to new upstream version
-    (closes: #717624)
+  * Update to new upstream version.
   * Uses wxwidgets 3.0 instead of 2.8
 
   [ Francesco Paolo Lovergine ]
