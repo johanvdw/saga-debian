@@ -1,4 +1,3 @@
 0001-Remove-references-to-libfire.patch
 0002-Use-debian-version-of-grib2.patch
 0004-Use-qhull-instead-of-triangle.patch
-0005-Fix-gcc-security-warnings.patch
