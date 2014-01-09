@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1277 2011-12-22 15:48:59Z reklov_w $
+# $Id: Makefile.am 1828 2013-09-05 21:36:10Z manfred-e $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -9,20 +9,18 @@ DEP_DEFS = -D_SAGA_UNICODE
 endif
 DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD
 CXX_INCS           = -I$(top_srcdir)/src/saga_core
-AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) -fpermissive $(GOMPFLAGS)
-AM_LDFLAGS         = $(DEP_LFLG) $(DEP_LIBS) -avoid-version
+AM_CXXFLAGS        = $(CXX_INCS) $(DEF_SAGA) $(DEP_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
+AM_LDFLAGS         = $(DEP_LFLG) $(DEP_LIBS) -shared -lodbc -avoid-version
 pkglib_LTLIBRARIES = libio_odbc.la
 libio_odbc_la_SOURCES =\
 get_connection.cpp\
 MLB_Interface.cpp\
-pgis_shapes.cpp\
-shapes.cpp\
+odbc.cpp\
 table.cpp\
 get_connection.h\
 MLB_Interface.h\
-pgis_shapes.h\
-shapes.h\
+odbc.h\
+otlv4.h\
 table.h
 
-libio_odbc_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la $(top_srcdir)/src/saga_core/saga_odbc/libsaga_odbc.la
-
+libio_odbc_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

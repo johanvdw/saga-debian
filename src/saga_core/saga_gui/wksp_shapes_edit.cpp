@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_edit.cpp 1646 2013-04-10 16:29:00Z oconrad $
+ * Version $Id: wksp_shapes_edit.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -98,9 +98,7 @@
 //---------------------------------------------------------
 wxMenu * CWKSP_Shapes::On_Edit_Get_Menu(void)
 {
-	wxMenu	*pMenu;
-
-	pMenu	= new wxMenu;
+	wxMenu	*pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, true , ID_CMD_SHAPES_EDIT_SHAPE);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_ADD_SHAPE);
@@ -108,6 +106,7 @@ wxMenu * CWKSP_Shapes::On_Edit_Get_Menu(void)
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_ADD_PART);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_DEL_PART);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_DEL_POINT);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_SEL_CLEAR);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_SEL_INVERT);
 
 	return( pMenu );
@@ -151,6 +150,7 @@ bool CWKSP_Shapes::On_Edit_On_Key_Down(int KeyCode)
 			return( _Edit_Shape_Del() );
 
 	case WXK_RETURN:
+	case WXK_SPACE:
 		if( !m_Edit_pShape )
 			return( _Edit_Shape_Start() );
 		else

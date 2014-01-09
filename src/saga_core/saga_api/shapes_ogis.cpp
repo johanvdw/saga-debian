@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_ogis.cpp 1373 2012-04-13 09:54:30Z oconrad $
+ * Version $Id: shapes_ogis.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -226,6 +226,9 @@ bool CSG_Shapes_OGIS_Converter::from_WKText(const CSG_String &Text, CSG_Shape *p
 			return( _WKT_Read_Polygon(Text, pShape) );
 		}
 		break;
+	default:
+		break;
+	  
 	}
 
 	return( false );
@@ -495,6 +498,9 @@ bool CSG_Shapes_OGIS_Converter::from_WKBinary(CSG_Bytes &Bytes, CSG_Shape *pShap
 
 		switch( pShape->Get_Type() )
 		{
+		default:
+			break;
+
 		case SHAPE_TYPE_Point:
 			if( Bytes.Read_DWord() == SG_OGIS_TYPE_Point )
 			{
@@ -713,6 +719,462 @@ bool CSG_Shapes_OGIS_Converter::to_WKBinary(CSG_Shape *pShape, CSG_Bytes &Bytes)
 	}
 
 	return( false );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Shapes_OGIS_Converter::from_ShapeType(CSG_String &Type, TSG_Shape_Type Shape, TSG_Vertex_Type Vertex)
+{
+	switch( Vertex )
+	{
+	case SG_VERTEX_TYPE_XY:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_STR_Point;           return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_STR_MultiPoint;      return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_STR_MultiLine;       return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_STR_MultiPolygon;    return( true );
+		}
+		break;
+
+	case SG_VERTEX_TYPE_XYZ:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_STR_Point_Z;         return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_STR_MultiPoint_Z;    return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_STR_MultiLine_Z;     return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_STR_MultiPolygon_Z;  return( true );
+		}
+		break;
+
+	case SG_VERTEX_TYPE_XYZM:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_STR_Point_ZM;        return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_STR_MultiPoint_ZM;   return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_STR_MultiLine_ZM;    return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_STR_MultiPolygon_ZM; return( true );
+		}
+		break;
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Shapes_OGIS_Converter::from_ShapeType(DWORD &Type, TSG_Shape_Type Shape, TSG_Vertex_Type Vertex)
+{
+	switch( Vertex )
+	{
+	case SG_VERTEX_TYPE_XY:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_Point;             return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_MultiPoint;        return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_MultiLineString;   return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_MultiPolygon;      return( true );
+		}
+		break;
+
+	case SG_VERTEX_TYPE_XYZ:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_PointZ;            return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_MultiPointZ;       return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_MultiLineStringZ;  return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_MultiPolygonZ;     return( true );
+		}
+		break;
+
+	case SG_VERTEX_TYPE_XYZM:
+		switch( Shape )
+		{
+		default:	break;
+		case SHAPE_TYPE_Point:   Type	= SG_OGIS_TYPE_PointZM;           return( true );
+		case SHAPE_TYPE_Points:  Type	= SG_OGIS_TYPE_MultiPointZM;      return( true );
+		case SHAPE_TYPE_Line:    Type	= SG_OGIS_TYPE_MultiLineStringZM; return( true );
+		case SHAPE_TYPE_Polygon: Type	= SG_OGIS_TYPE_MultiPolygonZM;    return( true );
+		}
+		break;
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+CSG_String CSG_Shapes_OGIS_Converter::from_ShapeType(TSG_Shape_Type Shape, TSG_Vertex_Type Vertex)
+{
+	CSG_String	Type;
+
+	from_ShapeType(Type, Shape, Vertex);
+
+	return( Type );
+}
+
+//---------------------------------------------------------
+bool CSG_Shapes_OGIS_Converter::to_ShapeType(const CSG_String &Type, TSG_Shape_Type &Shape, TSG_Vertex_Type &Vertex)
+{
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Point           ) )	{	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint      ) )	{	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Line            ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiLine       ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Polygon         ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon    ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );	}
+
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Point_Z         ) )	{	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint_Z    ) )	{	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Line_Z          ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiLine_Z     ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Polygon_Z       ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon_Z  ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Point_M         ) )	{	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint_M    ) )	{	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Line_M          ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiLine_M     ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Polygon_M       ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon_M  ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );	}
+
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Point_ZM        ) )	{	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPoint_ZM   ) )	{	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Line_ZM         ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiLine_ZM    ) )	{	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_Polygon_ZM      ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+	if( !Type.CmpNoCase(SG_OGIS_TYPE_STR_MultiPolygon_ZM ) )	{	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );	}
+
+	Shape	= SHAPE_TYPE_Undefined;
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CSG_Shapes_OGIS_Converter::to_ShapeType(DWORD Type, TSG_Shape_Type &Shape, TSG_Vertex_Type &Vertex)
+{
+	switch( Type )
+	{
+	case SG_OGIS_TYPE_Point             :	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+	case SG_OGIS_TYPE_MultiPoint        :	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+	case SG_OGIS_TYPE_LineString        :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+	case SG_OGIS_TYPE_MultiLineString   :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+	case SG_OGIS_TYPE_Polygon           :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+	case SG_OGIS_TYPE_MultiPolygon      :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XY;	return( true );
+
+	case SG_OGIS_TYPE_PointZ            :	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiPointZ       :	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_LineStringZ       :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiLineStringZ  :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_PolygonZ          :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiPolygonZ     :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+
+	case SG_OGIS_TYPE_PointM            :	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiPointM       :	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_LineStringM       :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiLineStringM  :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_PolygonM          :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+	case SG_OGIS_TYPE_MultiPolygonM     :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZ;	return( true );
+
+	case SG_OGIS_TYPE_PointZM           :	Shape	= SHAPE_TYPE_Point;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	case SG_OGIS_TYPE_MultiPointZM      :	Shape	= SHAPE_TYPE_Points;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	case SG_OGIS_TYPE_LineStringZM      :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	case SG_OGIS_TYPE_MultiLineStringZM :	Shape	= SHAPE_TYPE_Line;		Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	case SG_OGIS_TYPE_PolygonZM         :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	case SG_OGIS_TYPE_MultiPolygonZM    :	Shape	= SHAPE_TYPE_Polygon;	Vertex	= SG_VERTEX_TYPE_XYZM;	return( true );
+	}
+
+	Shape	= SHAPE_TYPE_Undefined;
+
+	return( false );
+}
+
+//---------------------------------------------------------
+TSG_Shape_Type CSG_Shapes_OGIS_Converter::to_ShapeType(const CSG_String &Type)
+{
+	TSG_Shape_Type	Shape;
+	TSG_Vertex_Type	Vertex;
+
+	to_ShapeType(Type, Shape, Vertex);
+
+	return( Shape );
+}
+
+//---------------------------------------------------------
+TSG_Shape_Type CSG_Shapes_OGIS_Converter::to_ShapeType(DWORD Type)
+{
+	TSG_Shape_Type	Shape;
+	TSG_Vertex_Type	Vertex;
+
+	to_ShapeType(Type, Shape, Vertex);
+
+	return( Shape );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+// Basic Type definitions
+// byte : 1 byte
+// uint16 : 16 bit unsigned integer (2 bytes)
+// uint32 : 32 bit unsigned integer (4 bytes)
+// float64 : double precision floating point number (8 bytes)
+//
+// +------------------------------------------------------------+
+// | RASTER                                                     |
+// +---------------+-------------+------------------------------+
+// | - name -      |  - type -   | - meaning -                  |
+// +---------------+-------------+------------------------------+
+// | endiannes     | byte        | 1:ndr/little endian          |
+// |               |             | 0:xdr/big endian             |
+// +---------------+-------------+------------------------------+
+// | version       | uint16      | format version (0 for this   |
+// |               |             | structure)                   |
+// +---------------+-------------+------------------------------+
+// | nBands        | uint16      | Number of bands              |
+// +---------------+-------------+------------------------------+
+// | scaleX        | float64     | pixel width                  |
+// |               |             | in geographical units        |
+// +---------------+-------------+------------------------------+
+// | scaleY        | float64     | pixel height                 |
+// |               |             | in geographical units        |
+// +---------------+-------------+------------------------------+
+// | ipX           | float64     | X ordinate of upper-left     |
+// |               |             | pixel's upper-left corner    |
+// |               |             | in geographical units        |
+// +---------------+-------------+------------------------------+
+// | ipY           | float64     | Y ordinate of upper-left     |
+// |               |             | pixel's upper-left corner    |
+// |               |             | in geographical units        |
+// +---------------+-------------+------------------------------+
+// | skewX         | float64     | rotation about Y-axis        |
+// +---------------+-------------+------------------------------+
+// | skewY         | float64     | rotation about X-axis        |
+// +---------------+-------------+------------------------------+
+// | srid          | int32       | Spatial reference id         |
+// +---------------+-------------+------------------------------+
+// | width         | uint16      | number of pixel columns      |
+// +---------------+-------------+------------------------------+
+// | height        | uint16      | number of pixel rows         |
+// +---------------+-------------+------------------------------+
+// | bands[nBands] | RASTERBAND  | Bands data                   |
+// +---------------+-------------+------------------------------+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+#include "grid.h"
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Grid_OGIS_Converter::from_WKBinary(CSG_Bytes &Bytes, class CSG_Grid *pGrid)
+{
+	Bytes.Rewind();
+
+	//-----------------------------------------------------
+	// Raster System
+
+	bool	bSwap	= Bytes.Read_Byte  () == 0;	// endiannes: 1=ndr/little endian, 0=xdr/big endian
+	short	version	= Bytes.Read_Short (bSwap);	// version
+	short	nBands	= Bytes.Read_Short (bSwap);	// number of bands
+	double	dx		= Bytes.Read_Double(bSwap);	// scaleX
+	double	dy		= Bytes.Read_Double(bSwap);	// scaleY
+	double	xMin	= Bytes.Read_Double(bSwap);	// ipX
+	double	yMax	= Bytes.Read_Double(bSwap);	// ipY
+	double	skewX	= Bytes.Read_Double(bSwap);	// skewX
+	double	skewY	= Bytes.Read_Double(bSwap);	// skewY
+	int   	SRID	= Bytes.Read_Int   (bSwap);	// srid
+	short 	NX		= Bytes.Read_Short (bSwap);	// width
+	short 	NY		= Bytes.Read_Short (bSwap);	// height
+
+	//-----------------------------------------------------
+	// Band
+
+	TSG_Data_Type	Type;
+
+	BYTE	Flags	= Bytes.Read_Byte();
+
+	switch( Flags & 0x0F )
+	{
+	case  0:	Type	= SG_DATATYPE_Bit   ; break;	//  0:  1-bit boolean
+	case  1:	Type	= SG_DATATYPE_Char  ; break;	//  1:  2-bit unsigned integer
+	case  2:	Type	= SG_DATATYPE_Char  ; break;	//  2:  4-bit unsigned integer
+	case  3:	Type	= SG_DATATYPE_Char  ; break;	//  3:  8-bit   signed integer
+	case  4:	Type	= SG_DATATYPE_Byte  ; break;	//  4:  8-bit unsigned integer
+	case  5:	Type	= SG_DATATYPE_Short ; break;	//  5: 16-bit   signed integer
+	case  6:	Type	= SG_DATATYPE_Word  ; break;	//  6: 16-bit unsigned integer
+	case  7:	Type	= SG_DATATYPE_Int   ; break;	//  7: 32-bit   signed integer
+	case  8:	Type	= SG_DATATYPE_DWord ; break;	//  8: 32-bit unsigned integer
+	case 10:	Type	= SG_DATATYPE_Float ; break;	// 10: 32-bit float
+	case 11:	Type	= SG_DATATYPE_Double; break;	// 11: 64-bit float
+	}
+
+//	Flags	|= 0x80;	// isOffline: no, never here!
+	Flags	|= 0x40;	// hasNodataValue
+//	Flags	|= 0x20;	// isNoDataValue: no, never here!
+//	Flags	|= 0x10;	// reserved (unused)
+
+	if( !pGrid->Create(Type, NX, NY, dx, xMin + 0.5 * dx, yMax - (NY - 0.5) * dx) )
+	{
+		return( false );
+	}
+
+	pGrid->Get_Projection().Create(SRID);
+
+	double	noData;
+
+	switch( pGrid->Get_Type() )
+	{
+	case SG_DATATYPE_Bit   : noData	= Bytes.Read_Byte  (     ); break;	//  0:  1-bit boolean
+	case SG_DATATYPE_Char  : noData	= Bytes.Read_Char  (     ); break;	//  3:  8-bit   signed integer
+	case SG_DATATYPE_Byte  : noData	= Bytes.Read_Byte  (     ); break;	//  4:  8-bit unsigned integer
+	case SG_DATATYPE_Short : noData	= Bytes.Read_Short (bSwap); break;	//  5: 16-bit   signed integer
+	case SG_DATATYPE_Word  : noData	= Bytes.Read_Word  (bSwap); break;	//  6: 16-bit unsigned integer
+	case SG_DATATYPE_Int   : noData	= Bytes.Read_Int   (bSwap); break;	//  7: 32-bit   signed integer
+	case SG_DATATYPE_DWord : noData	= Bytes.Read_DWord (bSwap); break;	//  8: 32-bit unsigned integer
+	case SG_DATATYPE_Float : noData	= Bytes.Read_Float (bSwap); break;	//  9: 32-bit float
+	case SG_DATATYPE_Double: noData	= Bytes.Read_Double(bSwap); break;	// 10: 64-bit float
+	default:
+		break;
+	}
+
+	pGrid->Set_NoData_Value(noData);
+
+	for(int y=0; y<pGrid->Get_NY() && SG_UI_Process_Set_Progress(y, pGrid->Get_NY()); y++)
+	{
+		for(int x=0; x<pGrid->Get_NX(); x++)
+		{
+			switch( pGrid->Get_Type() )
+			{
+			case SG_DATATYPE_Bit   : pGrid->Set_Value(x, y, Bytes.Read_Byte  (     )); break;	//  0:  1-bit boolean
+			case SG_DATATYPE_Char  : pGrid->Set_Value(x, y, Bytes.Read_Char  (     )); break;	//  3:  8-bit   signed integer
+			case SG_DATATYPE_Byte  : pGrid->Set_Value(x, y, Bytes.Read_Byte  (     )); break;	//  4:  8-bit unsigned integer
+			case SG_DATATYPE_Short : pGrid->Set_Value(x, y, Bytes.Read_Short (bSwap)); break;	//  5: 16-bit   signed integer
+			case SG_DATATYPE_Word  : pGrid->Set_Value(x, y, Bytes.Read_Word  (bSwap)); break;	//  6: 16-bit unsigned integer
+			case SG_DATATYPE_Int   : pGrid->Set_Value(x, y, Bytes.Read_Int   (bSwap)); break;	//  7: 32-bit   signed integer
+			case SG_DATATYPE_DWord : pGrid->Set_Value(x, y, Bytes.Read_DWord (bSwap)); break;	//  8: 32-bit unsigned integer
+			case SG_DATATYPE_Float : pGrid->Set_Value(x, y, Bytes.Read_Float (bSwap)); break;	//  9: 32-bit float
+			case SG_DATATYPE_Double: pGrid->Set_Value(x, y, Bytes.Read_Double(bSwap)); break;	// 10: 64-bit float
+			default:
+				break;
+			}
+		}
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+bool CSG_Grid_OGIS_Converter::to_WKBinary(CSG_Bytes &Bytes, class CSG_Grid *pGrid, int SRID)
+{
+	Bytes.Clear();
+
+	//-----------------------------------------------------
+	// Raster System
+
+	if( pGrid->Get_Projection().Get_EPSG() > 0 )
+	{
+		SRID	= pGrid->Get_Projection().Get_EPSG();
+	}
+
+	Bytes	+= (BYTE  )1;						// endiannes
+	Bytes	+= (short )0;						// version
+	Bytes	+= (short )1;						// number of bands
+	Bytes	+= (double)pGrid->Get_Cellsize();	// scaleX
+	Bytes	+= (double)pGrid->Get_Cellsize();	// scaleY
+	Bytes	+= (double)pGrid->Get_XMin(true);	// ipX
+	Bytes	+= (double)pGrid->Get_YMax(true);	// ipY
+	Bytes	+= (double)0.0;						// skewX
+	Bytes	+= (double)0.0;						// skewY
+	Bytes	+= (int   )SRID;					// srid
+	Bytes	+= (short )pGrid->Get_NX();			// width
+	Bytes	+= (short )pGrid->Get_NY();			// height
+
+	//-----------------------------------------------------
+	// Band
+
+	BYTE	Flags;
+
+	switch( pGrid->Get_Type() )
+	{
+	case SG_DATATYPE_Bit   : Flags =  0; break;	//  0:  1-bit boolean
+//	case SG_DATATYPE_      : Flags =  1; break;	//  1:  2-bit unsigned integer
+//	case SG_DATATYPE_      : Flags =  2; break;	//  2:  4-bit unsigned integer
+	case SG_DATATYPE_Char  : Flags =  3; break;	//  3:  8-bit   signed integer
+	case SG_DATATYPE_Byte  : Flags =  4; break;	//  4:  8-bit unsigned integer
+	case SG_DATATYPE_Short : Flags =  5; break;	//  5: 16-bit   signed integer
+	case SG_DATATYPE_Word  : Flags =  6; break;	//  6: 16-bit unsigned integer
+	case SG_DATATYPE_Int   : Flags =  7; break;	//  7: 32-bit   signed integer
+	case SG_DATATYPE_DWord : Flags =  8; break;	//  8: 32-bit unsigned integer
+	case SG_DATATYPE_Float : Flags = 10; break;	// 10: 32-bit float
+	case SG_DATATYPE_Double: Flags = 11; break;	// 11: 64-bit float
+	default:
+		break;
+	}
+
+//	Flags	|= 0x80;	// isOffline: no, never here!
+	Flags	|= 0x40;	// hasNodataValue
+//	Flags	|= 0x20;	// isNoDataValue: no, never here!
+//	Flags	|= 0x10;	// reserved (unused)
+
+	Bytes	+= Flags;
+
+	switch( pGrid->Get_Type() )
+	{
+	case SG_DATATYPE_Bit   : Bytes	+= (BYTE  )0; break;	//  0:  1-bit boolean
+	case SG_DATATYPE_Char  : Bytes	+= (char  )pGrid->Get_NoData_Value(); break;	//  3:  8-bit   signed integer
+	case SG_DATATYPE_Byte  : Bytes	+= (BYTE  )pGrid->Get_NoData_Value(); break;	//  4:  8-bit unsigned integer
+	case SG_DATATYPE_Short : Bytes	+= (short )pGrid->Get_NoData_Value(); break;	//  5: 16-bit   signed integer
+	case SG_DATATYPE_Word  : Bytes	+= (WORD  )pGrid->Get_NoData_Value(); break;	//  6: 16-bit unsigned integer
+	case SG_DATATYPE_Int   : Bytes	+= (int   )pGrid->Get_NoData_Value(); break;	//  7: 32-bit   signed integer
+	case SG_DATATYPE_DWord : Bytes	+= (DWORD )pGrid->Get_NoData_Value(); break;	//  8: 32-bit unsigned integer
+	case SG_DATATYPE_Float : Bytes	+= (float )pGrid->Get_NoData_Value(); break;	//  9: 32-bit float
+	case SG_DATATYPE_Double: Bytes	+= (double)pGrid->Get_NoData_Value(); break;	// 10: 64-bit float
+	default:
+		break;
+	}
+
+	for(int y=0; y<pGrid->Get_NY() && SG_UI_Process_Set_Progress(y, pGrid->Get_NY()); y++)
+	{
+		for(int x=0; x<pGrid->Get_NX(); x++)
+		{
+			switch( pGrid->Get_Type() )
+			{
+			case SG_DATATYPE_Bit   : Bytes	+= (BYTE  )pGrid->asDouble(x, y); break;	//  0:  1-bit boolean
+			case SG_DATATYPE_Char  : Bytes	+= (char  )pGrid->asDouble(x, y); break;	//  3:  8-bit   signed integer
+			case SG_DATATYPE_Byte  : Bytes	+= (BYTE  )pGrid->asDouble(x, y); break;	//  4:  8-bit unsigned integer
+			case SG_DATATYPE_Short : Bytes	+= (short )pGrid->asDouble(x, y); break;	//  5: 16-bit   signed integer
+			case SG_DATATYPE_Word  : Bytes	+= (WORD  )pGrid->asDouble(x, y); break;	//  6: 16-bit unsigned integer
+			case SG_DATATYPE_Int   : Bytes	+= (int   )pGrid->asDouble(x, y); break;	//  7: 32-bit   signed integer
+			case SG_DATATYPE_DWord : Bytes	+= (DWORD )pGrid->asDouble(x, y); break;	//  8: 32-bit unsigned integer
+			case SG_DATATYPE_Float : Bytes	+= (float )pGrid->asDouble(x, y); break;	//  9: 32-bit float
+			case SG_DATATYPE_Double: Bytes	+= (double)pGrid->asDouble(x, y); break;	// 10: 64-bit float
+			default:
+				break;	  
+			}
+		}
+	}
+
+	return( true );
 }
 
 

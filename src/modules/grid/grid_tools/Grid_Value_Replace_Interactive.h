@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Value_Replace_Interactive.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: Grid_Value_Replace_Interactive.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     Grid_Value_Replace_Interactive.h
@@ -31,14 +31,13 @@
 class CGrid_Value_Replace_Interactive : public CSG_Module_Grid_Interactive {
 
 private:
-	CSG_Grid *m_pGrid;
-	double m_dNewValue;
+	CSG_Grid	*m_pGrid;
 
 public:
 	CGrid_Value_Replace_Interactive(void);
 	virtual ~CGrid_Value_Replace_Interactive(void);
 
-	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Values") );	}
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Grid|Values") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1514 2012-11-06 09:47:38Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -90,7 +90,7 @@ CSG_String Get_Info(int i)
 		return( _TL("1.0") );
 
 	case MLB_INFO_Menu_Path:
-		return( _TL("Database") );
+		return( _TL("Database|ODBC") );
 	}
 }
 
@@ -100,8 +100,6 @@ CSG_String Get_Info(int i)
 
 #include "get_connection.h"
 #include "table.h"
-#include "shapes.h"
-#include "pgis_shapes.h"
 
 
 //---------------------------------------------------------
@@ -111,21 +109,19 @@ CSG_Module *		Create_Module(int i)
 {
 	switch( i )
 	{
+	case  9:	return( new CGet_Servers );
 	case  0:	return( new CGet_Connection );
 	case  1:	return( new CDel_Connection );
+	case 11:	return( new CDel_Connections );
 	case  2:	return( new CTransaction );
 	case  3:	return( new CExecute_SQL );
+
+	case 10:	return( new CTable_List );
 	case  4:	return( new CTable_Info );
 	case  5:	return( new CTable_Load );
 	case  6:	return( new CTable_Save );
 	case  7:	return( new CTable_Drop );
 	case  8:	return( new CTable_Query );
-	case  9:	return( new CPoints_Load );
-	case 10:	return( new CPoints_Save );
-	case 11:	return( new CPGIS_Shapes_Load );
-	case 12:	return( new CPGIS_Shapes_Save );
-	case 13:	return( new CShapes_Load );
-	case 14:	return( new CShapes_Save );
 	}
 
 	return( NULL );
@@ -139,8 +135,21 @@ CSG_Module *		Create_Module(int i)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+extern "C" _SAGA_DLL_EXPORT bool MLB_Finalize	(void)
+{
+	return( SG_ODBC_Get_Connection_Manager().Destroy() );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 //{{AFX_SAGA
 
-	MLB_INTERFACE
+	MLB_INTERFACE_CORE MLB_INTERFACE_INITIALIZE
 
 //}}AFX_SAGA

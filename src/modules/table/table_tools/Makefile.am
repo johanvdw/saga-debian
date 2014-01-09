@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1358 2012-03-28 17:17:15Z oconrad $
+# $Id: Makefile.am 1841 2013-09-17 08:11:24Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -15,18 +15,26 @@ pkglib_LTLIBRARIES = libtable_tools.la
 libtable_tools_la_SOURCES =\
 Join_Tables.cpp\
 MLB_Interface.cpp\
+table_change_color_format.cpp\
 table_change_date_format.cpp\
 table_change_field_type.cpp\
 Table_Create_Empty.cpp\
 Table_Enumerate.cpp\
+table_field_deletion.cpp\
 Table_Rotate.cpp\
+table_selection.cpp\
+table_text_replacer.cpp\
 Join_Tables.h\
 MLB_Interface.h\
+table_change_color_format.h\
 table_change_date_format.h\
 table_change_field_type.h\
 Table_Create_Empty.h\
 Table_Enumerate.h\
-Table_Rotate.h
+table_field_deletion.h\
+Table_Rotate.h\
+table_selection.h\
+table_text_replacer.h
 
 libtable_tools_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 

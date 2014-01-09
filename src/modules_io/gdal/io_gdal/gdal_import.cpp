@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_import.cpp 1642 2013-03-25 12:59:06Z oconrad $
+ * Version $Id: gdal_import.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -293,25 +293,16 @@ bool CGDAL_Import::Load(CSG_GDAL_DataSet &DataSet, const CSG_String &Name)
 	DataSet.Get_Transform(A, B);
 
 	//-----------------------------------------------------
-	Message_Add( 
-		SG_T("Driver: ") 
-		+ DataSet.Get_Description()
-		+ SG_T("/")
-		+ DataSet.Get_Name(),
-		 false);
-
-	if( DataSet.Get_Count() > 1 )
-	{
-		Message_Add(CSG_String::Format(SG_T("%d %s\n"), DataSet.Get_Count(), _TL("Bands")), false);
-	}
-
-	Message_Add(CSG_String::Format(
-		SG_T("%s: x %d, y %d\n%s: %d\n%s x' = %.6f + x * %.6f + y * %.6f\n%s y' = %.6f + x * %.6f + y * %.6f"),
-		_TL("Cells")			, DataSet.Get_NX(), DataSet.Get_NY(),
-		_TL("Bands")			, DataSet.Get_Count(),
-		_TL("Transformation")	, A[0], B[0][0], B[0][1],
-		_TL("Transformation")	, A[1], B[1][0], B[1][1]
-	), false);
+	Message_Add(SG_T("\n"), false);
+	Message_Add(CSG_String::Format(SG_T("\n%s: %s"), _TL("Driver" ), DataSet.Get_DriverID().c_str()   ), false);
+	Message_Add(CSG_String::Format(SG_T("\n%s: %d"), _TL("Bands"  ), DataSet.Get_Count()              ), false);
+	Message_Add(CSG_String::Format(SG_T("\n%s: %d"), _TL("Rows"   ), DataSet.Get_NX()                 ), false);
+	Message_Add(CSG_String::Format(SG_T("\n%s: %d"), _TL("Columns"), DataSet.Get_NY()                 ), false);
+	Message_Add(SG_T("\n"), false);
+	Message_Add(CSG_String::Format(SG_T("\n%s:"), _TL("Transformation")                               ), false);
+	Message_Add(CSG_String::Format(SG_T("\n  x' = %.6f + x * %.6f + y * %.6f"), A[0], B[0][0], B[0][1]), false);
+	Message_Add(CSG_String::Format(SG_T("\n  y' = %.6f + x * %.6f + y * %.6f"), A[1], B[1][0], B[1][1]), false);
+	Message_Add(SG_T("\n"), false);
 
 	//-----------------------------------------------------
 	int			i, n;
@@ -364,6 +355,7 @@ bool CGDAL_Import::Load(CSG_GDAL_DataSet &DataSet, const CSG_String &Name)
 
 	if( Parameters("TRANSFORM")->asBool() && DataSet.Needs_Transform() )
 	{
+		double		s;
 		CSG_Vector	v(2);
 		CSG_Rect	r;
 
@@ -372,7 +364,20 @@ bool CGDAL_Import::Load(CSG_GDAL_DataSet &DataSet, const CSG_String &Name)
 		v[0]	= DataSet.Get_xMax();	v[1]	= DataSet.Get_yMax();	v	= B * v + A;	r.Union(CSG_Point(v[0], v[1]));
 		v[0]	= DataSet.Get_xMax();	v[1]	= DataSet.Get_yMin();	v	= B * v + A;	r.Union(CSG_Point(v[0], v[1]));
 
-		Transform.Assign(DataSet.Get_Cellsize() * SG_Get_Length(B[0][0], B[0][1]), r);
+		v[0]	= 0;	v[1] = 1;	v = B * v;	s	= fabs(v.Get_Length());
+		v[0]	= 1;	v[1] = 0;	v = B * v;
+
+		if( s != fabs(v.Get_Length()) )
+		{
+			if( s > fabs(v.Get_Length()) )
+			{
+				s	= fabs(v.Get_Length());
+			}
+
+			Message_Add(CSG_String::Format(SG_T("\n%s: %s\n\t%s: %f\n"), _TL("warning"), _TL("top-to-bottom and left-to-right cell sizes differ."), _TL("using cellsize"), s), false);
+		}
+
+		Transform.Assign(s, r);
 	}
 
 	//-----------------------------------------------------

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_io.cpp 1617 2013-02-28 15:20:00Z oconrad $
+ * Version $Id: shapes_io.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -77,7 +77,7 @@
 //---------------------------------------------------------
 bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 {
-	int				Type, iField, iPart, nParts, *Parts, iPoint, nPoints;
+	int				Type, iField, iPart, nParts, *Parts, iPoint, nPoints, iOffset;
 	double			*pZ	= NULL, *pM	= NULL;
 	TSG_Point		*pPoint;
 	CSG_Buffer		File_Header(100), Record_Header(8), Content;
@@ -228,6 +228,7 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 				{
 				case SG_VERTEX_TYPE_XYZM:	pShape->Set_M(Content.asDouble(28), 0);
 				case SG_VERTEX_TYPE_XYZ:	pShape->Set_Z(Content.asDouble(20), 0);
+				default:	break;
 				}
 
 				break;
@@ -247,6 +248,8 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 				case SG_VERTEX_TYPE_XYZM:
 					pZ	= 56 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(56 + nPoints * 16) : NULL;	// [40 + nPoints * 16 + 2 * 8] + [nPoints * 8]
 					pM	= 72 + nPoints * 32 <= (int)Length ? (double *)Content.Get_Data(72 + nPoints * 24) : NULL;	// [40 + nPoints * 16 + 2 * 8] + [nPoints * 8 + 2 * 8] + [nPoints * 8]
+					break;
+				default:	
 					break;
 				}
 
@@ -280,21 +283,28 @@ bool CSG_Shapes::_Load_ESRI(const CSG_String &File_Name)
 					pZ	= 60 + nParts * 4 + nPoints * 24 <= (int)Length ? (double *)Content.Get_Data(60 + nParts * 4 + nPoints * 16) : NULL;	// [44 + nParts * 4 + nPoints * 16 + 2 * 8] + [nPoints * 8]
 					pM	= 76 + nParts * 4 + nPoints * 32 <= (int)Length ? (double *)Content.Get_Data(76 + nParts * 4 + nPoints * 24) : NULL;	// [44 + nParts * 4 + nPoints * 16 + 2 * 8] + [nPoints * 8 + 2 * 8] +  [nPoints * 8]
 					break;
+				default:
+					break;
 				}
 
 
 				//-----------------------------------------
+				iOffset = 0;
+
 				for(iPoint=0, iPart=0; iPoint<nPoints; iPoint++, pPoint++)
 				{
 					if( iPart < nParts - 1 && iPoint >= Parts[iPart + 1] )
 					{
 						iPart++;
+						iOffset = 0;
 					}
 
 					pShape->Add_Point(pPoint->x, pPoint->y, iPart);
 
-					if( pZ )	{	pShape->Set_Z(*(pZ++), iPoint);	}
-					if( pM )	{	pShape->Set_M(*(pM++), iPoint);	}
+					if( pZ )	{	pShape->Set_Z(*(pZ++), iOffset, iPart);	}
+					if( pM )	{	pShape->Set_M(*(pM++), iOffset, iPart);	}
+
+					iOffset++;
 				}
 
 				break;

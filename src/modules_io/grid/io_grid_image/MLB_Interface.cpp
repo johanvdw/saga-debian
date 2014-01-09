@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1313 2012-01-18 11:08:03Z reklov_w $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -110,11 +110,6 @@ CSG_Module *		Create_Module(int i)
 	case 0:	return( new CGrid_Export );
 	case 1:	return( new CGrid_Import );
 	}
-
-	//------------------------------------------------------
-	if( !SG_UI_Get_Window_Main() )
-		wxInitAllImageHandlers();
-
 
 	return( NULL );
 }

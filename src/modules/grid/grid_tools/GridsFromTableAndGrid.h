@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: GridsFromTableAndGrid.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: GridsFromTableAndGrid.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     GridsFromTableAndGrid.cpp
@@ -43,7 +43,7 @@ class CGridsFromTableAndGrid : public CSG_Module_Grid
 public:
 	CGridsFromTableAndGrid(void);
 
-	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Grid|Construction") );	}
+	virtual CSG_String			Get_MenuPath	(void)	{	return( _TL("A:Grid|Values") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: sgdi_helper.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: sgdi_helper.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -265,7 +265,7 @@ CSGDI_Slider::CSGDI_Slider(wxWindow *pParent, int ID, double Value, double minVa
 
 	Set_Value(Value);
 
-	SetTickFreq(SLIDER_RANGE / 10, 0);
+	SetTickFreq(SLIDER_RANGE / 10);
 }
 
 //---------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1648 2013-04-11 08:55:01Z oconrad $
+# $Id: Makefile.am 1800 2013-08-28 10:40:10Z oconrad $
 #
 INCS = -I.. -I.
 if DEBUG
@@ -31,6 +31,7 @@ callback.cpp\
 data_source.cpp\
 data_source_files.cpp\
 data_source_odbc.cpp\
+data_source_pgsql.cpp\
 dc_helper.cpp\
 dlg_about.cpp\
 dlg_about_logo.cpp\
@@ -126,6 +127,7 @@ callback.h\
 data_source.h\
 data_source_files.h\
 data_source_odbc.h\
+data_source_pgsql.h\
 dc_helper.h\
 dlg_about.h\
 dlg_about_logo.h\
@@ -210,7 +212,7 @@ wksp_table_manager.h\
 wksp_tin.h\
 wksp_tin_manager.h
 
-saga_gui_LDADD = ../saga_api/libsaga_api.la ../saga_odbc/libsaga_odbc.la
+saga_gui_LDADD = ../saga_api/libsaga_api.la
 
 dist-hook:
 	 mkdir $(distdir)/res

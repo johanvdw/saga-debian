@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: HillShade.cpp 1681 2013-05-06 15:15:31Z reklov_w $
+ * Version $Id: HillShade.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -153,7 +153,7 @@ CHillShade::CHillShade(void)
 	Parameters.Add_Value(
 		NULL	, "RADIUS"		, _TL("Search Radius"),
 		_TL("Radius used to trace for shadows (ambient occlusion) [map units]."),
-		PARAMETER_TYPE_Double	, 100.0, 0.001, true
+		PARAMETER_TYPE_Double	, 10.0, 0.001, true
 	);
 }
 

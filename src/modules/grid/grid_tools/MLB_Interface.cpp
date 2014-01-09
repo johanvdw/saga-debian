@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1383 2012-04-26 15:44:11Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -132,6 +132,8 @@ CSG_String Get_Info(int i)
 #include "Grid_Tiling.h"
 #include "Grid_Shrink_Expand.h"
 
+#include "Grid_Transpose.h"
+
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -142,7 +144,7 @@ CSG_Module *		Create_Module(int i)
 	{
 	case  0:	return( new CGrid_Resample );
 	case  1:	return( new CGrid_Aggregate );
-	case  2:	return( new CGrid_Cut );
+	case  2:	return( new CGrid_Clip_Interactive );
 	case  3:	return( new CGrid_Merge );
 	case  4: 	return( new CConstantGrid );
 	case  5:	return( new CGrid_Completion );
@@ -170,9 +172,12 @@ CSG_Module *		Create_Module(int i)
 	case 27: 	return( new CGrid_Tiling );
 	case 28: 	return( new CGrid_Shrink_Expand );
 	case 29: 	return( new CGrid_Gaps_Resampling );
-	}
+	case 30: 	return( new CGrid_Transpose );
+	case 31: 	return( new CGrid_Clip );
 
-	return( NULL );
+	case 40:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
+	}
 }
 
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -63,6 +63,7 @@
 
 #include "MLB_Interface.h"
 
+#include <opencv/cv.h>
 
 //---------------------------------------------------------
 // 2. Place general module library informations here...
@@ -78,12 +79,15 @@ CSG_String Get_Info(int i)
 		return( _TL("O. Conrad (c) 2009") );
 
 	case MLB_INFO_Description:
-		return( _TW(
-			"OpenCV, the \"Open Source Computer Vision Library\". "
-			"Find out more at the OpenCV  - Open Source Computer Vision - homepage:\n"
-			"<a target=\"_blank\" href=\"http://opencv.willowgarage.com\">"
-			"http://opencv.willowgarage.com</a>"
-		));
+		{
+			CSG_String	s;
+
+			s	+= _TW("OpenCV - \"Open Source Computer Vision Library\"\nVersion: ");
+			s	+= CV_VERSION;
+			s	+= "\n<a target=\"_blank\" href=\"http://opencv.org\">OpenCV homepage</a>";
+
+			return( s );
+		}
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
@@ -100,6 +104,7 @@ CSG_String Get_Info(int i)
 #include "opencv_morphology.h"
 #include "opencv_fourier.h"
 #include "opencv_svd.h"
+#include "opencv_nnet.h"
 
 
 //---------------------------------------------------------
@@ -112,6 +117,7 @@ CSG_Module *		Create_Module(int i)
 	case  0:	return( new COpenCV_Morphology );
 	case  1:	return( new COpenCV_FFT );
 	case  2:	return( new COpenCV_SVD );
+	case  3:	return( new COpenCV_NNet );
 	}
 
 	return( NULL );

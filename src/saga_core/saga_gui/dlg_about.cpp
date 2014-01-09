@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_about.cpp 1721 2013-06-06 09:55:02Z oconrad $
+ * Version $Id: dlg_about.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -110,7 +110,7 @@ CDLG_About::CDLG_About(void)
 {
 	wxTextCtrl	*pText;
 
-	m_pControl	= new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE);
+	m_pControl	= new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxNB_MULTILINE);
 
 	//-----------------------------------------------------
 	m_pVersion	=
@@ -246,7 +246,7 @@ wxString CDLG_About::_Get_Version(void)
 		wxT("http://www.wxwidgets.org/\n")
 		wxT("\n")
 		wxT("SAGA API includes the polygon clipping and offsetting library\n")
-		wxT("Clipper 5.1.6\n")
+		wxT("Clipper 6.0.0\n")
 		wxT("http://sourceforge.net/projects/polyclipping/\n")
 	);
 
@@ -362,7 +362,7 @@ wxString CDLG_About::_Get_GPL(void)
 		"Version 2, June 1991\n"
 		"\n"
 		"Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"
-		"59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+		"51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA\n"
 		"Everyone is permitted to copy and distribute verbatim copies\n"
 		"of this license document, but changing it is not allowed.\n"
 		"\n"
@@ -665,7 +665,7 @@ wxString CDLG_About::_Get_GPL(void)
 		"\n"
 		"You should have received a copy of the GNU General Public License\n"
 		"along with this program; if not, write to the Free Software\n"
-		"Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+		"Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA\n"
 		"\n"
 		"\n"
 		"Also add information on how to contact you by electronic and paper mail.\n"
@@ -710,7 +710,7 @@ wxString CDLG_About::_Get_LGPL(void)
 		"Version 2.1, February 1999\n"
 		"\n"
 		"Copyright (C) 1991, 1999 Free Software Foundation, Inc.\n"
-		"59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+		"51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA\n"
 		"Everyone is permitted to copy and distribute verbatim copies\n"
 		"of this license document, but changing it is not allowed.\n"
 		"\n"
@@ -1193,7 +1193,7 @@ wxString CDLG_About::_Get_LGPL(void)
 		"\n"
 		"You should have received a copy of the GNU Lesser General Public\n"
 		"License along with this library; if not, write to the Free Software\n"
-		"Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+		"Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA\n"
 		"\n"
 		"Also add information on how to contact you by electronic and paper mail.\n"
 		"\n"

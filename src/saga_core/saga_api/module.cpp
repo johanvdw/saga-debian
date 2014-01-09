@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.cpp 1687 2013-05-14 11:38:28Z oconrad $
+ * Version $Id: module.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -169,6 +169,13 @@ const CSG_String & CSG_Module::Get_Author(void)
 //														 //
 ///////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
 //---------------------------------------------------------
 bool CSG_Module::Execute(void)
 {
@@ -182,6 +189,8 @@ bool CSG_Module::Execute(void)
 	Destroy();
 
 	bool	bResult	= false;
+
+	Update_Parameter_States();
 
 	//-----------------------------------------------------
 	if( !Parameters.DataObjects_Create() )
@@ -710,6 +719,47 @@ bool CSG_Module::DataObject_Set_Parameter	(CSG_Data_Object *pDataObject, const C
 
 ///////////////////////////////////////////////////////////
 //														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CSG_Module::Update_Parameter_States(void)
+{
+	_Update_Parameter_States(&Parameters);
+
+	for(int i=0; i<Get_Parameters_Count(); i++)
+	{
+		_Update_Parameter_States(Get_Parameters(i));
+	}
+
+	return( true );
+}
+
+//---------------------------------------------------------
+void CSG_Module::_Update_Parameter_States(CSG_Parameters *pParameters)
+{
+	if( pParameters )
+	{
+		for(int i=0; i<pParameters->Get_Count(); i++)
+		{
+			CSG_Parameter	*pParameter	= pParameters->Get_Parameter(i);
+
+			if( pParameter->Get_Type() == PARAMETER_TYPE_Parameters )
+			{
+				_Update_Parameter_States(pParameter->asParameters());
+			}
+			else
+			{
+				On_Parameters_Enable(pParameters, pParameter);
+			}
+		}
+	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
 //						History							 //
 //														 //
 ///////////////////////////////////////////////////////////
@@ -823,6 +873,8 @@ void _Add_XML(CSG_MetaData *pParent, CSG_Parameter *pParameter, CSG_String ID = 
 				_Add_XML(pItem, pParameter->asParameters()->Get_Parameter(i), ID);
 			}
 		}
+	default:
+		break;
 	}
 }
 

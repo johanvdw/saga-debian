@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_pointcloud.cpp 1646 2013-04-10 16:29:00Z oconrad $
+ * Version $Id: wksp_pointcloud.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -72,6 +72,9 @@
 #include "wksp_layer_classify.h"
 
 #include "wksp_pointcloud.h"
+#include "wksp_table.h"
+
+#include "view_scatterplot.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -84,6 +87,8 @@
 CWKSP_PointCloud::CWKSP_PointCloud(CSG_PointCloud *pPointCloud)
 	: CWKSP_Layer(pPointCloud)
 {
+	m_pTable		= new CWKSP_Table(pPointCloud);
+
 	m_Edit_Attributes.Destroy();
 	m_Edit_Attributes.Add_Field(_TL("Name") , SG_DATATYPE_String);
 	m_Edit_Attributes.Add_Field(_TL("Value"), SG_DATATYPE_String);
@@ -103,7 +108,9 @@ CWKSP_PointCloud::CWKSP_PointCloud(CSG_PointCloud *pPointCloud)
 
 //---------------------------------------------------------
 CWKSP_PointCloud::~CWKSP_PointCloud(void)
-{}
+{
+	delete(m_pTable);
+}
 
 
 ///////////////////////////////////////////////////////////
@@ -157,6 +164,8 @@ wxMenu * CWKSP_PointCloud::Get_Menu(void)
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_POINTCLOUD_SHOW);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_POINTCLOUD_SAVE);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_POINTCLOUD_SAVEAS);
+	CMD_Menu_Add_Item(pMenu,  true, ID_CMD_SHAPES_HISTOGRAM);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_SET_LUT);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SETTINGS_COPY);
 
 	pMenu->AppendSeparator();
@@ -171,13 +180,13 @@ wxMenu * CWKSP_PointCloud::Get_Menu(void)
 	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Classification"), pSubMenu);
 
 	//-----------------------------------------------------
-//	wxMenu	*pTable	= new wxMenu(_TL("Table"));
+	wxMenu	*pTable	= new wxMenu(_TL("Table"));
 
-//	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_SHOW);
+	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_SHOW);
 //	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_DIAGRAM);
 //	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SCATTERPLOT);
 
-//	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Attributes"), pTable);
+	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Attributes"), pTable);
 
 	return( pMenu );
 }
@@ -198,6 +207,10 @@ bool CWKSP_PointCloud::On_Command(int Cmd_ID)
 		return( CWKSP_Layer::On_Command(Cmd_ID) );
 
 	case ID_CMD_POINTCLOUD_LAST:
+		break;
+
+	case ID_CMD_SHAPES_SET_LUT:
+		_LUT_Create();
 		break;
 
 	case ID_CMD_POINTCLOUD_RANGE_MINMAX:
@@ -221,6 +234,11 @@ bool CWKSP_PointCloud::On_Command(int Cmd_ID)
 		);
 		break;
 
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:
+		Get_PointCloud()->Select();
+		Update_Views();
+		break;
+
 	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
 		Get_PointCloud()->Inv_Selection();
 		Update_Views();
@@ -232,6 +250,18 @@ bool CWKSP_PointCloud::On_Command(int Cmd_ID)
 			Get_PointCloud()->Del_Selection();
 			Update_Views();
 		}
+		break;
+
+	case ID_CMD_TABLES_SHOW:
+		m_pTable->Toggle_View();
+		break;
+
+	case ID_CMD_TABLES_DIAGRAM:
+		m_pTable->Toggle_Diagram();
+		break;
+
+	case ID_CMD_SHAPES_HISTOGRAM:
+		Histogram_Toggle();
 		break;
 	}
 
@@ -247,6 +277,14 @@ bool CWKSP_PointCloud::On_Command_UI(wxUpdateUIEvent &event)
 		return( CWKSP_Layer::On_Command_UI(event) );
 
 	case ID_CMD_POINTCLOUD_LAST:
+		break;
+
+	case ID_CMD_TABLES_SHOW:
+		event.Check(m_pTable->Get_View() != NULL);
+		break;
+
+	case ID_CMD_TABLES_DIAGRAM:
+		event.Check(m_pTable->Get_Diagram() != NULL);
 		break;
 	}
 
@@ -334,6 +372,8 @@ void CWKSP_PointCloud::On_DataObject_Changed(void)
 	_AttributeList_Set(m_Parameters("LUT_ATTRIB"   ), false);
 	_AttributeList_Set(m_Parameters("METRIC_ATTRIB"), false);
 	_AttributeList_Set(m_Parameters("RGB_ATTRIB"   ), false);
+
+	m_pTable->DataObject_Changed();
 }
 
 //---------------------------------------------------------
@@ -418,6 +458,12 @@ int CWKSP_PointCloud::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Para
 	return( CWKSP_Layer::On_Parameter_Changed(pParameters, pParameter, Flags) );
 }
 
+//---------------------------------------------------------
+void CWKSP_PointCloud::On_Update_Views(void)
+{
+	m_pTable->Update_Views();
+}
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -468,6 +514,213 @@ void CWKSP_PointCloud::_AttributeList_Set(CSG_Parameter *pFields, bool bAddNoFie
 			pFields->Set_Value(Get_PointCloud()->Get_Field_Count());
 		}
 	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CWKSP_PointCloud::_LUT_Create(void)
+{
+	int				iField, Method;
+	CSG_Colors		*pColors;
+	CSG_Table		*pLUT;
+
+	//-----------------------------------------------------
+	if( Get_PointCloud()->Get_Field_Count() <= 0 || Get_PointCloud()->Get_Record_Count() < 1 )
+	{
+		DLG_Message_Show(_TL("Function failed because no attributes are available"), _TL("Create Lookup Table"));
+
+		return;
+	}
+
+	//-----------------------------------------------------
+	CSG_String	sFields;
+
+	for(iField=0; iField<Get_PointCloud()->Get_Field_Count(); iField++)
+	{
+		sFields	+= Get_PointCloud()->Get_Field_Name(iField);	sFields	+= SG_T("|");
+	}
+
+	//-----------------------------------------------------
+	static CSG_Parameters	Parameters;
+
+	if( Parameters.Get_Count() != 0 )
+	{
+		Parameters("FIELD")->asChoice()->Set_Items(sFields);
+	}
+	else
+	{
+		Parameters.Create(NULL, _TL("Create Lookup Table"), _TL(""));
+
+		Parameters.Add_Choice(
+			NULL, "FIELD"	, _TL("Attribute"),
+			_TL(""),
+			sFields
+		);
+
+		Parameters.Add_Colors(
+			NULL, "COLOR"	, _TL("Colors"),
+			_TL("")
+		)->asColors()->Set_Count(10);
+
+		Parameters.Add_Choice(
+			NULL, "METHOD"	, _TL("Classification Method"),
+			_TL(""),
+			CSG_String::Format(SG_T("%s|%s|%s|"),
+				_TL("unique values"),
+				_TL("equal intervals"),
+				_TL("quantiles")
+			), 0
+		);
+	}
+
+	if( !DLG_Parameters(&Parameters) )
+	{
+		return;
+	}
+
+	//-----------------------------------------------------
+	pColors	= Parameters("COLOR" )->asColors();
+	iField	= Parameters("FIELD" )->asInt();
+	Method	= Parameters("METHOD")->asInt();
+
+	pLUT	= m_Parameters("LUT" )->asTable();
+	pLUT	->Del_Records();
+
+	switch( Method )
+	{
+	//-----------------------------------------------------
+	case 0:	// unique values
+		{
+			TSG_Table_Index_Order	old_Order	= Get_PointCloud()->Get_Index_Order(0);
+			int						old_Field	= Get_PointCloud()->Get_Index_Field(0);
+
+			TSG_Data_Type	Type	= SG_Data_Type_is_Numeric(Get_PointCloud()->Get_Field_Type(iField))
+									? SG_DATATYPE_Double : SG_DATATYPE_String;
+
+			pLUT->Set_Field_Type(LUT_MIN, Type);
+			pLUT->Set_Field_Type(LUT_MAX, Type);
+
+			Get_PointCloud()->Set_Index(iField, TABLE_INDEX_Ascending);
+
+			CSG_String	sValue;
+
+			for(int iRecord=0; iRecord<Get_PointCloud()->Get_Count(); iRecord++)
+			{
+				CSG_Table_Record	*pRecord	= Get_PointCloud()->Get_Record_byIndex(iRecord);
+
+				if( iRecord == 0 || sValue.Cmp(pRecord->asString(iField)) )
+				{
+					sValue	= pRecord->asString(iField);
+
+					CSG_Table_Record	*pClass	= pLUT->Add_Record();
+
+					pClass->Set_Value(1, sValue);	// Name
+					pClass->Set_Value(2, sValue);	// Description
+					pClass->Set_Value(3, sValue);	// Minimum
+					pClass->Set_Value(4, sValue);	// Maximum
+				}
+			}
+
+			pColors->Set_Count(pLUT->Get_Count());
+
+			for(int iClass=0; iClass<pLUT->Get_Count(); iClass++)
+			{
+				pLUT->Get_Record(iClass)->Set_Value(0, pColors->Get_Color(iClass));
+			}
+
+			Get_PointCloud()->Set_Index(old_Field, old_Order);
+		}
+		break;
+
+	//-----------------------------------------------------
+	case 1:	// equal intervals
+		{
+			double	Minimum, Maximum, Interval;
+
+			Interval	= Get_PointCloud()->Get_Range  (iField) / (double)pColors->Get_Count();
+			Minimum		= Get_PointCloud()->Get_Minimum(iField);
+
+			pLUT->Set_Field_Type(LUT_MIN, SG_DATATYPE_Double);
+			pLUT->Set_Field_Type(LUT_MAX, SG_DATATYPE_Double);
+
+			for(int iClass=0; iClass<pColors->Get_Count(); iClass++, Minimum+=Interval)
+			{
+				Maximum	= iClass < pColors->Get_Count() - 1 ? Minimum + Interval : Get_PointCloud()->Get_Maximum(iField) + 1.0;
+
+				CSG_String	sValue;	sValue.Printf(SG_T("%s - %s"),
+					SG_Get_String(Minimum, -2).c_str(),
+					SG_Get_String(Maximum, -2).c_str()
+				);
+
+				CSG_Table_Record	*pClass	= pLUT->Add_Record();
+
+				pClass->Set_Value(0, pColors->Get_Color(iClass));
+				pClass->Set_Value(1, sValue);	// Name
+				pClass->Set_Value(2, sValue);	// Description
+				pClass->Set_Value(3, Minimum);	// Minimum
+				pClass->Set_Value(4, Maximum);	// Maximum
+			}
+		}
+		break;
+
+		//-----------------------------------------------------
+	case 2:	// quantiles
+		{
+			TSG_Table_Index_Order	old_Order	= Get_PointCloud()->Get_Index_Order(0);
+			int						old_Field	= Get_PointCloud()->Get_Index_Field(0);
+
+			Get_PointCloud()->Set_Index(iField, TABLE_INDEX_Ascending);
+
+			pLUT->Set_Field_Type(LUT_MIN, SG_DATATYPE_Double);
+			pLUT->Set_Field_Type(LUT_MAX, SG_DATATYPE_Double);
+
+			if( Get_PointCloud()->Get_Count() < pColors->Get_Count() )
+			{
+				pColors->Set_Count(Get_PointCloud()->Get_Count());
+			}
+
+			double	Minimum, Maximum, Count, iRecord;
+
+			Maximum	= Get_PointCloud()->Get_Minimum(iField);
+			iRecord	= Count	= Get_PointCloud()->Get_Count() / (double)pColors->Get_Count();
+
+			for(int iClass=0; iClass<pColors->Get_Count(); iClass++, iRecord+=Count)
+			{
+				Minimum	= Maximum;
+				Maximum	= iRecord < Get_PointCloud()->Get_Count() ? Get_PointCloud()->Get_Record_byIndex((int)iRecord)->asDouble(iField) : Get_PointCloud()->Get_Maximum(iField) + 1.0;
+
+				CSG_String	sValue;	sValue.Printf(SG_T("%s - %s"),
+					SG_Get_String(Minimum, -2).c_str(),
+					SG_Get_String(Maximum, -2).c_str()
+				);
+
+				CSG_Table_Record	*pClass	= pLUT->Add_Record();
+
+				pClass->Set_Value(0, pColors->Get_Color(iClass));
+				pClass->Set_Value(1, sValue);	// Name
+				pClass->Set_Value(2, sValue);	// Description
+				pClass->Set_Value(3, Minimum);	// Minimum
+				pClass->Set_Value(4, Maximum);	// Maximum
+			}
+
+			Get_PointCloud()->Set_Index(old_Field, old_Order);
+		}
+		break;
+	}
+
+	//-----------------------------------------------------
+	DataObject_Changed();
+
+	m_Parameters("COLORS_TYPE")->Set_Value(CLASSIFY_LUT);	// Lookup Table
+	m_Parameters("LUT_ATTRIB" )->Set_Value(iField);
+
+	Parameters_Changed();
 }
 
 
@@ -542,6 +795,7 @@ wxMenu * CWKSP_PointCloud::On_Edit_Get_Menu(void)
 	pMenu	= new wxMenu;
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_DEL_SHAPE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_SEL_CLEAR);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_SHAPES_EDIT_SEL_INVERT);
 
 	return( pMenu );

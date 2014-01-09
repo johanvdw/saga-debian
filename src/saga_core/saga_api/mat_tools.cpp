@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_tools.cpp 1615 2013-02-27 16:20:14Z oconrad $
+ * Version $Id: mat_tools.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -1238,14 +1238,16 @@ void CSG_Classifier_Supervised::_Get_Maximum_Likelihood(const CSG_Vector &Featur
 
 		dSum	+= (d	= pow(d, 1.0 / Get_Feature_Count()));
 
-/**//*	double	d	= 0.0;
+		/*
+		double	d	= 0.0;
 
 		for(int iFeature=0; iFeature<Get_Feature_Count(); iFeature++)
 		{
 			d	+= SG_Get_Square((Features(iFeature) - m_Statistics[iClass][iFeature].Get_Mean()) / m_Statistics[iClass][iFeature].Get_StdDev());
 		}
 
-		dSum	+= (d	= m_ML_s[iClass] * exp(-0.5 * d));	/**/
+		dSum	+= (d	= m_ML_s[iClass] * exp(-0.5 * d));	
+		*/
 
 		if( Quality < d )
 		{

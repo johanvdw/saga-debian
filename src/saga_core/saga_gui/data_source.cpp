@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -73,6 +73,7 @@
 #include "data_source.h"
 #include "data_source_files.h"
 #include "data_source_odbc.h"
+#include "data_source_pgsql.h"
 
 #include "wksp_layer.h"
 #include "wksp_map_layer.h"
@@ -129,7 +130,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CData_Source::CData_Source(wxWindow *pParent)
-	: wxNotebook(pParent, ID_WND_DATA_SOURCE, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE, _TL("Data Source"))
+	: wxNotebook(pParent, ID_WND_DATA_SOURCE, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxNB_MULTILINE, _TL("Data Source"))
 {
 	g_pData_Source	= this;
 
@@ -143,10 +144,12 @@ CData_Source::CData_Source(wxWindow *pParent)
 	//-----------------------------------------------------
 	m_pFiles	= new CData_Source_Files(this);	m_pFiles->SetName(_TL("File System"));
 	m_pODBC		= new CData_Source_ODBC (this);	m_pODBC ->SetName(_TL("ODBC"));
+	m_pPgSQL	= new CData_Source_PgSQL(this);	m_pPgSQL->SetName(_TL("PostgreSQL"));
 
 #if defined(_SAGA_MSW)
 	m_pFiles->Hide();
 	m_pODBC ->Hide();
+	m_pPgSQL->Hide();
 #endif
 }
 
@@ -155,6 +158,7 @@ void CData_Source::Add_Pages(void)
 {
 	_Show_Page(m_pFiles);
 	_Show_Page(m_pODBC);
+	_Show_Page(m_pPgSQL);
 }
 
 //---------------------------------------------------------
@@ -221,7 +225,8 @@ bool CData_Source::Set_Data_Source(CWKSP_Base_Item *pItem)
 //---------------------------------------------------------
 bool CData_Source::Update_ODBC_Source(const wxString &Server)
 {
-	m_pODBC->Update_Source(Server);
+	m_pODBC ->Update_Source(Server);
+	m_pPgSQL->Update_Source(Server);
 
 	return( true );
 }
@@ -241,6 +246,7 @@ bool CData_Source::_Show_Page(wxWindow *pPage)
 	//-----------------------------------------------------
 	if( pPage == m_pFiles )	Image_ID	= IMG_FILES;
 	if( pPage == m_pODBC  )	Image_ID	= IMG_DATABASE;
+	if( pPage == m_pPgSQL )	Image_ID	= IMG_DATABASE;
 
 	//-----------------------------------------------------
 	if( pPage )

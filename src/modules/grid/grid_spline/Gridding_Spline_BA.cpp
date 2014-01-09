@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_BA.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Gridding_Spline_BA.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -79,9 +79,9 @@ CGridding_Spline_BA::CGridding_Spline_BA(void)
 	Set_Author		(SG_T("(c) 2006 by O.Conrad"));
 
 	Set_Description	(_TW(
-		"Calculates B-spline functions for choosen level of detail. "
-		"This module serves as basis for the 'Multilevel B-Spline Interpolation' "
-		"and is not suited as it is for spatial data interpolation from "
+		"Calculates B-spline functions for chosen level of detail. "
+		"This module serves as the basis for the 'Multilevel B-Spline Interpolation' "
+		"and is not suited as is for spatial data interpolation from "
 		"scattered data. "
 
 		"\n\n"

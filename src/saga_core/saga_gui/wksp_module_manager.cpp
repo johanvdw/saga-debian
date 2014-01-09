@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_manager.cpp 1599 2013-01-29 15:31:09Z oconrad $
+ * Version $Id: wksp_module_manager.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -64,7 +64,6 @@
 #include <wx/filename.h>
 
 #include <saga_api/saga_api.h>
-#include <saga_odbc/saga_odbc.h>
 
 #include "saga.h"
 
@@ -212,8 +211,6 @@ bool CWKSP_Module_Manager::Initialise(void)
 //---------------------------------------------------------
 bool CWKSP_Module_Manager::Finalise(void)
 {
-	SG_ODBC_Get_Connection_Manager().Destroy();
-
 	_Config_Write();
 
 	return( true );

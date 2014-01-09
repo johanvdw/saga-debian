@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters.h 1755 2013-06-27 09:18:36Z oconrad $
+ * Version $Id: parameters.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -1199,7 +1199,7 @@ public:
 	bool						On_User_Changed			(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 	bool						Init_User				(const TSG_Rect &Extent, int Rows = 100, bool bFitToCells = false);
-	bool						Init_User				(double xMin, double yMin, double Size, int nx, int ny);
+	bool						Init_User				(double xMin, double yMin, double Size, int nx, int ny, bool bFitToCells = false);
 
 	CSG_Grid *					Get_User				(                              TSG_Data_Type Type = SG_DATATYPE_Float);
 	CSG_Grid *					Get_User				(const CSG_String &Identifier, TSG_Data_Type Type = SG_DATATYPE_Float);
@@ -1211,6 +1211,8 @@ public:
 
 
 private:
+
+	bool						m_bFitToCells;
 
 	CSG_Parameters				*m_pUser, *m_pGrid, *m_pSystem;
 

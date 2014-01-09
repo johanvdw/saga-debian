@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp.cpp 1652 2013-04-12 12:15:30Z oconrad $
+ * Version $Id: wksp.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -115,7 +115,7 @@ enum
 #define SUBNB_CAPTION_BUTTONS	_TL("Thumbnails")
 
 //---------------------------------------------------------
-#define SUBNB_CREATE(ID, Name)	pNotebook	= new wxNotebook(this, ID, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE|wxNB_MULTILINE, Name);\
+#define SUBNB_CREATE(ID, Name)	pNotebook	= new wxNotebook(this, ID, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxNB_MULTILINE, Name);\
 								pNotebook	->AssignImageList(new wxImageList(IMG_SIZE_NOTEBOOK, IMG_SIZE_NOTEBOOK, true, 0));\
 								pNotebook	->IMG_ADD_TO_NOTEBOOK(ID_IMG_NB_WKSP_TREEVIEW);\
 								pNotebook	->IMG_ADD_TO_NOTEBOOK(ID_IMG_NB_WKSP_THUMBNAILS);
@@ -152,7 +152,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CWKSP::CWKSP(wxWindow *pParent)
-	: wxNotebook(pParent, ID_WND_WKSP, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE|wxNB_MULTILINE, _TL("Manager"))
+	: wxNotebook(pParent, ID_WND_WKSP, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxNB_MULTILINE, _TL("Manager"))
 {
 	wxNotebook	*pNotebook;
 

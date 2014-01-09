@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_file.cpp 1520 2012-11-07 12:01:32Z oconrad $
+ * Version $Id: api_file.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -497,6 +497,23 @@ CSG_String		SG_File_Get_Path(const SG_Char *full_Path)
 	}
 
 	return( SG_T("") );
+}
+
+//---------------------------------------------------------
+CSG_String		SG_File_Get_Path_Absolute	(const SG_Char *full_Path)
+{
+	wxString	Path;
+
+	if( full_Path && *full_Path )
+	{
+		wxFileName	fn(full_Path);
+
+		fn.MakeAbsolute();
+
+		Path	= fn.GetFullPath();
+	}
+
+	return( &Path );
 }
 
 //---------------------------------------------------------

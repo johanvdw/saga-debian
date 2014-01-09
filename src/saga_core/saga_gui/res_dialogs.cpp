@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_dialogs.cpp 1640 2013-03-25 12:56:18Z oconrad $
+ * Version $Id: res_dialogs.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -479,35 +479,39 @@ bool		DLG_Table(const wxString &Caption, CSG_Table *pTable)
 //---------------------------------------------------------
 bool		DLG_Table_Fields(const wxString &Caption, CSG_Parameter_Table_Fields *pFields)
 {
-	int				i;
-	CSG_Parameters	P;
-	CSG_Table		*pTable	= pFields->Get_Table();
+	CSG_Table	*pTable	= pFields->Get_Table();
 
-	for(i=0; i<pTable->Get_Field_Count(); i++)
+	if( pTable )
 	{
-		P.Add_Value(NULL, SG_Get_String(i, 0), pTable->Get_Field_Name(i), _TL(""), PARAMETER_TYPE_Bool, false);
-	}
-
-	for(i=0; i<pFields->Get_Count(); i++)
-	{
-		P(pFields->Get_Index(i))->Set_Value(true);
-	}
-
-	if( DLG_Parameters(&P) )
-	{
-		CSG_String	s;
+		int				i;
+		CSG_Parameters	P;
 
 		for(i=0; i<pTable->Get_Field_Count(); i++)
 		{
-			if( P(i)->asBool() )
-			{
-				s	+= CSG_String::Format(s.Length() ? SG_T(",%d") : SG_T("%d"), i);
-			}
+			P.Add_Value(NULL, SG_Get_String(i, 0), pTable->Get_Field_Name(i), _TL(""), PARAMETER_TYPE_Bool, false);
 		}
 
-		pFields->Set_Value(s);
+		for(i=0; i<pFields->Get_Count(); i++)
+		{
+			P(pFields->Get_Index(i))->Set_Value(true);
+		}
 
-		return( true );
+		if( DLG_Parameters(&P) )
+		{
+			CSG_String	s;
+
+			for(i=0; i<pTable->Get_Field_Count(); i++)
+			{
+				if( P(i)->asBool() )
+				{
+					s	+= CSG_String::Format(s.Length() ? SG_T(",%d") : SG_T("%d"), i);
+				}
+			}
+
+			pFields->Set_Value(s);
+
+			return( true );
+		}
 	}
 
 	return( false );
@@ -639,27 +643,13 @@ bool		DLG_Font(CSG_Parameter *pFont)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool		DLG_Get_Number(double &Number, const wxString &Caption, const wxString &Text)
+bool		DLG_Get_Text(wxString &Value, const wxString &Caption, const wxString &Text)
 {
-	wxTextEntryDialog	dlg(MDI_Get_Top_Window(), Text, Caption, wxString::Format(wxT("%f"), Number));
+	wxTextEntryDialog	dlg(MDI_Get_Top_Window(), Text, Caption, Value);
 
-	return( dlg.ShowModal() == wxID_OK && dlg.GetValue().ToDouble(&Number) );
-}
-
-bool		DLG_Get_Number(double &Number)
-{
-	return( DLG_Get_Number(Number, _TL("Input"), _TL("Please enter a numeric value:")) );
-}
-
-//---------------------------------------------------------
-bool		DLG_Get_Number(int &Number, const wxString &Caption, const wxString &Text)
-{
-	long				lValue;
-	wxTextEntryDialog	dlg(MDI_Get_Top_Window(), Text, Caption, wxString::Format(wxT("%d"), Number));
-
-	if( dlg.ShowModal() == wxID_OK && dlg.GetValue().ToLong(&lValue) )
+	if( dlg.ShowModal() == wxID_OK )
 	{
-		Number	= lValue;
+		Value	= dlg.GetValue();
 
 		return( true );
 	}
@@ -667,9 +657,43 @@ bool		DLG_Get_Number(int &Number, const wxString &Caption, const wxString &Text)
 	return( false );
 }
 
-bool		DLG_Get_Number(int &Number)
+bool		DLG_Get_Text(wxString &Value)
 {
-	return( DLG_Get_Number(Number, _TL("Input"), _TL("Please enter a numeric value:")) );
+	return( DLG_Get_Text(Value, _TL("Input"), _TL("Please enter a text:")) );
+}
+
+//---------------------------------------------------------
+bool		DLG_Get_Number(double &Value, const wxString &Caption, const wxString &Text)
+{
+	wxTextEntryDialog	dlg(MDI_Get_Top_Window(), Text, Caption, wxString::Format(wxT("%f"), Value));
+
+	return( dlg.ShowModal() == wxID_OK && dlg.GetValue().ToDouble(&Value) );
+}
+
+bool		DLG_Get_Number(double &Value)
+{
+	return( DLG_Get_Number(Value, _TL("Input"), _TL("Please enter a numeric value:")) );
+}
+
+//---------------------------------------------------------
+bool		DLG_Get_Number(int &Value, const wxString &Caption, const wxString &Text)
+{
+	long				lValue;
+	wxTextEntryDialog	dlg(MDI_Get_Top_Window(), Text, Caption, wxString::Format(wxT("%d"), Value));
+
+	if( dlg.ShowModal() == wxID_OK && dlg.GetValue().ToLong(&lValue) )
+	{
+		Value	= lValue;
+
+		return( true );
+	}
+
+	return( false );
+}
+
+bool		DLG_Get_Number(int &Value)
+{
+	return( DLG_Get_Number(Value, _TL("Input"), _TL("Please enter a numeric value:")) );
 }
 
 

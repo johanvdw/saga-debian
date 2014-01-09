@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_commands.h 1743 2013-06-21 10:01:07Z oconrad $
+ * Version $Id: res_commands.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -126,13 +126,16 @@ enum ID_COMMANDS
 
 	ID_CMD_DATASOURCE_REFRESH,
 
-	ID_CMD_ODBC_REFRESH,
-	ID_CMD_ODBC_SOURCE_CLOSE_ALL,
-	ID_CMD_ODBC_SOURCE_CLOSE,
-	ID_CMD_ODBC_SOURCE_OPEN,
-	ID_CMD_ODBC_TABLE_OPEN,
-	ID_CMD_ODBC_TABLE_DELETE,
-	ID_CMD_ODBC_TABLE_FROM_QUERY,
+	ID_CMD_DB_REFRESH,
+	ID_CMD_DB_SOURCE_OPEN,
+	ID_CMD_DB_SOURCE_CLOSE,
+	ID_CMD_DB_SOURCE_CLOSE_ALL,
+	ID_CMD_DB_SOURCE_DELETE,
+	ID_CMD_DB_TABLE_OPEN,
+	ID_CMD_DB_TABLE_DELETE,
+	ID_CMD_DB_TABLE_RENAME,
+	ID_CMD_DB_TABLE_INFO,
+	ID_CMD_DB_TABLE_FROM_QUERY,
 
 	ID_CMD_MODULES_FIRST,
 	ID_CMD_MODULES_RECENT_FIRST,
@@ -171,6 +174,8 @@ enum ID_COMMANDS
 	ID_CMD_GRIDS_FIT_STDDEV,
 	ID_CMD_GRIDS_FIT_DIALOG,
 	ID_CMD_GRIDS_SET_LUT,
+	ID_CMD_GRIDS_SEL_CLEAR,
+	ID_CMD_GRIDS_SEL_DELETE,
 	ID_CMD_GRIDS_LAST,
 
 	ID_CMD_SHAPES_FIRST,
@@ -186,6 +191,7 @@ enum ID_COMMANDS
 	ID_CMD_SHAPES_RANGE_STDDEV200,
 	ID_CMD_SHAPES_SET_LUT,
 	ID_CMD_SHAPES_EDIT_SHAPE,
+	ID_CMD_SHAPES_EDIT_SEL_CLEAR,
 	ID_CMD_SHAPES_EDIT_SEL_INVERT,
 	ID_CMD_SHAPES_EDIT_ADD_SHAPE,
 	ID_CMD_SHAPES_EDIT_ADD_PART,

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_cmd.cpp 1716 2013-06-05 07:43:53Z oconrad $
+ * Version $Id: saga_cmd.cpp 1922 2014-01-09 10:28:46Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -61,6 +61,8 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#include <locale.h>
+
 #include <wx/app.h>
 #include <wx/utils.h>
 

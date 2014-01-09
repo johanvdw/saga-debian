@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Calculator.cpp 1195 2011-10-14 11:29:50Z oconrad $
+ * Version $Id: Table_Calculator.cpp 1889 2013-12-03 16:19:55Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     TableCalculator.cpp
@@ -95,6 +95,14 @@ bool CTable_Calculator_Base::On_Execute(void)
 
 		return( false );
 	}
+
+	if( nFields == 0 )
+	{
+		SG_UI_Msg_Add_Error(_TL("No attribute fields specified!"));
+		delete[](Fields);
+		return( false );
+	}
+
 
 	//-----------------------------------------------------
 	if( Parameters("RESULT")->asTable() && Parameters("RESULT")->asTable() != pTable )

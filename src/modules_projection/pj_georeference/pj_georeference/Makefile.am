@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1540 2012-11-22 13:40:57Z oconrad $
+# $Id: Makefile.am 1843 2013-09-18 10:49:15Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -20,13 +20,7 @@ Georef_Grid.cpp\
 georef_grid_move.cpp\
 Georef_Shapes.cpp\
 MLB_Interface.cpp\
-enorm.c\
-fdjac2.c\
-lmdif.c\
-lmdif0.c\
-lmpar.c\
-qrfac.c\
-qrsolv.c\
+set_grid_georeference.cpp\
 Collect_Points.h\
 direct_georeferencing.h\
 Georef_Engine.h\
@@ -34,8 +28,7 @@ Georef_Grid.h\
 georef_grid_move.h\
 Georef_Shapes.h\
 MLB_Interface.h\
-cminpak.h\
-dpmpar.h
+set_grid_georeference.h
 
 libpj_georeference_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 

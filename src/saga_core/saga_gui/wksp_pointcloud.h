@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_pointcloud.h 1646 2013-04-10 16:29:00Z oconrad $
+ * Version $Id: wksp_pointcloud.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -89,6 +89,7 @@ public:
 	virtual TWKSP_Item			Get_Type				(void)	{	return( WKSP_ITEM_PointCloud );	}
 
 	CSG_PointCloud *			Get_PointCloud			(void)	{	return( (CSG_PointCloud *)m_pObject );	}
+	class CWKSP_Table *			Get_Table				(void)	{	return( m_pTable );		}
 
 	virtual wxString			Get_Description			(void);
 
@@ -99,6 +100,8 @@ public:
 
 	virtual wxString			Get_Value				(CSG_Point ptWorld, double Epsilon);
 	virtual double				Get_Value_Range			(void);
+
+	int							Get_Color_Field			(void)	{	return( m_Color_Field );		}
 
 	bool						asImage					(CSG_Grid *pImage);
 
@@ -113,16 +116,21 @@ protected:
 
 	CSG_Grid					m_Z, m_N;
 
+	class CWKSP_Table			*m_pTable;
+
 
 	virtual void				On_Create_Parameters	(void);
 	virtual void				On_DataObject_Changed	(void);
 	virtual void				On_Parameters_Changed	(void);
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
+	virtual void				On_Update_Views			(void);
 
 	virtual wxMenu *			On_Edit_Get_Menu		(void);
 	virtual bool				On_Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key);
 	virtual bool				On_Edit_Set_Attributes	(void);
 	virtual TSG_Rect			On_Edit_Get_Extent		(void);
+
+	void						_LUT_Create				(void);
 
 	virtual void				On_Draw					(CWKSP_Map_DC &dc_Map, bool bEdit);
 

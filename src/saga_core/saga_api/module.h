@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.h 1705 2013-05-29 10:59:04Z oconrad $
+ * Version $Id: module.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -207,6 +207,8 @@ public:
 	CSG_Parameters *			Get_Parameters				(int i)	{	return( i >= 0 && i < m_npParameters ? m_pParameters[i] : NULL );	}
 	CSG_Parameters *			Get_Parameters				(const CSG_String &Identifier);
 
+	bool						Update_Parameter_States		(void);
+
 	virtual bool				do_Sync_Projections			(void)	{	return( true  );	}
 
 	virtual bool				is_Grid						(void)	{	return( false );	}
@@ -306,6 +308,8 @@ private:
 	bool						_Synchronize_DataObjects	(void);
 
 	void						_Set_Output_History			(void);
+
+	void						_Update_Parameter_States	(CSG_Parameters *pParameters);
 
 	static int					_On_Parameter_Changed		(CSG_Parameter *pParameter, int Flags);
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_selection.cpp 1728 2013-06-13 09:37:08Z oconrad $
+ * Version $Id: table_selection.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -157,21 +157,24 @@ bool CSG_Table::Select(CSG_Table_Record *pRecord, bool bInvert)
 //---------------------------------------------------------
 int CSG_Table::Del_Selection(void)
 {
-	int		n	= 0;
-
-	if( m_nSelected > 0 )
+	if( m_nSelected <= 0 )
 	{
-		for(int i=m_nSelected-1; i>=0; i--)
-		{
-			if( Del_Record(m_Selected[i]) )
-			{
-				n++;
-			}
-		}
-
-		SG_FREE_SAFE(m_Selected);
-		m_nSelected	= 0;
+		return( 0 );
 	}
+
+	int		i, n	= 0;
+
+	for(i=m_nRecords-1; i>=0; i--)
+	{
+		if( m_Records[i]->is_Selected() && Del_Record(i) )
+		{
+			n++;
+		}
+	}
+
+	SG_FREE_SAFE(m_Selected);
+
+	m_nSelected	= 0;
 
 	return( n );
 }

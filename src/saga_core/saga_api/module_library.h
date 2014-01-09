@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 1650 2013-04-11 11:51:20Z oconrad $
+ * Version $Id: module_library.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -103,14 +103,9 @@ enum
 //---------------------------------------------------------
 class SAGA_API_DLL_EXPORT CSG_Module_Library
 {
+	friend class CSG_Module_Library_Manager;
+
 public:
-	CSG_Module_Library(void);
-	virtual ~CSG_Module_Library(void);
-
-									CSG_Module_Library	(const CSG_String &File_Name);
-	bool							Create				(const CSG_String &File_Name);
-
-	bool							Destroy				(void);
 
 	bool							is_Valid			(void)	const	{	return( Get_Count() > 0 );	}
 
@@ -128,29 +123,32 @@ public:
 
 	int								Get_Count			(void)	const	{	return( m_pInterface ? m_pInterface->Get_Count() : 0 );	}
 
-	CSG_Module *					Get_Module			(int i)	const	{	return( i >= 0 && i < Get_Count() ? m_pInterface->Get_Module(i) : NULL );	}
-	CSG_Module *					Get_Module			(const SG_Char *Name)	const;
-
 	CSG_String						Get_Menu			(int i)	const;
 
-	CSG_Module_Grid *				Get_Module_Grid		(int i)	const;
-	CSG_Module_Grid *				Get_Module_Grid		(const SG_Char *Name)	const;
-	CSG_Module_Interactive *		Get_Module_I		(int i)	const;
-	CSG_Module_Interactive *		Get_Module_I		(const SG_Char *Name)	const;
-	CSG_Module_Grid_Interactive *	Get_Module_Grid_I	(int i)	const;
-	CSG_Module_Grid_Interactive *	Get_Module_Grid_I	(const SG_Char *Name)	const;
+	CSG_Module *					Get_Module			(int           Index, TSG_Module_Type Type = MODULE_TYPE_Base)	const;
+	CSG_Module *					Get_Module			(const SG_Char *Name, TSG_Module_Type Type = MODULE_TYPE_Base)	const;
+
+	CSG_Module_Grid *				Get_Module_Grid				(int           Index)	const;
+	CSG_Module_Grid *				Get_Module_Grid				(const SG_Char *Name)	const;
+	CSG_Module_Interactive *		Get_Module_Interactive		(int           Index)	const;
+	CSG_Module_Interactive *		Get_Module_Interactive		(const SG_Char *Name)	const;
+	CSG_Module_Grid_Interactive *	Get_Module_Grid_Interactive	(int           Index)	const;
+	CSG_Module_Grid_Interactive *	Get_Module_Grid_Interactive	(const SG_Char *Name)	const;
 
 
 private:
+
+	CSG_Module_Library(const CSG_String &File_Name);
+	virtual ~CSG_Module_Library(void);
+
+	bool							_Destroy			(void);
+
 
 	CSG_String						m_File_Name, m_Library_Name;
 
 	CSG_Module_Library_Interface	*m_pInterface;
 
 	class wxDynamicLibrary			*m_pLibrary;
-
-
-	void							_On_Construction	(void);
 
 };
 

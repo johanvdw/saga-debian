@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_cluster_analysis.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: pc_cluster_analysis.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -69,10 +69,9 @@
 #define HEADER_INCLUDED__PC_Cluster_Analysis_H
 
 //---------------------------------------------------------
-#include <vector>
-#include <wx/tokenzr.h>
-
 #include "MLB_Interface.h"
+
+#include <vector>
 
 
 ///////////////////////////////////////////////////////////
@@ -86,7 +85,6 @@ class CPC_Cluster_Analysis : public CSG_Module
 {
 public:
 	CPC_Cluster_Analysis(void);
-	virtual ~CPC_Cluster_Analysis(void);
 
 	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Classification") );	}
 

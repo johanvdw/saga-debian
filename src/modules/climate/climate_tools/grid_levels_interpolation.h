@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -100,6 +100,8 @@ private:
 
 	CSG_Table					*m_pXTable;
 
+	CSG_Grid					*m_Coeff;
+
 	CSG_Parameter_Grid_List		*m_pXGrids, *m_pVariables;
 
 
@@ -115,6 +117,7 @@ private:
 	bool						Get_Spline_All			(double x, double y, double z, double &Value);
 	bool						Get_Spline				(double x, double y, double z, double &Value);
 	bool						Get_Trend				(double x, double y, double z, double &Value);
+	bool						Get_Trend_Coeff			(double x, double y, double z, double &Value);
 
 };
 

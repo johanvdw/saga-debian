@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygon_Union.h 1595 2013-01-25 14:16:26Z oconrad $
+ * Version $Id: Polygon_Union.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -90,14 +90,30 @@ public:
 
 protected:
 
-	virtual bool			On_Execute				(void);
+	virtual bool				On_Execute				(void);
 
-	virtual int				On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
-	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
 
 private:
 
+	bool						m_bSUM, m_bAVG, m_bMIN, m_bMAX, m_bRNG, m_bDEV, m_bVAR, m_bNUM;
+
+	int							m_Stat_Offset;
+
+	CSG_Parameter_Table_Fields	*m_Stat_pFields;
+
+	CSG_Simple_Statistics		*m_Statistics;
+
+
+	CSG_String					Get_Statistics_Name		(const CSG_String &Type, const CSG_String &Name);
+
+	bool						Init_Statistics			(CSG_Shapes *pUnions, CSG_Shapes *pPolygons);
+
+	bool						Add_Statistics			(CSG_Shape *pUnion, CSG_Shape *pPolygon, bool bReset);
+
+	bool						Set_Union				(CSG_Shape *pUnion, bool bDissolve);
 
 };
 

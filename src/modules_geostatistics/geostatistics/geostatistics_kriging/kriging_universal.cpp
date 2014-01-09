@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: kriging_universal.cpp 1633 2013-03-22 13:35:15Z oconrad $
+ * Version $Id: kriging_universal.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -160,7 +160,7 @@ bool CKriging_Universal::On_Initialize(void)
 	//-----------------------------------------------------
 	if( m_nPoints_Max <= 0 && m_Radius <= 0 )	// global
 	{
-		return( CKriging_Universal_Global::On_Execute() );
+		return( CKriging_Universal_Global::On_Initialize() );
 	}
 
 	//-----------------------------------------------------
@@ -205,7 +205,7 @@ bool CKriging_Universal::On_Finalize(void)
 {
 	m_Search.Destroy();
 
-	return( true );
+	return( CKriging_Universal_Global::On_Finalize() );
 }
 
 
@@ -279,6 +279,13 @@ int CKriging_Universal::Get_Weights(const TSG_Point &p, CSG_Matrix &W, CSG_Point
 //---------------------------------------------------------
 bool CKriging_Universal::Get_Value(const TSG_Point &p, double &z, double &v)
 {
+	//-----------------------------------------------------
+	if( m_nPoints_Max <= 0 && m_Radius <= 0 )	// global
+	{
+		return( CKriging_Universal_Global::Get_Value(p, z, v) );
+	}
+
+	//-----------------------------------------------------
 	int				i, j, n, nGrids, nCoords;
 	CSG_Points_Z	Points;
 	CSG_Matrix		W;

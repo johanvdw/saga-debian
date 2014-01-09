@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: TopographicIndices.cpp 1637 2013-03-23 11:52:10Z reklov_w $
+ * Version $Id: TopographicIndices.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -548,7 +548,7 @@ double CLS_Factor::Get_LS(double Slope, double Area)
 			//     the flow is toward a corner.
 			//     (Peter I. A. Kinnell: 'ALTERNATIVE APPROACHES FOR DETERMINING THE
 			//     USLE-M SLOPE LENGTH FACTOR FOR GRID CELLS'
-			//     http://soil.scijournals.org/cgi/content/full/69/3/674)
+			//     https://www.soils.org/publications/sssaj/abstracts/69/3/0674)
 
 			L			= (pow(Area + d*d, m + 1.0) - pow(Area, m + 1.0))
 						/ (pow(d, m + 2.0) * pow(22.13, m) * pow(x, m));

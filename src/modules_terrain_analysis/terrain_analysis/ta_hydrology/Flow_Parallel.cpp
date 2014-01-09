@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow_Parallel.cpp 1759 2013-06-28 08:52:18Z oconrad $
+ * Version $Id: Flow_Parallel.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -102,7 +102,7 @@ CFlow_Parallel::CFlow_Parallel(void)
 		"Deterministic Infinity:\n"
 		"- Tarboton, D.G. (1997):\n"
 		"    'A new method for the determination of flow directions and upslope areas in grid digital elevation models',\n"
-		"    Water Ressources Research, Vol.33, No.2, p.309-319\n\n"
+		"    Water Resources Research, Vol.33, No.2, p.309-319\n\n"
 
 		"Multiple Flow Direction:\n"
 		"- Freeman, G.T. (1991):\n"
@@ -116,7 +116,7 @@ CFlow_Parallel::CFlow_Parallel(void)
 		"Triangular Multiple Flow Direction\n"
 		"- Seibert, J. / McGlynn, B. (2007):\n"
 		"    'A new triangular multiple flow direction algorithm for computing upslope areas from gridded digital elevation models',\n"
-		"    Water Ressources Research, Vol. 43, W04501\n"
+		"    Water Resources Research, Vol. 43, W04501\n"
 		"    C++ Implementation into SAGA by Thomas Grabs, Copyrights (c) 2007\n"
 		"    Contact: thomas.grabs@natgeo.su.se, jan.seibert@natgeo.su.se \n"
 	));

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_controls.cpp 1493 2012-10-19 11:31:13Z oconrad $
+ * Version $Id: res_controls.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -101,6 +101,7 @@ const wxString CTRL_Get_Name(int ID_CTRL)
 	case ID_BTN_UP:						return( _TL("Up") );
 	case ID_BTN_DOWN:					return( _TL("Down") );
 
+	case ID_BTN_COLORS:					return( _TL("Colors") );
 	case ID_BTN_COLORS_MIRROR:			return( _TL("Mirror") );
 	case ID_BTN_COLORS_INVERT:			return( _TL("Invert") );
 	case ID_BTN_COLORS_RANDOM:			return( _TL("Random") );

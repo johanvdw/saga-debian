@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Flow_RecursiveUp.cpp 1081 2011-06-08 08:05:26Z reklov_w $
+ * Version $Id: Flow_RecursiveUp.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -96,7 +96,7 @@ CFlow_RecursiveUp::CFlow_RecursiveUp(void)
 		"Deterministic Infinity:\n"
 		"- Tarboton, D.G. (1997):\n"
 		"    'A new method for the determination of flow directions and upslope areas in grid digital elevation models',\n"
-		"    Water Ressources Research, Vol.33, No.2, p.309-319\n\n"
+		"    Water Resources Research, Vol.33, No.2, p.309-319\n\n"
 
 		"Multiple Flow Direction:\n"
 		"- Freeman, G.T. (1991):\n"

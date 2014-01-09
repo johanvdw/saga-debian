@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_pyramid.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: grid_pyramid.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -201,6 +201,7 @@ bool CSG_Grid_Pyramid::_Get_Next_Level(CSG_Grid *pGrid)
 		{
 		case GRID_PYRAMID_Arithmetic:	Cellsize	= pGrid->Get_Cellsize() + m_Grow;	break;
 		case GRID_PYRAMID_Geometric:	Cellsize	= pGrid->Get_Cellsize() * m_Grow;	break;
+		default: Cellsize	= pGrid->Get_Cellsize() * m_Grow;	break;
 		}
 
 		nx	= (int)(1.5 + m_pGrid->Get_XRange() / Cellsize);	if( nx < 1 )	nx	= 1;

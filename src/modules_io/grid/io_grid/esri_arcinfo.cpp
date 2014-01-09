@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: esri_arcinfo.cpp 1725 2013-06-11 12:52:39Z oconrad $
+ * Version $Id: esri_arcinfo.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -594,13 +594,13 @@ bool CESRI_ArcInfo_Export::On_Execute(void)
 			{
 				if( x > 0 )
 				{
-					fprintf(Stream.Get_Stream(), " ");
+					fputs(" ",Stream.Get_Stream());
 				}
 
-				fprintf(Stream.Get_Stream(), Write_Value(pGrid->asDouble(x, y), Precision, bComma).b_str());
+				fputs(Write_Value(pGrid->asDouble(x, y), Precision, bComma).b_str(),Stream.Get_Stream());
 			}
 
-			fprintf(Stream.Get_Stream(), "\n");
+			fputs("\n", Stream.Get_Stream());
 		}
 
 		pGrid->Get_Projection().Save(SG_File_Make_Path(NULL, fName, SG_T("prj")));
@@ -671,7 +671,7 @@ bool CESRI_ArcInfo_Export::Write_Header(CSG_File &Stream, CSG_Grid *pGrid, bool 
 			s	+= CSG_String::Format(SG_T("%s %s\n")	, HDR_BYTEORDER	, Parameters("BYTEORD")->asInt() == 1 ? HDR_BYTEORDER_LO : HDR_BYTEORDER_HI);
 		}
 
-		fprintf(Stream.Get_Stream(), s.b_str());
+		fputs(s.b_str(),Stream.Get_Stream());
 
 		return( true );
 	}

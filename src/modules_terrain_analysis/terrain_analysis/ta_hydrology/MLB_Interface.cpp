@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1525 2012-11-09 15:09:34Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -117,6 +117,8 @@ CSG_String Get_Info(int i)
 
 #include "melton_ruggedness.h"
 
+#include "Erosion_LS_Fields.h"
+
 
 //---------------------------------------------------------
 CSG_Module *		Create_Module(int i)
@@ -148,6 +150,7 @@ CSG_Module *		Create_Module(int i)
 	case 22:	return( new CLS_Factor );
 	case 23:	return( new CMelton_Ruggedness );
 	case 24:	return( new CTCI_Low );
+	case 25:	return( new CErosion_LS_Fields );
 	}
 
 	return( NULL );

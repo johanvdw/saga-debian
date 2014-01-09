@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: AddCoordinates.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: AddCoordinates.cpp 1915 2013-12-28 16:35:03Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     AddCoordinates.cpp
@@ -30,7 +30,8 @@ CAddCoordinates::CAddCoordinates(void)
 	Set_Author		(SG_T("Victor Olaya (c) 2004"));
 
 	Set_Description	(_TW(
-		"(c) 2004 by Victor Olaya."
+		"The module attaches the x- and y-coordinates of each point to the attribute table. "
+		"For 3D shapefiles, also the z/m-coordinates are reported.\n"
 	));
 
 	Parameters.Add_Shapes(
@@ -67,6 +68,19 @@ bool CAddCoordinates::On_Execute(void)
 	int	yField	= pShapes->Get_Field_Count();
 	pShapes->Add_Field("Y", SG_DATATYPE_Double);
 
+	int zField	= 0, mField	= 0;
+	if( pShapes->Get_Vertex_Type() != SG_VERTEX_TYPE_XY )
+	{
+		zField	= pShapes->Get_Field_Count();
+		pShapes->Add_Field("Z", SG_DATATYPE_Double);
+
+		if( pShapes->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZM )
+		{
+			mField	= pShapes->Get_Field_Count();
+			pShapes->Add_Field("M", SG_DATATYPE_Double);
+		}
+	}
+
 	//-----------------------------------------------------
 	for(int i=0; i<pShapes->Get_Count(); i++)
 	{
@@ -74,7 +88,19 @@ bool CAddCoordinates::On_Execute(void)
 
 		pShape->Set_Value(xField, pShape->Get_Point(0).x);
 		pShape->Set_Value(yField, pShape->Get_Point(0).y);
+
+		if( pShapes->Get_Vertex_Type() != SG_VERTEX_TYPE_XY )
+		{
+			pShape->Set_Value(zField, pShape->Get_Z(0));
+
+			if( pShapes->Get_Vertex_Type() == SG_VERTEX_TYPE_XYZM )
+			{
+				pShape->Set_Value(mField, pShape->Get_M(0));
+			}
+		}
 	}
+
+	DataObject_Update(pShapes);
 
 	return( true );
 }

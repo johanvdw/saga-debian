@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameter_data.cpp 1749 2013-06-25 08:15:54Z oconrad $
+ * Version $Id: parameter_data.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -862,12 +862,19 @@ void CSG_Parameter_Choice::Set_Items(const SG_Char *String)
 	if( m_Items.Get_Count() <= 0 )
 	{
 		m_Items	+= _TL("<not set>");
+
+		Set_Minimum(              0, true);
+		Set_Maximum(Get_Count() - 1, true);
+
+		CSG_Parameter_Int::Set_Value(0);
 	}
+	else
+	{
+		Set_Minimum(              0, true);
+		Set_Maximum(Get_Count() - 1, true);
 
-	Set_Minimum(              0, true);
-	Set_Maximum(Get_Count() - 1, true);
-
-	CSG_Parameter_Int::Set_Value(m_Value);
+		CSG_Parameter_Int::Set_Value(m_Value);
+	}
 }
 
 //---------------------------------------------------------

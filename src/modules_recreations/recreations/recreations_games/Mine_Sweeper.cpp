@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Mine_Sweeper.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Mine_Sweeper.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -156,6 +156,25 @@ bool CMine_Sweeper::MakeBoard(int level)
 	pInput->Set_Name(_TL("Mine Sweeper"));
 	Parameters("GRID")->Set_Value(pInput);
 
+	//-----------------------------------------------------
+	CSG_Parameter	*pLUT	= DataObject_Get_Parameter(pInput, "LUT");
+
+	if( pLUT && pLUT->asTable() )
+	{
+		pLUT->asTable()->Del_Records();
+
+		for(i=0; i<16; i++)
+		{
+			CSG_Table_Record	*pRecord	= pLUT->asTable()->Add_Record();
+			
+			pRecord->Set_Value(0, SG_GET_RGB(mine_res_color[i*3], mine_res_color[i*3+1], mine_res_color[i*3+2]));
+			pRecord->Set_Value(3, i);
+		}
+
+		DataObject_Set_Parameter(pInput, pLUT);
+		DataObject_Set_Parameter(pInput, "COLORS_TYPE", 1);	// Color Classification Type: Lookup Table
+	}
+
 	Colors.Set_Count(16);
 	for ( i=0;i<16; i++)
 	{
@@ -164,6 +183,7 @@ bool CMine_Sweeper::MakeBoard(int level)
 	DataObject_Set_Colors(pInput, Colors);
 	DataObject_Update(pInput, 0.0, 15.0, true);
 
+	//-----------------------------------------------------
 	for(  y = 0; y <  Mine_NY; y++)	
 	for(  x = 0; x <  Mine_NX; x++)
 	{

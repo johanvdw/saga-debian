@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_morphology.cpp 1282 2011-12-29 17:13:26Z manfred-e $
+ * Version $Id: vigra_morphology.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -74,7 +74,7 @@
 //---------------------------------------------------------
 CViGrA_Morphology::CViGrA_Morphology(void)
 {
-	Set_Name		(_TL("ViGrA - Basic Morphological Operations"));
+	Set_Name		(_TL("Morphological Filter (ViGrA)"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2009"));
 

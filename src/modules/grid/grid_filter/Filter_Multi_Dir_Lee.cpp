@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Filter_Multi_Dir_Lee.cpp 1610 2013-02-18 11:25:09Z reklov_w $
+ * Version $Id: Filter_Multi_Dir_Lee.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
