@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: get_connection.cpp 1509 2012-11-01 16:39:43Z oconrad $
+ * Version $Id: get_connection.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -71,18 +71,82 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+CGet_Servers::CGet_Servers(void)
+{
+	Set_Name		(_TL("List ODBC Servers"));
+
+	Set_Author		(SG_T("O.Conrad (c) 2013"));
+
+	Set_Description	(_TW(
+		"Lists all ODBC sources."
+	));
+
+	Parameters.Add_Table(
+		NULL	, "SERVERS"		, _TL("Server"),
+		_TL(""),
+		PARAMETER_OUTPUT
+	);
+
+	Parameters.Add_Value(
+		NULL	, "CONNECTED"	, _TL("Only List Connected Servers"),
+		_TL(""),
+		PARAMETER_TYPE_Bool, false
+	);
+}
+
+//---------------------------------------------------------
+bool CGet_Servers::On_Execute(void)
+{
+	bool		bConnected	= Parameters("CONNECTED")->asBool();
+	CSG_Table	*pServers	= Parameters("SERVERS"  )->asTable();
+
+	pServers->Destroy();
+	pServers->Set_Name(_TL("ODBC Servers"));
+
+	pServers->Add_Field(_TL("Server")   , SG_DATATYPE_String);
+	pServers->Add_Field(_TL("Connected"), SG_DATATYPE_Int);
+
+	CSG_Strings	Servers;
+
+	if( SG_ODBC_Get_Connection_Manager().Get_Servers(Servers) > 0 )
+	{
+		for(int i=0; i<Servers.Get_Count(); i++)
+		{
+			if( !bConnected || SG_ODBC_Get_Connection_Manager().Get_Connection(Servers[i]) )
+			{
+				CSG_Table_Record	*pServer	= pServers->Add_Record();
+
+				pServer->Set_Value(0, Servers[i]);
+				pServer->Set_Value(1, SG_ODBC_Get_Connection_Manager().Get_Connection(Servers[i]) ? 1 : 0);
+			}
+		}
+
+		return( true );
+	}
+
+	return( false );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 CGet_Connection::CGet_Connection(void)
 {
-	Set_Name		(_TL("ODBC Connect"));
+	Set_Name		(_TL("Connect to ODBC Source"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2008"));
 
 	Set_Description	(_TW(
-		"Connect to ODBC source."
+		"Connects to an ODBC source."
 	));
 
 	Parameters.Add_Choice(
-		NULL	, "SERVERS"		, _TL("Server"),
+		NULL	, "SERVER"		, _TL("Server"),
 		_TL(""),
 		_TL("")
 	);
@@ -100,11 +164,6 @@ CGet_Connection::CGet_Connection(void)
 	);
 }
 
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
-
 //---------------------------------------------------------
 bool CGet_Connection::On_Before_Execution(void)
 {
@@ -112,7 +171,7 @@ bool CGet_Connection::On_Before_Execution(void)
 
 	if( SG_ODBC_Get_Connection_Manager().Get_Servers(Servers) > 0 )
 	{
-		Parameters("SERVERS")->asChoice()->Set_Items(Servers);
+		Parameters("SERVER")->asChoice()->Set_Items(Servers);
 
 		return( true );
 	}
@@ -126,19 +185,14 @@ bool CGet_Connection::On_Before_Execution(void)
 	return( false );
 }
 
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
-
 //---------------------------------------------------------
 bool CGet_Connection::On_Execute(void)
 {
 	CSG_String	Server, User, Password;
 
-	Server		= Parameters("SERVERS")		->asString();
-	User		= Parameters("USERNAME")	->asString();
-	Password	= Parameters("PASSWORD")	->asString();
+	Server		= Parameters("SERVER"  )->asString();
+	User		= Parameters("USERNAME")->asString();
+	Password	= Parameters("PASSWORD")->asString();
 
 	if( SG_ODBC_Get_Connection_Manager().Add_Connection(Server, User, Password) )
 	{
@@ -164,19 +218,13 @@ bool CGet_Connection::On_Execute(void)
 //---------------------------------------------------------
 CDel_Connection::CDel_Connection(void)
 {
-	Set_Name		(_TL("ODBC Disconnect"));
+	Set_Name		(_TL("Disconnect from ODBC Source"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2008"));
 
 	Set_Description	(_TW(
-		"Disconnect ODBC source."
+		"Disconnects an ODBC source connection."
 	));
-
-	Parameters.Add_Choice(
-		NULL	, "SERVERS"		, _TL("Server"),
-		_TL(""),
-		_TL("")
-	);
 
 	Parameters.Add_Choice(
 		NULL	, "TRANSACT"	, _TL("Transactions"),
@@ -188,20 +236,60 @@ CDel_Connection::CDel_Connection(void)
 	);
 }
 
+//---------------------------------------------------------
+bool CDel_Connection::On_Execute(void)
+{
+	CSG_String	Server	= Get_Connection()->Get_Server();
+
+	if( SG_ODBC_Get_Connection_Manager().Del_Connection(Get_Connection(), Parameters("TRANSACT")->asInt() == 1) )
+	{
+		Message_Add(Server + ": " + _TL("ODBC source disconnected"));
+
+		SG_UI_ODBC_Update(Server);
+
+		return( true );
+	}
+
+	Message_Add(Server + ": " + _TL("could not disconnect ODBC source"));
+
+	return( false );
+}
+
 
 ///////////////////////////////////////////////////////////
+//														 //
+//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CDel_Connection::On_Before_Execution(void)
+CDel_Connections::CDel_Connections(void)
+{
+	Set_Name		(_TL("Disconnect All"));
+
+	Set_Author		(SG_T("O.Conrad (c) 2013"));
+
+	Set_Description	(_TW(
+		"Disconnects all connected ODBC sources."
+	));
+
+	Parameters.Add_Choice(
+		NULL	, "TRANSACT"	, _TL("Transactions"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("rollback"),
+			_TL("commit")
+		), 1
+	);
+}
+
+//---------------------------------------------------------
+bool CDel_Connections::On_Before_Execution(void)
 {
 	CSG_String	Servers;
 
 	if( SG_ODBC_Get_Connection_Manager().Get_Connections(Servers) > 0 )
 	{
-		Parameters("SERVERS")->asChoice()->Set_Items(Servers);
-
 		return( true );
 	}
 
@@ -213,32 +301,19 @@ bool CDel_Connection::On_Before_Execution(void)
 	return( false );
 }
 
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
-
 //---------------------------------------------------------
-bool CDel_Connection::On_Execute(void)
+bool CDel_Connections::On_Execute(void)
 {
-	bool		bCommit;
-	CSG_String	Server;
+	bool	bCommit	= Parameters("TRANSACT")->asInt() == 1;
 
-	Server	= Parameters("SERVERS") ->asString();
-	bCommit	= Parameters("TRANSACT")->asInt() == 1;
+	CSG_ODBC_Connections	&Manager	= SG_ODBC_Get_Connection_Manager();
 
-	if( SG_ODBC_Get_Connection_Manager().Del_Connection(Server, bCommit) )
+	for(int i=Manager.Get_Count()-1; i>=0; i--)
 	{
-		Message_Add(CSG_String::Format(SG_T("%s: %s"), Server.c_str(), _TL("ODBC source connected")));
-
-		SG_UI_ODBC_Update(Server);
-
-		return( true );
+		Manager.Del_Connection(i, bCommit);
 	}
 
-	Message_Add(CSG_String::Format(SG_T("%s: %s"), Server.c_str(), _TL("could not connect ODBC source")));
-
-	return( false );
+	return( Manager.Get_Count() == 0 );
 }
 
 
@@ -251,7 +326,7 @@ bool CDel_Connection::On_Execute(void)
 //---------------------------------------------------------
 CTransaction::CTransaction(void)
 {
-	Set_Name		(_TL("ODBC Commit/Rollback Transaction"));
+	Set_Name		(_TL("Commit/Rollback Transaction"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2008"));
 
@@ -275,11 +350,6 @@ CTransaction::CTransaction(void)
 	);
 }
 
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
-
 //---------------------------------------------------------
 bool CTransaction::On_Before_Execution(void)
 {
@@ -299,11 +369,6 @@ bool CTransaction::On_Before_Execution(void)
 
 	return( false );
 }
-
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 bool CTransaction::On_Execute(void)
@@ -357,7 +422,7 @@ bool CTransaction::On_Execute(void)
 //---------------------------------------------------------
 CExecute_SQL::CExecute_SQL(void)
 {
-	Set_Name		(_TL("ODBC Execute SQL"));
+	Set_Name		(_TL("Execute SQL"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2010"));
 
@@ -387,11 +452,6 @@ CExecute_SQL::CExecute_SQL(void)
 		PARAMETER_TYPE_Bool, false
 	);
 }
-
-
-///////////////////////////////////////////////////////////
-//														 //
-///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 bool CExecute_SQL::On_Execute(void)

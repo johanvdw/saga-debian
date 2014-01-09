@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.cpp 1685 2013-05-14 09:52:41Z oconrad $
+ * Version $Id: res_images.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -108,6 +108,7 @@
 #include "./res/xpm/crs_select.xpm"
 
 #include "./res/xpm/tb_active.xpm"
+#include "./res/xpm/tb_datasource.xpm"
 #include "./res/xpm/tb_delete.xpm"
 #include "./res/xpm/tb_diagram_parameters.xpm"
 #include "./res/xpm/tb_edit_shape_add.xpm"
@@ -149,6 +150,7 @@
 #include "./res/xpm/tb_map_mode_pan.xpm"
 #include "./res/xpm/tb_map_mode_select.xpm"
 #include "./res/xpm/tb_map_mode_zoom.xpm"
+#include "./res/xpm/tb_map_scalebar.xpm"
 #include "./res/xpm/tb_map_synchronize.xpm"
 #include "./res/xpm/tb_map_zoom_active.xpm"
 #include "./res/xpm/tb_map_zoom_full.xpm"
@@ -245,6 +247,7 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_CRS_SELECT:	return( crs_select_xpm );
 
 	case ID_IMG_TB_ACTIVE:	return( tb_active_xpm );
+	case ID_IMG_TB_DATASOURCE:	return( tb_datasource_xpm );
 	case ID_IMG_TB_DELETE:	return( tb_delete_xpm );
 	case ID_IMG_TB_DIAGRAM_PARAMETERS:	return( tb_diagram_parameters_xpm );
 	case ID_IMG_TB_EDIT_SHAPE_ADD:	return( tb_edit_shape_add_xpm );
@@ -286,6 +289,7 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_TB_MAP_MODE_PAN:	return( tb_map_mode_pan_xpm );
 	case ID_IMG_TB_MAP_MODE_SELECT:	return( tb_map_mode_select_xpm );
 	case ID_IMG_TB_MAP_MODE_ZOOM:	return( tb_map_mode_zoom_xpm );
+    case ID_IMG_TB_MAP_SCALEBAR:	return( tb_map_scalebar_xpm );
 	case ID_IMG_TB_MAP_SYNCHRONIZE:	return( tb_map_synchronize_xpm );
 	case ID_IMG_TB_MAP_ZOOM_ACTIVE:	return( tb_map_zoom_active_xpm );
 	case ID_IMG_TB_MAP_ZOOM_FULL:	return( tb_map_zoom_full_xpm );
@@ -319,10 +323,10 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_WKSP_MODULE_LIBRARY:	return( wksp_module_library_xpm );
 	case ID_IMG_WKSP_MODULE_MANAGER:	return( wksp_module_manager_xpm );
 	case ID_IMG_WKSP_NOITEMS:	return( wksp_noitems_xpm );
-	case ID_IMG_WKSP_ODBC_SOURCES:	return( wksp_odbc_sources_xpm );
-	case ID_IMG_WKSP_ODBC_SOURCE_ON:	return( wksp_odbc_source_on_xpm );
-	case ID_IMG_WKSP_ODBC_SOURCE_OFF:	return( wksp_odbc_source_off_xpm );
-	case ID_IMG_WKSP_ODBC_TABLE:	return( wksp_table_xpm );
+	case ID_IMG_WKSP_DB_SOURCES:	return( wksp_odbc_sources_xpm );
+	case ID_IMG_WKSP_DB_SOURCE_ON:	return( wksp_odbc_source_on_xpm );
+	case ID_IMG_WKSP_DB_SOURCE_OFF:	return( wksp_odbc_source_off_xpm );
+	case ID_IMG_WKSP_DB_TABLE:	return( wksp_table_xpm );
 	case ID_IMG_WKSP_SHAPES_LINE:	return( wksp_shapes_line_xpm );
 	case ID_IMG_WKSP_SHAPES_MANAGER:	return( wksp_shapes_manager_xpm );
 	case ID_IMG_WKSP_SHAPES_POINT:	return( wksp_shapes_point_xpm );

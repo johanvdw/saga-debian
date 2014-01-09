@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: get_connection.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: get_connection.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -82,6 +82,26 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+class CGet_Servers : public CSG_Module
+{
+public:
+	CGet_Servers(void);
+
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
+
+
+protected:
+
+	virtual bool				On_Execute				(void);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class CGet_Connection : public CSG_Module
 {
 public:
@@ -99,15 +119,33 @@ protected:
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CDel_Connection : public CSG_ODBC_Module
+{
+public:
+	CDel_Connection(void);
+
+
+protected:
+
+	virtual bool				On_Execute				(void);
+
+};
+
+
+///////////////////////////////////////////////////////////
 //														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-class CDel_Connection : public CSG_Module
+class CDel_Connections : public CSG_Module
 {
 public:
-	CDel_Connection(void);
+	CDel_Connections(void);
+
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
 
 
 protected:
@@ -120,8 +158,6 @@ protected:
 
 
 ///////////////////////////////////////////////////////////
-//														 //
-//														 //
 //														 //
 ///////////////////////////////////////////////////////////
 
@@ -131,6 +167,8 @@ class CTransaction : public CSG_ODBC_Module
 public:
 	CTransaction(void);
 
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
+
 
 protected:
 
@@ -143,8 +181,6 @@ protected:
 
 ///////////////////////////////////////////////////////////
 //														 //
-//														 //
-//														 //
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
@@ -152,6 +188,8 @@ class CExecute_SQL : public CSG_ODBC_Module
 {
 public:
 	CExecute_SQL(void);
+
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
 
 
 protected:

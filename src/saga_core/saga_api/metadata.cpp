@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: metadata.cpp 1682 2013-05-07 11:12:35Z oconrad $
+ * Version $Id: metadata.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -195,7 +195,7 @@ CSG_MetaData * CSG_MetaData::Add_Child(void)
 		}
 		else
 		{
-			return( false );
+			return( NULL );
 		}
 	}
 

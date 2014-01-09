@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters.cpp 1715 2013-06-04 11:19:40Z oconrad $
+ * Version $Id: parameters.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -1254,7 +1254,7 @@ bool CSG_Parameters::DataObjects_Synchronize(void)
 		{
 			if( p->Get_Type() == PARAMETER_TYPE_Shapes && p->asShapes() && p->asShapes()->Get_Type() == SHAPE_TYPE_Undefined )
 			{
-				if( !m_pManager || !m_pManager->Delete(p->asShapes()) )
+				if( m_pManager && !m_pManager->Delete(p->asShapes()) )
 				{
 					delete(p->asShapes());
 				}
@@ -1654,7 +1654,6 @@ bool CSG_Parameters::Serialize_Compatibility(CSG_File &Stream)
 			TSG_Rect	r;
 			CSG_String	s;
 			CSG_Table	t;
-			int			iResult;
 
 			switch( sLine.asInt() )
 			{
@@ -1663,18 +1662,18 @@ bool CSG_Parameters::Serialize_Compatibility(CSG_File &Stream)
 			case  6: // PARAMETER_TYPE_Choice:
 			case 11: // PARAMETER_TYPE_Color:
 			case 15: // PARAMETER_TYPE_Table_Field:
-				iResult = fscanf(Stream.Get_Stream(), "%d", &i);
+				fscanf(Stream.Get_Stream(), "%d", &i);
 				pParameter->Set_Value(i);
 				break;
 
 			case  3: // PARAMETER_TYPE_Double:
 			case  4: // PARAMETER_TYPE_Degree:
-				iResult = fscanf(Stream.Get_Stream(), "%lf", &d);
+				fscanf(Stream.Get_Stream(), "%lf", &d);
 				pParameter->Set_Value(d);
 				break;
 
 			case  5: // PARAMETER_TYPE_Range:
-				iResult = fscanf(Stream.Get_Stream(), "%lf %lf", &d, &e);
+				fscanf(Stream.Get_Stream(), "%lf %lf", &d, &e);
 				pParameter->asRange()->Set_Range(d, e);
 				break;
 

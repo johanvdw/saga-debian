@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_core.h 1727 2013-06-13 09:35:38Z oconrad $
+ * Version $Id: api_core.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -148,6 +148,16 @@
 		typedef unsigned int	DWORD;
 	#endif
 #endif	// _TYPEDEF_WORD
+
+//---------------------------------------------------------
+#if defined(_SAGA_MSW)
+	#include <float.h>
+	#define SG_is_NaN	_isnan
+#elif defined(isnan)
+	#define SG_is_NaN	isnan
+#else
+	#define SG_is_NaN(x)	(x != x)
+#endif
 
 
 ///////////////////////////////////////////////////////////
@@ -375,6 +385,45 @@ protected:
 	int								m_nStrings;
 
 	CSG_String						**m_Strings;
+
+};
+
+//---------------------------------------------------------
+#define SG_DEFAULT_DELIMITERS		" \t\r\n"
+
+typedef enum
+{
+	SG_TOKEN_INVALID,
+	SG_TOKEN_DEFAULT,
+	SG_TOKEN_RET_EMPTY,
+	SG_TOKEN_RET_EMPTY_ALL,
+	SG_TOKEN_RET_DELIMS,
+	SG_TOKEN_STRTOK
+}
+TSG_String_Tokenizer_Mode;
+
+//---------------------------------------------------------
+class SAGA_API_DLL_EXPORT CSG_String_Tokenizer
+{
+public:
+	CSG_String_Tokenizer(void);
+	CSG_String_Tokenizer(const CSG_String &String, const CSG_String &Delimiters=SG_DEFAULT_DELIMITERS, TSG_String_Tokenizer_Mode Mode=SG_TOKEN_DEFAULT);
+
+	~CSG_String_Tokenizer(void);
+
+  
+	size_t							Get_Tokens_Count	(void)	const;
+	SG_Char							Get_Last_Delimiter	(void)	const;
+	CSG_String						Get_Next_Token		(void);
+	size_t							Get_Position		(void)	const;
+	CSG_String						Get_String			(void)	const;
+	bool							Has_More_Tokens		(void)	const;
+	void							Set_String			(const CSG_String &String, const CSG_String &Delimiters=SG_DEFAULT_DELIMITERS, TSG_String_Tokenizer_Mode Mode=SG_TOKEN_DEFAULT);
+
+
+private:
+
+	class wxStringTokenizer			*m_pTokenizer;
 
 };
 
@@ -897,19 +946,20 @@ private:
 };
 
 //---------------------------------------------------------
-SAGA_API_DLL_EXPORT bool			SG_Dir_Exists			(const SG_Char *Directory);
-SAGA_API_DLL_EXPORT bool			SG_Dir_Create			(const SG_Char *Directory);
-SAGA_API_DLL_EXPORT CSG_String		SG_Dir_Get_Current		(void);
+SAGA_API_DLL_EXPORT bool			SG_Dir_Exists				(const SG_Char *Directory);
+SAGA_API_DLL_EXPORT bool			SG_Dir_Create				(const SG_Char *Directory);
+SAGA_API_DLL_EXPORT CSG_String		SG_Dir_Get_Current			(void);
 
-SAGA_API_DLL_EXPORT bool			SG_File_Exists			(const SG_Char *FileName);
-SAGA_API_DLL_EXPORT bool			SG_File_Delete			(const SG_Char *FileName);
-SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_TmpName		(const SG_Char *Prefix, const SG_Char *Directory);
-SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Name		(const SG_Char *full_Path, bool bExtension);
-SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path		(const SG_Char *full_Path);
-SAGA_API_DLL_EXPORT CSG_String		SG_File_Make_Path		(const SG_Char *Directory, const SG_Char *Name, const SG_Char *Extension = NULL);
-SAGA_API_DLL_EXPORT bool			SG_File_Cmp_Extension	(const SG_Char *File_Name, const SG_Char *Extension);
-SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Extension	(const SG_Char *File_Name);
-SAGA_API_DLL_EXPORT bool			SG_File_Set_Extension	(CSG_String &File_Name, const CSG_String &Extension);
+SAGA_API_DLL_EXPORT bool			SG_File_Exists				(const SG_Char *FileName);
+SAGA_API_DLL_EXPORT bool			SG_File_Delete				(const SG_Char *FileName);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_TmpName			(const SG_Char *Prefix, const SG_Char *Directory);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Name			(const SG_Char *full_Path, bool bExtension);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path			(const SG_Char *full_Path);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path_Absolute	(const SG_Char *full_Path);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Make_Path			(const SG_Char *Directory, const SG_Char *Name, const SG_Char *Extension = NULL);
+SAGA_API_DLL_EXPORT bool			SG_File_Cmp_Extension		(const SG_Char *File_Name, const SG_Char *Extension);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Extension		(const SG_Char *File_Name);
+SAGA_API_DLL_EXPORT bool			SG_File_Set_Extension		(CSG_String &File_Name, const CSG_String &Extension);
 
 SAGA_API_DLL_EXPORT bool			SG_Read_Line			(FILE *Stream, CSG_String &Line);
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.h 1507 2012-10-31 18:49:02Z oconrad $
+ * Version $Id: res_images.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -89,7 +89,7 @@ enum ID_IMAGES
 	ID_IMG_NB_ACTIVE_DESCRIPTION,
 	ID_IMG_NB_ACTIVE_HISTORY,
 	ID_IMG_NB_ACTIVE_LEGEND,
-	ID_IMG_NB_ACTIVE_PARAMETERS,	
+	ID_IMG_NB_ACTIVE_PARAMETERS,
 	ID_IMG_NB_ACTIVE_HTMLEXTRAINFO,
 	ID_IMG_NB_DATA_SOURCE_FILES,
 	ID_IMG_NB_DATA_SOURCE_DATABASE,
@@ -124,6 +124,7 @@ enum ID_IMAGES
 	ID_IMG_CRS_SELECT,
 
 	ID_IMG_TB_ACTIVE,
+	ID_IMG_TB_DATASOURCE,
 	ID_IMG_TB_DELETE,
 	ID_IMG_TB_DIAGRAM_PARAMETERS,
 	ID_IMG_TB_EDIT_SHAPE_ADD,
@@ -165,6 +166,7 @@ enum ID_IMAGES
 	ID_IMG_TB_MAP_MODE_PAN,
 	ID_IMG_TB_MAP_MODE_SELECT,
 	ID_IMG_TB_MAP_MODE_ZOOM,
+	ID_IMG_TB_MAP_SCALEBAR,
 	ID_IMG_TB_MAP_SYNCHRONIZE,
 	ID_IMG_TB_MAP_ZOOM_ACTIVE,
 	ID_IMG_TB_MAP_ZOOM_FULL,
@@ -199,10 +201,10 @@ enum ID_IMAGES
 	ID_IMG_WKSP_MODULE_LIBRARY,
 	ID_IMG_WKSP_MODULE_MANAGER,
 	ID_IMG_WKSP_NOITEMS,
-	ID_IMG_WKSP_ODBC_SOURCES,
-	ID_IMG_WKSP_ODBC_SOURCE_ON,
-	ID_IMG_WKSP_ODBC_SOURCE_OFF,
-	ID_IMG_WKSP_ODBC_TABLE,
+	ID_IMG_WKSP_DB_SOURCES,
+	ID_IMG_WKSP_DB_SOURCE_ON,
+	ID_IMG_WKSP_DB_SOURCE_OFF,
+	ID_IMG_WKSP_DB_TABLE,
 	ID_IMG_WKSP_SHAPES_LINE,
 	ID_IMG_WKSP_SHAPES_MANAGER,
 	ID_IMG_WKSP_SHAPES_POINT,

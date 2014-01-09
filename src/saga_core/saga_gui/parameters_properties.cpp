@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters_properties.cpp 1662 2013-04-22 16:11:32Z oconrad $
+ * Version $Id: parameters_properties.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -248,6 +248,16 @@ int CParameters_PG_Choice::_Set_Table(void)
 			{
 				_Append(pShapes->Get_Data(j)->Get_Name(), pShapes->Get_Data(j)->Get_Shapes());
 			}
+		}
+	}
+
+	CWKSP_PointCloud_Manager	*pPointClouds;
+
+	if( (pPointClouds = g_pData->Get_PointClouds()) != NULL )
+	{
+		for(int i=0; i<pPointClouds->Get_Count(); i++)
+		{
+			_Append(pPointClouds->Get_Data(i)->Get_Name(), pPointClouds->Get_Data(i)->Get_PointCloud());
 		}
 	}
 

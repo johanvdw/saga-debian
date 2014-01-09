@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: 3dshapes_view_control.cpp 1644 2013-04-02 09:41:18Z reklov_w $
+ * Version $Id: 3dshapes_view_control.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -607,10 +607,10 @@ void C3DShapes_View_Control::_Draw_Shape(CSG_Shape *pShape)
 		{
 		case SHAPE_TYPE_Point:
 			{
-				p	= pShape->Get_Point(0);
+				p	= pShape->Get_Point(0, iPart);
 				a.x	= p.x;
 				a.y	= p.y;
-				a.z	= pShape->Get_Z(0);
+				a.z	= pShape->Get_Z(0, iPart);
 
 				_Get_Projection(a);
 
@@ -620,10 +620,10 @@ void C3DShapes_View_Control::_Draw_Shape(CSG_Shape *pShape)
 
 		case SHAPE_TYPE_Line:
 			{
-				p	= pShape->Get_Point(0);
+				p	= pShape->Get_Point(0, iPart);
 				a.x	= p.x;
 				a.y	= p.y;
-				a.z	= pShape->Get_Z(0);
+				a.z	= pShape->Get_Z(0, iPart);
 
 				_Get_Projection(a);
 
@@ -647,7 +647,7 @@ void C3DShapes_View_Control::_Draw_Shape(CSG_Shape *pShape)
 				p	= pShape->Get_Point(pShape->Get_Point_Count(iPart) - 1, iPart);
 				a.x	= p.x;
 				a.y	= p.y;
-				a.z	= pShape->Get_Z(pShape->Get_Point_Count(iPart) - 1);
+				a.z	= pShape->Get_Z(pShape->Get_Point_Count(iPart) - 1, iPart);
 
 				_Get_Projection(a);
 

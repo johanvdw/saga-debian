@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dataobject.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: dataobject.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -221,7 +221,7 @@ public:
 
 	bool							is_NoData_Value			(double Value)	const
 	{
-		return( m_NoData_Value < m_NoData_hiValue ? m_NoData_Value <= Value && Value <= m_NoData_hiValue : Value == m_NoData_Value );
+		return( SG_is_NaN(Value) || (m_NoData_Value < m_NoData_hiValue ? m_NoData_Value <= Value && Value <= m_NoData_hiValue : Value == m_NoData_Value) );
 	}
 
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: georef_grid_move.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: georef_grid_move.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -74,9 +74,9 @@
 CGeoref_Grid_Move::CGeoref_Grid_Move(void)
 {
 	//-----------------------------------------------------
-	Set_Name		(_TL("Georeferencing - Move Grid"));
+	Set_Name		(_TL("Move Grid"));
 
-	Set_Author		(SG_T("(c) 2008 by O.Conrad"));
+	Set_Author		(SG_T("O.Conrad (c) 2008"));
 
 	Set_Description	(_TW(
 		""

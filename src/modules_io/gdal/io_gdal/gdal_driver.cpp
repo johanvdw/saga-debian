@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: gdal_driver.cpp 1751 2013-06-26 08:03:18Z oconrad $
+ * Version $Id: gdal_driver.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -555,12 +555,14 @@ CSG_String CSG_GDAL_DataSet::Get_Name(int i)	const
 		//-------------------------------------------------
 		if( Name.is_Empty() )
 		{
-			if( (s = pBand->GetMetadataItem(GDAL_DMD_LONGNAME)) != NULL && *s )
+			Name	= Get_Name();
+
+			if( Name.is_Empty() )
 			{
-				Name	= s;
+				Name	= _TL("Band");
 			}
 
-			Name.Printf(SG_T("%s %02d"), Get_Name().c_str(), i + 1);
+			Name	+= CSG_String::Format(SG_T(" %0*d"), SG_Get_Digit_Count(Get_Count() + 1), i + 1);
 		}
 	}
 

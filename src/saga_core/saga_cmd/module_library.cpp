@@ -1,7 +1,7 @@
 /**********************************************************
- * Version $Id: module_library.cpp 1668 2013-04-24 12:19:06Z oconrad $
+ * Version $Id: module_library.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
- 
+
 ///////////////////////////////////////////////////////////
 //                                                       //
 //                         SAGA                          //
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -148,7 +148,7 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 
 	if( argc <= 1 )
 	{
-		m_CMD.Usage();
+		SG_PRINTF(m_CMD.GetUsageString());
 
 		return( false );
 	}
@@ -173,7 +173,7 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 
 	//-----------------------------------------------------
 	bool	bResult	= _Get_Parameters(m_pModule->Get_Parameters());
-		
+
 	for(i=0; bResult && i<m_pModule->Get_Parameters_Count(); i++)
 	{
 		_Get_Parameters(m_pModule->Get_Parameters(i));
@@ -183,7 +183,7 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 	{
 		CMD_Print("");
 
-		m_CMD.Usage();
+		SG_PRINTF(m_CMD.GetUsageString());
 	}
 
 	//-----------------------------------------------------
@@ -351,29 +351,21 @@ bool CCMD_Module::_Set_Parameters(CSG_Parameters *pParameters, bool bOptional)
 //---------------------------------------------------------
 bool CCMD_Module::_Get_Parameters(CSG_Parameters *pParameters)
 {
-	if( !pParameters )
-	{
-		return( false );
-	}
-
-	if( m_CMD.Parse(false) != 0 )
+	if( !pParameters || m_CMD.Parse(false) != 0 )
 	{
 		return( false );
 	}
 
 	//-----------------------------------------------------
-	for(int i=0; i<pParameters->Get_Count(); i++)
+	int		i;
+
+	for(i=0; i<pParameters->Get_Count(); i++)
 	{
 		CSG_Parameter	*pParameter	= pParameters->Get_Parameter(i);
 
 		if( pParameter->is_Input() )
 		{
-			if( !_Load_Input(pParameters->Get_Parameter(i)) )
-			{
-				CMD_Print_Error(pParameters->Get_Parameter(i)->Get_Name());
-
-				return( false );
-			}
+			// nop now, loading options first
 		}
 
 		else if( pParameter->is_Output() )
@@ -411,7 +403,6 @@ bool CCMD_Module::_Get_Parameters(CSG_Parameters *pParameters)
 				break;
 
 			case PARAMETER_TYPE_Choice:
-			case PARAMETER_TYPE_Table_Field:
 				if( m_CMD.Found(_Get_ID(pParameter), &s) )
 				{
 					if( s.ToLong(&l) )
@@ -422,13 +413,6 @@ bool CCMD_Module::_Get_Parameters(CSG_Parameters *pParameters)
 					{
 						pParameter->Set_Value(CSG_String(&s));
 					}
-				}
-				break;
-
-			case PARAMETER_TYPE_Table_Fields:
-				if( m_CMD.Found(_Get_ID(pParameter), &s) )
-				{
-					pParameter->Set_Value(CSG_String(&s));
 				}
 				break;
 
@@ -525,6 +509,55 @@ bool CCMD_Module::_Get_Parameters(CSG_Parameters *pParameters)
 		}
 	}
 
+	m_pModule->Update_Parameter_States();
+
+	//-----------------------------------------------------
+	for(i=0; i<pParameters->Get_Count(); i++)
+	{
+		CSG_Parameter	*pParameter	= pParameters->Get_Parameter(i);
+
+		if( pParameter->is_Input() )
+		{
+			if( !_Load_Input(pParameters->Get_Parameter(i)) )
+			{
+				CMD_Print_Error(pParameters->Get_Parameter(i)->Get_Name());
+
+				return( false );
+			}
+		}
+
+		else if( pParameter->is_Option() && !pParameter->is_Information() )
+		{
+			long		l;
+			wxString	s;
+
+			switch( pParameter->Get_Type() )
+			{
+			case PARAMETER_TYPE_Table_Field:
+				if( m_CMD.Found(_Get_ID(pParameter), &s) )
+				{
+					if( s.ToLong(&l) )
+					{
+						pParameter->Set_Value((int)l);
+					}
+					else
+					{
+						pParameter->Set_Value(CSG_String(&s));
+					}
+				}
+				break;
+
+			case PARAMETER_TYPE_Table_Fields:
+				if( m_CMD.Found(_Get_ID(pParameter), &s) )
+				{
+					pParameter->Set_Value(CSG_String(&s));
+				}
+				break;
+			}
+		}
+	}
+
+	//-----------------------------------------------------
 	return( true );
 }
 
@@ -540,7 +573,7 @@ bool CCMD_Module::_Load_Input(CSG_Parameter *pParameter)
 {
 	wxString	FileName;
 
-	if(	!pParameter->is_Input() )
+	if(	!pParameter->is_Input() || !pParameter->is_Enabled() )
 	{
 		return( true );
 	}

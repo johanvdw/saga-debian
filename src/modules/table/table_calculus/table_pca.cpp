@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_pca.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: table_pca.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -141,11 +141,14 @@ int CTable_PCA::On_Parameter_Changed(CSG_Parameters *pParameters, CSG_Parameter 
 
 		pFields->Del_Parameters();
 
-		for(int i=0; i<pTable->Get_Field_Count(); i++)
+		if( pTable && pTable->Get_Field_Count() > 0 )
 		{
-			if( SG_Data_Type_is_Numeric(pTable->Get_Field_Type(i)) )
+			for(int i=0; i<pTable->Get_Field_Count(); i++)
 			{
-				pFields->Add_Value(NULL, CSG_String::Format(SG_T("%d"), i), pTable->Get_Field_Name(i), _TL(""), PARAMETER_TYPE_Bool, false);
+				if( SG_Data_Type_is_Numeric(pTable->Get_Field_Type(i)) )
+				{
+					pFields->Add_Value(NULL, CSG_String::Format(SG_T("%d"), i), pTable->Get_Field_Name(i), _TL(""), PARAMETER_TYPE_Bool, false);
+				}
 			}
 		}
 	}

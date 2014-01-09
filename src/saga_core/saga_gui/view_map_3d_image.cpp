@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_3d_image.cpp 1283 2012-01-02 16:01:48Z oconrad $
+ * Version $Id: view_map_3d_image.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -426,7 +426,7 @@ void CVIEW_Map_3D_Image::Set_Image(void)
 			{
 				p[0]	= (p[0] + p[1] + p[2]) / 3;
 				p[1]	= r[i];
-				p[2]	= BkStereo;
+				p[2]	= m_bStereo == 1 ? r[i] : BkStereo;
 			}
 
 			SG_Free(r);

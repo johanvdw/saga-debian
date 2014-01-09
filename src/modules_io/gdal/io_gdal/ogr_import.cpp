@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: ogr_import.cpp 1200 2011-10-25 15:23:04Z oconrad $
+ * Version $Id: ogr_import.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -113,6 +113,20 @@ COGR_Import::COGR_Import(void)
 		_TL(""),
 		NULL, NULL, false, false, true
 	);
+
+	CSG_String	sChoices;
+	for(int i=0; i<GEOM_TYPE_KEY_Count; i++)
+	{
+		sChoices += gSG_Geom_Type_Choice_Key_Name[i];
+		sChoices += SG_T("|");
+	}
+
+	Parameters.Add_Choice(
+		NULL, "GEOM_TYPE"	, _TL("Geometry Type"),
+		_TL("Some OGR drivers are unable to determine the geometry type automatically, please choose the appropriate one in this case"),
+		sChoices,
+		0
+	);
 }
 
 
@@ -151,7 +165,7 @@ bool COGR_Import::On_Execute(void)
 		{
 			for(int iLayer=0; iLayer<DataSource.Get_Count(); iLayer++)
 			{
-				CSG_Shapes	*pShapes	= DataSource.Read(iLayer);
+				CSG_Shapes	*pShapes	= DataSource.Read(iLayer, Parameters("GEOM_TYPE")->asInt());
 
 				if( pShapes )
 				{

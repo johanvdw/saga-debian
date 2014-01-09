@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pointcloud_to_text_file.cpp 1500 2012-10-25 09:42:45Z reklov_w $
+ * Version $Id: pointcloud_to_text_file.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -63,6 +63,8 @@
 
 //---------------------------------------------------------
 #include "pointcloud_to_text_file.h"
+
+#include <vector>
 
 
 ///////////////////////////////////////////////////////////
@@ -142,10 +144,6 @@ CPointcloud_To_Text_File::CPointcloud_To_Text_File(void)
         );
 	}
 }
-
-//---------------------------------------------------------
-CPointcloud_To_Text_File::~CPointcloud_To_Text_File(void)
-{}
 
 
 ///////////////////////////////////////////////////////////
@@ -236,11 +234,11 @@ bool CPointcloud_To_Text_File::On_Execute(void)
 		sFields		= Parameters("FIELDS")->asString();
 		sPrecision	= Parameters("PRECISIONS")->asString();
 
-		wxStringTokenizer   tkz_fields(sFields.c_str(), wxT(";"), wxTOKEN_STRTOK);
+		CSG_String_Tokenizer   tkz_fields(sFields, ";", SG_TOKEN_STRTOK);
 
-		while( tkz_fields.HasMoreTokens() )
+		while( tkz_fields.Has_More_Tokens() )
 		{
-			token	= tkz_fields.GetNextToken().wc_str();
+			token	= tkz_fields.Get_Next_Token();
 
 			if( token.Length() == 0 )
 				break;
@@ -262,11 +260,11 @@ bool CPointcloud_To_Text_File::On_Execute(void)
 				vCol.push_back(iValue);
 		}
 
-		wxStringTokenizer   tkz_precisons(sPrecision.c_str(), wxT(";"), wxTOKEN_STRTOK);
+		CSG_String_Tokenizer   tkz_precisons(sPrecision.c_str(), ";", SG_TOKEN_STRTOK);
 
-		while( tkz_precisons.HasMoreTokens() )
+		while( tkz_precisons.Has_More_Tokens() )
 		{
-			token	= tkz_precisons.GetNextToken().wc_str();
+			token	= tkz_precisons.Get_Next_Token();
 
 			if( token.Length() == 0 )
 				break;

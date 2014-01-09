@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Georef_Shapes.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Georef_Shapes.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,18 +35,16 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //
-//    e-mail:     oconrad@saga-gis.org                   //
+//    e-mail:     oconrad@saga-gis.de                    //
 //                                                       //
 //    contact:    Olaf Conrad                            //
 //                Institute of Geography                 //
-//                University of Goettingen               //
-//                Goldschmidtstr. 5                      //
-//                37077 Goettingen                       //
+//                University of Hamburg                  //
 //                Germany                                //
 //                                                       //
 ///////////////////////////////////////////////////////////
@@ -86,15 +84,13 @@ class CGeoref_Shapes : public CSG_Module
 {
 public:
 	CGeoref_Shapes(void);
-	virtual ~CGeoref_Shapes(void);
 
 
 protected:
 
-	virtual bool			On_Execute					(void);
+	virtual int					On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
 
-
-private:
+	virtual bool				On_Execute				(void);
 
 
 };

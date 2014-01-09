@@ -15,9 +15,9 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-double earth_sun(char date[]);
-double julian_int(int year, int month, int day);
-double julian_char(char date[]);
+double	julian_int	(int year, int month, int day);
+double	julian_char	(const char date[]);
+double	earth_sun	(const char date[]);
 
 
 ///////////////////////////////////////////////////////////
@@ -506,80 +506,85 @@ int lsat_newdata(const char *mtlfile, lsat_data * lsat)
 //---------------------------------------------------------
 void sensor_MSS(lsat_data * lsat)
 {
-    int i;
+	/* green, red, near infrared, near infrared */
+	int		band[4] = {   1,   2,   3,   4 };
+	int		code[4] = {   4,   5,   6,   7 };
+	double	wmax[4] = { 0.6, 0.7, 0.8, 1.1 };
+	double	wmin[4] = { 0.5, 0.6, 0.7, 0.8 };
+	/* 68x83, 68x83, 68x83, 68x83 */
 
-    /* green, red, near infrared, near infrared */
-    int band[] = { 1, 2, 3, 4 };
-    int code[] = { 4, 5, 6, 7 };
-    double wmax[] = { 0.6, 0.7, 0.8, 1.1 };
-    double wmin[] = { 0.5, 0.6, 0.7, 0.8 };
-    /* 68x83, 68x83, 68x83, 68x83 */
+	strcpy(lsat->sensor, "MSS");
 
-    strcpy(lsat->sensor, "MSS");
+	lsat->bands		= 4;
 
-    lsat->bands = 4;
-    for (i = 0; i < lsat->bands; i++) {
-	lsat->band[i].number = *(band + i);
-	lsat->band[i].code = *(code + i);
-	lsat->band[i].wavemax = *(wmax + i);
-	lsat->band[i].wavemin = *(wmin + i);
-	lsat->band[i].qcalmax = 255.;
-	lsat->band[i].qcalmin = 0.;
-	lsat->band[i].thermal = 0;
-    }
-    return;
+	for(int i=0; i<lsat->bands; i++)
+	{
+		lsat->band[i].number	= band[i];
+		lsat->band[i].code		= code[i];
+		lsat->band[i].wavemax	= wmax[i];
+		lsat->band[i].wavemin	= wmin[i];
+		lsat->band[i].qcalmax	= 255.;
+		lsat->band[i].qcalmin	=   0.;
+		lsat->band[i].thermal	= 0;
+	}
+
+	return;
 }
 
 void sensor_TM(lsat_data * lsat)
 {
-    int i;
+	/* blue, green red, near infrared, shortwave IR, thermal IR, shortwave IR */
+	int		band[7]	= {    1,    2,    3,    4,    5,    6,    7 };
+	double	wmax[7]	= { 0.52, 0.60, 0.69, 0.90, 1.75, 12.5, 2.35 };
+	double	wmin[7]	= { 0.45, 0.52, 0.63, 0.76, 1.55, 10.4, 2.08 };
+	/* 30, 30, 30, 30, 30, 120, 30 */
 
-    /* blue, green red, near infrared, shortwave IR, thermal IR, shortwave IR */
-    int band[] = { 1, 2, 3, 4, 5, 6, 7 };
-    double wmax[] = { 0.52, 0.60, 0.69, 0.90, 1.75, 12.50, 2.35 };
-    double wmin[] = { 0.45, 0.52, 0.63, 0.76, 1.55, 10.40, 2.08 };
-    /* 30, 30, 30, 30, 30, 120, 30 */
+	if( !lsat->sensor )
+	{
+		strcpy(lsat->sensor, "TM");
+	}
 
-    if (!lsat->sensor)
-      strcpy(lsat->sensor, "TM");
+	lsat->bands		= 7;
 
-    lsat->bands = 7;
-    for (i = 0; i < lsat->bands; i++) {
-	lsat->band[i].number = *(band + i);
-	lsat->band[i].code = *(band + i);
-	lsat->band[i].wavemax = *(wmax + i);
-	lsat->band[i].wavemin = *(wmin + i);
-	lsat->band[i].qcalmax = 255.;
-	lsat->band[i].qcalmin = 0.;	/* Modified in set_TM5 by date */
-	lsat->band[i].thermal = (lsat->band[i].number == 6 ? 1 : 0);
-    }
-    return;
+	for(int i=0; i<lsat->bands; i++)
+	{
+		lsat->band[i].number	= band[i];
+		lsat->band[i].code		= band[i];
+		lsat->band[i].wavemax	= wmax[i];
+		lsat->band[i].wavemin	= wmin[i];
+		lsat->band[i].qcalmax	= 255.0;
+		lsat->band[i].qcalmin	=   0.0;	/* Modified in set_TM5 by date */
+		lsat->band[i].thermal	= band[i] == 6 ? 1 : 0;
+	}
+
+	return;
 }
 
 void sensor_ETM(lsat_data * lsat)
 {
-    int i;
+	/* blue, green, red, near infrared, shortwave IR, thermal IR, shortwave IR, panchromatic */
+	int		band[9]	= {     1,     2,     3,    4,    5,    6,    6,    7,    8 };
+	int		code[9]	= {     1,     2,     3,    4,    5,   61,   62,    7,    8 };
+	double	wmax[9]	= { 0.515, 0.605, 0.690, 0.90, 1.75, 12.5, 12.5, 2.35, 0.90 };
+	double	wmin[9]	= { 0.450, 0.525, 0.630, 0.75, 1.55, 10.4, 10.4, 2.09, 0.52 };
+	/* 30, 30, 30, 30, 30, 60, 30, 15 */
 
-    /* blue, green red, near infrared, shortwave IR, thermal IR, shortwave IR, panchromatic */
-    int band[] = { 1, 2, 3, 4, 5, 6, 6, 7, 8 };
-    int code[] = { 1, 2, 3, 4, 5, 61, 62, 7, 8 };
-    double wmax[] = { 0.515, 0.605, 0.690, 0.90, 1.75, 12.50, 2.35, 0.90 };
-    double wmin[] = { 0.450, 0.525, 0.630, 0.75, 1.55, 10.40, 2.09, 0.52 };
-    /* 30, 30, 30, 30, 30, 60, 30, 15 */
+	strcpy(lsat->sensor, "ETM+");
 
-    strcpy(lsat->sensor, "ETM+");
+	lsat->bands		= 9;
 
-    lsat->bands = 9;
-    for (i = 0; i < lsat->bands; i++) {
-	lsat->band[i].number = *(band + i);
-	lsat->band[i].code = *(code + i);
-	lsat->band[i].wavemax = *(wmax + i);
-	lsat->band[i].wavemin = *(wmin + i);
-	lsat->band[i].qcalmax = 255.;
-	lsat->band[i].qcalmin = 1.;
-	lsat->band[i].thermal = (lsat->band[i].number == 6 ? 1 : 0);
-    }
-    return;
+	for(int i=0; i<lsat->bands; i++)
+	{
+		lsat->band[i].number	= band[i];
+		lsat->band[i].code		= code[i];
+		lsat->band[i].wavemax	= wmax[i];
+		lsat->band[i].wavemin	= wmin[i];
+		lsat->band[i].qcalmax	= 255.0;
+		lsat->band[i].qcalmin	=   1.0;
+		lsat->band[i].thermal	= band[i] == 6 ? 1 : 0;
+	}
+
+	return;
 }
 
 
@@ -1226,8 +1231,6 @@ struct ln_vsop
 };
 
 double ln_calc_series(const struct ln_vsop *data, int terms, double t);
-double julian_int(int year, int month, int day);
-double julian_char(char date[]);
 
 static const struct ln_vsop earth_radius_r0[RADIUS_R0] = {
     {1.00013988784, 0.00000000000, 0.00000000000},
@@ -2225,7 +2228,6 @@ static const struct ln_vsop earth_radius_r5[RADIUS_R5] = {
     {0.00000000012, 0.65572878044, 12566.15169998280},
 };
 
-
 /* Use in earth-sun function */
 double ln_calc_series(const struct ln_vsop *data, int terms, double t)
 {
@@ -2263,7 +2265,7 @@ double julian_int(int year, int month, int day)
 }
 
 /* Get Julian day form Gregorian string yyyy-mm-dd */
-double julian_char(char date[])
+double julian_char(const char date[])
 {
     int day, month, year;
 
@@ -2275,7 +2277,7 @@ double julian_char(char date[])
 }
 
 /* Earth-Sun distance in astronomical units */
-double earth_sun(char *date)
+double earth_sun(const char *date)
 {
     double t;
     double R0, R1, R2, R3, R4, R5;

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_dialogs.h 1640 2013-03-25 12:56:18Z oconrad $
+ * Version $Id: res_dialogs.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -153,10 +153,12 @@ bool				DLG_Color				(long &Colour);
 
 bool				DLG_Font				(class CSG_Parameter *pFont);
 
-bool				DLG_Get_Number			(double &Number, const wxString &Caption, const wxString &Text);
-bool				DLG_Get_Number			(double &Number);
-bool				DLG_Get_Number			(int    &Number, const wxString &Caption, const wxString &Text);
-bool				DLG_Get_Number			(int    &Number);
+bool				DLG_Get_Text			(wxString &Value, const wxString &Caption, const wxString &Text);
+bool				DLG_Get_Text			(wxString &Value);
+bool				DLG_Get_Number			(double   &Value, const wxString &Caption, const wxString &Text);
+bool				DLG_Get_Number			(double   &Value);
+bool				DLG_Get_Number			(int      &Value, const wxString &Caption, const wxString &Text);
+bool				DLG_Get_Number			(int      &Value);
 
 bool				DLG_Directory			(wxString &Directory, const wxString &Caption);
 bool				DLG_Save				(wxString &File_Path, int ID_DLG);

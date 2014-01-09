@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.cpp 1728 2013-06-13 09:37:08Z oconrad $
+ * Version $Id: table.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -289,6 +289,14 @@ bool CSG_Table::Destroy(void)
 //						Assign							 //
 //														 //
 ///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CSG_Table & CSG_Table::operator = (const CSG_Table &Table)
+{
+	Create(Table);
+
+	return( *this );
+}
 
 //---------------------------------------------------------
 bool CSG_Table::Assign(CSG_Data_Object *pObject)
@@ -564,6 +572,20 @@ int CSG_Table::Get_Field_Length(int iField)	const
 	return( Length );
 }
 
+//---------------------------------------------------------
+int CSG_Table::Get_Field(const CSG_String &Name) const
+{
+	for(int iField=0; iField<Get_Field_Count(); iField++)
+	{
+		if( !Name.Cmp(Get_Field_Name(iField)) )
+		{
+			return( iField );
+		}
+	}
+
+	return( -1 );
+}
+
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -745,15 +767,15 @@ CSG_Table_Record * CSG_Table::Ins_Record(int iRecord, CSG_Table_Record *pCopy)
 //---------------------------------------------------------
 bool CSG_Table::Del_Record(int iRecord)
 {
-	int		i, j;
-
 	if( iRecord >= 0 && iRecord < m_nRecords )
 	{
+		int		i;
+
 		delete(m_Records[iRecord]);
 
 		m_nRecords--;
 
-		for(i=iRecord, j=iRecord+1; i<m_nRecords; i++, j++)
+		for(i=iRecord; i<m_nRecords; i++)
 		{
 			m_Records[i]			= m_Records[i + 1];
 			m_Records[i]->m_Index	= i;
@@ -1054,9 +1076,9 @@ void CSG_Table::_Index_Create(void)
 			jstack	= 0;
 
 	//-----------------------------------------------------
-	if( m_Index == NULL )
+	if( m_Index == NULL || m_nBuffer < m_nRecords )
 	{
-		m_Index	= (int *)SG_Malloc(m_nBuffer * sizeof(int));
+		m_Index	= (int *)SG_Realloc(m_Index, (m_nBuffer < m_nRecords ? m_nRecords : m_nBuffer) * sizeof(int));
 	}
 
 	for(j=0; j<m_nRecords; j++)
@@ -1196,15 +1218,16 @@ inline int CSG_Table::_Index_Compare(int a, int b, int Field)
 	switch( m_Field_Type[m_Index_Field[Field]] )
 	{
 	case SG_DATATYPE_String:
+	case SG_DATATYPE_Date:
 		Result	= SG_STR_CMP(
-					m_Records[a]->asString(m_Index_Field[Field]),
-					m_Records[b]->asString(m_Index_Field[Field])
+				  Get_Record(a)->asString(m_Index_Field[Field]),
+				  Get_Record(b)->asString(m_Index_Field[Field])
 				);
 		break;
 
 	default:
-		Result	= m_Records[a]->asDouble(m_Index_Field[Field])
-				- m_Records[b]->asDouble(m_Index_Field[Field]);
+		Result	= Get_Record(a)->asDouble(m_Index_Field[Field])
+				- Get_Record(b)->asDouble(m_Index_Field[Field]);
 		break;
 	}
 

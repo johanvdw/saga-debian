@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Shrink_Expand.h 1104 2011-06-20 20:50:18Z reklov_w $
+ * Version $Id: Grid_Shrink_Expand.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -107,12 +107,15 @@ class CGrid_Shrink_Expand : public CSG_Module_Grid
 public:
 	CGrid_Shrink_Expand(void);
 
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Grid|Gaps") );	}
+
 
 protected:
 
 	virtual bool			On_Execute		(void);
 
 	virtual int				On_Parameters_Enable(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
 
 private:
 

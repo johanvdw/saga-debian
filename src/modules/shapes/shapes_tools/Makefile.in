@@ -37,13 +37,14 @@ host_triplet = @host@
 subdir = src/modules/shapes/shapes_tools
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_lib_postgresql.m4 \
+	$(top_srcdir)/m4/ax_pkg_swig.m4 \
 	$(top_srcdir)/m4/ax_python_devel.m4 \
 	$(top_srcdir)/m4/ax_swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/ax_swig_python.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -80,7 +81,8 @@ am_libshapes_tools_la_OBJECTS = CreateChartLayer.lo \
 	NewLayerFromSelectedShapes.lo quadtree_structure.lo \
 	QueryBuilder.lo SearchInTable.lo SelectByTheme.lo \
 	SeparateShapes.lo Shapes_Create_Empty.lo Shapes_Merge.lo \
-	TransformShapes.lo shapes_buffer.lo shapes_cut.lo \
+	TransformShapes.lo shapes_buffer.lo \
+	shapes_convert_vertex_type.lo shapes_cut.lo \
 	shapes_cut_interactive.lo shapes_extents.lo shapes_generate.lo \
 	shapes_polar_to_cartes.lo shapes_split.lo \
 	shapes_split_by_attribute.lo shapes_split_randomly.lo
@@ -175,6 +177,10 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PG_CONFIG = @PG_CONFIG@
+POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
+POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
+POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
 POW_LIB = @POW_LIB@
 PYTHON = @PYTHON@
 PYTHON_CPPFLAGS = @PYTHON_CPPFLAGS@
@@ -253,7 +259,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1404 2012-05-14 10:04:07Z reklov_w $
+# $Id: Makefile.am 1917 2013-12-28 16:38:41Z reklov_w $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -276,6 +282,7 @@ Shapes_Create_Empty.cpp\
 Shapes_Merge.cpp\
 TransformShapes.cpp\
 shapes_buffer.cpp\
+shapes_convert_vertex_type.cpp\
 shapes_cut.cpp\
 shapes_cut_interactive.cpp\
 shapes_extents.cpp\
@@ -297,6 +304,7 @@ Shapes_Create_Empty.h\
 Shapes_Merge.h\
 TransformShapes.h\
 shapes_buffer.h\
+shapes_convert_vertex_type.h\
 shapes_cut.h\
 shapes_cut_interactive.h\
 shapes_extents.h\
@@ -320,9 +328,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/modules/shapes/shapes_tools/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/modules/shapes/shapes_tools/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/modules/shapes/shapes_tools/Makefile
+	  $(AUTOMAKE) --foreign src/modules/shapes/shapes_tools/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -394,6 +402,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransformShapes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/quadtree_structure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_convert_vertex_type.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_cut.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_cut_interactive.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shapes_extents.Plo@am__quote@

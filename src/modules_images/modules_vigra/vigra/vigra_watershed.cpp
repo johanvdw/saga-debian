@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: vigra_watershed.cpp 1282 2011-12-29 17:13:26Z manfred-e $
+ * Version $Id: vigra_watershed.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -62,6 +62,8 @@
 #include "vigra_watershed.h"
 
 //---------------------------------------------------------
+#include <iostream>
+
 #include <vigra/stdimagefunctions.hxx>
 #include <vigra/localminmax.hxx>
 #include <vigra/labelimage.hxx>
@@ -77,7 +79,7 @@
 //---------------------------------------------------------
 CViGrA_Watershed::CViGrA_Watershed(void)
 {
-	Set_Name		(_TL("ViGrA - Watershed Segmentation"));
+	Set_Name		(_TL("Watershed Segmentation (ViGrA)"));
 
 	Set_Author		(SG_T("O.Conrad (c) 2009"));
 

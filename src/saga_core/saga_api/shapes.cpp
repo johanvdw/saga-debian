@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes.cpp 1728 2013-06-13 09:37:08Z oconrad $
+ * Version $Id: shapes.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -462,6 +462,8 @@ bool CSG_Shapes::On_Update(void)
 				if( m_ZMin > pShape->Get_ZMin() )	m_ZMin	= pShape->Get_ZMin();
 				if( m_ZMax < pShape->Get_ZMax() )	m_ZMax	= pShape->Get_ZMax();
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -543,12 +545,16 @@ bool CSG_Shapes::Make_Clean(void)
 
 		for(int iPart=0; iPart<pPolygon->Get_Part_Count(); iPart++)
 		{
-			//--------------------------------------------
-			// ring direction: outer rings > clockwise, inner rings (lakes) > counterclockwise !
-
-			if( (pPolygon->is_Lake(iPart) == pPolygon->is_Clockwise(iPart)) )
+			if( m_Vertex_Type == SG_VERTEX_TYPE_XY )	// currently we have to disable this check for 3D shapefiles since the
+														// _Update_Area() method can not handle polygons with no horizontal extent
 			{
-				pPolygon->Revert_Points(iPart);
+				//--------------------------------------------
+				// ring direction: outer rings > clockwise, inner rings (lakes) > counterclockwise !
+
+				if( (pPolygon->is_Lake(iPart) == pPolygon->is_Clockwise(iPart)) )
+				{
+					pPolygon->Revert_Points(iPart);
+				}
 			}
 
 			//--------------------------------------------

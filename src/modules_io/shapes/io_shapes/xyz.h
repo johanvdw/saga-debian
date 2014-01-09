@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: xyz.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: xyz.h 1922 2014-01-09 10:28:46Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -82,7 +82,6 @@ class CXYZ_Export : public CSG_Module
 {
 public:
 	CXYZ_Export(void);
-	virtual ~CXYZ_Export(void);
 
 	virtual CSG_String		Get_MenuPath(void)		{	return( _TL("R:Export") );	}
 
@@ -93,12 +92,15 @@ protected:
 
 };
 
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
 //---------------------------------------------------------
 class CXYZ_Import : public CSG_Module  
 {
 public:
 	CXYZ_Import(void);
-	virtual ~CXYZ_Import(void);
 
 	virtual CSG_String		Get_MenuPath(void)		{	return( _TL("R:Import") );	}
 
@@ -109,4 +111,12 @@ protected:
 
 };
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #endif // #ifndef HEADER_INCLUDED__XYZ_H

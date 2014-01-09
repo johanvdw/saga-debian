@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes.cpp 1646 2013-04-10 16:29:00Z oconrad $
+ * Version $Id: wksp_shapes.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -166,7 +166,7 @@ wxMenu * CWKSP_Shapes::Get_Menu(void)
 	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_SHOW);
 	CMD_Menu_Add_Item(pTable,  true, ID_CMD_TABLES_DIAGRAM);
 	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SCATTERPLOT);
-	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SAVE);
+	CMD_Menu_Add_Item(pTable, false, ID_CMD_TABLES_SAVEAS);
 	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Attributes"), pTable);
 
 	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Edit"), Edit_Get_Menu());
@@ -217,6 +217,11 @@ bool CWKSP_Shapes::On_Command(int Cmd_ID)
 		_Edit_Point_Del();
 		break;
 
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:
+		Get_Shapes()->Select();
+		Update_Views();
+		break;
+
 	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
 		Get_Shapes()->Inv_Selection();
 		Update_Views();
@@ -234,7 +239,7 @@ bool CWKSP_Shapes::On_Command(int Cmd_ID)
 		Add_ScatterPlot(Get_Table()->Get_Table());
 		break;
 
-	case ID_CMD_TABLES_SAVE:
+	case ID_CMD_TABLES_SAVEAS:
 		{
 			wxString	File(m_pObject->Get_File_Name());
 
@@ -286,6 +291,10 @@ bool CWKSP_Shapes::On_Command_UI(wxUpdateUIEvent &event)
 
 	case ID_CMD_SHAPES_EDIT_DEL_POINT:
 		event.Enable(m_Edit_pShape != NULL && m_Edit_iPart >= 0 && m_Edit_iPoint >= 0);
+		break;
+
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:
+		event.Enable(m_Edit_pShape == NULL && Get_Shapes()->Get_Selection_Count() > 0);
 		break;
 
 	case ID_CMD_SHAPES_EDIT_SEL_INVERT:

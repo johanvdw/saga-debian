@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -78,18 +78,27 @@ CSG_String Get_Info(int i)
 		return( _TL("O. Conrad (c) 2009") );
 
 	case MLB_INFO_Description:
-		return( _TW(
-			"ViGrA stands for \"Vision with Generic Algorithms\". "
-			"It's a novel computer vision library that puts its main "
-			"emphasize on customizable algorithms and data structures. "
-			"By using template techniques similar to those in the C++ "
-			"Standard Template Library, you can easily adapt any VIGRA "
-			"component to the needs of your application, without thereby "
-			"giving up execution speed.\n"
-			"Find out more at the ViGrA - Vision with Generic Algorithms - homepage:\n"
-			"<a target=\"_blank\" href=\"http://hci.iwr.uni-heidelberg.de/vigra\">"
-			"http://hci.iwr.uni-heidelberg.de</a>"
-		));
+		{
+			CSG_String	s;
+			
+			s	+= "ViGrA - \"Vision with Generic Algorithms\"\n";
+#ifdef VIGRA_VERSION
+			s	+= "Version: ";	s += VIGRA_VERSION; s += "\n";
+#endif
+			s	+= _TW(
+				"ViGrA is a novel computer vision library that puts its main "
+				"emphasize on customizable algorithms and data structures. "
+				"By using template techniques similar to those in the C++ "
+				"Standard Template Library (STL), you can easily adapt any ViGrA "
+				"component to the needs of your application, without thereby "
+				"giving up execution speed.\n"
+				"Find out more at the ViGrA - Vision with Generic Algorithms - homepage:\n"
+				"<a target=\"_blank\" href=\"http://hci.iwr.uni-heidelberg.de/vigra\">"
+				"http://hci.iwr.uni-heidelberg.de</a>\n"
+			);
+
+			return( s );
+		}
 
 	case MLB_INFO_Version:
 		return( SG_T("1.0") );
@@ -109,6 +118,7 @@ CSG_String Get_Info(int i)
 #include "vigra_distance.h"
 #include "vigra_fft.h"
 #include "vigra_watershed.h"
+#include "vigra_random_forest.h"
 
 
 //---------------------------------------------------------
@@ -127,6 +137,7 @@ CSG_Module *		Create_Module(int i)
 	case  6:	return( new CViGrA_FFT_Inverse );
 	case  7:	return( new CViGrA_FFT_Real );
 	case  8:	return( new CViGrA_FFT_Filter );
+	case  9:	return( new CViGrA_Random_Forest );
 	}
 
 	return( NULL );

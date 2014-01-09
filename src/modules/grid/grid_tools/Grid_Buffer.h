@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Buffer.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: Grid_Buffer.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     Grid_Buffer.h
@@ -27,19 +27,18 @@
 #include "MLB_Interface.h"
 
 //---------------------------------------------------------
-class CGrid_Buffer : public CSG_Module_Grid {
-
-private:
-
+class CGrid_Buffer : public CSG_Module_Grid
+{
 public:
 	CGrid_Buffer(void);
 	virtual ~CGrid_Buffer(void);
 
-	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Buffers") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Distances") );	}
 
 
 protected:
-	virtual bool		On_Execute(void);
+
+	virtual bool				On_Execute				(void);
 
 };
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.h 1728 2013-06-13 09:37:08Z oconrad $
+ * Version $Id: table.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -234,6 +234,7 @@ public:
 
 	virtual TSG_Data_Object_Type	Get_ObjectType		(void)	const			{	return( DATAOBJECT_TYPE_Table );	}
 
+	CSG_Table &						operator =			(const CSG_Table &Table);
 	virtual bool					Assign				(CSG_Data_Object *pSource);
 	bool							Assign_Values		(CSG_Table *pTable);
 
@@ -252,7 +253,8 @@ public:
 	int								Get_Field_Count		(void)			const	{	return( m_nFields );	}
 	const SG_Char *					Get_Field_Name		(int iField)	const	{	return( iField >= 0 && iField < m_nFields ? m_Field_Name[iField]->c_str() : NULL );			}
 	TSG_Data_Type					Get_Field_Type		(int iField)	const	{	return( iField >= 0 && iField < m_nFields ? m_Field_Type[iField] : SG_DATATYPE_Undefined );	}
-	int								Get_Field_Length	(int iField)	const;	// returns the maximum number of characters for data type string and zero for all other data types.
+	int								Get_Field_Length	(int iField)	const;				// returns the maximum number of characters for data type string and zero for all other data types.
+	int								Get_Field			(const CSG_String &Name)	const;	// returns the zero based position of the field named 'Name' or '-1' if there is no field with such name.
 
 	bool							Set_Field_Name		(int iField, const SG_Char *Name);
 	bool							Set_Field_Type		(int iField, TSG_Data_Type  Type);
@@ -284,10 +286,10 @@ public:
 		{
 			if( m_Index != NULL )
 			{
-				return( m_Records[m_Index[Index]] );
+				return( Get_Record(m_Index[Index]) );
 			}
 
-			return( m_Records[Index] );
+			return( Get_Record(Index) );
 		}
 
 		return( NULL );

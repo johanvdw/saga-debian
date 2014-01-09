@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_3d_image.h 1283 2012-01-02 16:01:48Z oconrad $
+ * Version $Id: view_map_3d_image.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -106,16 +106,16 @@ public:
 	CVIEW_Map_3D_Image(class CVIEW_Map_3D *pParent, class CWKSP_Map *pMap);
 	virtual ~CVIEW_Map_3D_Image(void);
 
-	bool							m_bCentral, m_bStereo, m_bInterpol, m_Src_bUpdate;
+	bool							m_bCentral, m_bInterpol, m_Src_bUpdate;
 
-	int								m_img_nx, m_img_ny, m_Resolution, m_nxPoints, m_nyPoints, m_BkColor, m_Figure;
+	int								m_img_nx, m_img_ny, m_Resolution, m_nxPoints, m_nyPoints, m_BkColor, m_Figure, m_bStereo;
 
 	double							m_xRotate, m_yRotate, m_zRotate,
 									m_xShift, m_yShift, m_zShift,
 									m_Range, m_Exaggeration, m_Central, m_Stereo,
 									m_Figure_Weight;
 
-	CSG_Grid							*m_pDEM;
+	CSG_Grid						*m_pDEM;
 
 
 	void							Set_Source				(int Resolution = -1);

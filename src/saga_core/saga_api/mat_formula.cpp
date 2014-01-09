@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_formula.cpp 1468 2012-08-29 11:58:37Z manfred-e $
+ * Version $Id: mat_formula.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -625,7 +625,7 @@ int CSG_Formula::Del_Function(SG_Char *name)
 // Result: 0 is rendered if there is an error
 // 1 is rendered otherwise
 //
-int CSG_Formula::Add_Function(SG_Char *name, TSG_PFNC_Formula_1 f, int n_pars, int varying)
+int CSG_Formula::Add_Function(const SG_Char *name, TSG_PFNC_Formula_1 f, int n_pars, int varying)
 {
 	TSG_Formula_Item *where;
 	

@@ -37,13 +37,14 @@ host_triplet = @host@
 subdir = src/modules_images/modules_vigra/vigra
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_lib_postgresql.m4 \
+	$(top_srcdir)/m4/ax_pkg_swig.m4 \
 	$(top_srcdir)/m4/ax_python_devel.m4 \
 	$(top_srcdir)/m4/ax_swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/ax_swig_python.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -76,13 +77,15 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 @HAVE_VIGRA_TRUE@libvigra_la_DEPENDENCIES = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am__libvigra_la_SOURCES_DIST = vigra.h vigra_edges.h vigra_smoothing.h \
 	vigra_distance.h vigra_fft.h vigra_morphology.h \
-	vigra_watershed.h MLB_Interface.cpp vigra.cpp MLB_Interface.h \
-	vigra_distance.cpp vigra_fft.cpp vigra_smoothing.cpp \
-	vigra_edges.cpp vigra_morphology.cpp vigra_watershed.cpp
+	vigra_random_forest.h vigra_watershed.h MLB_Interface.cpp \
+	vigra.cpp MLB_Interface.h vigra_distance.cpp vigra_fft.cpp \
+	vigra_smoothing.cpp vigra_edges.cpp vigra_morphology.cpp \
+	vigra_random_forest.cpp vigra_watershed.cpp
 @HAVE_VIGRA_TRUE@am_libvigra_la_OBJECTS = MLB_Interface.lo vigra.lo \
 @HAVE_VIGRA_TRUE@	vigra_distance.lo vigra_fft.lo \
 @HAVE_VIGRA_TRUE@	vigra_smoothing.lo vigra_edges.lo \
-@HAVE_VIGRA_TRUE@	vigra_morphology.lo vigra_watershed.lo
+@HAVE_VIGRA_TRUE@	vigra_morphology.lo vigra_random_forest.lo \
+@HAVE_VIGRA_TRUE@	vigra_watershed.lo
 libvigra_la_OBJECTS = $(am_libvigra_la_OBJECTS)
 @HAVE_VIGRA_TRUE@am_libvigra_la_rpath = -rpath $(pkglibdir)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -175,6 +178,10 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PG_CONFIG = @PG_CONFIG@
+POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
+POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
+POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
 POW_LIB = @POW_LIB@
 PYTHON = @PYTHON@
 PYTHON_CPPFLAGS = @PYTHON_CPPFLAGS@
@@ -253,7 +260,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1277 2011-12-22 15:48:59Z reklov_w $
+# $Id: Makefile.am 1896 2013-12-10 14:56:59Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -269,6 +276,7 @@ top_srcdir = @top_srcdir@
 @HAVE_VIGRA_TRUE@vigra_distance.h\
 @HAVE_VIGRA_TRUE@vigra_fft.h\
 @HAVE_VIGRA_TRUE@vigra_morphology.h\
+@HAVE_VIGRA_TRUE@vigra_random_forest.h\
 @HAVE_VIGRA_TRUE@vigra_watershed.h\
 @HAVE_VIGRA_TRUE@MLB_Interface.cpp\
 @HAVE_VIGRA_TRUE@vigra.cpp\
@@ -278,6 +286,7 @@ top_srcdir = @top_srcdir@
 @HAVE_VIGRA_TRUE@vigra_smoothing.cpp\
 @HAVE_VIGRA_TRUE@vigra_edges.cpp\
 @HAVE_VIGRA_TRUE@vigra_morphology.cpp\
+@HAVE_VIGRA_TRUE@vigra_random_forest.cpp\
 @HAVE_VIGRA_TRUE@vigra_watershed.cpp
 
 @HAVE_VIGRA_TRUE@libvigra_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
@@ -294,9 +303,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/modules_images/modules_vigra/vigra/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/modules_images/modules_vigra/vigra/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/modules_images/modules_vigra/vigra/Makefile
+	  $(AUTOMAKE) --foreign src/modules_images/modules_vigra/vigra/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -361,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_edges.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_fft.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_morphology.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_random_forest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_smoothing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vigra_watershed.Plo@am__quote@
 

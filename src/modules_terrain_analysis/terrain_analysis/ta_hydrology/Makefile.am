@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1447 2012-07-16 13:01:47Z oconrad $
+# $Id: Makefile.am 1824 2013-09-05 08:48:21Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -15,6 +15,7 @@ pkglib_LTLIBRARIES = libta_hydrology.la
 libta_hydrology_la_SOURCES =\
 CellBalance.cpp\
 EdgeContamination.cpp\
+Erosion_LS_Fields.cpp\
 Flow.cpp\
 Flow_AreaDownslope.cpp\
 Flow_AreaUpslope.cpp\
@@ -38,6 +39,7 @@ SlopeLength.cpp\
 TopographicIndices.cpp\
 CellBalance.h\
 EdgeContamination.h\
+Erosion_LS_Fields.h\
 Flow.h\
 Flow_AreaDownslope.h\
 Flow_AreaUpslope.h\

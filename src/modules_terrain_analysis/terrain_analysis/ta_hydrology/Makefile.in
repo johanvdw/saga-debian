@@ -37,13 +37,14 @@ host_triplet = @host@
 subdir = src/modules_terrain_analysis/terrain_analysis/ta_hydrology
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_lib_postgresql.m4 \
+	$(top_srcdir)/m4/ax_pkg_swig.m4 \
 	$(top_srcdir)/m4/ax_python_devel.m4 \
 	$(top_srcdir)/m4/ax_swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/ax_swig_python.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -76,13 +77,13 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libta_hydrology_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libta_hydrology_la_OBJECTS = CellBalance.lo EdgeContamination.lo \
-	Flow.lo Flow_AreaDownslope.lo Flow_AreaUpslope.lo \
-	Flow_Distance.lo Flow_Parallel.lo Flow_RecursiveDown.lo \
-	Flow_RecursiveUp.lo flow_massflux.lo flow_width.lo \
-	FlowDepth.lo Helper.lo IsochronesConst.lo IsochronesVar.lo \
-	LakeFlood.lo LakeFloodInteractive.lo MLB_Interface.lo \
-	melton_ruggedness.lo SAGA_Wetness_Index.lo Sinuosity.lo \
-	SlopeLength.lo TopographicIndices.lo
+	Erosion_LS_Fields.lo Flow.lo Flow_AreaDownslope.lo \
+	Flow_AreaUpslope.lo Flow_Distance.lo Flow_Parallel.lo \
+	Flow_RecursiveDown.lo Flow_RecursiveUp.lo flow_massflux.lo \
+	flow_width.lo FlowDepth.lo Helper.lo IsochronesConst.lo \
+	IsochronesVar.lo LakeFlood.lo LakeFloodInteractive.lo \
+	MLB_Interface.lo melton_ruggedness.lo SAGA_Wetness_Index.lo \
+	Sinuosity.lo SlopeLength.lo TopographicIndices.lo
 libta_hydrology_la_OBJECTS = $(am_libta_hydrology_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -174,6 +175,10 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PG_CONFIG = @PG_CONFIG@
+POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
+POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
+POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
 POW_LIB = @POW_LIB@
 PYTHON = @PYTHON@
 PYTHON_CPPFLAGS = @PYTHON_CPPFLAGS@
@@ -252,7 +257,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1447 2012-07-16 13:01:47Z oconrad $
+# $Id: Makefile.am 1824 2013-09-05 08:48:21Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -264,6 +269,7 @@ pkglib_LTLIBRARIES = libta_hydrology.la
 libta_hydrology_la_SOURCES = \
 CellBalance.cpp\
 EdgeContamination.cpp\
+Erosion_LS_Fields.cpp\
 Flow.cpp\
 Flow_AreaDownslope.cpp\
 Flow_AreaUpslope.cpp\
@@ -287,6 +293,7 @@ SlopeLength.cpp\
 TopographicIndices.cpp\
 CellBalance.h\
 EdgeContamination.h\
+Erosion_LS_Fields.h\
 Flow.h\
 Flow_AreaDownslope.h\
 Flow_AreaUpslope.h\
@@ -323,9 +330,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/modules_terrain_analysis/terrain_analysis/ta_hydrology/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/modules_terrain_analysis/terrain_analysis/ta_hydrology/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/modules_terrain_analysis/terrain_analysis/ta_hydrology/Makefile
+	  $(AUTOMAKE) --foreign src/modules_terrain_analysis/terrain_analysis/ta_hydrology/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -386,6 +393,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CellBalance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EdgeContamination.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Erosion_LS_Fields.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Flow.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FlowDepth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Flow_AreaDownslope.Plo@am__quote@

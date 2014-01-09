@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1401 2012-05-11 14:27:10Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -77,7 +77,7 @@ CSG_String Get_Info(int i)
 		return( _TL("Table - Tools") );
 
 	case MLB_INFO_Author:
-		return( _TL("SAGA User Group Associaton (c) 2002") );
+		return( _TL("SAGA User Group Associaton (c) 2002-2013") );
 
 	case MLB_INFO_Description:
 		return( _TL("") );
@@ -100,6 +100,10 @@ CSG_String Get_Info(int i)
 #include "Join_Tables.h"
 #include "table_change_date_format.h"
 #include "table_change_field_type.h"
+#include "table_change_color_format.h"
+#include "table_text_replacer.h"
+#include "table_field_deletion.h"
+#include "table_selection.h"
 
 
 //---------------------------------------------------------
@@ -118,9 +122,19 @@ CSG_Module *		Create_Module(int i)
 	case  6:	return( new CTable_Change_Time_Format );
 	case  7:	return( new CTable_Change_Field_Type );
 	case  8:	return( new CTable_Append_Rows );
-	}
+	case  9:	return( new CTable_Change_Color_Format );
+	case 10:	return( new CTable_Text_Replacer );
+	case 11:	return( new CTable_Field_Deletion );
 
-	return( NULL );
+	case 15:	return( new CSelection_Copy );
+	case 16:	return( new CSelection_Delete );
+	case 17:	return( new CSelection_Invert );
+	case 18:	return( new CSelect_Numeric );
+	case 19:	return( new CSelect_String );
+
+	case 20:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
+	}
 }
 
 

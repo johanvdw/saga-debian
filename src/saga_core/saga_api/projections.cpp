@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: projections.cpp 1757 2013-06-27 11:03:20Z oconrad $
+ * Version $Id: projections.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -665,31 +665,33 @@ bool CSG_Projections::EPSG_to_WKT(CSG_String &WKT, int EPSG_Code) const
 //---------------------------------------------------------
 CSG_String CSG_Projections::Get_Names_List(TSG_Projection_Type Type) const
 {
-	TSG_Projection_Type	iType;
-	CSG_String			Names, iWKT;
+	CSG_String	Names;
 
 	for(int i=0; i<Get_Count(); i++)
 	{
 		CSG_Table_Record	*pProjection	= m_pProjections->Get_Record(i);
 
-		iWKT	= pProjection->asString(PRJ_FIELD_SRTEXT);
+		CSG_String	WKT		= pProjection->asString(PRJ_FIELD_SRTEXT);
+		int			SRID	= pProjection->asInt   (PRJ_FIELD_SRID);
 
-		iType	= !iWKT.BeforeFirst('[').Cmp(SG_T("PROJCS")) ? SG_PROJ_TYPE_CS_Projected
-				: !iWKT.BeforeFirst('[').Cmp(SG_T("GEOGCS")) ? SG_PROJ_TYPE_CS_Geographic
-				: !iWKT.BeforeFirst('[').Cmp(SG_T("GEOCCS")) ? SG_PROJ_TYPE_CS_Geocentric
+		TSG_Projection_Type	iType;
+
+		iType	= !WKT.BeforeFirst('[').Cmp(SG_T("PROJCS")) ? SG_PROJ_TYPE_CS_Projected
+				: !WKT.BeforeFirst('[').Cmp(SG_T("GEOGCS")) ? SG_PROJ_TYPE_CS_Geographic
+				: !WKT.BeforeFirst('[').Cmp(SG_T("GEOCCS")) ? SG_PROJ_TYPE_CS_Geocentric
 				: SG_PROJ_TYPE_CS_Undefined;
 
 		if( Type == SG_PROJ_TYPE_CS_Undefined )
 		{
-			Names	+= CSG_String::Format(SG_T("{%d}%s: %s|"), i,
+			Names	+= CSG_String::Format(SG_T("{%d}%s: %s|"), SRID,
 				SG_Get_Projection_Type_Name(iType).c_str(),
-				iWKT.AfterFirst('\"').BeforeFirst('\"').c_str()
+				WKT.AfterFirst('\"').BeforeFirst('\"').c_str()
 			);
 		}
 		else if( Type == iType )
 		{
-			Names	+= CSG_String::Format(SG_T("{%d}%s|"), i,
-				iWKT.AfterFirst('\"').BeforeFirst('\"').c_str()
+			Names	+= CSG_String::Format(SG_T("{%d}%s|"), SRID,
+				WKT.AfterFirst('\"').BeforeFirst('\"').c_str()
 			);
 		}
 	}
@@ -1032,7 +1034,7 @@ bool CSG_Projections::_Proj4_Read_Parameter(CSG_String &Value, const CSG_String 
 }
 
 //---------------------------------------------------------
-/*/ ellipsoids (a, b)
+/* ellipsoids (a, b)
 	{	"MERIT"		, "6378137.0"	, "6356752.298"	},	// MERIT 1983
 	{	"SGS85"		, "6378136.0"	, "6356751.302"	},	// Soviet Geodetic System 85
 	{	"GRS80"		, "6378137.0"	, "6356752.314"	},	// GRS 1980 (IUGG, 1980)
@@ -1075,7 +1077,7 @@ bool CSG_Projections::_Proj4_Read_Parameter(CSG_String &Value, const CSG_String 
 	{	"WGS72"		, "6378135.0"	, "6356750.52"	},	// WGS 72
 	{	"WGS84"		, "6378137.0"	, "6356752.314"	},	// WGS 84
 	{	"sphere"	, "6370997.0"	, "6370997.0"	}	// Normal Sphere (r=6370997)
-/**/
+*/
 
 bool CSG_Projections::_Proj4_Get_Ellipsoid(CSG_String &Value, const CSG_String &Proj4) const
 {

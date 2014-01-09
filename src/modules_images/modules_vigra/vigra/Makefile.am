@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1277 2011-12-22 15:48:59Z reklov_w $
+# $Id: Makefile.am 1896 2013-12-10 14:56:59Z oconrad $
 #
 if DEBUG
 DBGFLAGS = -g -DDEBUG
@@ -20,6 +20,7 @@ vigra_smoothing.h\
 vigra_distance.h\
 vigra_fft.h\
 vigra_morphology.h\
+vigra_random_forest.h\
 vigra_watershed.h\
 MLB_Interface.cpp\
 vigra.cpp\
@@ -29,6 +30,7 @@ vigra_fft.cpp\
 vigra_smoothing.cpp\
 vigra_edges.cpp\
 vigra_morphology.cpp\
+vigra_random_forest.cpp\
 vigra_watershed.cpp
 
 libvigra_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la

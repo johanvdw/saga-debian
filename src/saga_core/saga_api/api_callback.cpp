@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_callback.cpp 1710 2013-05-31 13:37:05Z oconrad $
+ * Version $Id: api_callback.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@
 // You should have received a copy of the GNU Lesser     //
 // General Public License along with this program; if    //
 // not, write to the Free Software Foundation, Inc.,     //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -228,20 +228,18 @@ bool		SG_UI_Process_Set_Ready(void)
 //---------------------------------------------------------
 void		SG_UI_Process_Set_Text(const CSG_String &Text)
 {
-	if( gSG_UI_Progress_Lock > 0 )
+	if( gSG_UI_Progress_Lock == 0 )
 	{
-		return;
-	}
+		if( gSG_UI_Callback )
+		{
+			CSG_UI_Parameter	p1(Text), p2;
 
-	if( gSG_UI_Callback )
-	{
-		CSG_UI_Parameter	p1(Text), p2;
-
-		gSG_UI_Callback(CALLBACK_PROCESS_SET_TEXT, p1, p2);
-	}
-	else
-	{
-		SG_PRINTF(SG_T("%s\n"), Text.c_str());
+			gSG_UI_Callback(CALLBACK_PROCESS_SET_TEXT, p1, p2);
+		}
+		else
+		{
+			SG_PRINTF(SG_T("%s\n"), Text.c_str());
+		}
 	}
 }
 
@@ -275,15 +273,18 @@ bool		SG_UI_Stop_Execution(bool bDialog)
 //---------------------------------------------------------
 void		SG_UI_Dlg_Message(const CSG_String &Message, const CSG_String &Caption)
 {
-	if( gSG_UI_Callback )
+	if( gSG_UI_Progress_Lock == 0 )
 	{
-		CSG_UI_Parameter	p1(Message), p2(Caption);
+		if( gSG_UI_Callback )
+		{
+			CSG_UI_Parameter	p1(Message), p2(Caption);
 
-		gSG_UI_Callback(CALLBACK_DLG_MESSAGE, p1, p2);
-	}
-	else
-	{
-		SG_PRINTF(SG_T("%s: %s\n"), Caption.c_str(), Message.c_str());
+			gSG_UI_Callback(CALLBACK_DLG_MESSAGE, p1, p2);
+		}
+		else
+		{
+			SG_PRINTF(SG_T("%s: %s\n"), Caption.c_str(), Message.c_str());
+		}
 	}
 }
 

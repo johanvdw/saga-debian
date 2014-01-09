@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Collect_Points.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Collect_Points.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -9,14 +9,14 @@
 //      System for Automated Geoscientific Analyses      //
 //                                                       //
 //                    Module Library:                    //
-//                   Grid_Georeference                   //
+//                    pj_georeference                    //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //
 //                    Collect_Points.h                   //
 //                                                       //
-//                 Copyright (C) 2004 by                 //
-//                     Andre Ringeler                    //
+//                 Copyright (C) 2013 by                 //
+//                      Olaf Conrad                      //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //
@@ -35,18 +35,16 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //
-//    e-mail:     aringel@gwdg.de                        //
+//    e-mail:     oconrad@gwdg.de                        //
 //                                                       //
-//    contact:    Andre Ringeler                         //
+//    contact:    Olaf Conrad                            //
 //                Institute of Geography                 //
-//                University of Goettingen               //
-//                Goldschmidtstr. 5                      //
-//                37077 Goettingen                       //
+//                University of Hamburg                  //
 //                Germany                                //
 //                                                       //
 ///////////////////////////////////////////////////////////
@@ -65,7 +63,7 @@
 #define HEADER_INCLUDED__Collect_Points_H
 
 //---------------------------------------------------------
-#include "MLB_Interface.h"
+#include "Georef_Engine.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -79,20 +77,27 @@ class CCollect_Points : public CSG_Module_Interactive
 {
 public:
 	CCollect_Points(void);
-	virtual ~CCollect_Points(void);
 
 
 protected:
 
-	virtual bool			On_Execute			(void);
-	virtual bool			On_Execute_Position	(CSG_Point ptWorld, TSG_Module_Interactive_Mode Mode);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool			On_Execute				(void);
+
+	virtual bool			On_Execute_Position		(CSG_Point ptWorld, TSG_Module_Interactive_Mode Mode);
+
+	virtual bool			On_Execute_Finish		(void);
 
 
 private:
 
-	CSG_Shapes					*m_pSource, *m_pTarget;
+	CSG_Shapes				*m_pPoints;
+
+	CGeoref_Engine			m_Engine;
 
 
+	bool					is_Compatible			(CSG_Shapes *pPoints);
 };
 
 

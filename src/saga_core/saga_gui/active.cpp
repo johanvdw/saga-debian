@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active.cpp 1653 2013-04-15 13:56:59Z oconrad $
+ * Version $Id: active.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -73,6 +73,8 @@
 #include "helper.h"
 
 #include "data_source.h"
+
+#include "saga_frame.h"
 
 #include "active.h"
 #include "active_parameters.h"
@@ -148,7 +150,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CACTIVE::CACTIVE(wxWindow *pParent)
-	: wxNotebook(pParent, ID_WND_ACTIVE, wxDefaultPosition, wxDefaultSize, NOTEBOOK_STYLE, _TL("Object Properties"))
+	: wxNotebook(pParent, ID_WND_ACTIVE, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxNB_MULTILINE, _TL("Properties"))
 {
 	g_pACTIVE		= this;
 
@@ -294,24 +296,26 @@ bool CACTIVE::Set_Active(CWKSP_Base_Item *pItem)
 	//-----------------------------------------------------
 	m_pItem		= pItem;
 
-	if( m_pParameters )
-	{
-		m_pParameters->Set_Parameters(m_pItem);
-	}
+	if( m_pParameters )	m_pParameters->Set_Parameters(m_pItem);
 
 	Update_Description();
 
 	STATUSBAR_Set_Text(SG_T(""), STATUSBAR_VIEW_X);
 	STATUSBAR_Set_Text(SG_T(""), STATUSBAR_VIEW_Y);
 	STATUSBAR_Set_Text(SG_T(""), STATUSBAR_VIEW_Z);
-	STATUSBAR_Set_Text(SG_T(""), STATUSBAR_ACTIVE);
 
 	if( m_pItem == NULL )
 	{
+		STATUSBAR_Set_Text(SG_T(""), STATUSBAR_ACTIVE);
+
+		if( g_pSAGA_Frame )	g_pSAGA_Frame->Set_Pane_Caption(this, _TL("Properties"));
+
 		return( true );
 	}
 
 	STATUSBAR_Set_Text(m_pItem->Get_Name(), STATUSBAR_ACTIVE);
+
+	if( g_pSAGA_Frame )	g_pSAGA_Frame->Set_Pane_Caption(this, wxString(_TL("Properties")) + ": " + m_pItem->Get_Name());
 
 	//-----------------------------------------------------
 	if( Get_Active_Data_Item() )
@@ -369,6 +373,8 @@ bool CACTIVE::Set_Active(CWKSP_Base_Item *pItem)
 	{
 		g_pData->Update_Views(pObject);
 	}
+
+	SendSizeEvent();
 
 	return( true );
 }

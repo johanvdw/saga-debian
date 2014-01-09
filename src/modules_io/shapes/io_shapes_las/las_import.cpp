@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: las_import.cpp 1498 2012-10-23 11:55:43Z reklov_w $
+ * Version $Id: las_import.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -283,8 +283,11 @@ bool CLAS_Import::On_Execute(void)
 		int		iPoint	= 0;
 
 		try {
-			while( reader.ReadNextPoint() && (iPoint % 10000 || SG_UI_Process_Set_Progress((double)iPoint, header.GetPointRecordsCount())) )
+			while( reader.ReadNextPoint() )
 			{
+				if (iPoint % 100000)
+					SG_UI_Process_Set_Progress(iPoint, header.GetPointRecordsCount()); 
+
 				liblas::LASPoint const& point = reader.GetPoint();
 
 				if( bValidity )

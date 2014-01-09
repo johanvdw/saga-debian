@@ -37,13 +37,14 @@ host_triplet = @host@
 subdir = src/modules/table/table_tools
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pkg_swig.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_lib_postgresql.m4 \
+	$(top_srcdir)/m4/ax_pkg_swig.m4 \
 	$(top_srcdir)/m4/ax_python_devel.m4 \
 	$(top_srcdir)/m4/ax_swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/ax_swig_python.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -76,8 +77,10 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libtable_tools_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 am_libtable_tools_la_OBJECTS = Join_Tables.lo MLB_Interface.lo \
-	table_change_date_format.lo table_change_field_type.lo \
-	Table_Create_Empty.lo Table_Enumerate.lo Table_Rotate.lo
+	table_change_color_format.lo table_change_date_format.lo \
+	table_change_field_type.lo Table_Create_Empty.lo \
+	Table_Enumerate.lo table_field_deletion.lo Table_Rotate.lo \
+	table_selection.lo table_text_replacer.lo
 libtable_tools_la_OBJECTS = $(am_libtable_tools_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -169,6 +172,10 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PG_CONFIG = @PG_CONFIG@
+POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
+POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
+POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
 POW_LIB = @POW_LIB@
 PYTHON = @PYTHON@
 PYTHON_CPPFLAGS = @PYTHON_CPPFLAGS@
@@ -247,7 +254,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #
-# $Id: Makefile.am 1358 2012-03-28 17:17:15Z oconrad $
+# $Id: Makefile.am 1841 2013-09-17 08:11:24Z oconrad $
 #
 @DEBUG_TRUE@DBGFLAGS = -g -DDEBUG
 @SAGA_UNICODE_TRUE@UC_DEFS = -D_SAGA_UNICODE
@@ -259,18 +266,26 @@ pkglib_LTLIBRARIES = libtable_tools.la
 libtable_tools_la_SOURCES = \
 Join_Tables.cpp\
 MLB_Interface.cpp\
+table_change_color_format.cpp\
 table_change_date_format.cpp\
 table_change_field_type.cpp\
 Table_Create_Empty.cpp\
 Table_Enumerate.cpp\
+table_field_deletion.cpp\
 Table_Rotate.cpp\
+table_selection.cpp\
+table_text_replacer.cpp\
 Join_Tables.h\
 MLB_Interface.h\
+table_change_color_format.h\
 table_change_date_format.h\
 table_change_field_type.h\
 Table_Create_Empty.h\
 Table_Enumerate.h\
-Table_Rotate.h
+table_field_deletion.h\
+Table_Rotate.h\
+table_selection.h\
+table_text_replacer.h
 
 libtable_tools_la_LIBADD = $(top_srcdir)/src/saga_core/saga_api/libsaga_api.la
 all: all-am
@@ -286,9 +301,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/modules/table/table_tools/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/modules/table/table_tools/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/modules/table/table_tools/Makefile
+	  $(AUTOMAKE) --foreign src/modules/table/table_tools/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -352,8 +367,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Create_Empty.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Enumerate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Table_Rotate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_change_color_format.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_change_date_format.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_change_field_type.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_field_deletion.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_selection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/table_text_replacer.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

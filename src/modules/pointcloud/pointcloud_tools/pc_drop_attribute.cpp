@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: pc_drop_attribute.cpp 1463 2012-08-18 15:52:03Z reklov_w $
+ * Version $Id: pc_drop_attribute.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -61,6 +61,9 @@
 
 //---------------------------------------------------------
 #include "pc_drop_attribute.h"
+
+#include <set>
+#include <algorithm>
 
 
 ///////////////////////////////////////////////////////////
@@ -113,10 +116,6 @@ CPC_Drop_Attribute::CPC_Drop_Attribute(void)
 	}
 }
 
-//---------------------------------------------------------
-CPC_Drop_Attribute::~CPC_Drop_Attribute(void)
-{}
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -132,7 +131,6 @@ bool CPC_Drop_Attribute::On_Execute(void)
 	CSG_Parameters		sParms;
 
 	CSG_Parameters		P;
-	CSG_Parameter		*pNode;
 	CSG_String			s;
 	std::set<int>		setCols;
 	std::set<int>::iterator it;
@@ -191,11 +189,11 @@ bool CPC_Drop_Attribute::On_Execute(void)
 
 		sFields		= Parameters("FIELDS")->asString();
 
-		wxStringTokenizer   tkz_fields(sFields.c_str(), wxT(";"), wxTOKEN_STRTOK);
+		CSG_String_Tokenizer   tkz_fields(sFields, ";", SG_TOKEN_STRTOK);
 
-		while( tkz_fields.HasMoreTokens() )
+		while( tkz_fields.Has_More_Tokens() )
 		{
-			token	= tkz_fields.GetNextToken().wc_str();
+			token	= tkz_fields.Get_Next_Token();
 
 			if( token.Length() == 0 )
 				break;

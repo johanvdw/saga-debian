@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_histogram.cpp 1743 2013-06-21 10:01:07Z oconrad $
+ * Version $Id: view_histogram.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -76,6 +76,7 @@
 #include "wksp_layer_classify.h"
 #include "wksp_grid.h"
 #include "wksp_shapes.h"
+#include "wksp_pointcloud.h"
 
 #include "view_histogram.h"
 
@@ -284,6 +285,13 @@ void CVIEW_Histogram_Control::On_Mouse_RDown(wxMouseEvent &event)
 			m_pLayer->Set_Color_Range(
 				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Minimum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt()),
 				((CWKSP_Shapes *)m_pLayer)->Get_Shapes()->Get_Maximum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt())
+			);
+			break;
+
+		case WKSP_ITEM_PointCloud:
+			m_pLayer->Set_Color_Range(
+				((CWKSP_PointCloud *)m_pLayer)->Get_PointCloud()->Get_Minimum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt()),
+				((CWKSP_PointCloud *)m_pLayer)->Get_PointCloud()->Get_Maximum(m_pLayer->Get_Parameter("METRIC_ATTRIB")->asInt())
 			);
 			break;
 		}

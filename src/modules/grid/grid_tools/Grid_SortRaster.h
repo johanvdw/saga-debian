@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_SortRaster.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_SortRaster.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     SortRaster.h
@@ -25,12 +25,12 @@ class CSortRaster : public CSG_Module_Grid
 {
 public:
 	CSortRaster(void);
-	virtual ~CSortRaster(void);
+
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Values") );	}
+
 
 protected:
 
 	bool On_Execute(void);
-
-private:
 
 };

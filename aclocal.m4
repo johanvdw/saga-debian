@@ -1171,6 +1171,7 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/ax_lib_postgresql.m4])
 m4_include([m4/ax_pkg_swig.m4])
 m4_include([m4/ax_python_devel.m4])
 m4_include([m4/ax_swig_enable_cxx.m4])

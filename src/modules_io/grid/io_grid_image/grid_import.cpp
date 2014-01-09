@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_import.cpp 1355 2012-03-15 16:54:05Z oconrad $
+ * Version $Id: grid_import.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -158,6 +158,35 @@ bool CGrid_Import::On_Execute(void)
 	Method	= Parameters("METHOD")	->asInt();
 
 	Name	= SG_File_Get_Name(fImage, false);
+
+	//-----------------------------------------------------
+	wxImageHandler	*pImgHandler = NULL;
+
+	if( !SG_UI_Get_Window_Main() )
+	{
+		CSG_String	fName = SG_File_Get_Name(fImage, true);
+
+		if( SG_File_Cmp_Extension(fName, SG_T("jpg")) )
+			pImgHandler = new wxJPEGHandler;
+		else if( SG_File_Cmp_Extension(fName, SG_T("pcx")) )
+			pImgHandler = new wxPCXHandler;
+		else if( SG_File_Cmp_Extension(fName, SG_T("tif")) )
+			pImgHandler = new wxTIFFHandler;
+		else if( SG_File_Cmp_Extension(fName, SG_T("gif")) )
+			pImgHandler = new wxGIFHandler;
+		else if( SG_File_Cmp_Extension(fName, SG_T("pnm")) )
+			pImgHandler = new wxPNMHandler;
+		else if( SG_File_Cmp_Extension(fName, SG_T("xpm")) )
+			pImgHandler = new wxXPMHandler;
+#ifdef _SAGA_MSW
+		else if( SG_File_Cmp_Extension(fName, SG_T("bmp")) )
+			pImgHandler = new wxBMPHandler;
+#endif
+		else // if( SG_File_Cmp_Extension(fName, SG_T("png")) )
+			pImgHandler = new wxPNGHandler;
+
+		wxImage::AddHandler(pImgHandler);
+	}
 
 	if( !Image.LoadFile(fImage.c_str()) )
 	{
@@ -313,6 +342,12 @@ bool CGrid_Import::On_Execute(void)
 			DataObject_Set_Colors(pG, 100, SG_COLORS_BLACK_GREEN);
 			DataObject_Set_Colors(pB, 100, SG_COLORS_BLACK_BLUE);
 		}
+	}
+
+	//-----------------------------------------------------
+	if( !SG_UI_Get_Window_Main() && pImgHandler != NULL)
+	{
+		wxImage::RemoveHandler(pImgHandler->GetName());
 	}
 
 	//-----------------------------------------------------

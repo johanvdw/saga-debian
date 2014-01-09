@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_export.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: grid_export.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -87,20 +87,20 @@ class io_grid_image_EXPORT CGrid_Export : public CSG_Module_Grid
 public:
 	CGrid_Export(void);
 
-	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Export") );	}
+	virtual CSG_String		Get_MenuPath			(void)	{	return( _TL("R:Export") );	}
 
 
 protected:
 
-	virtual bool			On_Execute		(void);
+	virtual int				On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool			On_Execute				(void);
 
 
 private:
 
 
 };
-
-#endif // #ifndef HEADER_INCLUDED__Grid_Export_H
 
 
 ///////////////////////////////////////////////////////////
@@ -110,3 +110,4 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#endif // #ifndef HEADER_INCLUDED__Grid_Export_H

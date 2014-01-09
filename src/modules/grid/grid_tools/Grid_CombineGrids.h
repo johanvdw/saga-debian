@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_CombineGrids.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: Grid_CombineGrids.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     CombineGrids.h
@@ -26,16 +26,17 @@
 
 #include "MLB_Interface.h"
 
-class CCombineGrids : public CSG_Module_Grid {
-
-private:
-
+class CCombineGrids : public CSG_Module_Grid
+{
 public:
 	CCombineGrids(void);
 	virtual ~CCombineGrids(void);
 
+	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("A:Grid|Values") );	}
+
 
 protected:
-	virtual bool		On_Execute(void);
+
+	virtual bool			On_Execute		(void);
 
 };

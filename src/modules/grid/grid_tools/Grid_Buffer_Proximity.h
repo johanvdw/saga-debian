@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Buffer_Proximity.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: Grid_Buffer_Proximity.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -34,7 +34,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -59,17 +59,18 @@
 #include "MLB_Interface.h"
 
 //---------------------------------------------------------
-class grid_tools_EXPORT CGrid_Proximity_Buffer : public CSG_Module_Grid {
-
+class grid_tools_EXPORT CGrid_Proximity_Buffer : public CSG_Module_Grid
+{
 public:
 	CGrid_Proximity_Buffer(void);
 	virtual ~CGrid_Proximity_Buffer(void);
 
-	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Buffers") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Distances") );	}
 
 
 protected:
-	virtual bool			On_Execute		(void);
+
+	virtual bool				On_Execute				(void);
 
 };
 

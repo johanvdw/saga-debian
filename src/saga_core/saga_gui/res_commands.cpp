@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_commands.cpp 1743 2013-06-21 10:01:07Z oconrad $
+ * Version $Id: res_commands.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -120,13 +120,16 @@ wxString CMD_Get_Name(int Cmd_ID)
 
 	case ID_CMD_DATASOURCE_REFRESH:		return( _TL("Refresh") );
 
-	case ID_CMD_ODBC_REFRESH:			return( _TL("Refresh") );
-	case ID_CMD_ODBC_SOURCE_CLOSE_ALL:	return( _TL("Close All") );
-	case ID_CMD_ODBC_SOURCE_CLOSE:		return( _TL("Close") );
-	case ID_CMD_ODBC_SOURCE_OPEN:		return( _TL("Open") );
-	case ID_CMD_ODBC_TABLE_OPEN:		return( _TL("Load") );
-	case ID_CMD_ODBC_TABLE_DELETE:		return( _TL("Delete") );
-	case ID_CMD_ODBC_TABLE_FROM_QUERY:	return( _TL("Query") );
+	case ID_CMD_DB_REFRESH:				return( _TL("Refresh") );
+	case ID_CMD_DB_SOURCE_OPEN:			return( _TL("Open") );
+	case ID_CMD_DB_SOURCE_CLOSE:		return( _TL("Close") );
+	case ID_CMD_DB_SOURCE_CLOSE_ALL:	return( _TL("Close All") );
+	case ID_CMD_DB_SOURCE_DELETE:		return( _TL("Delete") );
+	case ID_CMD_DB_TABLE_OPEN:			return( _TL("Load") );
+	case ID_CMD_DB_TABLE_DELETE:		return( _TL("Delete") );
+	case ID_CMD_DB_TABLE_RENAME:		return( _TL("Rename") );
+	case ID_CMD_DB_TABLE_INFO:			return( _TL("Field Description") );
+	case ID_CMD_DB_TABLE_FROM_QUERY:	return( _TL("Query") );
 
 	case ID_CMD_MODULES_OPEN:			return( _TL("Load Module Library") );
 	case ID_CMD_MODULES_SAVE_SCRIPT:	return( _TL("Create Script Command File") );
@@ -183,8 +186,11 @@ wxString CMD_Get_Name(int Cmd_ID)
 	case ID_CMD_GRIDS_FIT_MINMAX:		return( _TL("Fit Colours to Minimum/Maximum") );
 	case ID_CMD_GRIDS_FIT_STDDEV:		return( _TL("Fit Colours to Standard Deviation") );
 	case ID_CMD_GRIDS_FIT_DIALOG:		return( _TL("Fit Colours Dialog") );
+	case ID_CMD_GRIDS_SEL_CLEAR:		return( _TL("Clear Selection") );
+	case ID_CMD_GRIDS_SEL_DELETE:		return( _TL("Delete Selection") );
 
 	case ID_CMD_SHAPES_EDIT_SHAPE:		return( _TL("Edit Selected Shape") );
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:	return( _TL("Clear Selection") );
 	case ID_CMD_SHAPES_EDIT_SEL_INVERT:	return( _TL("Invert Selection") );
 	case ID_CMD_SHAPES_EDIT_ADD_SHAPE:	return( _TL("Add Shape") );
 	case ID_CMD_SHAPES_EDIT_ADD_PART:	return( _TL("Add Part") );
@@ -324,7 +330,7 @@ int CMD_Get_ImageID(int Cmd_ID)
 	switch( Cmd_ID )
 	{
 	case ID_CMD_FRAME_WKSP_SHOW:		return( ID_IMG_TB_WKSP );
-	case ID_CMD_FRAME_DATA_SOURCE_SHOW:	return( ID_IMG_TB_ACTIVE );
+	case ID_CMD_FRAME_DATA_SOURCE_SHOW:	return( ID_IMG_TB_DATASOURCE );
 	case ID_CMD_FRAME_ACTIVE_SHOW:		return( ID_IMG_TB_ACTIVE );
 	case ID_CMD_FRAME_INFO_SHOW:		return( ID_IMG_TB_INFO );
 	case ID_CMD_FRAME_HELP:				return( ID_IMG_TB_HELP );
@@ -354,7 +360,7 @@ int CMD_Get_ImageID(int Cmd_ID)
 	case ID_CMD_MAPS_SAVE_TO_CLIPBOARD_LEGEND:	break;
 	case ID_CMD_MAPS_SAVE_IMAGE:				break;
 	case ID_CMD_MAP_SYNCHRONIZE:		return( ID_IMG_TB_MAP_SYNCHRONIZE );
-	case ID_CMD_MAP_SCALEBAR:			break;
+	case ID_CMD_MAP_SCALEBAR:			return( ID_IMG_TB_MAP_SCALEBAR );
 	case ID_CMD_MAP_LEGEND_VERTICAL:	return( ID_IMG_TB_MAP_LEGEND_VERTICAL );
 	case ID_CMD_MAP_LEGEND_HORIZONTAL:	return( ID_IMG_TB_MAP_LEGEND_HORIZONTAL );
 

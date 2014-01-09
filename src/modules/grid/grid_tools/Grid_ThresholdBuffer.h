@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_ThresholdBuffer.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: Grid_ThresholdBuffer.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     ThresholdBuffer.h
@@ -26,32 +26,31 @@
 
 #include "MLB_Interface.h"
 
-class CThresholdBuffer : public CSG_Module_Grid {
-
-private:
-
-	CSG_Grid* m_pFeatures; 
-	CSG_Grid* m_pBuffer;
-	CSG_Grid* m_pValueGrid;
-	CSG_Grid* m_pThresholdGrid;
-	double m_dThreshold;
-	int m_iThresholdType;
-//	CAPI_3D_iPoints	m_pCentralPoints;
-//	CAPI_3D_iPoints	m_pAdjPoints;
-	CSG_Points_Int	m_pCentralPoints;
-	CSG_Points_Int	m_pAdjPoints;
-	
-	void BufferPoint(int,int);
-
+class CThresholdBuffer : public CSG_Module_Grid
+{
 public:
-
 	CThresholdBuffer(void);
 	virtual ~CThresholdBuffer(void);
 
-	virtual CSG_String		Get_MenuPath	(void)	{	return( _TL("R:Buffers") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Distances") );	}
+
 
 protected:
-	virtual bool On_Execute(void);
+
+	virtual bool				On_Execute				(void);
+
+
+private:
+
+	int							m_iThresholdType;
+
+	double						m_dThreshold;
+
+	CSG_Grid					*m_pFeatures, *m_pBuffer, *m_pValueGrid, *m_pThresholdGrid;
+
+	CSG_Points_Int				m_pCentralPoints, m_pAdjPoints;
+
+
+	void						BufferPoint				(int x, int y);
 
 };
-

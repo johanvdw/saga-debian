@@ -36,7 +36,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -113,35 +113,33 @@ public:
 		{
 			if( xRange < yRange )
 			{
-				xMin	-= (yRange - xRange) / 2.0;
 				xRange	 =  yRange;
 			}
 			else if( yRange < xRange )
 			{
-				yMin	-= (xRange - yRange) / 2.0;
 				yRange	 =  xRange;
 			}
 		}
 
 		return( xRange > 0 && yRange > 0 ? Create(
-			xMin, (1000000000000000000LL) / xRange,
-			yMin, (1000000000000000000LL) / yRange
+			xMin, (0x3FFFFFFFFFFFFFF) / xRange,
+			yMin, (0x3FFFFFFFFFFFFFF) / yRange
 		) : false);
 	}
 
-	static ClipperLib::long64	Round			(double Value)	{	return( (ClipperLib::long64)(Value < 0.0 ? Value - 0.5 : Value + 0.5) );	}
+	static ClipperLib::cInt		Round			(double Value)	{	return( (ClipperLib::cInt)(Value < 0.0 ? Value - 0.5 : Value + 0.5) );	}
 
-	ClipperLib::long64			Get_X_asInt		(double Value)	const	{	return( Round((Value - m_xOffset) * m_xScale) );	}
-	ClipperLib::long64			Get_Y_asInt		(double Value)	const	{	return( Round((Value - m_yOffset) * m_yScale) );	}
+	ClipperLib::cInt			Get_X_asInt		(double Value)	const	{	return( Round((Value - m_xOffset) * m_xScale) );	}
+	ClipperLib::cInt			Get_Y_asInt		(double Value)	const	{	return( Round((Value - m_yOffset) * m_yScale) );	}
 
-	double						Get_X_asWorld	(ClipperLib::long64 Value)	const	{	return( m_xOffset + Value / m_xScale );	}
-	double						Get_Y_asWorld	(ClipperLib::long64 Value)	const	{	return( m_yOffset + Value / m_yScale );	}
+	double						Get_X_asWorld	(ClipperLib::cInt Value)	const	{	return( m_xOffset + Value / m_xScale );	}
+	double						Get_Y_asWorld	(ClipperLib::cInt Value)	const	{	return( m_yOffset + Value / m_yScale );	}
 
-	bool						Convert			(CSG_Shapes *pPolygons, ClipperLib::Polygons &P)		const;
-	bool						Convert			(const ClipperLib::Polygons &P, CSG_Shapes *pPolygons)	const;
+	bool						Convert			(CSG_Shapes *pPolygons     , ClipperLib::Paths &P )	const;
+	bool						Convert			(const ClipperLib::Paths &P, CSG_Shapes *pPolygons)	const;
 
-	bool						Convert			(CSG_Shape *pPolygon, ClipperLib::Polygons &P)	const;
-	bool						Convert			(const ClipperLib::Polygons &P, CSG_Shape *pPolygon)	const;
+	bool						Convert			(CSG_Shape *pPolygon       , ClipperLib::Paths &P)	const;
+	bool						Convert			(const ClipperLib::Paths &P, CSG_Shape *pPolygon )	const;
 
 	double						Get_xScale		(void)	const	{	return( m_xScale );	}
 	double						Get_yScale		(void)	const	{	return( m_yScale );	}
@@ -160,7 +158,7 @@ private:
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CSG_Converter_WorldToInt::Convert(CSG_Shapes *pPolygons, ClipperLib::Polygons &Polygons) const
+bool CSG_Converter_WorldToInt::Convert(CSG_Shapes *pPolygons, ClipperLib::Paths &Polygons) const
 {
 	Polygons.clear();
 
@@ -191,7 +189,7 @@ bool CSG_Converter_WorldToInt::Convert(CSG_Shapes *pPolygons, ClipperLib::Polygo
 }
 
 //---------------------------------------------------------
-bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Polygons &Polygons, CSG_Shapes *pPolygons) const
+bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Paths &Polygons, CSG_Shapes *pPolygons) const
 {
 	pPolygons->Del_Shapes();
 
@@ -206,25 +204,36 @@ bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Polygons &Polygons, CSG
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CSG_Converter_WorldToInt::Convert(CSG_Shape *pPolygon, ClipperLib::Polygons &Polygons) const
+bool CSG_Converter_WorldToInt::Convert(CSG_Shape *pPolygon, ClipperLib::Paths &Polygons) const
 {
 	Polygons.clear();
 
 	for(int iPart=0, iPolygon=0; iPart<pPolygon->Get_Part_Count(); iPart++, iPolygon++)
 	{
-		bool	bAscending	= pPolygon->Get_Type() != SHAPE_TYPE_Polygon
-		|| (((CSG_Shape_Polygon *)pPolygon)->is_Lake(iPart)
-		==  ((CSG_Shape_Polygon *)pPolygon)->is_Clockwise(iPart));
-
-		Polygons.resize(1 + iPolygon);
-		Polygons[iPolygon].resize(pPolygon->Get_Point_Count(iPart));
-
-		for(int iPoint=0; iPoint<pPolygon->Get_Point_Count(iPart); iPoint++)
+		if( pPolygon->Get_Point_Count(iPart) > 0 )
 		{
-			TSG_Point	p	= pPolygon->Get_Point(iPoint, iPart, bAscending);
+			bool	bAscending	= pPolygon->Get_Type() != SHAPE_TYPE_Polygon
+			|| (((CSG_Shape_Polygon *)pPolygon)->is_Lake(iPart)
+			==  ((CSG_Shape_Polygon *)pPolygon)->is_Clockwise(iPart));
 
-			Polygons[iPolygon][iPoint].X	= Get_X_asInt(p.x);
-			Polygons[iPolygon][iPoint].Y	= Get_Y_asInt(p.y);
+			Polygons.resize(1 + iPolygon);
+
+			for(int iPoint=0; iPoint<pPolygon->Get_Point_Count(iPart); iPoint++)
+			{
+				TSG_Point	p	= pPolygon->Get_Point(iPoint, iPart, bAscending);
+
+				ClipperLib::IntPoint	Point(Get_X_asInt(p.x), Get_Y_asInt(p.y));
+
+				if( iPoint == 0 || Polygons[iPolygon].back() != Point )	// don't add duplicates !!!
+				{
+					Polygons[iPolygon].push_back(Point);
+				}
+			}
+
+			if( pPolygon->Get_Type() == SHAPE_TYPE_Polygon && Polygons[iPolygon][0] == Polygons[iPolygon].back() )
+			{
+				Polygons[iPolygon].pop_back();
+			}
 		}
 	}
 
@@ -232,7 +241,7 @@ bool CSG_Converter_WorldToInt::Convert(CSG_Shape *pPolygon, ClipperLib::Polygons
 }
 
 //---------------------------------------------------------
-bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Polygons &Polygons, CSG_Shape *pPolygon) const
+bool CSG_Converter_WorldToInt::Convert(const ClipperLib::Paths &Polygons, CSG_Shape *pPolygon) const
 {
 	pPolygon->Del_Parts();
 
@@ -272,17 +281,28 @@ bool _SG_Polygon_Clip(ClipperLib::ClipType ClipType, CSG_Shape *pPolygon, CSG_Sh
 
 	CSG_Converter_WorldToInt	Converter(r);
 
-	ClipperLib::Polygons		Polygon, Clip, Result;
+	ClipperLib::Paths			Polygon, Clip, Result;
 
 	if(	Converter.Convert(pPolygon, Polygon)
 	&&	Converter.Convert(pClip   , Clip   ) )
 	{
 		ClipperLib::Clipper	Clipper;
 
-		Clipper.AddPolygons(Polygon, ClipperLib::ptSubject);
-		Clipper.AddPolygons(Clip   , ClipperLib::ptClip);
+		Clipper.AddPaths(Polygon, ClipperLib::ptSubject, pPolygon->Get_Type() != SHAPE_TYPE_Line);
+		Clipper.AddPaths(Clip   , ClipperLib::ptClip   , true);
 
-		Clipper.Execute(ClipType, Result);
+		if( pPolygon->Get_Type() != SHAPE_TYPE_Line )
+		{
+			Clipper.Execute(ClipType, Result);
+		}
+		else
+		{
+			ClipperLib::PolyTree	PolyTree;
+
+			Clipper.Execute(ClipType, PolyTree);
+
+			ClipperLib::PolyTreeToPaths(PolyTree, Result);
+		}
 
 		return( Converter.Convert(Result, pResult ? pResult : pPolygon) );
 	}
@@ -407,13 +427,13 @@ bool	SG_Polygon_Dissolve		(CSG_Shape *pPolygon, CSG_Shape *pResult)
 {
 	CSG_Converter_WorldToInt	Converter(pPolygon->Get_Extent());
 
-	ClipperLib::Polygons		Polygon, Result;
+	ClipperLib::Paths			Polygon, Result;
 
 	if(	Converter.Convert(pPolygon, Polygon) )
 	{
 		ClipperLib::Clipper	Clipper;
 
-		Clipper.AddPolygons(Polygon, ClipperLib::ptSubject);
+		Clipper.AddPaths(Polygon, ClipperLib::ptSubject, true);
 
 		Clipper.Execute(ClipperLib::ctUnion, Result);
 
@@ -428,7 +448,7 @@ bool	SG_Polygon_Simplify		(CSG_Shape *pPolygon, CSG_Shape *pResult)
 {
 	CSG_Converter_WorldToInt	Converter(pPolygon->Get_Extent());
 
-	ClipperLib::Polygons		Polygon, Result;
+	ClipperLib::Paths			Polygon, Result;
 
 	if(	Converter.Convert(pPolygon, Polygon) )
 	{
@@ -443,21 +463,21 @@ bool	SG_Polygon_Simplify		(CSG_Shape *pPolygon, CSG_Shape *pResult)
 //---------------------------------------------------------
 bool	SG_Polygon_Offset		(CSG_Shape *pPolygon, double dSize, double dArc, CSG_Shape *pResult)
 {
-	CSG_Rect					r(pPolygon->Get_Extent());	if( dSize > 0.0 )	r.Inflate(2.5 * dSize, false);
+	CSG_Rect					r(pPolygon->Get_Extent());	if( dSize > 0.0 )	r.Inflate(5.0 * dSize, false);
 
 	CSG_Converter_WorldToInt	Converter(r, true);
 
-	ClipperLib::Polygons		Polygon, Result;
+	ClipperLib::Paths			Paths, Result;
 
-	if(	Converter.Convert(pPolygon, Polygon) )
+	if(	Converter.Convert(pPolygon, Paths) )
 	{
-		if( pPolygon->Get_Type() == SHAPE_TYPE_Line )
+		if( pPolygon->Get_Type() == SHAPE_TYPE_Polygon )
 		{
-			ClipperLib::OffsetPolyLines(Polygon, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, ClipperLib::etRound, dArc);
+			ClipperLib::OffsetPaths(Paths, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, ClipperLib::etClosed, dArc);
 		}
 		else
 		{
-			ClipperLib::OffsetPolygons(Polygon, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, dArc);
+			ClipperLib::OffsetPaths(Paths, Result, dSize * Converter.Get_xScale(), ClipperLib::jtRound, ClipperLib::etRound , dArc);
 		}
 
 		return( Converter.Convert(Result, pResult ? pResult : pPolygon) );

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module.cpp 1743 2013-06-21 10:01:07Z oconrad $
+ * Version $Id: wksp_module.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -248,7 +248,7 @@ void CWKSP_Module::_Save_Script(void)
 {
 	wxString	FileName;
 
-	if( DLG_Save(FileName, _TL("Create Script Command File"), SG_T("DOS Batch Script (*.bat)|*.bat|Python Script (*.py)|*.py")) )
+	if( DLG_Save(FileName, _TL("Create Script Command File"), SG_T("DOS Batch Script (*.bat)|*.bat|Bash Script (*.sh)|*.sh|Python Script (*.py)|*.py")) )
 	{
 		CSG_File	File;
 		CSG_String	Command;
@@ -262,7 +262,11 @@ void CWKSP_Module::_Save_Script(void)
 
 			Command	+= SG_T("saga_cmd ");
 
+			#ifdef _SAGA_MSW
 			Command	+= SG_File_Get_Name(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), false);
+			#else
+			Command	+= SG_File_Get_Name(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), false).Remove(0, 3);
+			#endif
 
 			Command	+= SG_T(" \"");
 			Command	+= m_pModule->Get_Name();
@@ -276,6 +280,31 @@ void CWKSP_Module::_Save_Script(void)
 			}
 
 			Command	+= SG_T("\n\nPAUSE\n");
+		}
+		if(      SG_File_Cmp_Extension(FileName, SG_T("sh")) )
+		{
+			Command	+= SG_T("#!/bin/bash\n\n");
+
+			Command	+= SG_T("# export SAGA_MLB=/usr/lib/saga\n\n");
+
+			Command	+= SG_T("saga_cmd ");
+
+			#ifdef _SAGA_MSW
+			Command	+= SG_File_Get_Name(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), false);
+			#else
+			Command	+= SG_File_Get_Name(((CWKSP_Module_Library *)Get_Manager())->Get_File_Name(), false).Remove(0, 3);
+			#endif
+
+			Command	+= SG_T(" \"");
+			Command	+= m_pModule->Get_Name();
+			Command	+= SG_T("\"");
+
+			_Save_Script_CMD(Command, m_pModule->Get_Parameters());
+
+			for(int i=0; i<m_pModule->Get_Parameters_Count(); i++)
+			{
+				_Save_Script_CMD(Command, m_pModule->Get_Parameters(i));
+			}
 		}
 		else if( SG_File_Cmp_Extension(FileName, SG_T("py" )) )
 		{
@@ -347,6 +376,8 @@ void CWKSP_Module::_Save_Script(void)
 }
 
 //---------------------------------------------------------
+#include "wksp_data_manager.h"
+
 #define GET_ID1(p)		(p->Get_Owner()->Get_Identifier().Length() > 0 \
 						? CSG_String::Format(SG_T("%s_%s"), p->Get_Owner()->Get_Identifier().c_str(), p->Get_Identifier()) \
 						: CSG_String::Format(p->Get_Identifier())).c_str()
@@ -417,7 +448,7 @@ void CWKSP_Module::_Save_Script_CMD(CSG_String &Command, CSG_Parameters *pParame
 		case PARAMETER_TYPE_Table:
 		case PARAMETER_TYPE_Shapes:
 		case PARAMETER_TYPE_TIN:
-			Command	+= CSG_String::Format(SG_T(" -%s=%s"), GET_ID1(p), p->asDataObject() && p->asDataObject()->Get_File_Name() ? p->asDataObject()->Get_File_Name() : SG_T("NULL"));
+			Command	+= CSG_String::Format(SG_T(" -%s=%s"), GET_ID1(p), g_pData->Get(p->asDataObject()) && p->asDataObject()->Get_File_Name() ? p->asDataObject()->Get_File_Name() : SG_T("NULL"));
 			break;
 
 		case PARAMETER_TYPE_Grid_List:

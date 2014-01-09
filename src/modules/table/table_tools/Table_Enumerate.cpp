@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Enumerate.cpp 1098 2011-06-16 16:06:32Z oconrad $
+ * Version $Id: Table_Enumerate.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -78,7 +78,7 @@ CTable_Enumerate::CTable_Enumerate(void)
 	Set_Name(_TL("Enumerate Table Field"));
 
 	Set_Description(_TW(
-		"Enumerate attribute of a table, i.e. assign to identical values of choosen attribute field unique identifiers."
+		"Enumerate attribute of a table, i.e. assign to identical values of chosen attribute field unique identifiers."
 	));
 
 	pNode	= Parameters.Add_Table(

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_manager.cpp 1739 2013-06-20 14:01:48Z oconrad $
+ * Version $Id: wksp_data_manager.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -214,6 +214,17 @@ CWKSP_Data_Manager::CWKSP_Data_Manager(void)
 		pNode	, "FIT_STDDEV"				, _TL("Fit to Standard Deviation"),
 		_TL("Multiple of Standard Deviation used as default for colour classifications."),
 		PARAMETER_TYPE_Double, dValue, 0.01, true
+	);
+
+	if( CONFIG_Read(wxT("/DATA/GRIDS"), wxT("SELECT_MAX")	, lValue) == false )
+	{
+		lValue	= 100;
+	}
+
+	m_Parameters.Add_Value(
+		pNode	, "SELECT_MAX"				, _TL("Maximum Selection"),
+		_TL("Maximum number of rows/columns in selection of grid cells."),
+		PARAMETER_TYPE_Int, lValue, 1, true
 	);
 
 	//-----------------------------------------------------
@@ -756,7 +767,7 @@ CWKSP_Base_Manager * CWKSP_Data_Manager::Get_Manager(TSG_Data_Object_Type Type, 
 //---------------------------------------------------------
 CWKSP_Data_Item * CWKSP_Data_Manager::Get(CSG_Data_Object *pObject)
 {
-	if( pObject && Get_Manager(pObject->Get_ObjectType()) )
+	if( pObject && pObject != DATAOBJECT_CREATE && Get_Manager(pObject->Get_ObjectType()) )
 	{
 		switch( pObject->Get_ObjectType() )
 		{
@@ -776,7 +787,7 @@ CWKSP_Data_Item * CWKSP_Data_Manager::Get(CSG_Data_Object *pObject)
 //---------------------------------------------------------
 CWKSP_Data_Item * CWKSP_Data_Manager::Add(CSG_Data_Object *pObject)
 {
-	if( pObject && Get_Manager(pObject->Get_ObjectType(), true) )
+	if( pObject && pObject != DATAOBJECT_CREATE && Get_Manager(pObject->Get_ObjectType(), true) )
 	{
 		switch( pObject->Get_ObjectType() )
 		{
@@ -796,7 +807,7 @@ CWKSP_Data_Item * CWKSP_Data_Manager::Add(CSG_Data_Object *pObject)
 //---------------------------------------------------------
 CWKSP_Layer * CWKSP_Data_Manager::Get_Layer(CSG_Data_Object *pObject)
 {
-	if( pObject && Get_Manager(pObject->Get_ObjectType()) )
+	if( pObject && pObject != DATAOBJECT_CREATE && Get_Manager(pObject->Get_ObjectType()) )
 	{
 		switch( pObject->Get_ObjectType() )
 		{

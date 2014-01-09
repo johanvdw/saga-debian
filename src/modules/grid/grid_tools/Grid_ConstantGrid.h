@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_ConstantGrid.h 1688 2013-05-14 11:40:29Z oconrad $
+ * Version $Id: Grid_ConstantGrid.h 1891 2013-12-04 17:50:43Z oconrad $
  *********************************************************/
 /*******************************************************************************
     Grid_ConstantGrid.h
@@ -44,7 +44,7 @@ class CConstantGrid : public CSG_Module
 public:
 	CConstantGrid(void);
 	
-	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Construction") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Grid|Values") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Aggregate.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: Grid_Aggregate.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -73,7 +73,7 @@ public:
 	CGrid_Aggregate(void);
 	virtual ~CGrid_Aggregate(void);
 
-	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("A:Grid|Construction") );	}
+	virtual CSG_String		Get_MenuPath		(void)	{	return( _TL("A:Grid|Grid System") );	}
 
 
 protected:

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.h 1246 2011-11-25 13:42:38Z oconrad $
+ * Version $Id: table.h 1922 2014-01-09 10:28:46Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -82,17 +82,37 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+class CTable_List : public CSG_ODBC_Module
+{
+public:
+	CTable_List(void);
+
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
+
+
+protected:
+
+	virtual bool				On_Execute				(void);
+
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class CTable_Info : public CSG_ODBC_Module
 {
 public:
 	CTable_Info(void);
 
-	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tables") );	}
+	virtual CSG_String			Get_MenuPath			(void)	{	return( SG_T("R:Tools") );	}
 
 
 protected:
 
-	virtual bool				On_Before_Execution		(void);
+	virtual void				On_Connection_Changed	(CSG_Parameters *pParameters);
 
 	virtual bool				On_Execute				(void);
 
@@ -114,7 +134,7 @@ public:
 
 protected:
 
-	virtual bool				On_Before_Execution		(void);
+	virtual void				On_Connection_Changed	(CSG_Parameters *pParameters);
 
 	virtual bool				On_Execute				(void);
 
@@ -158,7 +178,7 @@ public:
 
 protected:
 
-	virtual bool				On_Before_Execution		(void);
+	virtual void				On_Connection_Changed	(CSG_Parameters *pParameters);
 
 	virtual bool				On_Execute				(void);
 

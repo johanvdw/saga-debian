@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: helper.cpp 1504 2012-10-27 17:43:15Z reklov_w $
+ * Version $Id: helper.cpp 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -116,12 +116,25 @@ double		Degree_To_Decimal(double Deg, double Min, double Sec)
 //---------------------------------------------------------
 void		Decimal_To_Degree(double Value, double &Deg, double &Min, double &Sec)
 {
+	bool	bNegative = false;
+
+	if( Value < 0 )
+	{
+		Value		= fabs(Value);
+		bNegative	= true;
+	}
+
 	Value	= fmod(Value, 360.0);
 	Deg		= (int)Value;
 	Value	= 60.0 * (Value - Deg);
 	Min		= (int)Value;
 	Value	= 60.0 * (Value - Min);
 	Sec		= Value;
+
+	if( bNegative )
+	{
+		Deg	*= -1.0;
+	}
 }
 
 

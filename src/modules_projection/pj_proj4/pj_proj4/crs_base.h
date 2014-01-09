@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: crs_base.h 1015 2011-04-27 10:19:23Z oconrad $
+ * Version $Id: crs_base.h 1921 2014-01-09 10:24:11Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 // You should have received a copy of the GNU General    //
 // Public License along with this program; if not,       //
 // write to the Free Software Foundation, Inc.,          //
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307,   //
+// 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, //
 // USA.                                                  //
 //                                                       //
 //-------------------------------------------------------//
@@ -90,6 +90,9 @@ protected:
 
 
 private:
+
+	CSG_Projection			m_Projection;
+
 
 	bool					Set_User_Parameters		(CSG_Parameters *pParameters);
 	bool					Add_User_Projection		(const CSG_String &sID, const CSG_String &sName, const CSG_String &sArgs);
