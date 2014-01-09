@@ -1,6 +1,11 @@
 saga (2.1.1+dfsg-1) UNRELEASED; urgency=medium
 
   * Import new upstream (closes: #717624)
+  * Fix patches - remove autoreconf results - rename configure.in
+  * Remove changes to Makefile.am (autoreconf)
+  * Remove patch (included upstream)
+  * Delete missing icons from menu fil
+  * Bump standards version - no changes needed
 
  -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 09 Jan 2014 10:53:49 -0500
 
