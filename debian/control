@@ -1,19 +1,33 @@
 Source: saga
+Maintainer: Debian GIS Project <pkg-grass-devel@lists.alioth.debian.org>
+Uploaders: Johan Van de Wauw <johan.vandewauw@gmail.com>,
+           Francesco Paolo Lovergine <frankie@debian.org>
 Section: science
 Priority: optional
-Maintainer: Debian GIS Project <pkg-grass-devel@lists.alioth.debian.org>
-Uploaders: Johan Van de Wauw <johan.vandewauw@gmail.com>, Francesco Paolo Lovergine <frankie@debian.org>
-Build-Depends: libwxgtk3.0-dev, wx-common, libgdal-dev, libexpat-dev,
- libogdi3.2-dev, libproj-dev, libgrib2c-dev, debhelper (>=8), swig,
- libqhull-dev, libhpdf-dev, python-dev, liblas-dev, dh-autoreconf
+Build-Depends: libwxgtk3.0-dev,
+               wx-common,
+               libgdal-dev,
+               libexpat-dev,
+               libogdi3.2-dev,
+               libproj-dev,
+               libgrib2c-dev,
+               debhelper (>= 9),
+               swig,
+               libqhull-dev,
+               libhpdf-dev,
+               python-dev,
+               liblas-dev,
+               dh-autoreconf
 Standards-Version: 3.9.5
-Homepage: http://www.saga-gis.org/
-Vcs-Git: git://git.debian.org/pkg-grass/saga.git
 Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
+Vcs-Git: git://git.debian.org/pkg-grass/saga.git
+Homepage: http://www.saga-gis.org/
 
 Package: saga
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libsaga (= ${binary:Version})
 Description: System for Automated Geoscientific Analyses
  SAGA GIS (System for Automated Geoscientific Analyses) is a free and
  open source geographic information system used for editing and 
@@ -26,13 +40,15 @@ Description: System for Automated Geoscientific Analyses
  by using the C++ API.
 
 Package: libsaga-dev
-Section: libdevel
 Architecture: any
-Suggests: saga (= ${binary:Version})
-Depends: ${shlibs:Depends}, ${misc:Depends}, libsaga (= ${binary:Version})
-Replaces: libsaga (<< 2.0.4+dfsg-3~)
-Breaks: libsaga (<< 2.0.4+dfsg-3~)
 Multi-Arch: same
+Section: libdevel
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libsaga (= ${binary:Version})
+Suggests: saga (= ${binary:Version})
+Breaks: libsaga (<< 2.0.4+dfsg-3~)
+Replaces: libsaga (<< 2.0.4+dfsg-3~)
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
@@ -41,11 +57,12 @@ Description: SAGA GIS development files
  Install this package if you wish to develop software that uses the SAGA API.
 
 Package: libsaga
-Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Provides: libsaga-2.1.1
 Multi-Arch: same
+Section: libs
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Provides: libsaga-2.1.1
 Description: SAGA GIS development files
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
@@ -53,9 +70,12 @@ Description: SAGA GIS development files
  This package contains the library files for developing with SAGA.
 
 Package: python-saga
-Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}, libsaga (= ${binary:Version})
+Section: python
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${python:Depends},
+         libsaga (= ${binary:Version})
 Suggests: saga (= ${binary:Version})
 Description: SAGA GIS python bindings
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
