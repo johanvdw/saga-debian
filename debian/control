@@ -19,8 +19,8 @@ Build-Depends: libwxgtk3.0-dev,
                liblas-dev,
                dh-autoreconf
 Standards-Version: 3.9.5
-Vcs-Browser: http://git.debian.org/?p=pkg-grass/saga.git
-Vcs-Git: git://git.debian.org/pkg-grass/saga.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-grass/saga.git
+Vcs-Git: git://anonscm.debian.org/pkg-grass/saga.git
 Homepage: http://www.saga-gis.org/
 
 Package: saga
