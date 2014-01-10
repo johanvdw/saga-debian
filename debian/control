@@ -65,7 +65,7 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
          ${misc:Depends}
 Provides: libsaga-2.1.1
-Description: SAGA GIS development files
+Description: SAGA GIS shared libraries
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
  . 
@@ -80,8 +80,8 @@ Depends: ${shlibs:Depends},
          ${python:Depends},
          libsaga (= ${binary:Version})
 Suggests: saga (= ${binary:Version})
-Description: SAGA GIS python bindings
+Description: SAGA GIS Python bindings
  SAGA GIS (System for Automated Geoscientific Analyses) is a geographic
  information system used for editing and analysing spatial data.
  . 
- This package contains the python bindings to SAGA. 
+ This package contains the Python bindings to SAGA. 
