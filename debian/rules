@@ -1,4 +1,7 @@
 #!/usr/bin/make -f
+
+CFLAGS+=$(CPPFLAGS)
+
 %:
 	dh $@ --with python2 --with autoreconf
 
@@ -19,6 +22,9 @@ override_dh_python2:
 override_dh_clean:
 	dh_clean
 	rm -f src/saga_core/saga_api/saga_api.py
+
+override_dh_makeshlibs:
+	dh_makeshlibs -Xpython-saga
 
 get-orig-source:
 	wget $(UPSTREAM_URL)
