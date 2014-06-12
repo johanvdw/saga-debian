@@ -1,3 +1,4 @@
 0001-Use-qhull-instead-of-triangle.patch
 0002-Remove-reference-to-libfire.patch
 0003-Remove-references-to-internal-grib2-and-libfire.patch
+0004-Fix-gcc-errors-from-upstream.patch

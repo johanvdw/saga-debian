@@ -1,0 +1,52 @@
+From: Johan Van de Wauw <johan.vandewauw@gmail.com>
+Date: Fri, 13 Jun 2014 01:04:37 +0200
+Subject: Fix gcc errors - from upstream
+
+>From upstream:
+errfunc.c: fix bug, refers to bug #191 Missing format strings
+2014-05-29 12:13:13
+by reklov_w
+---
+ src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c b/src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c
+index 959b37f..d229221 100644
+--- a/src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c
++++ b/src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c
+@@ -225,7 +225,7 @@ void fehler (int zeile,
+       cp4 = cp2;
+    }
+ 
+-   fprintf (protfile, cp1);
++   fprintf (protfile, "%s", cp1);
+ 
+    if (fil -> art == 'E')
+    {
+@@ -415,7 +415,7 @@ void error_message (int zeile,
+       cp4 = cp2;
+    }
+ 
+-   sprintf (fmessage + sl_all, cp1);
++   sprintf (fmessage + sl_all, "%s", cp1);
+    sl_all = strlen (fmessage);
+    
+    sl_alt = strlen (*error_list);
+@@ -577,7 +577,7 @@ void fehler2 (int zeile,
+ 
+    va_end (ap);
+ 
+-   fprintf (protfile, cp1);
++   fprintf (protfile, "%s", cp1);
+ 
+    if (fil -> art == 'E')
+    {
+@@ -756,7 +756,7 @@ void fehler3 (int zeile,
+ 
+    va_end (ap);
+ 
+-   sprintf (fmessage + sl_all, cp1);
++   sprintf (fmessage + sl_all, "%s", cp1);
+    sl_all = strlen (fmessage);
+    
+    sl_alt = strlen (*error_list);
