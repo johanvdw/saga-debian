@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_table.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: dlg_list_table.h 1964 2014-02-04 16:25:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,12 +88,9 @@ class CDLG_List_Table : public CDLG_List_Base
 
 public:
 	CDLG_List_Table(CSG_Parameter_Table_List *pList, wxString Caption);
-	virtual ~CDLG_List_Table(void);
 
 
 protected:
-
-	virtual void				_Set_Objects(void);
 
 
 //---------------------------------------------------------

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: helper.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: helper.h 2086 2014-04-04 09:07:51Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ double				Degree_To_Decimal				(double Deg, double Min, double Sec);
 void				Decimal_To_Degree				(double Value, double &Deg, double &Min, double &Sec);
 
 //---------------------------------------------------------
-wxString			Get_nBytes_asString				(long nBytes, int Precision = -1);
+wxString			Get_nBytes_asString				(double nBytes, int Precision = -1);
 
 //---------------------------------------------------------
 double				Get_Random						(double loValue, double hiValue);
@@ -149,6 +149,8 @@ void				MSG_Execution_Add_Line			(void);
 void				MSG_Execution_Add				(const wxString &Message, bool bNewLine = true, bool bTime = false, TSG_UI_MSG_STYLE Style = SG_UI_MSG_STYLE_NORMAL);
 
 //---------------------------------------------------------
+bool				CONFIG_Do_Save					(bool bOn);
+
 bool				CONFIG_Read						(const wxString &Group, const wxString &Entry,       wxString &Value);
 bool				CONFIG_Read						(const wxString &Group, const wxString &Entry, long           &Value);
 bool				CONFIG_Read						(const wxString &Group, const wxString &Entry, double         &Value);
@@ -163,6 +165,9 @@ bool				CONFIG_Write					(const wxString &Group, const wxString &Entry, bool    
 
 bool				CONFIG_Delete					(const wxString &Group);
 bool				CONFIG_Delete					(const wxString &Group, const wxString &Entry);
+
+bool				CONFIG_Read						(const wxString &Group, CSG_Parameters *pParameters);
+bool				CONFIG_Write					(const wxString &Group, CSG_Parameters *pParameters);
 
 //---------------------------------------------------------
 bool				PROCESS_is_Executing			(void);
@@ -199,7 +204,7 @@ void				STATUSBAR_Set_Text				(const wxString &Text, int iPane = 0);
 //---------------------------------------------------------
 #define DESC_ADD_STR(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, value))
 #define DESC_ADD_INT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%d</td></tr>"), label, value))
-#define DESC_ADD_LONG(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%ld</td></tr>"), label, value))
+#define DESC_ADD_LONG(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%lld</td></tr>"), label, value))
 #define DESC_ADD_FLT(label, value)	s.Append(wxString::Format(wxT("<tr><td valign=\"top\">%s</td><td valign=\"top\">%s</td></tr>"), label, SG_Get_String(value, -20).c_str()))
 
 

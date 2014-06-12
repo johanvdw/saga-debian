@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 1800 2013-08-28 10:40:10Z oconrad $
+# $Id: Makefile.am 2071 2014-03-31 08:10:22Z reklov_w $
 #
 INCS = -I.. -I.
 if DEBUG
@@ -95,6 +95,7 @@ wksp_map.cpp\
 wksp_map_buttons.cpp\
 wksp_map_control.cpp\
 wksp_map_dc.cpp\
+wksp_map_graticule.cpp\
 wksp_map_layer.cpp\
 wksp_map_manager.cpp\
 wksp_module.cpp\
@@ -191,6 +192,7 @@ wksp_map.h\
 wksp_map_buttons.h\
 wksp_map_control.h\
 wksp_map_dc.h\
+wksp_map_graticule.h\
 wksp_map_layer.h\
 wksp_map_manager.h\
 wksp_module.h\
@@ -214,8 +216,20 @@ wksp_tin_manager.h
 
 saga_gui_LDADD = ../saga_api/libsaga_api.la
 
+applicationsdir = $(datadir)/applications
+dist_applications_DATA = res/saga.desktop
+
+pixmapdir = $(datadir)/pixmaps
+dist_pixmap_DATA = res/saga.png
+
+dist_pkgdata_DATA = res/saga_tip.txt res/saga_dic.txt res/saga_srs.txt
+
+install-data-hook:
+	cd $(DESTDIR)/$(pkgdatadir); \
+	mv saga_srs.txt saga_prj.srs; \
+	mv saga_dic.txt saga_prj.dic;
+
 dist-hook:
-	 mkdir $(distdir)/res
 	 cp -Rp $(srcdir)/res/* $(distdir)/res/
 
 SUBDIRS=man 

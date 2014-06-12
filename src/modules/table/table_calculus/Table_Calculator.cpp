@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Table_Calculator.cpp 1889 2013-12-03 16:19:55Z reklov_w $
+ * Version $Id: Table_Calculator.cpp 2072 2014-03-31 08:50:43Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     TableCalculator.cpp
@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA
 *******************************************************************************/
 
 ///////////////////////////////////////////////////////////

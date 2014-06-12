@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Cut.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Grid_Cut.h 2097 2014-04-11 12:50:55Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -132,6 +132,8 @@ protected:
 
 
 private:
+
+	bool						Get_Mask				(CSG_Grid &Mask, CSG_Grid_System &System, CSG_Shapes *pPolygons);
 
 };
 

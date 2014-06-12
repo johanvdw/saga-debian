@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_cmd.cpp 1922 2014-01-09 10:28:46Z oconrad $
+ * Version $Id: saga_cmd.cpp 2111 2014-05-07 09:58:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -110,21 +110,21 @@ void		Create_Docs		(void);
 //---------------------------------------------------------
 int		main	(int argc, char *argv[])
 {
-#if wxCHECK_VERSION(2, 8, 11)
-	if( !wxInitialize(argc, argv) )
-#else
 	if( !wxInitialize() )
-#endif
 	{
 		CMD_Print_Error(SG_T("initialisation failed"));
 
 		return( 1 );
 	}
 
+#if !defined(_DEBUG)
+	wxSetAssertHandler(NULL);		// disable all wx asserts in SAGA release builds
+#endif
+
 //---------------------------------------------------------
 #if !defined(_DEBUG) && defined(_SAGA_VC)
 #define _MODULE_EXCEPTION
-_try 
+_try
 {
 #endif
 //---------------------------------------------------------
@@ -165,7 +165,7 @@ _except(1)
 bool		Run(int argc, char *argv[])
 {
 	setlocale(LC_NUMERIC, "C");
-	
+
 	SG_Set_UI_Callback(CMD_Get_Callback());
 
 	//-----------------------------------------------------
@@ -241,15 +241,15 @@ bool		Execute(int argc, char *argv[])
 	}
 
 	if( argc == 3 && CMD_Get_XML() )
-	{	// Just output module synopsis as XML-tagged text, then return.
+	{	// Just output tool synopsis as XML-tagged text, then return.
 		SG_PRINTF(pModule->Get_Summary(true, "", "", true).c_str());
 
 		return( true );
 	}
 
-	if( pModule->is_Interactive() )
+	if( pModule->needs_GUI() )
 	{
-		CMD_Print_Error(_TL("cannot execute interactive module"), pModule->Get_Name());
+		CMD_Print_Error(_TL("tool needs graphical user interface"), pModule->Get_Name());
 
 		return( false );
 	}
@@ -259,7 +259,7 @@ bool		Execute(int argc, char *argv[])
 
 	CCMD_Module	CMD_Module(pModule);
 
-	return( CMD_Module.Execute(argc - 2, argv + 2) );
+	return( CMD_Module.Execute(pLibrary->Get_Library_Name(), argc - 2, argv + 2) );
 }
 
 
@@ -427,7 +427,7 @@ bool		Load_Libraries(void)
 
 	if( SG_Get_Module_Library_Manager().Get_Count() <= 0 )
 	{
-		CMD_Print_Error(SG_T("could not load any module library"));
+		CMD_Print_Error(SG_T("could not load any tool library"));
 
 		return( false );
 	}
@@ -498,8 +498,19 @@ bool		Check_Flags		(const CSG_String &Argument)
 
 		if( s.Find('p') >= 0 )	// p: load projections dictionary
 		{
-			SG_Get_Projections().Create(SG_File_Make_Path(SG_File_Get_Path(SG_UI_Get_Application_Path()),
-				SG_T("saga_prj"), SG_T("srs")));
+#if defined(_SAGA_LINUX)
+		SG_Get_Projections().Create(SG_File_Make_Path(SG_File_Get_Path( CSG_String(SHARE_PATH)),
+			SG_T("saga_prj"), SG_T("srs")));
+#endif
+#if defined(_SAGA_MSW)
+		SG_Get_Projections().Create(SG_File_Make_Path(SG_File_Get_Path(SG_UI_Get_Application_Path()),
+			SG_T("saga_prj"), SG_T("srs")));
+#endif
+		}
+
+		if( s.Find('o') >= 0 )	// o: load old style naming, has no effect if l-flag is set.
+		{
+			SG_Set_OldStyle_Naming();
 		}
 
 		return( true );
@@ -554,7 +565,7 @@ void		Print_Libraries	(void)
 //---------------------------------------------------------
 void		Print_Modules	(CSG_Module_Library *pLibrary)
 {
-	CMD_Print_Error(_TL("module"));
+	CMD_Print_Error(_TL("tool"));
 
 	if( CMD_Get_Show_Messages() )
 	{
@@ -589,7 +600,7 @@ void		Print_Execution	(CSG_Module_Library *pLibrary, CSG_Module *pModule)
 			SG_PRINTF(SG_T("_____________________________________________\n"));
 			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("library path"), pLibrary->Get_File_Name().c_str());
 			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("library name"), pLibrary->Get_Name     ().c_str());
-			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("module name "), pModule ->Get_Name     ().c_str());
+			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("tool name   "), pModule ->Get_Name     ().c_str());
 			SG_PRINTF(SG_T("%s:\t%s\n"), _TL("author      "), pModule ->Get_Author   ().c_str());
 			SG_PRINTF(SG_T("_____________________________________________\n\n"));
 		}
@@ -640,7 +651,7 @@ void		Print_Get_Help	(void)
 	{
 		CMD_Print(_TL("type -h or --help for further information"));
 		CMD_Print("");
-	} 
+	}
 }
 
 //---------------------------------------------------------
@@ -661,21 +672,21 @@ void		Print_Help		(void)
 		"saga_cmd [-b, --batch]\n"
 		"saga_cmd [-d, --docs]\n"
 #ifdef _OPENMP
-		"saga_cmd [-f, --flags][=qrsilpx][-c, --cores][=#] <LIBRARY> <MODULE> <OPTIONS>\n"
-		"saga_cmd [-f, --flags][=qrsilpx][-c, --cores][=#] <SCRIPT>\n"
+		"saga_cmd [-f, --flags][=qrsilpxo][-c, --cores][=#] <LIBRARY> <MODULE> <OPTIONS>\n"
+		"saga_cmd [-f, --flags][=qrsilpxo][-c, --cores][=#] <SCRIPT>\n"
 #else
-		"saga_cmd [-f, --flags][=qrsilpx] <LIBRARY> <MODULE> <module specific options...>\n"
-		"saga_cmd [-f, --flags][=qrsilpx] <SCRIPT>\n"
+		"saga_cmd [-f, --flags][=qrsilpxo] <LIBRARY> <MODULE> <module specific options...>\n"
+		"saga_cmd [-f, --flags][=qrsilpxo] <SCRIPT>\n"
 #endif
 		"\n"
 		"[-h], [--help]   : help on usage\n"
 		"[-v], [--version]: print version information\n"
 		"[-b], [--batch]  : create a batch file example\n"
-		"[-d], [--docs]   : create module documentation in current working directory\n"
+		"[-d], [--docs]   : create tool documentation in current working directory\n"
 #ifdef _OPENMP
 		"[-c], [--cores]  : number of physical processors to use for computation\n"
 #endif
-		"[-f], [--flags]  : various flags for general usage [qrsilpx]\n"
+		"[-f], [--flags]  : various flags for general usage [qrsilpxo]\n"
 		"  q              : no progress report\n"
 		"  r              : no messages report\n"
 		"  s              : silent mode (no progress and no messages report)\n"
@@ -683,11 +694,12 @@ void		Print_Help		(void)
 		"  l              : load translation dictionary\n"
 		"  p              : load projections dictionary\n"
 		"  x              : use XML markups for synopses and messages\n"
+		"  o              : load old style naming\n"
 		"\n"
 		"<LIBRARY>        : name of the library\n"
-		"<MODULE>         : either name or index of the module\n"
-		"<OPTIONS>        : module specific options\n"
-		"<SCRIPT>         : saga cmd script file with one or more module calls\n"
+		"<MODULE>         : either name or index of the tool\n"
+		"<OPTIONS>        : tool specific options\n"
+		"<SCRIPT>         : saga cmd script file with one or more tool calls\n"
 		"\n"
 		"_____________________________________________\n"
 		"Example:\n"
@@ -695,13 +707,13 @@ void		Print_Help		(void)
 		"  saga_cmd -f=s ta_lighting 0 -ELEVATION=c:\\dem.sgrd -SHADE=c:\\shade.sgrd\n"
 		"\n"
 		"_____________________________________________\n"
-		"Module libraries in the \'modules\' subdirectory of the SAGA installation\n"
+		"Tool libraries in the \'modules\' subdirectory of the SAGA installation\n"
 		"will be loaded automatically. Additional directories can be specified\n"
 		"by adding the environment variable \'SAGA_MLB\' and let it point to one\n"
 		"or more directories, just the way it is done with the DOS \'PATH\' variable.\n"
 		"\n"
 		"The SAGA command line interpreter is particularly useful for the processing\n"
-		"of complex work flows by defining a series of subsequent module calls in a\n"
+		"of complex work flows by defining a series of subsequent tool calls in a\n"
 		"script file. Calling saga_cmd with the option \'-b\' or \'--batch\' will\n"
 		"create an example of a DOS batch script file, which might be a good starting\n"
 		"point for the implementation of your own specific work flows.\n"
@@ -823,7 +835,7 @@ void		Create_Docs		(void)
 
 	if( Load_Libraries() )
 	{
-		CMD_Print(_TL("creating module documentation files"));
+		CMD_Print(_TL("creating tool documentation files"));
 
 		CMD_Set_Show_Messages(false);
 

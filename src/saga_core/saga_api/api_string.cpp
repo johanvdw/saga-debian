@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_string.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: api_string.cpp 1967 2014-02-05 10:15:53Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -955,7 +955,7 @@ CSG_String		SG_Double_To_Degree(double Value)
 	Value	= 60.0 * (Value - h);
 	s		= Value;
 
-	String.Printf(SG_T("%c%03d\xb0%02d'%02f''"), c, d, h, s);
+	String.Printf(SG_T("%c%03d\xb0%02d'%02.*f''"), c, d, h, SG_Get_Significant_Decimals(s), s);
 
 	return( String );
 }
@@ -1101,10 +1101,25 @@ CSG_String		SG_Get_String(double Value, int Precision, bool bScientific)
 	}
 	else // if( Precision == -2 )
 	{
+		Precision	= SG_Get_Significant_Decimals(Value, abs(Precision));
+
 		s.Printf(SG_T("%.*f"), SG_Get_Significant_Decimals(Value, abs(Precision)), Value);
+
+		if( Precision > 0 )
+		{
+			while( s.Length() > 1 && s[s.Length() - 1] == '0' )
+			{
+				s	= s.Left(s.Length() - 1);
+			}
+
+			if( s.Length() > 1 && (s[s.Length() - 1] == '.' || s[s.Length() - 1] == ',') )
+			{
+				s	= s.Left(s.Length() - 1);
+			}
+		}
 	}
 
-	s.Replace(SG_T(","), SG_T("."));
+	s.Replace(",", ".");
 
 	return( s );
 }

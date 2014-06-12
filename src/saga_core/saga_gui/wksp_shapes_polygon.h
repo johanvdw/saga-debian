@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_polygon.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_shapes_polygon.h 2017 2014-02-25 15:48:09Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ public:
 
 protected:
 
-	bool						m_bPoints, m_bCentroid, m_bOutline;
+	bool						m_bCentroid, m_bOutline;
 
 	wxColour					m_Sel_Color_Fill;
 
@@ -109,16 +109,15 @@ protected:
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
-	virtual void				_Draw_Initialize		(CWKSP_Map_DC &dc_Map);
-	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection);
-	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
+	virtual void				Draw_Initialize			(CWKSP_Map_DC &dc_Map);
+	virtual void				Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int Selection);
+	virtual void				Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, const wxString &Label);
 
-	void						_Draw_Polygon_Points	(CWKSP_Map_DC &dc_Map, CSG_Shape_Polygon *pPolygon);
+	virtual void				Edit_Shape_Draw_Move	(wxDC &dc, const CSG_Rect &rWorld, const wxPoint &Point);
+	virtual void				Edit_Shape_Draw			(CWKSP_Map_DC &dc_Map);
+	virtual int					Edit_Shape_HitTest		(CSG_Point Point, double max_Dist, int &iPart, int &iPoint);
+	virtual void				Edit_Snap_Point_ToLine	(CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shape *pShape);
 
-	virtual void				_Edit_Shape_Draw_Move	(wxDC &dc, CSG_Rect rWorld, double ClientToWorld, wxPoint Point);
-	virtual void				_Edit_Shape_Draw		(CWKSP_Map_DC &dc_Map);
-	virtual int					_Edit_Shape_HitTest		(CSG_Point Point, double max_Dist, int &iPart, int &iPoint);
-	virtual void				_Edit_Snap_Point_ToLine (CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shape *pShape);
 
 };
 

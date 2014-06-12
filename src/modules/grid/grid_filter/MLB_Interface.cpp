@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1991 2014-02-13 12:29:09Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ CSG_String Get_Info(int i)
 		return( _TL("Grid - Filter") );
 
 	case MLB_INFO_Author:
-		return( SG_T("SAGA User Group Associaton (c) 2002-10") );
+		return( SG_T("SAGA User Group Associaton, HfT Stuttgart (c) 2002-14") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for the manipulation of gridded data.") );
@@ -106,6 +106,10 @@ CSG_String Get_Info(int i)
 #include "Filter_Rank.h"
 #include "mesh_denoise.h"
 #include "Filter_Resample.h"
+#include "geomrec.h"
+#include "bin_erosion_reconst.h"
+#include "connect_analysis.h"
+#include "Filter_Sieve.h"
 
 
 //---------------------------------------------------------
@@ -127,9 +131,14 @@ CSG_Module *		Create_Module(int i)
 	case  9:	return( new CFilter_Rank );
 	case 10:	return( new CMesh_Denoise_Grid );
 	case 11:	return( new CFilter_Resample );
-	}
+	case 12:	return( new CGeomrec );
+	case 13:	return( new Cbin_erosion_reconst );
+	case 14:	return( new Cconnectivity_analysis );
+	case 15:	return( new CFilter_Sieve );
 
-	return( NULL );
+	case 16:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
+	}
 }
 
 

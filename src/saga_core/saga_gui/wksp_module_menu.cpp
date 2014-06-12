@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_menu.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_module_menu.cpp 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -143,8 +143,8 @@ void CWKSP_Menu_Modules::Update(void)
 		}
 
 		m_pMenu->InsertSeparator(0);
-		CMD_Menu_Ins_Item(m_pMenu, false, ID_CMD_WKSP_ITEM_CLOSE, 0);
 		CMD_Menu_Ins_Item(m_pMenu, false, ID_CMD_MODULES_OPEN	, 0);
+		CMD_Menu_Ins_Item(m_pMenu, false, ID_CMD_MODULES_SEARCH	, 1);
 
 		_Set_Recent(m_pMenu);
 	}

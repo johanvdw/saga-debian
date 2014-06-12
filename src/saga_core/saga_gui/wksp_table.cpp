@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_table.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_table.cpp 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,7 +72,6 @@
 
 #include "view_table.h"
 #include "view_table_diagram.h"
-#include "view_scatterplot.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -97,9 +96,6 @@ CWKSP_Table::CWKSP_Table(CSG_Table *pTable)
 //---------------------------------------------------------
 CWKSP_Table::~CWKSP_Table(void)
 {
-	Set_View	(false);
-	Set_Diagram	(false);
-
 	if( m_pObject->Get_ObjectType() != DATAOBJECT_TYPE_Table )
 	{
 		m_pObject	= NULL;
@@ -192,7 +188,7 @@ bool CWKSP_Table::On_Command(int Cmd_ID)
 		break;
 
 	case ID_CMD_TABLES_SCATTERPLOT:
-		Add_ScatterPlot(Get_Table());
+		Add_ScatterPlot();
 		break;
 	}
 
@@ -236,15 +232,13 @@ void CWKSP_Table::Set_View(bool bShow)
 	else if( !bShow && m_pView )
 	{
 		m_pView->Destroy();
-
-		delete(m_pView);
 	}
 }
 
 //---------------------------------------------------------
 void CWKSP_Table::Toggle_View(void)
 {
-	Set_View( m_pView == NULL );
+	Set_View(m_pView == NULL);
 }
 
 
@@ -264,15 +258,13 @@ void CWKSP_Table::Set_Diagram(bool bShow)
 	else if( !bShow && m_pDiagram )
 	{
 		m_pDiagram->Destroy();
-
-		delete(m_pDiagram);
 	}
 }
 
 //---------------------------------------------------------
 void CWKSP_Table::Toggle_Diagram(void)
 {
-	Set_Diagram( m_pDiagram == NULL );
+	Set_Diagram(m_pDiagram == NULL);
 }
 
 
@@ -291,32 +283,12 @@ bool CWKSP_Table::Show(int Flags)
 }
 
 //---------------------------------------------------------
-void CWKSP_Table::On_Update_Views(bool bAll)
-{
-	if( m_pView )
-	{
-		m_pView->Update_Table();
-	}
-
-	if( m_pDiagram )
-	{
-		m_pDiagram->Update_Diagram();
-	}
-}
-
-//---------------------------------------------------------
 bool CWKSP_Table::View_Closes(wxMDIChildFrame *pView)
 {
-	if		( wxDynamicCast(pView, CVIEW_Table) )
-	{
-		m_pView		= NULL;
-	}
-	else if	( wxDynamicCast(pView, CVIEW_Table_Diagram) )
-	{
-		m_pDiagram	= NULL;
-	}
+	if( pView == m_pView    )	m_pView		= NULL;
+	if( pView == m_pDiagram )	m_pDiagram	= NULL;
 
-	return( true );
+	return( CWKSP_Data_Item::View_Closes(pView) );
 }
 
 

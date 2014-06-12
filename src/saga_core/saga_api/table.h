@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: table.h 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -156,7 +156,8 @@ public:
 	short						asShort			(const CSG_String &Field)	const	{	return( (short  )asInt   ( Field) );	}
 	int							asInt			(int              iField)	const;
 	int							asInt			(const CSG_String &Field)	const;
-
+	sLong						asLong			(int              iField)	const	{	return( (sLong  )asDouble(iField) );	}
+	sLong						asLong			(const CSG_String &Field)	const	{	return( (sLong  )asDouble( Field) );	}
 	float						asFloat			(int              iField)	const	{	return( (float  )asDouble(iField) );	}
 	float						asFloat			(const CSG_String &Field)	const	{	return( (float  )asDouble( Field) );	}
 	double						asDouble		(int              iField)	const;

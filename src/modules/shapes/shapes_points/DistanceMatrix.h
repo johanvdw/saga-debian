@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: DistanceMatrix.h 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: DistanceMatrix.h 2072 2014-03-31 08:50:43Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     DistanceMatrix.h
@@ -17,23 +17,46 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA
 *******************************************************************************/ 
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 #include "MLB_Interface.h"
 
-class CDistanceMatrix : public CSG_Module {
 
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+class CDistanceMatrix : public CSG_Module
+{
 public:
 	CDistanceMatrix(void);
-	virtual ~CDistanceMatrix(void);
-	virtual bool is_ProjectDependent(void) {return( false );}
+
 
 protected:
-	virtual bool On_Execute(void);
+
+	virtual int		On_Parameters_Enable	(CSG_Parameters *pParameters, CSG_Parameter *pParameter);
+
+	virtual bool	On_Execute				(void);
 
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------

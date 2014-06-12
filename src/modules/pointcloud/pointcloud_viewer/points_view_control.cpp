@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: points_view_control.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: points_view_control.cpp 2052 2014-03-12 14:47:06Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -359,7 +359,10 @@ void CPoints_View_Control::On_Mouse_LDown(wxMouseEvent &event)
 	m_xDown			= m_zRotate;
 	m_yDown			= m_xRotate;
 
-	CaptureMouse();
+	if( !HasCapture() )
+	{
+		CaptureMouse();
+	}
 }
 
 void CPoints_View_Control::On_Mouse_LUp(wxMouseEvent &event)
@@ -389,7 +392,10 @@ void CPoints_View_Control::On_Mouse_RDown(wxMouseEvent &event)
 	m_xDown			= m_xShift;
 	m_yDown			= m_yShift;
 
-	CaptureMouse();
+	if( !HasCapture() )
+	{
+		CaptureMouse();
+	}
 }
 
 void CPoints_View_Control::On_Mouse_RUp(wxMouseEvent &event)
@@ -419,7 +425,10 @@ void CPoints_View_Control::On_Mouse_MDown(wxMouseEvent &event)
 	m_xDown			= m_yRotate;
 	m_yDown			= m_zShift;
 
-	CaptureMouse();
+	if( !HasCapture() )
+	{
+		CaptureMouse();
+	}
 }
 
 void CPoints_View_Control::On_Mouse_MUp(wxMouseEvent &event)

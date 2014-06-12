@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters_properties.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: parameters_properties.h 1947 2014-01-16 15:03:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -122,8 +122,10 @@ protected:
 
 	int							_DataObject_Init	(void);
 
-	void						_Update_Grids		(wxPropertyGrid *pPG);
-	void						_Update_TableFields	(wxPropertyGrid *pPG);
+	void						_Set_Parameter_Value(int iChoice);
+
+	void						_Update_Grids		(void);
+	void						_Update_TableFields	(void);
 
 };
 

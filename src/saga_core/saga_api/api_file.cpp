@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_file.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: api_file.cpp 1975 2014-02-09 14:59:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -514,6 +514,16 @@ CSG_String		SG_File_Get_Path_Absolute	(const SG_Char *full_Path)
 	}
 
 	return( &Path );
+}
+
+//---------------------------------------------------------
+CSG_String		SG_File_Get_Path_Relative	(const SG_Char *Directory, const SG_Char *full_Path)
+{
+	wxFileName	fn(full_Path);
+
+	fn.MakeRelativeTo(Directory);
+
+	return( CSG_String(fn.GetFullPath().wc_str()) );
 }
 
 //---------------------------------------------------------

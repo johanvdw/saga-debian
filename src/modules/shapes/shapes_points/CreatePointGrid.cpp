@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: CreatePointGrid.cpp 911 2011-02-14 16:38:15Z reklov_w $
+ * Version $Id: CreatePointGrid.cpp 2072 2014-03-31 08:50:43Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     CreatePointGrid.cpp
@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA
 *******************************************************************************/ 
 
 #include "CreatePointGrid.h"

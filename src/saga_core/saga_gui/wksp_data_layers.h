@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_layers.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_data_layers.h 2020 2014-02-26 11:21:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -74,8 +74,6 @@
 //---------------------------------------------------------
 #include <wx/scrolwin.h>
 
-#include <saga_api/saga_api.h>
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -89,34 +87,32 @@ class CWKSP_Data_Button : public wxPanel
 	DECLARE_CLASS(CWKSP_Data_Button)
 
 public:
-	CWKSP_Data_Button(wxWindow *pParent, class CWKSP_Layer *pLayer);
-	CWKSP_Data_Button(wxWindow *pParent, const wxString &Title);
-	virtual ~CWKSP_Data_Button(void)	{}
+	CWKSP_Data_Button(wxWindow *pParent, class CWKSP_Base_Item *pItem);
 
-	void						On_Paint			(wxPaintEvent &event);
-
-	void						On_Mouse_LDown		(wxMouseEvent &event);
-	void						On_Mouse_LDClick	(wxMouseEvent &event);
-	void						On_Mouse_RDown		(wxMouseEvent &event);
-
-	bool						is_Title			(void)		{	return( m_pLayer == NULL );	}
+	bool						is_Manager			(void);
 
 
 private:
 
-	wxString					m_Title;
-
-	class CWKSP_Layer			*m_pLayer;
-
-	CSG_Data_Object				*m_pObject;
+	class CWKSP_Base_Item		*m_pItem;
 
 
-	bool						_Select				(bool bKeepOthers);
+	void						On_Paint			(wxPaintEvent &event);
+	void						On_Key				(wxKeyEvent   &event);
+	void						On_Mouse_LDown		(wxMouseEvent &event);
+	void						On_Mouse_LDClick	(wxMouseEvent &event);
+	void						On_Mouse_RDown		(wxMouseEvent &event);
 
+	bool						_Set_Active			(bool bKeepOthers);
 
-//---------------------------------------------------------
-DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
+	DECLARE_EVENT_TABLE()
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 class CWKSP_Data_Buttons : public wxScrolledWindow
@@ -127,39 +123,28 @@ public:
 	CWKSP_Data_Buttons(wxWindow *pParent);
 	virtual ~CWKSP_Data_Buttons(void);
 
-	void						On_Mouse_RDown		(wxMouseEvent &event);
-
-	void						On_Size				(wxSizeEvent  &event);
-
 	void						Update_Buttons		(void);
-
-	int							Get_Item_Size		(void)		{	return( m_Size );	}
-	long						Get_Active_Color	(void)		{	return( m_Active_Color );	}
 
 
 private:
 
-	bool						m_bCategorised;
-
-	int							m_xScroll, m_yScroll, m_nItems, m_Size;
-
-	long						m_Active_Color;
+	int							m_nItems, m_xScroll, m_yScroll;
 
 	CWKSP_Data_Button			**m_Items;
 
-	CSG_Parameters				m_Parameters;
 
+	void						On_Size				(wxSizeEvent  &event);
+	void						On_Mouse_LDown		(wxMouseEvent &event);
+
+	bool						_Del_Items			(void);
+	bool						_Add_Items			(class CWKSP_Base_Item    *pItem);
+	bool						_Add_Item			(class CWKSP_Data_Item    *pItem);
+	bool						_Add_Item			(class CWKSP_Base_Manager *pItem);
 
 	void						_Set_Positions		(void);
 
-	bool						_Add_Items			(class CWKSP_Base_Item *pItem);
-	bool						_Add_Item			(class CWKSP_Layer *pLayer);
-	bool						_Add_Item			(const wxString &Title);
-	bool						_Del_Items			(void);
-
-
-//---------------------------------------------------------
-DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
+	DECLARE_EVENT_TABLE()
 };
 
 //---------------------------------------------------------

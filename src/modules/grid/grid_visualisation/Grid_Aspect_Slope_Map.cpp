@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Aspect_Slope_Map.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Grid_Aspect_Slope_Map.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ bool CGrid_Aspect_Slope_Map::On_Execute(void)
 
 	//-----------------------------------------------------
 	#pragma omp parallel for
-	for(long n=0; n<Get_NCells(); n++)
+	for(sLong n=0; n<Get_NCells(); n++)
 	{
 		int		iAspectClass, iSlopeClass;
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module_library.h 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ SAGA_API_DLL_EXPORT CSG_Module_Library_Manager &	SG_Get_Module_Library_Manager	(
 	\
 	if(	pModule == NULL )\
 	{\
-		Error_Set(CSG_String::Format(SG_T("%s: %s"), _TL("could not find module"), SG_T(LIBRARY)));\
+		Error_Set(CSG_String::Format(SG_T("%s: %s"), _TL("could not find tool"), SG_T(LIBRARY)));\
 	}\
 	else\
 	{\
@@ -225,11 +225,11 @@ SAGA_API_DLL_EXPORT CSG_Module_Library_Manager &	SG_Get_Module_Library_Manager	(
 		\
 		if( !(CONDITION) )\
 		{\
-			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not initialize module"), SG_T(LIBRARY), pModule->Get_Name().c_str()));\
+			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not initialize tool"), SG_T(LIBRARY), pModule->Get_Name().c_str()));\
 		}\
 		else if( !pModule->Execute() )\
 		{\
-			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not execute module")   , SG_T(LIBRARY), pModule->Get_Name().c_str()));\
+			Error_Set(CSG_String::Format(SG_T("%s: %s > %s"), _TL("could not execute tool")   , SG_T(LIBRARY), pModule->Get_Name().c_str()));\
 		}\
 		else\
 		{\

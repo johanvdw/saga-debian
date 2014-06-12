@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dc_helper.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: dc_helper.h 2039 2014-03-05 13:26:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -153,7 +153,27 @@ void			Draw_Text			(wxDC &dc, int Align, int x, int y, double Angle, const wxStr
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void			Draw_Scale			(wxDC &dc, wxRect r, double min_Value, double max_Value, bool bHorizontal, bool bAscendent, bool bTickAtTop, bool bLineConnector = false);
+#define SCALE_HORIZONTAL		0x00
+#define SCALE_VERTICAL			0x01
+
+//---------------------------------------------------------
+#define SCALE_TICK_NONE			0x00
+#define SCALE_TICK_TOP			0x01
+#define SCALE_TICK_BOTTOM		0x02
+
+//---------------------------------------------------------
+#define SCALE_STYLE_DEFAULT		0x00
+#define SCALE_STYLE_DESCENDENT	0x02
+#define SCALE_STYLE_LINECONN	0x04
+#define SCALE_STYLE_BLACKWHITE	0x08
+#define SCALE_STYLE_GLOOMING	0x10
+#define SCALE_STYLE_UNIT_ABOVE	0x20
+#define SCALE_STYLE_UNIT_BELOW	0x40
+
+//---------------------------------------------------------
+void			Draw_Scale			(wxDC &dc, const wxRect &r, double min_Value, double max_Value, int Orientation = SCALE_HORIZONTAL, int Tick = SCALE_TICK_NONE, int Style = SCALE_STYLE_DEFAULT, const wxString &Unit = "");
+
+void			Draw_Scale			(wxDC &dc, const wxRect &r, double min_Value, double max_Value, bool bHorizontal, bool bAscendent, bool bTickAtTop);
 
 
 ///////////////////////////////////////////////////////////

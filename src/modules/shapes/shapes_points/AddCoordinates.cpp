@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: AddCoordinates.cpp 1915 2013-12-28 16:35:03Z reklov_w $
+ * Version $Id: AddCoordinates.cpp 2072 2014-03-31 08:50:43Z reklov_w $
  *********************************************************/
 /*******************************************************************************
     AddCoordinates.cpp
@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, 5th Floor, Boston, MA 02110-1301, USA
 *******************************************************************************/ 
 
 #include "AddCoordinates.h"

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: MLB_Interface.cpp 2076 2014-03-31 10:35:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ CSG_String Get_Info(int i)
 		return( _TL("Shapes - Polygons") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad, V. Olaya (c) 2002-5") );
+		return( SG_T("O. Conrad, V. Olaya, V. Wichmann (c) 2002-14") );
 
 	case MLB_INFO_Description:
 		return( _TL("Tools for polygons.") );
@@ -107,6 +107,8 @@ CSG_String Get_Info(int i)
 #include "polygon_split_parts.h"
 #include "Polygon_Clip.h"
 #include "Polygon_SelfIntersection.h"
+#include "add_point_attributes.h"
+#include "polygon_flatten.h"
 
 
 //---------------------------------------------------------
@@ -135,9 +137,12 @@ CSG_Module *		Create_Module(int i)
 	case 17:	return( new CPolygon_Union );
 	case 18:	return( new CPolygon_Update );
 	case 19:	return( new CPolygon_Identity );
+	case 20:	return( new CAdd_Point_Attributes );
+
+	case 21:	return( new CPolygon_Flatten );
 
 	//-----------------------------------------------------
-	case 20:	return( NULL );
+	case 22:	return( NULL );
 	default:	return( MLB_INTERFACE_SKIP_MODULE );
 	}
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_point.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_shapes_point.h 2007 2014-02-20 13:53:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -119,12 +119,10 @@ protected:
 
 	virtual int					On_Parameter_Changed	(CSG_Parameters *pParameters, CSG_Parameter *pParameter, int Flags);
 
-	virtual void				_Draw_Initialize		(CWKSP_Map_DC &dc_Map);
-	virtual bool				_Draw_Initialize		(CWKSP_Map_DC &dc_Map, int &Size, CSG_Shape *pShape, bool bSelection);
-	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection);
-	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
-
-	virtual wxMenu *			On_Edit_Get_Menu		(void);
+	virtual void				Draw_Initialize			(CWKSP_Map_DC &dc_Map);
+	virtual bool				Draw_Initialize			(CWKSP_Map_DC &dc_Map, int &Size, CSG_Shape *pShape, int Selection);
+	virtual void				Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int Selection);
+	virtual void				Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, const wxString &Label);
 
 };
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_table_diagram.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_table_diagram.cpp 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -159,8 +159,9 @@ private:
 	void							_Draw_Bars			(wxDC &dc, wxRect r, double dx, double dy, int iField);
 
 
-	DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
 	DECLARE_CLASS(CVIEW_Table_Diagram_Control)
+	DECLARE_EVENT_TABLE()
 
 };
 
@@ -200,8 +201,6 @@ CVIEW_Table_Diagram_Control::CVIEW_Table_Diagram_Control(wxWindow *pParent, CWKS
 	Fit_Size();
 
 	_Initialize();
-
-	Set_Parameters();
 }
 
 //---------------------------------------------------------
@@ -1001,23 +1000,22 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CVIEW_Table_Diagram::CVIEW_Table_Diagram(CWKSP_Table *pTable)
-	: CVIEW_Base(ID_VIEW_TABLE_DIAGRAM, wxString::Format(wxT("%s [%s]"), _TL("Diagram"), pTable->Get_Name().c_str()), ID_IMG_WND_DIAGRAM)
+	: CVIEW_Base(pTable, ID_VIEW_TABLE_DIAGRAM, wxString::Format(wxT("%s [%s]"), _TL("Diagram"), pTable->Get_Name().c_str()), ID_IMG_WND_DIAGRAM, false)
 {
 	SYS_Set_Color_BG_Window(this);
 
-	m_pOwner	= pTable;
-
 	m_pControl	= new CVIEW_Table_Diagram_Control(this, pTable);
 
-	wxCommandEvent	dummy;
+	if( m_pControl->Set_Parameters() )
+	{
+		m_pControl->Fit_Size();
 
-	On_Size_Fit(dummy);
-}
-
-//---------------------------------------------------------
-CVIEW_Table_Diagram::~CVIEW_Table_Diagram(void)
-{
-	m_pOwner->View_Closes(this);
+		Do_Show();
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
 
@@ -1060,9 +1058,9 @@ wxToolBarBase * CVIEW_Table_Diagram::_Create_ToolBar(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CVIEW_Table_Diagram::Update_Diagram(void)
+void CVIEW_Table_Diagram::Do_Update(void)
 {
-	return( m_pControl->Update_Diagram() );
+	m_pControl->Update_Diagram();
 }
 
 

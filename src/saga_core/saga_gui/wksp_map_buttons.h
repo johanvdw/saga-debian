@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_buttons.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_map_buttons.h 2020 2014-02-26 11:21:04Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -74,8 +74,6 @@
 //---------------------------------------------------------
 #include <wx/scrolwin.h>
 
-#include <saga_api/saga_api.h>
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -90,31 +88,29 @@ class CWKSP_Map_Button : public wxPanel
 
 public:
 	CWKSP_Map_Button(wxWindow *pParent, class CWKSP_Map *pMap);
-	CWKSP_Map_Button(wxWindow *pParent, const wxString &Title);
-	virtual ~CWKSP_Map_Button(void)	{}
-
-	void						On_Paint			(wxPaintEvent &event);
-
-	void						On_Mouse_LDown		(wxMouseEvent &event);
-	void						On_Mouse_LDClick	(wxMouseEvent &event);
-	void						On_Mouse_RDown		(wxMouseEvent &event);
-
-	bool						is_Title			(void)		{	return( m_pMap == NULL );	}
 
 
 private:
 
-	wxString					m_Title;
-
 	class CWKSP_Map				*m_pMap;
 
 
-	bool						_Set_Layer_Active	(void);
+	void						On_Paint			(wxPaintEvent &event);
+	void						On_Key				(wxKeyEvent   &event);
+	void						On_Mouse_LDown		(wxMouseEvent &event);
+	void						On_Mouse_LDClick	(wxMouseEvent &event);
+	void						On_Mouse_RDown		(wxMouseEvent &event);
 
+	bool						_Set_Active			(void);
 
-//---------------------------------------------------------
-DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
+	DECLARE_EVENT_TABLE()
 };
+
+
+///////////////////////////////////////////////////////////
+//														 //
+///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 class CWKSP_Map_Buttons : public wxScrolledWindow
@@ -125,37 +121,28 @@ public:
 	CWKSP_Map_Buttons(wxWindow *pParent);
 	virtual ~CWKSP_Map_Buttons(void);
 
-	void						On_Mouse_RDown		(wxMouseEvent &event);
-
-	void						On_Size				(wxSizeEvent  &event);
-
 	void						Update_Buttons		(void);
-
-	int							Get_Item_Size		(void)		{	return( m_Size );	}
-	long						Get_Active_Color	(void)		{	return( m_Active_Color );	}
 
 
 private:
 
-	int							m_xScroll, m_yScroll, m_nItems, m_Size;
-
-	long						m_Active_Color;
+	int							m_nItems, m_xScroll, m_yScroll;
 
 	CWKSP_Map_Button			**m_Items;
 
-	CSG_Parameters				m_Parameters;
 
+	void						On_Size				(wxSizeEvent  &event);
+	void						On_Mouse_LDown		(wxMouseEvent &event);
+
+	bool						_Del_Items			(void);
+	bool						_Add_Items			(class CWKSP_Base_Item *pItem);
+	bool						_Add_Item			(class CWKSP_Map *pMap);
 
 	void						_Set_Positions		(void);
 
-	bool						_Add_Items			(class CWKSP_Base_Item *pItem);
-	bool						_Add_Item			(class CWKSP_Map *pMap);
-	bool						_Add_Item			(const wxString &Title);
-	bool						_Del_Items			(void);
 
-
-//---------------------------------------------------------
-DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
+	DECLARE_EVENT_TABLE()
 };
 
 //---------------------------------------------------------

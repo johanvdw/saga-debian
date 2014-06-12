@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_control.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_map_control.h 2066 2014-03-24 08:55:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ public:
 	bool						Close			(bool bSilent);
 
 	void						Add_Item		(class CWKSP_Base_Manager *pManager, class CWKSP_Base_Item *pItem);
-	bool						Del_Item		(class CWKSP_Map *pMap, class CWKSP_Layer *pLayer);
+	bool						Del_Item		(class CWKSP_Map *pMap             , class CWKSP_Base_Item *pItem);
 
 
 private:

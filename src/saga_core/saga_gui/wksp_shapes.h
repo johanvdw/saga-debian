@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_shapes.h 2017 2014-02-25 15:48:09Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -82,6 +82,21 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+enum
+{
+	EDIT_SHAPE_MODE_Normal	= 0,
+	EDIT_SHAPE_MODE_Split,
+	EDIT_SHAPE_MODE_Move
+};
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
 class CWKSP_Shapes : public CWKSP_Layer
 {
 public:
@@ -110,22 +125,25 @@ public:
 
 	bool						is_Editing				(void)	{	return( m_Edit_pShape != NULL );	}
 
+	virtual wxMenu *			Edit_Get_Menu			(void);
+	virtual TSG_Rect			Edit_Get_Extent			(void);
+	virtual bool				Edit_On_Key_Down		(int KeyCode);
+	virtual bool				Edit_On_Mouse_Down		(CSG_Point Point, double ClientToWorld, int Key);
+	virtual bool				Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key);
+	virtual bool				Edit_On_Mouse_Move		(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key);
+	virtual bool				Edit_Set_Index			(int Index);
+	virtual bool				Edit_Set_Attributes		(void);
+
 
 protected:
 
-	int							m_iColor, m_iLabel, m_iLabel_Size, m_Label_Prec, m_Label_Eff, m_iExtraInfo, m_Edit_iPart, m_Edit_iPoint, m_Chart_Type, m_Chart_sField, m_Chart_sType;
+	bool						m_bVertices;
 
-	double						m_Chart_sSize, m_Chart_sRange;
+	int							m_iColor, m_iLabel, m_Label_Prec, m_Label_Eff, m_Edit_Mode, m_Edit_iPart, m_Edit_iPoint;
 
 	wxColour					m_Def_Color, m_Edit_Color, m_Sel_Color, m_Label_Eff_Color;
 
-	CSG_Points_Int				m_Chart;
-
-	CSG_Parameters				m_Chart_Options;
-
 	CSG_Shape					*m_Edit_pShape;
-
-	CSG_Shapes					m_Edit_Shapes;
 
 	class CWKSP_Table			*m_pTable;
 
@@ -140,45 +158,62 @@ protected:
 
 	virtual void				On_Draw					(CWKSP_Map_DC &dc_Map, bool bEdit);
 
-	CSG_Parameter *				_AttributeList_Add		(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
-	void						_AttributeList_Set		(CSG_Parameter *pFields, bool bAddNoField);
+	bool						Get_Class_Color			(CSG_Shape *pShape, int &Color);
 
-	CSG_Parameter *				_BrushList_Add			(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
-	int							_BrushList_Get_Style	(int Index);
+	CSG_Parameter *				AttributeList_Add		(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
+	void						AttributeList_Set		(CSG_Parameter *pFields, bool bAddNoField);
 
-	CSG_Parameter *				_PenList_Add			(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
-	int							_PenList_Get_Style		(int Index);
+	CSG_Parameter *				BrushList_Add			(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
+	int							BrushList_Get_Style		(int Index);
 
-	virtual void				_Draw_Initialize		(CWKSP_Map_DC &dc_Map)										= 0;
-	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection)	= 0;
-	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape)					= 0;
+	CSG_Parameter *				PenList_Add				(CSG_Parameter *pNode, const CSG_String &Identifier, const CSG_String &Name, const CSG_String &Description);
+	int							PenList_Get_Style		(int Index);
 
-	bool						_Get_Class_Color		(CSG_Shape *pShape, int &Color);
+	virtual void				Draw_Initialize			(CWKSP_Map_DC &dc_Map)												= 0;
+	virtual void				Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int Selection)			= 0;
+	virtual void				Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, const wxString &Label)	= 0;
 
-	void						_Draw_Chart				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
-	void						_Draw_Chart_Pie			(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pRecord, bool bOutline, int x, int y, int size);
-	void						_Draw_Chart_Bar			(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pRecord, bool bOutline, int x, int y, int sx, int sy);
+	virtual void				Edit_Shape_Draw_Move	(wxDC &dc, const CSG_Rect &rWorld, const wxPoint &Point, const TSG_Point &ptWorld);
+	virtual void				Edit_Shape_Draw_Move	(wxDC &dc, const CSG_Rect &rWorld, const wxPoint &Point);
+	virtual void				Edit_Shape_Draw			(CWKSP_Map_DC &dc_Map);
+	virtual int					Edit_Shape_HitTest		(CSG_Point Point, double max_Dist, int &iPart, int &iPoint);
+	virtual void				Edit_Snap_Point_ToLine	(CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shape *pShape);
+
+
+private:
+
+	void						_LUT_Create				(void);
+
+	void						_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int Selection = 0);
+	void						_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int PointSize = 0);
+
+
+	//-----------------------------------------------------
+	// Charts...
+
+	int							m_Chart_Type, m_Chart_sField, m_Chart_sType;
+
+	double						m_Chart_sSize, m_Chart_sRange;
+
+	CSG_Points_Int				m_Chart;
+
+	CSG_Parameters				m_Chart_Options;
+
 
 	bool						_Chart_is_Valid			(void)	{	return( m_Chart.Get_Count() > 0 );	}
 	bool						_Chart_Set_Options		(void);
 	bool						_Chart_Get_Options		(void);
 
+	void						_Draw_Chart				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
+	void						_Draw_Chart_Pie			(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pRecord, bool bOutline, int x, int y, int size);
+	void						_Draw_Chart_Bar			(CWKSP_Map_DC &dc_Map, CSG_Table_Record *pRecord, bool bOutline, int x, int y, int sx, int sy);
+
 
 	//-----------------------------------------------------
 	// Editing...
 
-	virtual wxMenu *			On_Edit_Get_Menu		(void);
-	virtual TSG_Rect			On_Edit_Get_Extent		(void);
-	virtual bool				On_Edit_Set_Attributes	(void);
+	CSG_Shapes					m_Edit_Shapes;
 
-	virtual bool				On_Edit_On_Key_Down		(int KeyCode);
-	virtual bool				On_Edit_On_Mouse_Down	(CSG_Point Point, double ClientToWorld, int Key);
-	virtual bool				On_Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key);
-	virtual bool				On_Edit_On_Mouse_Move	(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key);
-
-	void						_LUT_Create				(void);
-
-	bool						_Edit_Set_Attributes	(void);
 
 	bool						_Edit_Shape				(void);
 	bool						_Edit_Shape_Start		(void);
@@ -189,18 +224,16 @@ protected:
 	bool						_Edit_Part_Add			(void);
 	bool						_Edit_Part_Del			(void);
 	bool						_Edit_Point_Del			(void);
+	bool						_Edit_Merge				(void);
+	bool						_Edit_Split				(void);
+	bool						_Edit_Move				(bool bToggle = true);
 
 	void						_Edit_Shape_Draw_Point	(wxDC &dc, TSG_Point_Int Point, bool bSelected);
 	void						_Edit_Shape_Draw_Point	(wxDC &dc, int x, int y, bool bSelected);
-	virtual void				_Edit_Shape_Draw_Move	(wxDC &dc, CSG_Rect rWorld, double ClientToWorld, wxPoint Point);
-	virtual void				_Edit_Shape_Draw		(CWKSP_Map_DC &dc_Map);
-
-	virtual int					_Edit_Shape_HitTest		(CSG_Point Point, double max_Dist, int &iPart, int &iPoint);
 
 	void						_Edit_Snap_Point		(CSG_Point &Point, double ClientToWorld);
 	void						_Edit_Snap_Point		(CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shapes *pShapes, bool bLine);
 	void						_Edit_Snap_Point		(CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shape *pShape);
-	virtual void				_Edit_Snap_Point_ToLine (CSG_Point Point, CSG_Point &snap_Point, double &snap_Dist, CSG_Shape *pShape);
 
 };
 

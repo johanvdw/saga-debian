@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Gridding_Spline_CSA.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Gridding_Spline_CSA.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ bool CGridding_Spline_CSA::On_Execute(void)
 	m_Points.Clear();
 
 	//-----------------------------------------------------
-	point	*pDst	= (point *)SG_Malloc((long) m_pGrid->Get_NCells() * sizeof(point));
+	point	*pDst	= (point *)SG_Malloc(m_pGrid->Get_NCells() * sizeof(point));
 
 	for(y=0, i=0, p.y=m_pGrid->Get_YMin(); y<m_pGrid->Get_NY() && Set_Progress(y, m_pGrid->Get_NY()); y++, p.y+=m_pGrid->Get_Cellsize())
 	{

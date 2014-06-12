@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: parameters.h 2037 2014-03-04 17:19:43Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -491,6 +491,7 @@ public:
 	void						Set_Items				(const SG_Char *String);
 
 	const SG_Char *				Get_Item				(int Index)	const;
+	CSG_String					Get_Item_Data			(int Index)	const;
 
 	bool						Get_Data				(int        &Value)	const;
 	bool						Get_Data				(double     &Value)	const;
@@ -1400,7 +1401,8 @@ public:
 	CSG_Parameter *				Get_Parameter			(int i)							{	return( i >= 0 && i < m_nParameters ? m_Parameters[i] : NULL );	}
 	CSG_Parameter *				Get_Parameter			(const CSG_String &Identifier);
 
-	CSG_Parameter *				Get						(const SG_Char    *Identifier)	{	return(  Get_Parameter(CSG_String(Identifier)) );	}
+	CSG_Parameter *				Get						(const char       *Identifier)	{	return(  Get_Parameter(CSG_String(Identifier)) );	}
+	CSG_Parameter *				Get						(const wchar_t    *Identifier)	{	return(  Get_Parameter(CSG_String(Identifier)) );	}
 
 	CSG_Parameter *				operator()				(int i)							{	return(  Get_Parameter(i         ) );	}
 	CSG_Parameter *				operator()				(const CSG_String &Identifier)	{	return(  Get_Parameter(Identifier) );	}

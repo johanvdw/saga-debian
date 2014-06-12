@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: res_images.cpp 2039 2014-03-05 13:26:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -151,6 +151,7 @@
 #include "./res/xpm/tb_map_mode_select.xpm"
 #include "./res/xpm/tb_map_mode_zoom.xpm"
 #include "./res/xpm/tb_map_scalebar.xpm"
+#include "./res/xpm/tb_map_north_arrow.xpm"
 #include "./res/xpm/tb_map_synchronize.xpm"
 #include "./res/xpm/tb_map_zoom_active.xpm"
 #include "./res/xpm/tb_map_zoom_full.xpm"
@@ -180,6 +181,7 @@
 #include "./res/xpm/wksp_grid_system.xpm"
 #include "./res/xpm/wksp_map.xpm"
 #include "./res/xpm/wksp_map_manager.xpm"
+#include "./res/xpm/wksp_map_graticule.xpm"
 #include "./res/xpm/wksp_module.xpm"
 #include "./res/xpm/wksp_module_library.xpm"
 #include "./res/xpm/wksp_module_manager.xpm"
@@ -290,6 +292,7 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_TB_MAP_MODE_SELECT:	return( tb_map_mode_select_xpm );
 	case ID_IMG_TB_MAP_MODE_ZOOM:	return( tb_map_mode_zoom_xpm );
     case ID_IMG_TB_MAP_SCALEBAR:	return( tb_map_scalebar_xpm );
+	case ID_IMG_TB_MAP_NORTH_ARROW:	return( tb_map_north_arrow_xpm );
 	case ID_IMG_TB_MAP_SYNCHRONIZE:	return( tb_map_synchronize_xpm );
 	case ID_IMG_TB_MAP_ZOOM_ACTIVE:	return( tb_map_zoom_active_xpm );
 	case ID_IMG_TB_MAP_ZOOM_FULL:	return( tb_map_zoom_full_xpm );
@@ -318,6 +321,7 @@ const char ** IMG_Get_XPM(int ID_IMG)
 	case ID_IMG_WKSP_GRID_MANAGER:	return( wksp_grid_manager_xpm );
 	case ID_IMG_WKSP_GRID_SYSTEM:	return( wksp_grid_system_xpm );
 	case ID_IMG_WKSP_MAP:	return( wksp_map_xpm );
+	case ID_IMG_WKSP_MAP_GRATICULE:	return( wksp_map_graticule_xpm );
 	case ID_IMG_WKSP_MAP_MANAGER:	return( wksp_map_manager_xpm );
 	case ID_IMG_WKSP_MODULE:	return( wksp_module_xpm );
 	case ID_IMG_WKSP_MODULE_LIBRARY:	return( wksp_module_library_xpm );

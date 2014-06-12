@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_shapes_points.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_shapes_points.h 2007 2014-02-20 13:53:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,8 +90,8 @@ public:
 
 protected:
 
-	virtual void				_Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, bool bSelection);
-	virtual void				_Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape);
+	virtual void				Draw_Shape				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, int Selection);
+	virtual void				Draw_Label				(CWKSP_Map_DC &dc_Map, CSG_Shape *pShape, const wxString &Label);
 
 };
 

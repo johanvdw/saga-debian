@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: info_messages.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: info_messages.cpp 2110 2014-05-05 12:45:44Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -176,9 +176,12 @@ void CINFO_Messages::_Add_Text(wxString Text)
 void CINFO_Messages::_Set_Style(TSG_UI_MSG_STYLE Style)
 {
 	int			i	= 0;
-	wxColour	c	= wxColour(  0,   0,   0);
-	wxFont		f	= wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	wxColour	c	= wxColour(0, 0, 0);
+	wxFont		f	= wxSystemSettings::GetFont(wxSYS_ANSI_VAR_FONT);//wxSYS_SYSTEM_FONT);
 	wxTextAttr	t;
+
+	f.SetPointSize((int)(0.5 + 0.9 * f.GetPointSize()));	// generally scale message window font to 90 percent
+
 
 	switch( Style )
 	{
@@ -204,19 +207,18 @@ void CINFO_Messages::_Set_Style(TSG_UI_MSG_STYLE Style)
 
 	case SG_UI_MSG_STYLE_BIG:
 		f.SetWeight(wxFONTWEIGHT_BOLD);
-		f.SetPointSize(12);
+		f.SetPointSize((int)(0.5 + 1.1 * f.GetPointSize()));
 		break;
 
 	case SG_UI_MSG_STYLE_SMALL:
 		f.SetWeight(wxFONTWEIGHT_LIGHT);
-		f.SetPointSize(8);
+		f.SetPointSize((int)(0.5 + 0.9 * f.GetPointSize()));
 		break;
 
 	case SG_UI_MSG_STYLE_01:
 		i	= 50;
 		c	= wxColour(  0,   0, 127);
 		f.SetWeight(wxFONTWEIGHT_LIGHT);
-		f.SetPointSize(10);
 		break;
 
 	case SG_UI_MSG_STYLE_02:
@@ -228,7 +230,6 @@ void CINFO_Messages::_Set_Style(TSG_UI_MSG_STYLE Style)
 		break;
 	}
 
-	t.SetFlags(wxTEXT_ATTR_TEXT_COLOUR|wxTEXT_ATTR_FONT_WEIGHT|wxTEXT_ATTR_FONT_ITALIC|wxTEXT_ATTR_FONT_SIZE|wxTEXT_ATTR_LEFT_INDENT);
 
 	t.SetLeftIndent(i);
 	t.SetTextColour(c);

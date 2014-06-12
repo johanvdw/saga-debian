@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_layer.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_layer.cpp 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -147,13 +147,13 @@ CWKSP_Layer::CWKSP_Layer(CSG_Data_Object *pObject)
 	m_pLegend		= new CWKSP_Layer_Legend(this);
 
 	m_pHistogram	= NULL;
+
+	m_Edit_Index	= 0;
 }
 
 //---------------------------------------------------------
 CWKSP_Layer::~CWKSP_Layer(void)
 {
-	Histogram_Show(false);
-
 	if( g_pMaps     )	{	g_pMaps->Del(this);	}
 
 	if( m_pClassify )	{	delete(m_pClassify);	}
@@ -181,6 +181,10 @@ bool CWKSP_Layer::On_Command(int Cmd_ID)
 	case ID_CMD_TIN_SHOW:
 	case ID_CMD_POINTCLOUD_SHOW:
 		g_pMaps->Add(this);
+		break;
+
+	case ID_CMD_DATA_PROJECTION:
+		_Set_Projection();
 		break;
 	}
 
@@ -408,6 +412,8 @@ void CWKSP_Layer::On_Parameters_Changed(void)
 	);
 
 	//-----------------------------------------------------
+	m_pClassify->Initialise(this, m_Parameters("LUT")->asTable(), m_Parameters("METRIC_COLORS")->asColors());
+
 	m_pClassify->Set_Mode(m_Parameters("COLORS_TYPE")->asInt());
 
 	m_pClassify->Set_Unique_Color(m_Parameters("UNISYMBOL_COLOR")->asInt());
@@ -507,6 +513,36 @@ CSG_Rect CWKSP_Layer::Get_Extent(void)
 	}
 
 	return( CSG_Rect(0.0, 0.0, 0.0, 0.0) );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CWKSP_Layer::_Set_Projection(void)
+{
+	CSG_Module	*pModule	= SG_Get_Module_Library_Manager().Get_Module(SG_T("pj_proj4"), 15);	// CCRS_Picker
+
+	if(	pModule && Get_Object() )
+	{
+		CSG_Parameters	P; P.Assign(pModule->Get_Parameters());
+
+		if( pModule->Get_Parameters()->Set_Parameter("CRS_PROJ4", Get_Object()->Get_Projection().Get_Proj4())
+		&&	pModule->On_Before_Execution() && DLG_Parameters(pModule->Get_Parameters())
+		&&  pModule->Execute() )
+		{
+			Get_Object()->Get_Projection().Create(pModule->Get_Parameters()->Get_Parameter("CRS_PROJ4")->asString(), SG_PROJ_FMT_Proj4);
+			Get_Object()->Set_Modified();
+
+			DataObject_Changed();
+		}
+
+		pModule->Get_Parameters()->Assign_Values(&P);
+	}
 }
 
 
@@ -666,17 +702,12 @@ bool CWKSP_Layer::Update(CWKSP_Layer *pChanged)
 //---------------------------------------------------------
 void CWKSP_Layer::On_Update_Views(bool bAll)
 {
+	_Set_Thumbnail(true);
+
 	g_pMaps->Update(this, !bAll);
 
 	if( bAll )
 	{
-		_Set_Thumbnail(true);
-
-		if( Histogram_Get() )
-		{
-			Histogram_Get()->Update_Histogram();
-		}
-
 		On_Update_Views();
 	}
 }
@@ -684,12 +715,12 @@ void CWKSP_Layer::On_Update_Views(bool bAll)
 //---------------------------------------------------------
 bool CWKSP_Layer::View_Closes(wxMDIChildFrame *pView)
 {
-	if( wxDynamicCast(pView, CVIEW_Histogram) != NULL )
+	if( pView == m_pHistogram )
 	{
 		m_pHistogram	= NULL;
 	}
 
-	return( true );
+	return( CWKSP_Data_Item::View_Closes(pView) );
 }
 
 
@@ -726,28 +757,17 @@ void CWKSP_Layer::Histogram_Toggle(void)
 //														 //
 ///////////////////////////////////////////////////////////
 
+
 //---------------------------------------------------------
 wxMenu * CWKSP_Layer::Edit_Get_Menu(void)
 {
-	return( On_Edit_Get_Menu() );
-}
-
-//---------------------------------------------------------
-TSG_Rect CWKSP_Layer::Edit_Get_Extent(void)
-{
-	return( On_Edit_Get_Extent() );
-}
-
-//---------------------------------------------------------
-bool CWKSP_Layer::Edit_Set_Attributes(void)
-{
-	return( On_Edit_Set_Attributes() );
+	return( NULL );
 }
 
 //---------------------------------------------------------
 bool CWKSP_Layer::Edit_On_Key_Down(int KeyCode)
 {
-	return( On_Edit_On_Key_Down(KeyCode) );
+	return( false );
 }
 
 //---------------------------------------------------------
@@ -755,19 +775,37 @@ bool CWKSP_Layer::Edit_On_Mouse_Down(CSG_Point Point, double ClientToWorld, int 
 {
 	m_Edit_Mouse_Down	= Point;
 
-	return( On_Edit_On_Mouse_Down(Point, ClientToWorld, Key) );
+	return( true );
 }
 
 //---------------------------------------------------------
 bool CWKSP_Layer::Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
 {
-	return( On_Edit_On_Mouse_Up(Point, ClientToWorld, Key) );
+	return( false );
 }
 
 //---------------------------------------------------------
 bool CWKSP_Layer::Edit_On_Mouse_Move(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key)
 {
-	return( On_Edit_On_Mouse_Move(pMap, rWorld, pt, ptLast, Key) );
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CWKSP_Layer::Edit_Set_Index(int Index)
+{
+	return( true );
+}
+
+//---------------------------------------------------------
+int CWKSP_Layer::Edit_Get_Index(void)
+{
+	return( m_Edit_Index );
+}
+
+//---------------------------------------------------------
+CSG_Table * CWKSP_Layer::Edit_Get_Attributes(void)
+{
+	return( &m_Edit_Attributes );
 }
 
 

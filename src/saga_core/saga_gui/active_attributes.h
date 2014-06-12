@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_attributes.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: active_attributes.h 2014 2014-02-24 14:47:32Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,16 +90,20 @@ public:
 	CACTIVE_Attributes(wxWindow *pParent);
 	virtual ~CACTIVE_Attributes(void);
 
-	void						On_Size				(wxSizeEvent &event);
+	void						On_Size				(wxSizeEvent     &event);
 
-	void						On_Apply			(wxCommandEvent &event);
+	void						On_Choice			(wxCommandEvent  &event);
+
+	void						On_Apply			(wxCommandEvent  &event);
 	void						On_Apply_UI			(wxUpdateUIEvent &event);
-	void						On_Restore			(wxCommandEvent &event);
+	void						On_Restore			(wxCommandEvent  &event);
 	void						On_Restore_UI		(wxUpdateUIEvent &event);
 
-	void						Set_Layer			(class CWKSP_Layer *pLayer);
+	void						Set_Item			(class CWKSP_Layer *pItem);
 
 	void						Set_Attributes		(void);
+
+	void						Save_Changes		(bool bConfirm);
 
 
 protected:
@@ -108,16 +112,18 @@ protected:
 
 	class wxButton				*m_Btn_Restore, *m_Btn_Apply;
 
-	class CSG_Table				*m_pAttributes;
+	class wxChoice				*m_pSelections;
 
+	class CSG_Table				*m_pAttributes;
+	
 	class CVIEW_Table_Control	*m_pControl;
 
-	class CWKSP_Layer			*m_pLayer;
+	class CWKSP_Layer			*m_pItem;
 
 
 	void						_Set_Positions		(void);
 
-	void						_Save_Changes		(bool bConfirm);
+	class CSG_Table *			_Get_Table			(void);
 
 
 //---------------------------------------------------------

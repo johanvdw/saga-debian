@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_3d_image.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_map_3d_image.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ void CVIEW_Map_3D_Image::Save(const wxString &file, int type)
 {
 	if( m_img.Ok() && file.Length() > 0 )
 	{
-		m_img.SaveFile(file, type);
+		m_img.SaveFile(file, (wxBitmapType)type);
 	}
 }
 

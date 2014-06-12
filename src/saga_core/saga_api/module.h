@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module.h 2111 2014-05-07 09:58:48Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -211,6 +211,8 @@ public:
 
 	virtual bool				do_Sync_Projections			(void)	{	return( true  );	}
 
+	virtual bool				needs_GUI					(void)	{	return( false );	}
+
 	virtual bool				is_Grid						(void)	{	return( false );	}
 	virtual bool				is_Interactive				(void)	{	return( false );	}
 	bool						is_Progress					(void)	{	return( SG_UI_Process_Get_Okay(false) );	}
@@ -256,7 +258,7 @@ protected:
 	virtual bool				Process_Get_Okay			(bool bBlink = false);
 	virtual void				Process_Set_Text			(const CSG_String &Text);
 
-	virtual bool				Set_Progress				(int Position);
+	virtual bool				Set_Progress				(double Percent);
 	virtual bool				Set_Progress				(double Position, double Range);
 
 	bool						Stop_Execution				(bool bDialog = true);
@@ -342,14 +344,14 @@ public:
 
 protected:
 
-	virtual bool				Set_Progress			(int iRow);
+	virtual bool				Set_Progress_NCells		(sLong iCell);
+	virtual bool				Set_Progress			(int  iRow);
 	virtual bool				Set_Progress			(double Position, double Range);
-	virtual bool				Set_Progress_NCells		(int iCell);
 
 	//-----------------------------------------------------
 	int							Get_NX					(void)						{	return( Get_System()->Get_NX() );				}
 	int							Get_NY					(void)						{	return( Get_System()->Get_NY() );				}
-	long						Get_NCells				(void)						{	return( Get_System()->Get_NCells() );			}
+	sLong						Get_NCells				(void)						{	return( Get_System()->Get_NCells() );			}
 	double						Get_Cellsize			(void)						{	return( Get_System()->Get_Cellsize() );			}
 	double						Get_Cellarea			(void)						{	return( Get_System()->Get_Cellarea() );			}
 	double						Get_XMin				(void)						{	return( Get_System()->Get_XMin() );				}
@@ -504,6 +506,8 @@ public:
 
 	virtual TSG_Module_Type		Get_Type				(void)	{	return( MODULE_TYPE_Interactive );	}
 
+	virtual bool				needs_GUI				(void)	{	return( true );	}
+
 	virtual bool				is_Interactive			(void)	{	return( true );	}
 
 };
@@ -527,6 +531,8 @@ public:
 	virtual ~CSG_Module_Grid_Interactive(void);
 
 	virtual TSG_Module_Type		Get_Type				(void)	{	return( MODULE_TYPE_Grid_Interactive );	}
+
+	virtual bool				needs_GUI				(void)	{	return( true );	}
 
 	virtual bool				is_Interactive			(void)	{	return( true );	}
 

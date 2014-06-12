@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_data_menu_files.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_data_menu_files.cpp 2029 2014-02-27 16:00:28Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -61,7 +61,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <wx/string.h>
 #include <wx/menu.h>
 
 #include <saga_api/saga_api.h>
@@ -70,6 +69,8 @@
 
 #include "wksp_data_menu_files.h"
 #include "wksp_data_menu_file.h"
+
+#include "saga_frame.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -82,18 +83,21 @@
 CWKSP_Data_Menu_Files::CWKSP_Data_Menu_Files(void)
 {
 	m_bUpdate	= true;
-
 	m_pMenu		= new wxMenu;
 
-	//-----------------------------------------------------
-	m_pMenu->Append(ID_CMD_DATA_FIRST      , _TL("Project")    , m_Projects   .Create(DATAOBJECT_TYPE_Undefined));
+	CMD_Menu_Add_Item(m_pMenu, false, ID_CMD_WKSP_OPEN);
+	CMD_Menu_Add_Item(m_pMenu, false, ID_CMD_WKSP_SAVE);
+	CMD_Menu_Add_Item(m_pMenu, false, ID_CMD_DATA_PROJECT_NEW);
+
 	m_pMenu->AppendSeparator();
+	m_pMenu->Append(ID_CMD_DATA_FIRST      , _TL("Project")    , m_Projects   .Create(DATAOBJECT_TYPE_Undefined));
 	m_pMenu->Append(ID_CMD_TABLES_FIRST    , _TL("Table")      , m_Tables     .Create(DATAOBJECT_TYPE_Table));
 	m_pMenu->Append(ID_CMD_SHAPES_FIRST    , _TL("Shapes")     , m_Shapes     .Create(DATAOBJECT_TYPE_Shapes));
-	m_pMenu->Append(ID_CMD_TIN_FIRST       , _TL("TIN")        , m_TINs       .Create(DATAOBJECT_TYPE_TIN));
 	m_pMenu->Append(ID_CMD_POINTCLOUD_FIRST, _TL("Point Cloud"), m_PointClouds.Create(DATAOBJECT_TYPE_PointCloud));
+	m_pMenu->Append(ID_CMD_TIN_FIRST       , _TL("TIN")        , m_TINs       .Create(DATAOBJECT_TYPE_TIN));
 	m_pMenu->Append(ID_CMD_GRIDS_FIRST     , _TL("Grid")       , m_Grids      .Create(DATAOBJECT_TYPE_Grid));
 	m_pMenu->AppendSeparator();
+
 	CMD_Menu_Add_Item(m_pMenu, false, ID_CMD_FRAME_QUIT);
 }
 
@@ -168,12 +172,14 @@ inline CWKSP_Data_Menu_File * CWKSP_Data_Menu_Files::_Get_Menu(int DataType)
 //---------------------------------------------------------
 void CWKSP_Data_Menu_Files::_Update(void)
 {
+	g_pSAGA_Frame->Freeze();
 	m_Projects   .Update(m_pMenu->FindItem(ID_CMD_DATA_FIRST      )->GetSubMenu());
 	m_Tables     .Update(m_pMenu->FindItem(ID_CMD_TABLES_FIRST    )->GetSubMenu());
 	m_Shapes     .Update(m_pMenu->FindItem(ID_CMD_SHAPES_FIRST    )->GetSubMenu());
 	m_TINs       .Update(m_pMenu->FindItem(ID_CMD_TIN_FIRST       )->GetSubMenu());
 	m_PointClouds.Update(m_pMenu->FindItem(ID_CMD_POINTCLOUD_FIRST)->GetSubMenu());
 	m_Grids      .Update(m_pMenu->FindItem(ID_CMD_GRIDS_FIRST     )->GetSubMenu());
+	g_pSAGA_Frame->Thaw();
 }
 
 

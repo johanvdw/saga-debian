@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: grid_system.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: grid_system.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ bool CSG_Grid_System::Assign(double Cellsize, double xMin, double yMin, int NX, 
 	{
 		m_NX		= NX;
 		m_NY		= NY;
-		m_NCells	= (long) NY * NX;
+		m_NCells	= (sLong)NY * NX;
 
 		m_Cellsize	= Cellsize;
 		m_Cellarea	= Cellsize * Cellsize;

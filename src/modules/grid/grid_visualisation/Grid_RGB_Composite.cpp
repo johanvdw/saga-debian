@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_RGB_Composite.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Grid_RGB_Composite.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ CSG_Grid * CGrid_RGB_Composite::_Get_Grid(CSG_Grid *pGrid, int Method, CSG_Param
 	if( pGrid )
 	{
 		int		x, y;
-		long	n;
+		sLong	n;
 
 		switch( Method )
 		{
@@ -365,10 +365,10 @@ CSG_Grid * CGrid_RGB_Composite::_Get_Grid(CSG_Grid *pGrid, int Method, CSG_Param
 			break;
 
 		case 3:	// Normalise
-			n		= (long)(pGrid->Get_NCells() * pPerctl->Get_LoVal() / 100.0);
+			n		= (sLong)(pGrid->Get_NCells() * pPerctl->Get_LoVal() / 100.0);
 			pGrid->Get_Sorted(n < 0 ? 0 : (n >= pGrid->Get_NCells() ? pGrid->Get_NCells() - 1 : n), x, y, false, false);
 			Min		= pGrid->asDouble(x, y);
-			n		= (long)(pGrid->Get_NCells() * pPerctl->Get_HiVal() / 100.0);
+			n		= (sLong)(pGrid->Get_NCells() * pPerctl->Get_HiVal() / 100.0);
 			pGrid->Get_Sorted(n < 0 ? 0 : (n >= pGrid->Get_NCells() ? pGrid->Get_NCells() - 1 : n), x, y, false, false);
 			Range	= pGrid->asDouble(x, y) - Min;
 			Range	= Range > 0.0 ? 255.0 / Range : 0.0;

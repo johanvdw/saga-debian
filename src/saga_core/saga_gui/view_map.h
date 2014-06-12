@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_map.h 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,10 +86,31 @@ class CVIEW_Map : public CVIEW_Base
 {
 public:
 	CVIEW_Map(class CWKSP_Map *pMap, int Frame_Width);
-	virtual ~CVIEW_Map(void);
 
 	static class wxToolBarBase *	_Create_ToolBar				(void);
 	static class wxMenu *			_Create_Menu				(void);
+
+	virtual void					Do_Update					(void);
+
+	class CVIEW_Map_Control *		Get_Map_Control				(void)	{	return( m_pControl );	}
+
+	void							Ruler_Set_Width				(int Width);
+	void							Ruler_Set_Position			(int x, int y);
+	void							Ruler_Refresh				(void);
+
+
+private:
+
+	int								m_Ruler_Size;
+
+	class CWKSP_Map					*m_pMap;
+
+	class CVIEW_Map_Control			*m_pControl;
+
+	class CVIEW_Ruler				*m_pRuler_X1, *m_pRuler_X2, *m_pRuler_Y1, *m_pRuler_Y2;
+
+
+	void							_Set_Positions				(void);
 
 	void							On_Paint					(wxPaintEvent    &event);
 	void							On_Size						(wxSizeEvent     &event);
@@ -113,39 +134,18 @@ public:
 	void							On_Map_Zoom_Extent			(wxCommandEvent  &event);
 	void							On_Map_Zoom_Synchronize		(wxCommandEvent  &event);
 	void							On_Map_ScaleBar				(wxCommandEvent  &event);
+	void							On_Map_North_Arrow			(wxCommandEvent  &event);
+	void							On_Map_Graticule			(wxCommandEvent  &event);
 
 	void							On_Map_Mode_Zoom			(wxCommandEvent  &event);
 	void							On_Map_Mode_Pan				(wxCommandEvent  &event);
 	void							On_Map_Mode_Select			(wxCommandEvent  &event);
 	void							On_Map_Mode_Distance		(wxCommandEvent  &event);
 
-	class CVIEW_Map_Control *		Get_Map_Control				(void)	{	return( m_pControl );	}
 
-	void							Refresh_Map					(void);
-
-	void							Ruler_Set_Width				(int Width);
-	void							Ruler_Set_Position			(int x, int y);
-	void							Ruler_Refresh				(void);
-
-
-private:
-
-	int								m_Ruler_Size;
-
-	class CWKSP_Map					*m_pMap;
-
-	class CVIEW_Map_Control			*m_pControl;
-
-	class CVIEW_Ruler				*m_pRuler_X1, *m_pRuler_X2, *m_pRuler_Y1, *m_pRuler_Y2;
-
-
-	void							_Set_Positions				(void);
-
-
-private:
-
-	DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
 	DECLARE_CLASS(CVIEW_Map)
+	DECLARE_EVENT_TABLE()
 
 };
 

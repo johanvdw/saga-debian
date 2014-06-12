@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_parameters.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: active_parameters.h 2002 2014-02-19 17:06:08Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -91,6 +91,7 @@ public:
 	virtual ~CACTIVE_Parameters(void);
 
 	void						On_Size				(wxSizeEvent     &event);
+	void						On_Key				(wxKeyEvent      &event);
 
 	void						On_Apply			(wxCommandEvent  &event);
 	void						On_Apply_UI			(wxUpdateUIEvent &event);

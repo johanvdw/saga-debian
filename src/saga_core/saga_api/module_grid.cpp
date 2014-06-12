@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_grid.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module_grid.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -95,6 +95,17 @@ CSG_Module_Grid::~CSG_Module_Grid(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+bool CSG_Module_Grid::Set_Progress_NCells(sLong iCell)
+{
+	if( Get_System()->is_Valid() && (Get_System()->Get_NCells() <= 100 || !(iCell % (Get_System()->Get_NCells() / 100))) )
+	{
+		return( CSG_Module::Set_Progress((double)iCell, (double)Get_System()->Get_NCells()) );
+	}
+
+	return( is_Progress() );
+}
+
+//---------------------------------------------------------
 bool CSG_Module_Grid::Set_Progress(int iRow)
 {
 	return( CSG_Module::Set_Progress(iRow, Get_System()->Get_NY() - 1) );
@@ -104,17 +115,6 @@ bool CSG_Module_Grid::Set_Progress(int iRow)
 bool CSG_Module_Grid::Set_Progress(double Position, double Range)
 {
 	return( CSG_Module::Set_Progress(Position, Range) );
-}
-
-//---------------------------------------------------------
-bool CSG_Module_Grid::Set_Progress_NCells(int iCell)
-{
-	if( Get_System()->is_Valid() && (Get_System()->Get_NCells() <= 100 || !(iCell % (Get_System()->Get_NCells() / 100))) )
-	{
-		return( CSG_Module::Set_Progress(iCell, Get_System()->Get_NCells()) );
-	}
-
-	return( is_Progress() );
 }
 
 

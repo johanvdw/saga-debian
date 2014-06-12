@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_tin.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_tin.cpp 2053 2014-03-18 09:47:18Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -71,8 +71,6 @@
 
 #include "wksp_tin.h"
 #include "wksp_table.h"
-
-#include "view_scatterplot.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -153,6 +151,9 @@ wxMenu * CWKSP_TIN::Get_Menu(void)
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_TIN_SHOW);
+	pMenu->AppendSeparator();
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECTION);
+	pMenu->AppendSeparator();
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SETTINGS_COPY);
 
 	pMenu->AppendSeparator();
@@ -190,7 +191,7 @@ bool CWKSP_TIN::On_Command(int Cmd_ID)
 		break;
 
 	case ID_CMD_TABLES_SCATTERPLOT:
-		Add_ScatterPlot(Get_Table()->Get_Table());
+		Add_ScatterPlot();
 		break;
 	}
 
@@ -368,7 +369,13 @@ bool CWKSP_TIN::asImage(CSG_Grid *pImage)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CWKSP_TIN::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
+TSG_Rect CWKSP_TIN::Edit_Get_Extent(void)
+{
+	return( Get_TIN()->Get_Extent() );
+}
+
+//---------------------------------------------------------
+bool CWKSP_TIN::Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
 {
 	CSG_Rect	rWorld(m_Edit_Mouse_Down, Point);
 
@@ -381,15 +388,9 @@ bool CWKSP_TIN::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int K
 }
 
 //---------------------------------------------------------
-bool CWKSP_TIN::On_Edit_Set_Attributes(void)
+bool CWKSP_TIN::Edit_Set_Attributes(void)
 {
 	return( true );
-}
-
-//---------------------------------------------------------
-TSG_Rect CWKSP_TIN::On_Edit_Get_Extent(void)
-{
-	return( Get_TIN()->Get_Extent() );
 }
 
 

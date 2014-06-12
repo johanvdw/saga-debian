@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: table_record.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: table_record.cpp 2054 2014-03-18 09:49:22Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -242,13 +242,16 @@ void CSG_Table_Record::Set_Modified(bool bOn)
 		if( bOn )
 		{
 			m_Flags	|=  SG_TABLE_REC_FLAG_Modified;
-
-			m_pTable->Set_Modified();
 		}
 		else
 		{
 			m_Flags	&= ~SG_TABLE_REC_FLAG_Modified;
 		}
+	}
+
+	if( bOn )
+	{
+		m_pTable->Set_Modified();
 	}
 }
 
@@ -519,6 +522,8 @@ bool CSG_Table_Record::Assign(CSG_Table_Record *pRecord)
 		{
 			*(m_Values[iField])	= *(pRecord->m_Values[iField]);
 		}
+
+		Set_Modified();
 
 		return( true );
 	}
