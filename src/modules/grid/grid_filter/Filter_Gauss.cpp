@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Filter_Gauss.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Filter_Gauss.cpp 1960 2014-02-03 12:43:13Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -167,6 +167,7 @@ bool CFilter_Gauss::On_Execute(void)
 		//-------------------------------------------------
 		for(int y=0; y<Get_NY() && Set_Progress(y); y++)
 		{
+			#pragma omp parallel for
 			for(int x=0; x<Get_NX(); x++)
 			{
 				if( m_pInput->is_InGrid(x, y) )

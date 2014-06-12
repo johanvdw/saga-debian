@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_formula.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: mat_formula.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -615,7 +615,7 @@ int CSG_Formula::Del_Function(SG_Char *name)
 
 	_Set_Error();
 
-	return( pFunction - gSG_Functions );
+	return( (int)(pFunction - gSG_Functions) );
 }
 
 //---------------------------------------------------------
@@ -726,7 +726,7 @@ int CSG_Formula::_Get_Function(SG_Char *name)
 
 	_Set_Error();
 
-	return( pFunction - gSG_Functions );
+	return( (int)(pFunction - gSG_Functions) );
 }
 
 

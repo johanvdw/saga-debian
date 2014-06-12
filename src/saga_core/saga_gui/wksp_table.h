@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_table.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_table.h 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -109,11 +109,6 @@ public:
 
 	virtual bool					Show					(int Flags = 0);
 	virtual bool					View_Closes				(class wxMDIChildFrame *pView);
-
-
-protected:
-
-	virtual void					On_Update_Views			(bool bAll);
 
 
 private:

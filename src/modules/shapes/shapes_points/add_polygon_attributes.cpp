@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: add_polygon_attributes.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: add_polygon_attributes.cpp 1959 2014-02-03 12:41:37Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -113,16 +113,6 @@ CAdd_Polygon_Attributes::CAdd_Polygon_Attributes(void)
 bool CAdd_Polygon_Attributes::On_Execute(void)
 {
 	//-----------------------------------------------------
-	CSG_Parameter_Table_Fields	*pFields	= Parameters("FIELDS")->asTableFields();
-
-	if( pFields->Get_Count() == 0 )
-	{
-		Error_Set(_TL("No attributes in selection."));
-
-		return( false );
-	}
-
-	//-----------------------------------------------------
 	CSG_Shapes	*pInput		= Parameters("INPUT")->asShapes();
 
 	if( !pInput->is_Valid() )
@@ -140,6 +130,21 @@ bool CAdd_Polygon_Attributes::On_Execute(void)
 		Error_Set(_TL("Invalid polygon layer."));
 
 		return( false );
+	}
+
+	//-----------------------------------------------------
+	CSG_Parameter_Table_Fields	*pFields	= Parameters("FIELDS")->asTableFields();
+
+	if( pFields->Get_Count() == 0 )
+	{
+		CSG_String	sFields;
+
+		for(int iField=0; iField<pPolygons->Get_Field_Count(); iField++)
+		{
+			sFields += CSG_String::Format(SG_T("%d,"), iField);
+		}
+
+		pFields->Set_Value(sFields);
 	}
 
 	//-----------------------------------------------------

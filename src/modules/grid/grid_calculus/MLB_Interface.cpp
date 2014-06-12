@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1937 2014-01-11 18:22:42Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ CSG_String Get_Info(int i)
 		return( _TL("Grid - Calculus") );
 
 	case MLB_INFO_Author:
-		return( SG_T("O. Conrad, A. Ringeler, V. Olaya (c) 2001-4") );
+		return( SG_T("O. Conrad, A. Ringeler, V. Olaya, J. Engels (c) 2001-2014") );
 
 	case MLB_INFO_Description:
 		return( _TL("Grid based or related calculations.") );
@@ -110,6 +110,7 @@ CSG_String Get_Info(int i)
 #include "grid_metric_conversion.h"
 #include "gradient_cartes_polar.h"
 
+#include "kff_synth.h"
 
 //---------------------------------------------------------
 // 4. Allow your modules to be created here...
@@ -143,8 +144,10 @@ CSG_Module *		Create_Module(int i)
 	case 15:		return( new CGradient_Cartes_To_Polar );
 	case 16:		return( new CGradient_Polar_To_Cartes );
 
+	case 19:		return( new Ckff_synthesis );
+
 	//-----------------------------------------------------
-	case 19:		return( NULL );
+	case 20:		return( NULL );
 	default:		return( MLB_INTERFACE_SKIP_MODULE );
 	}
 }

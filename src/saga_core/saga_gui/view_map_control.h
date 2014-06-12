@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_control.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_map_control.h 2027 2014-02-27 15:14:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -113,8 +113,6 @@ public:
 	void						On_Size				(wxSizeEvent  &event);
 	void						On_Key_Down			(wxKeyEvent   &event);
 
-	void						On_Mouse_Wheel		(wxMouseEvent &event);
-	void						On_Mouse_Motion		(wxMouseEvent &event);
 	void						On_Mouse_LDown		(wxMouseEvent &event);
 	void						On_Mouse_LUp		(wxMouseEvent &event);
 	void						On_Mouse_LDClick	(wxMouseEvent &event);
@@ -123,6 +121,10 @@ public:
 	void						On_Mouse_RDClick	(wxMouseEvent &event);
 	void						On_Mouse_MDown		(wxMouseEvent &event);
 	void						On_Mouse_MUp		(wxMouseEvent &event);
+	void						On_Mouse_Motion		(wxMouseEvent &event);
+	void						On_Mouse_Wheel		(wxMouseEvent &event);
+
+	void						On_Mouse_Lost		(wxMouseCaptureLostEvent &event);
 
 	bool						Set_Mode			(int Mode);
 	int							Get_Mode			(void)	{	return( m_Mode );	}

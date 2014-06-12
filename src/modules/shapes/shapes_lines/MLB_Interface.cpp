@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: MLB_Interface.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: MLB_Interface.cpp 1973 2014-02-07 11:24:19Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -100,6 +100,7 @@ CSG_String Get_Info(int i)
 #include "line_polygon_intersection.h"
 #include "line_simplification.h"
 #include "line_dissolve.h"
+#include "line_split_with_lines.h"
 
 
 //---------------------------------------------------------
@@ -115,9 +116,11 @@ CSG_Module *		Create_Module(int i)
 	case  3:	return( new CLine_Polygon_Intersection );
 	case  4:	return( new CLine_Simplification );
 	case  5:	return( new CLine_Dissolve );
-	}
+	case  6:	return( new CLine_Split_with_Lines );
 
-	return( NULL );
+	case 10:	return( NULL );
+	default:	return( MLB_INTERFACE_SKIP_MODULE );
+	}
 }
 
 

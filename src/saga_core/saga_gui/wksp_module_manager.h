@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_manager.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_module_manager.h 1993 2014-02-13 16:38:16Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -126,9 +126,6 @@ private:
 
 	class CWKSP_Menu_Modules		*m_pMenu_Modules;
 
-
-	void							_Config_Read		(void);
-	void							_Config_Write		(void);
 
 	int								_Open_Directory		(const wxString &sDirectory, bool bOnlySubDirectories = false);
 

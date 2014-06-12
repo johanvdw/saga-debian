@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: api_core.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: api_core.h 2112 2014-05-07 09:59:40Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -116,33 +116,31 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-// this is defined by configure, but will not be on a normal
-// application build
-//
+// this is defined by configure, but will not be on a normal application build
 #ifndef SIZEOF_LONG
 	#if defined(__alpha) || defined(__sparcv9) || defined(__LP64__) || (defined(__HOS_AIX__) && defined(_LP64))
-		#define SIZEOF_LONG        8
+		#define SIZEOF_LONG		8
 	#else
-		#define SIZEOF_LONG        4
+		#define SIZEOF_LONG		4
 	#endif
 #endif
 
 //---------------------------------------------------------
 #ifdef _TYPEDEF_BOOL
-	typedef unsigned int	bool;
-	#define true			((bool)1)
-	#define false			((bool)0)
+	typedef unsigned int		bool;
+	#define true				((bool)1)
+	#define false				((bool)0)
 #endif	// _TYPEDEF_BOOL
 
 //---------------------------------------------------------
 #ifdef _TYPEDEF_BYTE
-	typedef unsigned char	BYTE;
+	typedef unsigned char		BYTE;
 #endif	// _TYPEDEF_BYTE
 
 //---------------------------------------------------------
 #ifdef _TYPEDEF_WORD
-	typedef unsigned short	WORD;
-	#if (SIZEOF_LONG == 4)
+	typedef unsigned short		WORD;
+	#if SIZEOF_LONG == 4
 		typedef unsigned long	DWORD;
 	#else
 		typedef unsigned int	DWORD;
@@ -150,13 +148,22 @@
 #endif	// _TYPEDEF_WORD
 
 //---------------------------------------------------------
+#if SIZEOF_LONG == 4
+	typedef   signed long long	sLong;
+	typedef unsigned long long	uLong;
+#else
+	typedef   signed long		sLong;
+	typedef unsigned long		uLong;
+#endif
+
+//---------------------------------------------------------
 #if defined(_SAGA_MSW)
 	#include <float.h>
-	#define SG_is_NaN	_isnan
+	#define SG_is_NaN			_isnan
 #elif defined(isnan)
-	#define SG_is_NaN	isnan
+	#define SG_is_NaN			isnan
 #else
-	#define SG_is_NaN(x)	(x != x)
+	#define SG_is_NaN(x)		(x != x)
 #endif
 
 
@@ -831,8 +838,8 @@ inline size_t	SG_Data_Type_Get_Size	(TSG_Data_Type Type)
 	case SG_DATATYPE_Short:		return( sizeof(short int) );
 	case SG_DATATYPE_DWord:		return( sizeof(unsigned int) );
 	case SG_DATATYPE_Int:		return( sizeof(int) );
-	case SG_DATATYPE_ULong:		return( sizeof(unsigned long) );
-	case SG_DATATYPE_Long:		return( sizeof(long) );
+	case SG_DATATYPE_ULong:		return( sizeof(uLong) );
+	case SG_DATATYPE_Long:		return( sizeof(sLong) );
 	case SG_DATATYPE_Float:		return( sizeof(float) );
 	case SG_DATATYPE_Double:	return( sizeof(double) );
 	case SG_DATATYPE_String:	return( 0 );
@@ -956,6 +963,7 @@ SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_TmpName			(const SG_Char *Prefix, co
 SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Name			(const SG_Char *full_Path, bool bExtension);
 SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path			(const SG_Char *full_Path);
 SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path_Absolute	(const SG_Char *full_Path);
+SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Path_Relative	(const SG_Char *Directory, const SG_Char *full_Path);
 SAGA_API_DLL_EXPORT CSG_String		SG_File_Make_Path			(const SG_Char *Directory, const SG_Char *Name, const SG_Char *Extension = NULL);
 SAGA_API_DLL_EXPORT bool			SG_File_Cmp_Extension		(const SG_Char *File_Name, const SG_Char *Extension);
 SAGA_API_DLL_EXPORT CSG_String		SG_File_Get_Extension		(const SG_Char *File_Name);
@@ -1111,11 +1119,26 @@ public:
 	bool							Set_Blue			(int Index, int Value);
 	bool							Set_Brightness		(int Index, int Value);
 
-	long							Get_Color			(int Index) const	{	return( Index >= 0 && Index < m_nColors ? m_Colors[Index] : 0 );	}
-	long							Get_Red				(int Index) const	{	return( SG_GET_R(Get_Color(Index)) );	}
-	long							Get_Green			(int Index) const	{	return( SG_GET_G(Get_Color(Index)) );	}
-	long							Get_Blue			(int Index) const	{	return( SG_GET_B(Get_Color(Index)) );	}
-	long							Get_Brightness		(int Index) const	{	return( (Get_Red(Index) + Get_Green(Index) + Get_Blue(Index)) / 3 );	}
+	long							Get_Color			(int Index)	const	{	return( m_nColors > 0 ? m_Colors[Index < 0 ? 0 : Index >= m_nColors ? m_nColors - 1 : Index] : 0 );	}
+	long							Get_Red				(int Index)	const	{	return( SG_GET_R(Get_Color(Index)) );	}
+	long							Get_Green			(int Index)	const	{	return( SG_GET_G(Get_Color(Index)) );	}
+	long							Get_Blue			(int Index)	const	{	return( SG_GET_B(Get_Color(Index)) );	}
+	long							Get_Brightness		(int Index)	const	{	return( (Get_Red(Index) + Get_Green(Index) + Get_Blue(Index)) / 3 );	}
+
+	long							Get_Interpolated	(double Index)	const
+	{
+		if( m_nColors <= 0             )	return( 0 );
+		if( Index     <= 0             )	return( m_Colors[0] );
+		if( Index     >= m_nColors - 1 )	return( m_Colors[m_nColors - 1] );
+
+		int	i	= (int)Index;	Index	-= i;
+
+		return( SG_GET_RGB(
+			SG_GET_R(m_Colors[i]) + Index * (SG_GET_R(m_Colors[i + 1]) - SG_GET_R(m_Colors[i])),
+			SG_GET_G(m_Colors[i]) + Index * (SG_GET_G(m_Colors[i + 1]) - SG_GET_G(m_Colors[i])),
+			SG_GET_B(m_Colors[i]) + Index * (SG_GET_B(m_Colors[i + 1]) - SG_GET_B(m_Colors[i])))
+		);
+	}
 
 	bool							Set_Default			(int nColors = 11);
 	bool							Set_Palette			(int Index, bool bRevert = false, int nColors = 11);
@@ -1218,6 +1241,9 @@ SAGA_API_DLL_EXPORT const SG_Char *		SG_Translate		(const CSG_String &Text);
 
 #define _TL(s)	SG_Translate(L ## s)
 #define _TW(s)	SG_Translate(CSG_String(s))
+
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT bool SG_Set_OldStyle_Naming(void);
 
 
 ///////////////////////////////////////////////////////////

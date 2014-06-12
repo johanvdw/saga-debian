@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map_control.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_map_control.cpp 2027 2014-02-27 15:14:20Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -105,20 +105,21 @@
 
 //---------------------------------------------------------
 BEGIN_EVENT_TABLE(CVIEW_Map_Control, wxPanel)
-	EVT_PAINT			(CVIEW_Map_Control::On_Paint)
-	EVT_SIZE			(CVIEW_Map_Control::On_Size)
-	EVT_KEY_DOWN		(CVIEW_Map_Control::On_Key_Down)
+	EVT_PAINT				(CVIEW_Map_Control::On_Paint)
+	EVT_SIZE				(CVIEW_Map_Control::On_Size)
+	EVT_KEY_DOWN			(CVIEW_Map_Control::On_Key_Down)
 
-	EVT_MOUSEWHEEL		(CVIEW_Map_Control::On_Mouse_Wheel)
-	EVT_MOTION			(CVIEW_Map_Control::On_Mouse_Motion)
-	EVT_LEFT_DOWN		(CVIEW_Map_Control::On_Mouse_LDown)
-	EVT_LEFT_UP			(CVIEW_Map_Control::On_Mouse_LUp)
-	EVT_LEFT_DCLICK		(CVIEW_Map_Control::On_Mouse_LDClick)
-	EVT_RIGHT_DOWN		(CVIEW_Map_Control::On_Mouse_RDown)
-	EVT_RIGHT_UP		(CVIEW_Map_Control::On_Mouse_RUp)
-	EVT_RIGHT_DCLICK	(CVIEW_Map_Control::On_Mouse_RDClick)
-	EVT_MIDDLE_DOWN		(CVIEW_Map_Control::On_Mouse_MDown)
-	EVT_MIDDLE_UP		(CVIEW_Map_Control::On_Mouse_MUp)
+	EVT_MOUSEWHEEL			(CVIEW_Map_Control::On_Mouse_Wheel)
+	EVT_MOTION				(CVIEW_Map_Control::On_Mouse_Motion)
+	EVT_LEFT_DOWN			(CVIEW_Map_Control::On_Mouse_LDown)
+	EVT_LEFT_UP				(CVIEW_Map_Control::On_Mouse_LUp)
+	EVT_LEFT_DCLICK			(CVIEW_Map_Control::On_Mouse_LDClick)
+	EVT_RIGHT_DOWN			(CVIEW_Map_Control::On_Mouse_RDown)
+	EVT_RIGHT_UP			(CVIEW_Map_Control::On_Mouse_RUp)
+	EVT_RIGHT_DCLICK		(CVIEW_Map_Control::On_Mouse_RDClick)
+	EVT_MIDDLE_DOWN			(CVIEW_Map_Control::On_Mouse_MDown)
+	EVT_MIDDLE_UP			(CVIEW_Map_Control::On_Mouse_MUp)
+	EVT_MOUSE_CAPTURE_LOST	(CVIEW_Map_Control::On_Mouse_Lost)
 END_EVENT_TABLE()
 
 
@@ -668,7 +669,7 @@ void CVIEW_Map_Control::On_Mouse_LDown(wxMouseEvent &event)
 	}
 
 	//-----------------------------------------------------
-	if( bCaptureMouse )
+	if( bCaptureMouse && !HasCapture() )
 	{
 		CaptureMouse();
 	}
@@ -776,6 +777,10 @@ void CVIEW_Map_Control::On_Mouse_RDown(wxMouseEvent &event)
 		if( g_pModule )
 		{
 			g_pModule->Execute(_Get_World(event.GetPosition()), MODULE_INTERACTIVE_RDOWN, GET_KEYS(event));
+		}
+		else if( m_pMap->Find_Layer(Get_Active_Layer()) )
+		{
+			Get_Active_Layer()->Edit_On_Mouse_Down(_Get_World(event.GetPosition()), _Get_World(1.0), GET_KEYS(event));
 		}
 		break;
 
@@ -920,7 +925,7 @@ void CVIEW_Map_Control::On_Mouse_MDown(wxMouseEvent &event)
 	}
 
 	//-----------------------------------------------------
-	if( bCaptureMouse )
+	if( bCaptureMouse && !HasCapture() )
 	{
 		CaptureMouse();
 	}
@@ -1060,6 +1065,18 @@ void CVIEW_Map_Control::On_Mouse_Wheel(wxMouseEvent &event)
 	{
 		_Zoom(_Get_World(event.GetPosition()), true);
 	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CVIEW_Map_Control::On_Mouse_Lost(wxMouseCaptureLostEvent &event)
+{
 }
 
 

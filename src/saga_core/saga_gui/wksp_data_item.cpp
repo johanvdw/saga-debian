@@ -66,6 +66,7 @@
 
 #include "active.h"
 #include "active_parameters.h"
+#include "active_attributes.h"
 
 #include "wksp_base_control.h"
 
@@ -81,6 +82,7 @@
 #include "wksp_data_item.h"
 
 #include "view_histogram.h"
+#include "view_scatterplot.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -100,6 +102,12 @@ CWKSP_Data_Item::CWKSP_Data_Item(CSG_Data_Object *pObject)
 //---------------------------------------------------------
 CWKSP_Data_Item::~CWKSP_Data_Item(void)
 {
+	for(int i=m_Views.GetCount()-1; i>=0; i--)
+	{
+		((CVIEW_Base *)m_Views[i])->Do_Destroy();
+	}
+
+	//-----------------------------------------------------
 	if( m_pObject )
 	{
 		CSG_Data_Object	*pObject	= m_pObject;	m_pObject	= NULL;
@@ -287,19 +295,17 @@ bool CWKSP_Data_Item::Save(const wxString &File_Name)
 //---------------------------------------------------------
 void CWKSP_Data_Item::Parameters_Changed(void)
 {
-	static bool	bUpdates	= false;
-
-	if( !bUpdates )
+	if( !m_bUpdating )
 	{
-		bUpdates	= true;
+		m_bUpdating	= true;
 
 		On_Parameters_Changed();
 
 		CWKSP_Base_Item::Parameters_Changed();
 
-		Update_Views(true);
+		m_bUpdating	= false;
 
-		bUpdates	= false;
+		Update_Views(true);
 	}
 }
 
@@ -364,6 +370,47 @@ void CWKSP_Data_Item::On_DataObject_Changed(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+bool CWKSP_Data_Item::Add_ScatterPlot(void)
+{
+	new CVIEW_ScatterPlot(this);
+
+	return( true );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+bool CWKSP_Data_Item::View_Opened(wxMDIChildFrame *pView)
+{
+	if( m_Views.Index(pView) == wxNOT_FOUND )	// only add once
+	{
+		m_Views.Add(pView);
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
+bool CWKSP_Data_Item::View_Closes(wxMDIChildFrame *pView)
+{
+	if( m_Views.Index(pView) != wxNOT_FOUND )
+	{
+		m_Views.Remove(pView);
+
+		return( true );
+	}
+
+	return( false );
+}
+
+//---------------------------------------------------------
 bool CWKSP_Data_Item::Update_Views(bool bAll)
 {
 	if( !m_bUpdating )
@@ -371,6 +418,19 @@ bool CWKSP_Data_Item::Update_Views(bool bAll)
 		m_bUpdating	= true;
 
 		On_Update_Views(bAll);
+
+		if( bAll )
+		{
+			for(size_t i=0; i<m_Views.Count(); i++)
+			{
+				((CVIEW_Base *)m_Views[i])->Do_Update();
+			}
+		}
+
+		if( g_pACTIVE->Get_Active_Data_Item() == this )
+		{
+			g_pACTIVE->Get_Attributes()->Set_Attributes();
+		}
 
 		m_bUpdating	= false;
 

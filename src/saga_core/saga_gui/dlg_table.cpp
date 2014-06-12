@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_table.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: dlg_table.cpp 2041 2014-03-05 15:08:03Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -83,6 +83,8 @@ IMPLEMENT_CLASS(CDLG_Table, CDLG_Base)
 
 //---------------------------------------------------------
 BEGIN_EVENT_TABLE(CDLG_Table, CDLG_Base)
+	EVT_KEY_DOWN		(CDLG_Table::On_Key)
+
 	EVT_BUTTON			(ID_BTN_LOAD			, CDLG_Table::On_Load)
 	EVT_BUTTON			(ID_BTN_SAVE			, CDLG_Table::On_Save)
 	EVT_BUTTON			(ID_BTN_ADD				, CDLG_Table::On_Add)
@@ -136,6 +138,22 @@ CDLG_Table::~CDLG_Table(void)
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CDLG_Table::On_Key(wxKeyEvent &event)
+{
+	if( event.GetKeyCode() == WXK_RETURN )
+	{
+		if( m_pControl->IsCellEditControlShown() )
+		{
+			m_pControl->SaveEditControlValue();
+
+			return;
+		}
+	}
+
+	event.Skip();
+}
 
 //---------------------------------------------------------
 void CDLG_Table::Set_Position(wxRect r)

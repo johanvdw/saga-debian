@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: shapes.h 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 ///////////////////////////////////////////////////////////
 //                                                       //
@@ -821,7 +821,7 @@ public:
 
 	virtual bool			has_Statistics	(void)	const	{	return( true );	}
 
-	int						Get_Count		(void)	{	return( s_z.Get_Count   () );	}
+	sLong					Get_Count		(void)	{	return( s_z.Get_Count   () );	}
 	double					Get_Value		(int i)	{	return( s_z.Get_Value  (i) );	}
 	double					Get_Minimum		(void)	{	return( s_z.Get_Minimum () );	}
 	double					Get_Maximum		(void)	{	return( s_z.Get_Maximum () );	}

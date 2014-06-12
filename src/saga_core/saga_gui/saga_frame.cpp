@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: saga_frame.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: saga_frame.cpp 2047 2014-03-06 13:02:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ void CSAGA_Frame::On_Close(wxCloseEvent &event)
 		{
 			if( g_pModule )
 			{
-				DLG_Message_Show(_TL("Please stop module execution before exiting SAGA."), _TL("Exit SAGA"));
+				DLG_Message_Show(_TL("Please stop tool execution before exiting SAGA."), _TL("Exit SAGA"));
 			}
 
 			event.Veto();
@@ -752,7 +752,7 @@ bool CSAGA_Frame::Process_Set_Okay(bool bOkay)
 {
 	StatusBar_Set_Text(_TL("ready"));
 
-	ProgressBar_Set_Position(0);
+	ProgressBar_Set_Position(-1);
 
 	g_pSAGA->Process_Set_Okay(bOkay);
 
@@ -764,16 +764,19 @@ bool CSAGA_Frame::ProgressBar_Set_Position(int Position)
 {
 	if( Position < 0 )
 	{
-		Position	= 0;
+		m_pProgressBar->SetValue(0);
 	}
-	else if( Position > 100 )
+	else
 	{
-		Position	= 100;
-	}
+		if( Position > 100 )
+		{
+			Position	= 100;
+		}
 
-	if( m_pProgressBar->GetValue() != Position )
-	{
-		m_pProgressBar->SetValue(Position);
+		if( m_pProgressBar->GetValue() != Position )
+		{
+			m_pProgressBar->SetValue(Position);
+		}
 	}
 
 	return( Process_Get_Okay(false) );
@@ -890,6 +893,7 @@ void CSAGA_Frame::On_Child_Activates(int View_ID)
 	}
 
 	//-----------------------------------------------------
+	_Bar_Show(m_pTB_Main		, true);
 	_Bar_Show(m_pTB_Table		, pToolBar == m_pTB_Table);
 	_Bar_Show(m_pTB_Diagram		, pToolBar == m_pTB_Diagram);
 	_Bar_Show(m_pTB_Map			, pToolBar == m_pTB_Map);
@@ -969,10 +973,10 @@ wxMenuBar * CSAGA_Frame::_Create_MenuBar(void)
 	//-----------------------------------------------------
 	wxMenuBar	*pMenuBar	= new wxMenuBar;
 
-	pMenuBar->Append(g_pData   ->Get_Menu_Files  ()->Get_Menu(), _TL("File"   ));	// 0
-	pMenuBar->Append(g_pModules->Get_Menu_Modules()->Get_Menu(), _TL("Modules"));	// 1
-	pMenuBar->Append(pMenu_Window                              , _TL("Window" ));	// 2
-	pMenuBar->Append(pMenu_Help                                , _TL("?"      ));	// 3
+	pMenuBar->Append(g_pData   ->Get_Menu_Files  ()->Get_Menu(), _TL("File"         ));	// 0
+	pMenuBar->Append(g_pModules->Get_Menu_Modules()->Get_Menu(), _TL("Geoprocessing"));	// 1
+	pMenuBar->Append(pMenu_Window                              , _TL("Window"       ));	// 2
+	pMenuBar->Append(pMenu_Help                                , _TL("?"            ));	// 3
 
 	SetMenuBar(pMenuBar);
 
@@ -999,57 +1003,56 @@ void CSAGA_Frame::Set_Pane_Caption(wxWindow *pWindow, const wxString &Caption)
 //---------------------------------------------------------
 void CSAGA_Frame::_Bar_Add(wxWindow *pWindow, int Position, int Row)
 {
-	wxAuiPaneInfo	Info;
+	wxAuiPaneInfo	Pane;
 
-	Info.Name			(pWindow->GetName());
-	Info.Caption		(pWindow->GetName());
-	Info.MinSize		(100, 100);
-	Info.BestSize		(400, 400);
-	Info.FloatingSize	(400, 400);
-	Info.Position		(0);
-	Info.Layer			(Row);
-	Info.Row			(Row);
+	Pane.Name			(pWindow->GetName());
+	Pane.Caption		(pWindow->GetName());
+	Pane.MinSize		(100, 100);
+	Pane.BestSize		(400, 400);
+	Pane.FloatingSize	(400, 400);
+	Pane.Position		(0);
+	Pane.Layer			(Row);
+	Pane.Row			(Row);
 
 	switch( Position )
 	{
 	default:
-	case 0:	Info.Bottom();	break;
-	case 1:	Info.Right ();	break;
-	case 2:	Info.Left  ();	break;
-	case 3:	Info.Top   ();	break;
-	case 4:	Info.Center();	break;
+	case 0:	Pane.Bottom();	break;
+	case 1:	Pane.Right ();	break;
+	case 2:	Pane.Left  ();	break;
+	case 3:	Pane.Top   ();	break;
+	case 4:	Pane.Center();	break;
 	}
 
-	m_pLayout->AddPane(pWindow, Info);
+	m_pLayout->AddPane(pWindow, Pane);
 }
 
 //---------------------------------------------------------
 void CSAGA_Frame::_Bar_Toggle(wxWindow *pWindow)
 {
-	if( pWindow->IsShown() && m_pLayout->GetPane(pWindow).IsShown() )
+	if( m_pLayout->GetPane(pWindow).IsOk() )
 	{
-		m_pLayout->GetPane(pWindow).Hide();
-
-		if( m_pLayout->GetPane(pWindow).IsToolbar() )
-			pWindow->Hide();
+		_Bar_Show(pWindow, !m_pLayout->GetPane(pWindow).IsShown());
 	}
-	else
-	{
-		if( m_pLayout->GetPane(pWindow).IsToolbar() )
-			pWindow->Show();
-
-		m_pLayout->GetPane(pWindow).Show();
-	}
-
-	m_pLayout->Update();
 }
 
 //---------------------------------------------------------
 void CSAGA_Frame::_Bar_Show(wxWindow *pWindow, bool bShow)
 {
-	if( pWindow && pWindow->IsShown() != bShow )
+	wxAuiPaneInfo	Pane(m_pLayout->GetPane(pWindow));
+
+	if( Pane.IsOk() && Pane.IsShown() != bShow )
 	{
-		_Bar_Toggle(pWindow);
+		Pane.Show(bShow);
+
+		if( bShow && Pane.IsToolbar() && Pane.IsDocked() )
+		{
+			Pane.Position(pWindow == m_pTB_Main ? 0 : 1);
+		}
+
+		m_pLayout->GetPane(pWindow)	= Pane;
+
+		m_pLayout->Update();
 	}
 }
 
@@ -1077,10 +1080,8 @@ wxToolBarBase * CSAGA_Frame::TB_Create(int ID)
 void CSAGA_Frame::TB_Add(wxToolBarBase *pToolBar, const wxString &Name)
 {
 	pToolBar->Realize();
-	pToolBar->Hide();
 
 	m_pLayout->AddPane(pToolBar, wxAuiPaneInfo()
-	//	.Name			(pToolBar->GetName())
 		.Name			(Name)
 		.Caption		(Name)
 		.ToolbarPane	()
@@ -1113,15 +1114,18 @@ wxToolBarBase * CSAGA_Frame::_Create_ToolBar(void)
 	wxToolBarBase	*pToolBar	= TB_Create(ID_TB_MAIN);
 
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_WKSP_OPEN);
+	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_WKSP_SAVE);
 	CMD_ToolBar_Add_Separator(pToolBar);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_FRAME_WKSP_SHOW);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_FRAME_ACTIVE_SHOW);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_FRAME_DATA_SOURCE_SHOW);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_FRAME_INFO_SHOW);
 	CMD_ToolBar_Add_Separator(pToolBar);
+	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_MODULES_SEARCH);
+	CMD_ToolBar_Add_Separator(pToolBar);
 	CMD_ToolBar_Add_Item(pToolBar, false, ID_CMD_FRAME_HELP);
 
-	TB_Add(pToolBar, _TL("Standard"));
+	TB_Add(pToolBar, _TL("Main"));
 
 	return( pToolBar );
 }

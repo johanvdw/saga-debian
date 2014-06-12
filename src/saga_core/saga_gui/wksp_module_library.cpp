@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_library.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_module_library.cpp 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ wxString CWKSP_Module_Library::Get_Description(void)
 	wxString	s;
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<b>%s</b>"), _TL("Module Library"));
+	s	+= wxString::Format(wxT("<b>%s</b>"), _TL("Tool Library"));
 
 	s	+= wxT("<table border=\"0\">");
 
@@ -152,7 +152,7 @@ wxString CWKSP_Module_Library::Get_Description(void)
 	s	+= sDesc.Length() > 0 ? sDesc.c_str() : m_pLibrary->Get_Description().c_str();
 
 	//-----------------------------------------------------
-	s	+= wxString::Format(wxT("<hr><b>%s:<ul>"), _TL("Modules"));
+	s	+= wxString::Format(wxT("<hr><b>%s:<ul>"), _TL("Tools"));
 
 	for(int iModule=0; iModule<Get_Count(); iModule++)
 	{

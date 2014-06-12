@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_layer_classify.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_layer_classify.cpp 2079 2014-04-02 16:37:16Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -117,7 +117,6 @@ bool CWKSP_Layer_Classify::Initialise(CWKSP_Layer *pLayer, CSG_Table *pLUT, CSG_
 	m_pLayer	= pLayer;
 	m_pLUT		= pLUT;
 	m_pColors	= pColors;
-	m_pColors	->Set_Count(11);
 
 	//-----------------------------------------------------
 	if( m_pLUT && m_pLUT->Get_Record_Count() == 0 )
@@ -137,6 +136,11 @@ bool CWKSP_Layer_Classify::Initialise(CWKSP_Layer *pLayer, CSG_Table *pLUT, CSG_
 		pRecord->Set_Value(LUT_DESCRIPTION	, _TL("Second Class"));
 		pRecord->Set_Value(LUT_MIN			, 1.0);
 		pRecord->Set_Value(LUT_MAX			, 2.0);
+	}
+
+	if( m_pLUT )
+	{
+		m_pLUT->Set_Index(LUT_MIN, TABLE_INDEX_Ascending);
 	}
 
 	return( true );

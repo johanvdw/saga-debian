@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: shapes_split_randomly.h 1922 2014-01-09 10:28:46Z oconrad $
+ * Version $Id: shapes_split_randomly.h 2108 2014-05-05 09:16:47Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,7 +76,6 @@ class CShapes_Split_Randomly : public CSG_Module
 {
 public:
 	CShapes_Split_Randomly(void);
-	virtual ~CShapes_Split_Randomly(void);
 
 	virtual CSG_String			Get_MenuPath			(void)	{	return( _TL("A:Shapes|Construction") );	}
 

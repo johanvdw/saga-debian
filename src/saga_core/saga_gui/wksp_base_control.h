@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_control.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_base_control.h 2009 2014-02-21 14:42:18Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <wx/treectrl.h>
+#include "wksp_base_item.h"
 
 
 ///////////////////////////////////////////////////////////
@@ -90,9 +90,9 @@ public:
 	CWKSP_Base_Control(wxWindow *pParent, wxWindowID id);
 	virtual ~CWKSP_Base_Control(void);
 
+	int							Get_Selection_Count	(void);
 	class CWKSP_Base_Item *		Get_Item_Selected	(void);
 	bool						Set_Item_Selected	(class CWKSP_Base_Item *pItem, bool bKeepMultipleSelection = false);
-	int							Get_Selection_Count	(void);
 
 	void						On_Command			(wxCommandEvent  &event);
 	void						On_Command_UI		(wxUpdateUIEvent &event);
@@ -106,8 +106,12 @@ public:
 
 	wxMenu *					Get_Context_Menu	(void);
 
+	CWKSP_Base_Item	*			Search_Item			(const wxString &Caption, TWKSP_Item Type = WKSP_ITEM_Undefined);
+
 
 protected:
+
+	bool						m_bUpdating;
 
 	class CWKSP_Base_Manager	*m_pManager;
 
@@ -118,7 +122,6 @@ protected:
 	bool						_Del_Item			(class CWKSP_Base_Item *pItem, bool bSilent);
 	bool						_Del_Item_Confirm	(class CWKSP_Base_Item *pItem);
 
-	bool						_Set_Active			(void);
 	bool						_Del_Active			(bool bSilent);
 
 	bool						_Show_Active		(void);
@@ -130,8 +133,8 @@ protected:
 	bool						_Copy_Settings		(class CSG_Parameters *pParameters, class CWKSP_Base_Item *pItem);
 
 	bool						_Search_Compare		(wxString A, wxString B, bool bCase);
+	bool						_Search_Get_List	(class CSG_Table *pList, class CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase, TWKSP_Item Type);
 	bool						_Search_Item		(void);
-	bool						_Search_Get_List	(class CSG_Table *pList, class CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase);
 
 
 //---------------------------------------------------------

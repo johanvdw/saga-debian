@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Accumulation_Functions.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Grid_Accumulation_Functions.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -235,7 +235,7 @@ bool CGrid_Accumulation_Functions::On_Execute(void)
 	}
 
 
-	for(long n=0; n<Get_NCells() && Set_Progress(n); n++)
+	for(sLong n=0; n<Get_NCells() && Set_Progress(n); n++)
 	{
 		pSurface->Get_Sorted(n, x, y, true);
 

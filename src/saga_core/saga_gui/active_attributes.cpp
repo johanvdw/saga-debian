@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_attributes.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: active_attributes.cpp 2074 2014-03-31 10:32:12Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -86,12 +86,14 @@ IMPLEMENT_CLASS(CACTIVE_Attributes, wxPanel)
 
 //---------------------------------------------------------
 BEGIN_EVENT_TABLE(CACTIVE_Attributes, wxPanel)
-	EVT_SIZE			(CACTIVE_Attributes::On_Size)
+	EVT_SIZE		(CACTIVE_Attributes::On_Size)
 
-	EVT_BUTTON			(ID_BTN_APPLY	, CACTIVE_Attributes::On_Apply)
-	EVT_UPDATE_UI		(ID_BTN_APPLY	, CACTIVE_Attributes::On_Apply_UI)
-	EVT_BUTTON			(ID_BTN_RESTORE	, CACTIVE_Attributes::On_Restore)
-	EVT_UPDATE_UI		(ID_BTN_RESTORE	, CACTIVE_Attributes::On_Restore_UI)
+	EVT_CHOICE		(ID_COMBOBOX_SELECT, CACTIVE_Attributes::On_Choice)
+
+	EVT_BUTTON		(ID_BTN_APPLY      , CACTIVE_Attributes::On_Apply)
+	EVT_UPDATE_UI	(ID_BTN_APPLY      , CACTIVE_Attributes::On_Apply_UI)
+	EVT_BUTTON		(ID_BTN_RESTORE    , CACTIVE_Attributes::On_Restore)
+	EVT_UPDATE_UI	(ID_BTN_RESTORE    , CACTIVE_Attributes::On_Restore_UI)
 END_EVENT_TABLE()
 
 
@@ -107,13 +109,16 @@ CACTIVE_Attributes::CACTIVE_Attributes(wxWindow *pParent)
 {
 	m_pAttributes	= new CSG_Table;
 	m_pControl		= new CVIEW_Table_Control(this, m_pAttributes, TABLE_CTRL_FIXED_TABLE|TABLE_CTRL_COL1ISLABEL);
-	m_pLayer		= NULL;
+
+	m_pItem			= NULL;
 
 	//-----------------------------------------------------
 	m_Btn_Apply		= new wxButton(this, ID_BTN_APPLY	, CTRL_Get_Name(ID_BTN_APPLY)	, wxPoint(0, 0));
 	m_Btn_Restore	= new wxButton(this, ID_BTN_RESTORE	, CTRL_Get_Name(ID_BTN_RESTORE)	, wxPoint(0, 0));
 
 	m_btn_height	= m_Btn_Apply->GetDefaultSize().y;
+
+	m_pSelections	= new wxChoice(this, ID_COMBOBOX_SELECT, wxDefaultPosition, wxDefaultSize, 0, NULL, 0);
 
 	//-----------------------------------------------------
 	m_pAttributes->Set_Modified(false);
@@ -150,10 +155,21 @@ void CACTIVE_Attributes::_Set_Positions(void)
 	int		nButtons	= 2;
 	wxRect	r(wxPoint(0, 0), GetSize());
 
-	r.SetHeight(r.GetHeight() - m_btn_height);
+	if( m_pSelections->GetCount() > 0 )
+	{
+		m_pSelections->SetSize(0, 0, r.GetWidth(), m_btn_height - BUTTON_DIST);
+
+		r.SetTop(m_btn_height);
+		r.SetHeight(r.GetHeight() - m_btn_height * 2);
+	}
+	else
+	{
+		r.SetHeight(r.GetHeight() - m_btn_height);
+	}
+
 	m_pControl->SetSize(r);
 
-	r.SetTop(r.GetHeight() + BUTTON_DIST);
+	r.SetTop(r.GetBottom() + BUTTON_DIST2);
 	r.SetHeight(m_btn_height - BUTTON_DIST);
 	r.SetWidth(r.GetWidth() / nButtons - BUTTON_DIST2);
 	r.SetLeft(BUTTON_DIST);
@@ -172,7 +188,7 @@ void CACTIVE_Attributes::_Set_Positions(void)
 //---------------------------------------------------------
 void CACTIVE_Attributes::On_Apply(wxCommandEvent &event)
 {
-	_Save_Changes(false);
+	Save_Changes(false);
 }
 
 void CACTIVE_Attributes::On_Apply_UI(wxUpdateUIEvent &event)
@@ -199,13 +215,46 @@ void CACTIVE_Attributes::On_Restore_UI(wxUpdateUIEvent &event)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CACTIVE_Attributes::Set_Layer(CWKSP_Layer *pLayer)
+void CACTIVE_Attributes::On_Choice(wxCommandEvent &event)
 {
-	if( m_pLayer != pLayer )
+	if( _Get_Table() && m_pSelections->GetSelection() < _Get_Table()->Get_Selection_Count() )
 	{
-		_Save_Changes(true);
+		Save_Changes(true);
 
-		m_pLayer	= pLayer;
+		m_pItem->Edit_Set_Index(m_pSelections->GetSelection());
+		m_pItem->Update_Views(false);
+	}
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+inline CSG_Table * CACTIVE_Attributes::_Get_Table(void)
+{
+	switch( m_pItem ? m_pItem->Get_Type() : WKSP_ITEM_Undefined )
+	{
+	default:
+		return( NULL );
+
+	case WKSP_ITEM_Shapes:
+	case WKSP_ITEM_PointCloud:
+		return( (CSG_Table *)m_pItem->Get_Object() );
+	}
+}
+
+//---------------------------------------------------------
+void CACTIVE_Attributes::Set_Item(CWKSP_Layer *pItem)
+{
+	if( m_pItem != pItem )
+	{
+		Save_Changes(true);
+
+		m_pItem	= pItem;
 
 		Set_Attributes();
 	}
@@ -214,13 +263,24 @@ void CACTIVE_Attributes::Set_Layer(CWKSP_Layer *pLayer)
 //---------------------------------------------------------
 void CACTIVE_Attributes::Set_Attributes(void)
 {
-	if( m_pLayer && m_pLayer->Edit_Get_Attributes()->is_Valid() )
+	Freeze();
+
+	m_pSelections->Clear();
+
+	if( m_pItem && m_pItem->Edit_Get_Attributes()->is_Valid() )
 	{
-		_Save_Changes(true);
+		m_pAttributes->Assign(m_pItem->Edit_Get_Attributes());
+		m_pAttributes->Set_Modified(false);
 
-		m_pAttributes->Assign(m_pLayer->Edit_Get_Attributes());
+		if( _Get_Table() && _Get_Table()->Get_Selection_Count() > 1 )
+		{
+			for(int i=0; i<_Get_Table()->Get_Selection_Count(); i++)
+			{
+				m_pSelections->Append(wxString::Format("%d", i + 1));
+			}
 
-		m_pControl->Set_Labeling(m_pLayer->Get_Object()->Get_ObjectType() == DATAOBJECT_TYPE_Shapes);
+			m_pSelections->Select(m_pItem->Edit_Get_Index());
+		}
 	}
 	else
 	{
@@ -229,7 +289,15 @@ void CACTIVE_Attributes::Set_Attributes(void)
 
 	m_pAttributes->Set_Modified(false);
 
+	m_pControl->Set_Labeling(_Get_Table() != NULL);
+
 	m_pControl->Update_Table();
+
+	m_pSelections->Show(m_pSelections->GetCount() > 1);
+
+	_Set_Positions();
+
+	Thaw();
 }
 
 
@@ -240,14 +308,14 @@ void CACTIVE_Attributes::Set_Attributes(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void CACTIVE_Attributes::_Save_Changes(bool bConfirm)
+void CACTIVE_Attributes::Save_Changes(bool bConfirm)
 {
-	if( m_pLayer && m_pAttributes->is_Modified() && (!bConfirm || DLG_Message_Confirm(_TL("Save changes?"), _TL("Attributes"))) )
+	if( m_pItem && m_pAttributes->is_Modified() && (!bConfirm || DLG_Message_Confirm(_TL("Save changes?"), _TL("Attributes"))) )
 	{
-		m_pLayer->Edit_Get_Attributes()->Assign_Values(m_pAttributes);
-		m_pLayer->Edit_Set_Attributes();
+		m_pItem->Edit_Get_Attributes()->Assign_Values(m_pAttributes);
+		m_pItem->Edit_Set_Attributes();
 
-		m_pAttributes->Set_Modified(false);
+		Set_Attributes();
 	}
 }
 

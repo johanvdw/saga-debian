@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module_library.h 1966 2014-02-04 16:48:38Z reklov_w $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ public:
 	bool						Create					(CSG_Module *pModule);
 	void						Destroy					(void);
 
-	bool						Execute					(int argc, char *argv[]);
+	bool						Execute					(CSG_String sLibName, int argc, char *argv[]);
 
 	bool						Get_Parameters			(CSG_Parameters *pParameters)	{	return( _Get_Parameters(pParameters) );	}
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_layer.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_map_layer.cpp 1985 2014-02-11 17:00:31Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -90,9 +90,7 @@ CWKSP_Map_Layer::CWKSP_Map_Layer(CWKSP_Layer *pLayer)
 
 //---------------------------------------------------------
 CWKSP_Map_Layer::~CWKSP_Map_Layer(void)
-{
-	((CWKSP_Map *)Get_Manager())->On_Delete(this);
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -163,6 +161,16 @@ bool CWKSP_Map_Layer::On_Command(int Cmd_ID)
 	default:
 		return( CWKSP_Base_Item::On_Command(Cmd_ID) );
 
+	case ID_CMD_SHAPES_EDIT_SHAPE:
+	case ID_CMD_SHAPES_EDIT_ADD_SHAPE:
+	case ID_CMD_SHAPES_EDIT_DEL_SHAPE:
+	case ID_CMD_SHAPES_EDIT_ADD_PART:
+	case ID_CMD_SHAPES_EDIT_DEL_PART:
+	case ID_CMD_SHAPES_EDIT_DEL_POINT:
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:
+	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
+		return( m_pLayer->On_Command(Cmd_ID) );
+
 	case ID_CMD_WKSP_ITEM_RETURN:
 	case ID_CMD_MAPS_LAYER_SHOW:
 		m_bShow	= !m_bShow;
@@ -206,6 +214,16 @@ bool CWKSP_Map_Layer::On_Command_UI(wxUpdateUIEvent &event)
 	{
 	default:
 		return( CWKSP_Base_Item::On_Command_UI(event) );
+
+	case ID_CMD_SHAPES_EDIT_SHAPE:
+	case ID_CMD_SHAPES_EDIT_ADD_SHAPE:
+	case ID_CMD_SHAPES_EDIT_DEL_SHAPE:
+	case ID_CMD_SHAPES_EDIT_ADD_PART:
+	case ID_CMD_SHAPES_EDIT_DEL_PART:
+	case ID_CMD_SHAPES_EDIT_DEL_POINT:
+	case ID_CMD_SHAPES_EDIT_SEL_CLEAR:
+	case ID_CMD_SHAPES_EDIT_SEL_INVERT:
+		return( m_pLayer->On_Command_UI(event) );
 
 	case ID_CMD_MAPS_LAYER_SHOW:
 		event.Check(m_bShow);

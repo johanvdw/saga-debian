@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_scatterplot.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_scatterplot.h 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -84,39 +84,20 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-void		Add_ScatterPlot(CSG_Grid *pGrid);
-void		Add_ScatterPlot(CSG_Table *pTable);
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
 class CVIEW_ScatterPlot : public CVIEW_Base
 {
 public:
-	CVIEW_ScatterPlot(CSG_Grid  *pGrid);
-	CVIEW_ScatterPlot(CSG_Table *pTable);
+	CVIEW_ScatterPlot(CWKSP_Data_Item *pItem);
 
 	static class wxToolBarBase *	_Create_ToolBar				(void);
 	static class wxMenu *			_Create_Menu				(void);
 
-	void							On_Size						(wxSizeEvent    &event);
-	void							On_Paint					(wxPaintEvent   &event);
-
-	void							On_Parameters				(wxCommandEvent &event);
-	void							On_Options					(wxCommandEvent &event);
-	void							On_Update					(wxCommandEvent &event);
-	void							On_AsTable					(wxCommandEvent &event);
-	void							On_ToClipboard				(wxCommandEvent &event);
-
-	void							Draw						(wxDC &dc, wxRect r);
+	virtual void					Do_Update					(void);
 
 
 private:
+
+	class CWKSP_Data_Item			*m_pItem;
 
 	CSG_Grid						*m_pGrid, m_Count;
 
@@ -129,14 +110,25 @@ private:
 	CSG_String						m_sTitle, m_sX, m_sY;
 
 
+	void							On_Size						(wxSizeEvent    &event);
+	void							On_Paint					(wxPaintEvent   &event);
+
+	void							On_Parameters				(wxCommandEvent &event);
+	void							On_Options					(wxCommandEvent &event);
+	void							On_Update					(wxCommandEvent &event);
+	void							On_AsTable					(wxCommandEvent &event);
+	void							On_ToClipboard				(wxCommandEvent &event);
+
 	void							_On_Construction			(void);
 
-	bool							_Initialize					(void);
+	bool							_Update_Data				(void);
+
 	bool							_Initialize_Count			(void);
 	bool							_Initialize_Grids			(void);
 	bool							_Initialize_Shapes			(void);
 	bool							_Initialize_Table			(void);
 
+	void							_Draw						(wxDC &dc, wxRect r);
 	wxRect							_Draw_Get_rDiagram			(wxRect r);
 	void							_Draw_Legend				(wxDC &dc, wxRect r);
 	void							_Draw_Image					(wxDC &dc, wxRect r);
@@ -145,10 +137,9 @@ private:
 	void							_Draw_Frame					(wxDC &dc, wxRect r);
 
 
-private:
-
-	DECLARE_EVENT_TABLE()
+	//-----------------------------------------------------
 	DECLARE_CLASS(CVIEW_ScatterPlot)
+	DECLARE_EVENT_TABLE()
 
 };
 

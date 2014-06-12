@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ bool CSG_Module::Execute(void)
 		}	// try
 		__except(1)
 		{
-			Message_Dlg(SG_T("Module caused access violation!"));
+			Message_Dlg(SG_T("Tool caused access violation!"));
 		}	// except(1)
 #endif
 ///////////////////////////////////////////////////////////
@@ -460,9 +460,9 @@ void CSG_Module::Process_Set_Text(const CSG_String &Text)
 }
 
 //---------------------------------------------------------
-bool CSG_Module::Set_Progress(int Position)
+bool CSG_Module::Set_Progress(double Percent)
 {
-	return( Set_Progress(Position, 100.0) );
+	return( Set_Progress(Percent, 100.0) );
 }
 
 //---------------------------------------------------------
@@ -790,16 +790,19 @@ void CSG_Module::_Set_Output_History(void)
 		{
 			CSG_Parameter	*p	= pParameters->Get_Parameter(i);
 
-			if( p->is_Output() && p->is_DataObject() && p->asDataObject() )
+			if( p->is_Output() && p->is_Enabled() )
 			{
-				p->asDataObject()->Get_History().Assign(History);
-			}
-
-			if( p->is_Output() && p->is_DataObject_List() )
-			{
-				for(int j=0; j<p->asList()->Get_Count(); j++)
+				if( p->is_DataObject() && p->asDataObject() )
 				{
-					p->asList()->asDataObject(j)->Get_History().Assign(History);
+					p->asDataObject()->Get_History().Assign(History);
+				}
+
+				if( p->is_DataObject_List() )
+				{
+					for(int j=0; j<p->asList()->Get_Count(); j++)
+					{
+						p->asList()->asDataObject(j)->Get_History().Assign(History);
+					}
 				}
 			}
 		}
@@ -941,7 +944,7 @@ CSG_String CSG_Module::Get_Summary(bool bParameters, const CSG_String &Menu, con
 	//-----------------------------------------------------
 	else
 	{
-		s	+= CSG_String::Format(SG_T("<b>%s</b><table border=\"0\">"), _TL("Module"));
+		s	+= CSG_String::Format(SG_T("<b>%s</b><table border=\"0\">"), _TL("Tool"));
 
 		SUMMARY_ADD_STR(_TL("Name"  ), Get_Name  ().c_str());
 		SUMMARY_ADD_INT(_TL("ID"    ), Get_ID    ());

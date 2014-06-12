@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameter_data.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: parameter_data.cpp 2082 2014-04-03 16:08:33Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -903,6 +903,30 @@ const SG_Char * CSG_Parameter_Choice::Get_Item(int Index)	const
 }
 
 //---------------------------------------------------------
+CSG_String CSG_Parameter_Choice::Get_Item_Data(int Index)	const
+{
+	CSG_String	Value;
+
+	if( Index >= 0 && Index < m_Items.Get_Count() )
+	{
+		const SG_Char	*Item	= m_Items[Index].c_str();
+
+		if( *Item == SG_T('{') )
+		{
+			Item++;
+
+			do
+			{
+				Value	+= *(Item++);
+			}
+			while( *Item && *Item != SG_T('}') );
+		}
+	}
+
+	return( Value );
+}
+
+//---------------------------------------------------------
 bool CSG_Parameter_Choice::Get_Data(int        &Value)	const
 {
 	CSG_String	sValue;
@@ -1342,23 +1366,25 @@ bool CSG_Parameter_Fixed_Table::On_Serialize(CSG_MetaData &Entry, bool bSave)
 
 	if( bSave )
 	{
-		pNode	= Entry.Add_Child(SG_T("FIELDS"));
+		pNode	= Entry.Add_Child("FIELDS");
 
 		for(iField=0; iField<m_Table.Get_Field_Count(); iField++)
 		{
-			pEntry	= pNode->Add_Child	(SG_T("FIELD")	, m_Table.Get_Field_Name(iField));
-			pEntry	->Set_Property		(SG_T("type")	, gSG_Data_Type_Identifier[m_Table.Get_Field_Type(iField)]);
+			pEntry	= pNode->Add_Child("FIELD", m_Table.Get_Field_Name(iField));
+			pEntry	->Set_Property("type" , gSG_Data_Type_Identifier[m_Table.Get_Field_Type(iField)]);
 		}
 
-		pNode	= Entry.Add_Child(SG_T("RECORDS"));
+		pNode	= Entry.Add_Child("RECORDS");
 
 		for(iRecord=0; iRecord<m_Table.Get_Count(); iRecord++)
 		{
-			pEntry	= pNode->Add_Child(SG_T("RECORD"));
+			pEntry	= pNode->Add_Child("RECORD");
+
+			CSG_Table_Record	*pRecord	= m_Table.Get_Record(iRecord);
 
 			for(iField=0; iField<m_Table.Get_Field_Count(); iField++)
 			{
-				pEntry->Add_Child(SG_T("FIELD"), m_Table[iRecord].asString(iField));
+				pEntry->Add_Child("FIELD", pRecord->asString(iField));
 			}
 		}
 	}
@@ -1366,7 +1392,7 @@ bool CSG_Parameter_Fixed_Table::On_Serialize(CSG_MetaData &Entry, bool bSave)
 	{
 		CSG_Table	t;
 
-		if( (pNode = Entry.Get_Child(SG_T("FIELDS"))) == NULL )
+		if( (pNode = Entry.Get_Child("FIELDS")) == NULL )
 		{
 			return( false );
 		}
@@ -1376,7 +1402,7 @@ bool CSG_Parameter_Fixed_Table::On_Serialize(CSG_MetaData &Entry, bool bSave)
 			CSG_String		s;
 			TSG_Data_Type	type	= SG_DATATYPE_String;
 
-			if( pNode->Get_Child(iField)->Get_Property(SG_T("type"), s) )
+			if( pNode->Get_Child(iField)->Get_Property("type", s) )
 			{
 				     if( !s.Cmp(gSG_Data_Type_Identifier[SG_DATATYPE_Bit   ]) )	type	= SG_DATATYPE_Bit;
 				else if( !s.Cmp(gSG_Data_Type_Identifier[SG_DATATYPE_Byte  ]) )	type	= SG_DATATYPE_Byte;
@@ -1397,7 +1423,7 @@ bool CSG_Parameter_Fixed_Table::On_Serialize(CSG_MetaData &Entry, bool bSave)
 			t.Add_Field(pNode->Get_Child(iField)->Get_Content(), type);
 		}
 
-		if( (pNode = Entry.Get_Child(SG_T("RECORDS"))) == NULL )
+		if( (pNode = Entry.Get_Child("RECORDS")) == NULL )
 		{
 			return( false );
 		}
@@ -1406,11 +1432,11 @@ bool CSG_Parameter_Fixed_Table::On_Serialize(CSG_MetaData &Entry, bool bSave)
 		{
 			pEntry	= pNode->Get_Child(iRecord);
 
-			t.Add_Record();
+			CSG_Table_Record	*pRecord	= t.Add_Record();
 
 			for(iField=0; iField<pEntry->Get_Children_Count(); iField++)
 			{
-				t[iRecord].Set_Value(iField, pEntry->Get_Child(iField)->Get_Content());
+				pRecord->Set_Value(iField, pEntry->Get_Child(iField)->Get_Content());
 			}
 		}
 
@@ -1944,9 +1970,9 @@ bool CSG_Parameter_Data_Object_Output::Set_Value(void *Value)
 		if( m_pOwner->Get_Manager() )
 		{
 			m_pOwner->Get_Manager()->Add(m_pDataObject);
-		}
 
-		SG_UI_DataObject_Add(m_pDataObject, false);
+			SG_UI_DataObject_Add(m_pDataObject, false);
+		}
 	}
 
 	return( true );

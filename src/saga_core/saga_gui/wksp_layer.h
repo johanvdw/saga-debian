@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_layer.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_layer.h 2061 2014-03-20 11:48:01Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -121,21 +121,24 @@ public:
 
 	const wxBitmap &				Get_Thumbnail			(int dx, int dy);
 
-	class CVIEW_Histogram *			Histogram_Get			(void)	{	return( m_pHistogram );	}
 	void							Histogram_Show			(bool bShow);
 	void							Histogram_Toggle		(void);
 
-	wxMenu *						Edit_Get_Menu			(void);
-	TSG_Rect						Edit_Get_Extent			(void);
-	CSG_Table *						Edit_Get_Attributes		(void)	{	return( &m_Edit_Attributes );	}
-	bool							Edit_Set_Attributes		(void);
-	bool							Edit_On_Key_Down		(int KeyCode);
-	bool							Edit_On_Mouse_Down		(CSG_Point Point, double WorldToClient, int Key);
-	bool							Edit_On_Mouse_Up		(CSG_Point Point, double WorldToClient, int Key);
-	bool							Edit_On_Mouse_Move		(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key);
+	virtual wxMenu *				Edit_Get_Menu			(void);
+	virtual TSG_Rect				Edit_Get_Extent			(void)	= 0;
+	virtual bool					Edit_On_Key_Down		(int KeyCode);
+	virtual bool					Edit_On_Mouse_Down		(CSG_Point Point, double ClientToWorld, int Key);
+	virtual bool					Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key);
+	virtual bool					Edit_On_Mouse_Move		(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key);
+	virtual bool					Edit_Set_Index			(int Index);
+	virtual bool					Edit_Set_Attributes		(void)	= 0;
+	int								Edit_Get_Index			(void);
+	CSG_Table *						Edit_Get_Attributes		(void);
 
 
 protected:
+
+	int								m_Edit_Index;
 
 	CSG_Parameter_Range				*m_pZRange;
 
@@ -162,18 +165,12 @@ protected:
 
 	virtual void					On_Draw					(CWKSP_Map_DC &dc_Map, bool bEdit)	= 0;
 
-	virtual wxMenu *				On_Edit_Get_Menu		(void)			{	return( NULL );	}
-	virtual TSG_Rect				On_Edit_Get_Extent		(void)	= 0;
-	virtual bool					On_Edit_Set_Attributes	(void)	= 0;
-	virtual bool					On_Edit_On_Key_Down		(int KeyCode)	{	return( false );	}
-	virtual bool					On_Edit_On_Mouse_Down	(CSG_Point Point, double ClientToWorld, int Key)	{	return( false );	}
-	virtual bool					On_Edit_On_Mouse_Up		(CSG_Point Point, double ClientToWorld, int Key)	{	return( false );	}
-	virtual bool					On_Edit_On_Mouse_Move	(wxWindow *pMap, CSG_Rect rWorld, wxPoint pt, wxPoint ptLast, int Key)	{	return( false );	}
-
 
 private:
 
 	bool							_Set_Thumbnail			(bool bRefresh);
+
+	void							_Set_Projection			(void);
 
 };
 

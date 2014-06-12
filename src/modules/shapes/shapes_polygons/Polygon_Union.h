@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Polygon_Union.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Polygon_Union.h 1982 2014-02-10 16:52:17Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -98,9 +98,11 @@ protected:
 
 private:
 
-	bool						m_bSUM, m_bAVG, m_bMIN, m_bMAX, m_bRNG, m_bDEV, m_bVAR, m_bNUM;
+	bool						m_bSUM, m_bAVG, m_bMIN, m_bMAX, m_bRNG, m_bDEV, m_bVAR, m_bLST, m_bNUM;
 
 	int							m_Stat_Offset;
+
+	CSG_Strings					m_List;
 
 	CSG_Parameter_Table_Fields	*m_Stat_pFields;
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: points_view_dialog.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: points_view_dialog.cpp 1928 2014-01-10 12:10:05Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -9,7 +9,7 @@
 //      System for Automated Geoscientific Analyses      //
 //                                                       //
 //                    Module Library:                    //
-//            geostatistics_kriging_variogram            //
+//					point_cloud_viewer			         //
 //                                                       //
 //-------------------------------------------------------//
 //                                                       //

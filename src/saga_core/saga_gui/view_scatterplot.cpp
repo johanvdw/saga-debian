@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_scatterplot.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_scatterplot.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -145,18 +145,6 @@ int Scatter_Plot_On_Parameter_Changed(CSG_Parameter *pParameter, int Flags)
 	return( 0 );
 }
 
-//---------------------------------------------------------
-void		Add_ScatterPlot(CSG_Grid *pGrid)
-{
-	new CVIEW_ScatterPlot(pGrid);
-}
-
-//---------------------------------------------------------
-void		Add_ScatterPlot(CSG_Table *pTable)
-{
-	new CVIEW_ScatterPlot(pTable);
-}
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -187,27 +175,52 @@ END_EVENT_TABLE()
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Grid *pGrid)
-	: CVIEW_Base(ID_VIEW_SCATTERPLOT, _TL("Scatterplot"), ID_IMG_WND_SCATTERPLOT)
+CVIEW_ScatterPlot::CVIEW_ScatterPlot(CWKSP_Data_Item *pItem)
+	: CVIEW_Base(pItem, ID_VIEW_SCATTERPLOT, wxString::Format("%s: %s", _TL("Scatterplot"), pItem->Get_Object()->Get_Name()), ID_IMG_WND_SCATTERPLOT, false)
 {
-	m_pGrid		= pGrid;
+	m_pItem		= pItem;
+
+	m_pGrid		= NULL;
 	m_pTable	= NULL;
 
-	m_Parameters.Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Scatterplot"), m_pGrid->Get_Name()));
+	switch( m_pItem->Get_Type() )
+	{
+	case WKSP_ITEM_Grid:
+		m_pGrid		= pItem->Get_Object()->asGrid();
+		break;
+
+	default:
+		m_pTable	= (CSG_Table *)pItem->Get_Object();
+		break;
+	}
+
+	m_Parameters.Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Scatterplot"), m_pItem->Get_Object()->Get_Name()));
 
 	_On_Construction();
+
+	if( DLG_Parameters(&m_Parameters) )
+	{
+		_Update_Data();
+
+		Do_Show();
+	}
+	else
+	{
+		Destroy();
+	}
 }
 
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
 //---------------------------------------------------------
-CVIEW_ScatterPlot::CVIEW_ScatterPlot(CSG_Table *pTable)
-	: CVIEW_Base(ID_VIEW_SCATTERPLOT, _TL("Scatterplot"), ID_IMG_WND_SCATTERPLOT)
+void CVIEW_ScatterPlot::Do_Update(void)
 {
-	m_pGrid		= NULL;
-	m_pTable	= pTable;
-
-	m_Parameters.Set_Name(CSG_String::Format(SG_T("%s: %s"), _TL("Scatterplot"), m_pTable->Get_Name()));
-
-	_On_Construction();
+	_Update_Data();
 }
 
 
@@ -382,11 +395,6 @@ void CVIEW_ScatterPlot::_On_Construction(void)
 
 	//-----------------------------------------------------
 	m_Parameters.Set_Callback_On_Parameter_Changed(&Scatter_Plot_On_Parameter_Changed);
-
-	if( DLG_Parameters(&m_Parameters) )
-	{
-		_Initialize();
-	}
 }
 
 
@@ -401,7 +409,7 @@ void CVIEW_ScatterPlot::On_Parameters(wxCommandEvent &event)
 {
 	if( DLG_Parameters(&m_Parameters) )
 	{
-		_Initialize();
+		_Update_Data();
 	}
 }
 
@@ -410,14 +418,14 @@ void CVIEW_ScatterPlot::On_Options(wxCommandEvent &event)
 {
 	if( DLG_Parameters(&m_Options) )
 	{
-		_Initialize();
+		_Update_Data();
 	}
 }
 
 //---------------------------------------------------------
 void CVIEW_ScatterPlot::On_Update(wxCommandEvent &event)
 {
-	_Initialize();
+	_Update_Data();
 }
 
 //---------------------------------------------------------
@@ -460,7 +468,7 @@ void CVIEW_ScatterPlot::On_ToClipboard(wxCommandEvent &event)
 	dc.SetBackground(*wxWHITE_BRUSH);
 	dc.Clear();
 
-	Draw(dc, wxRect(BMP.GetSize()));
+	_Draw(dc, wxRect(BMP.GetSize()));
 
 	dc.SelectObject(wxNullBitmap);
 
@@ -507,11 +515,11 @@ void CVIEW_ScatterPlot::On_Paint(wxPaintEvent &event)
 
 	Draw_Edge(dc, EDGE_STYLE_SUNKEN, r);
 
-	Draw(dc, r);
+	_Draw(dc, r);
 }
 
 //---------------------------------------------------------
-void CVIEW_ScatterPlot::Draw(wxDC &dc, wxRect r)
+void CVIEW_ScatterPlot::_Draw(wxDC &dc, wxRect r)
 {
 	r	= _Draw_Get_rDiagram(r);
 
@@ -731,7 +739,7 @@ void CVIEW_ScatterPlot::_Draw_Frame(wxDC &dc, wxRect r)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CVIEW_ScatterPlot::_Initialize(void)
+bool CVIEW_ScatterPlot::_Update_Data(void)
 {
 	bool	bResult;
 
@@ -834,8 +842,8 @@ bool CVIEW_ScatterPlot::_Initialize_Grids()
 				if( !pGrid_Y->is_NoData((long)i) )
 				{
 					m_Regression.Add_Values(
-						m_pGrid->asDouble((long)i, true),
-						pGrid_Y->asDouble((long)i, true)
+						m_pGrid->asDouble((sLong)i, true),
+						pGrid_Y->asDouble((sLong)i, true)
 					);
 				}
 			}
@@ -847,7 +855,7 @@ bool CVIEW_ScatterPlot::_Initialize_Grids()
 
 				if(	pGrid_Y->Get_Value(m_pGrid->Get_System().Get_Grid_to_World(x, y), z, Interpolation, true) )
 				{
-					m_Regression.Add_Values(m_pGrid->asDouble((long)i, true), z);
+					m_Regression.Add_Values(m_pGrid->asDouble((sLong)i, true), z);
 				}
 			}
 		}

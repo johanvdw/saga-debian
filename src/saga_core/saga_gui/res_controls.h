@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_controls.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: res_controls.h 1939 2014-01-14 16:48:06Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -111,8 +111,6 @@ enum ID_CONTROLS
 	ID_WND_DATA_SOURCE_WEBSERVICE,
 
 	ID_WND_PARM,
-	ID_WND_PARM_PG_ACTIVE,
-	ID_WND_PARM_PG_DIALOG,
 
 	ID_WND_WKSP,
 	ID_WND_WKSP_MODULES,

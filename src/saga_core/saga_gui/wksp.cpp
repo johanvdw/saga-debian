@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp.cpp 1995 2014-02-14 12:02:16Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -183,28 +183,42 @@ void CWKSP::Add_Pages(void)
 {
 	long	lValue;
 
-	AddPage(m_pModules				, _TL("Modules")	, false, IMG_MODULES);
-	AddPage(m_pData->GetParent()	, _TL("Data")		, false, IMG_DATA);
-	AddPage(m_pMaps->GetParent()	, _TL("Maps")		, false, IMG_MAPS);
+	//-----------------------------------------------------
+	AddPage(m_pModules          , _TL("Tools"), false, IMG_MODULES);
+	AddPage(m_pData->GetParent(), _TL("Data" ), false, IMG_DATA);
+	AddPage(m_pMaps->GetParent(), _TL("Maps" ), false, IMG_MAPS);
 
+	if( CONFIG_Read("/DATA", "TAB", lValue) )
+	{
+		SetSelection((size_t)lValue);
+	}
+
+	//-----------------------------------------------------
 	((wxNotebook *)m_pData->GetParent())->AddPage(m_pData			, SUBNB_CAPTION_TREE	, false, 0);
 	((wxNotebook *)m_pData->GetParent())->AddPage(m_pData_Buttons	, SUBNB_CAPTION_BUTTONS	, false, 1);
 
-	if( CONFIG_Read(wxT("/BUTTONS_DATA"), wxT("TAB"), lValue) )
+	if( CONFIG_Read("/DATA/BUTTONS", "TAB", lValue) )
+	{
 		((wxNotebook *)m_pData->GetParent())->SetSelection((size_t)lValue);
+	}
 
+	//-----------------------------------------------------
 	((wxNotebook *)m_pMaps->GetParent())->AddPage(m_pMaps			, SUBNB_CAPTION_TREE	, false, 0);
 	((wxNotebook *)m_pMaps->GetParent())->AddPage(m_pMaps_Buttons	, SUBNB_CAPTION_BUTTONS	, false, 1);
 
-	if( CONFIG_Read(wxT("/BUTTONS_MAPS"), wxT("TAB"), lValue) )
+	if( CONFIG_Read("/MAPS/BUTTONS", "TAB", lValue) )
+	{
 		((wxNotebook *)m_pMaps->GetParent())->SetSelection((size_t)lValue);
+	}
 }
 
 //---------------------------------------------------------
 CWKSP::~CWKSP(void)
 {
-	CONFIG_Write(wxT("/BUTTONS_DATA"), wxT("TAB"), (long)((wxNotebook *)m_pData->GetParent())->GetSelection());
-	CONFIG_Write(wxT("/BUTTONS_MAPS"), wxT("TAB"), (long)((wxNotebook *)m_pMaps->GetParent())->GetSelection());
+	CONFIG_Write("/DATA", "TAB", (long)GetSelection());
+
+	CONFIG_Write("/DATA/BUTTONS", "TAB", (long)((wxNotebook *)m_pData->GetParent())->GetSelection());
+	CONFIG_Write("/MAPS/BUTTONS", "TAB", (long)((wxNotebook *)m_pMaps->GetParent())->GetSelection());
 
 	g_pWKSP		= NULL;
 }
@@ -303,6 +317,10 @@ void CWKSP::On_Command(wxCommandEvent &event)
 		m_pModules->On_Command(event);
 		break;
 
+	case ID_CMD_MODULES_SEARCH:
+		m_pModules->On_Command(event);
+		break;
+
 	case ID_CMD_DATA_PROJECT_NEW:
 	case ID_CMD_DATA_PROJECT_OPEN:
 	case ID_CMD_DATA_PROJECT_OPEN_ADD:
@@ -313,11 +331,15 @@ void CWKSP::On_Command(wxCommandEvent &event)
 	case ID_CMD_TIN_OPEN:
 	case ID_CMD_POINTCLOUD_OPEN:
 	case ID_CMD_GRIDS_OPEN:
-		m_pData   ->On_Command(event);
+		m_pData->On_Command(event);
 		break;
 
 	case ID_CMD_WKSP_OPEN:
 		Open();
+		break;
+
+	case ID_CMD_WKSP_SAVE:
+		g_pData->On_Command(ID_CMD_DATA_PROJECT_SAVE);
 		break;
 	}
 }
@@ -348,6 +370,14 @@ void CWKSP::On_Command_UI(wxUpdateUIEvent &event)
 		break;
 
 	case ID_CMD_WKSP_OPEN:
+		break;
+
+	case ID_CMD_MODULES_SEARCH:
+		m_pModules->On_Command_UI(event);
+		break;
+
+	case ID_CMD_WKSP_SAVE:
+		event.Enable(g_pData->Get_Count() > 0);
 		break;
 	}
 }

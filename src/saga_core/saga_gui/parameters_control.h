@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: parameters_control.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: parameters_control.h 2075 2014-03-31 10:34:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,12 +72,6 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <wx/panel.h>
-#include <wx/scrolwin.h>
-#include <wx/toolbar.h>
-#include <wx/stattext.h>
-#include <wx/dcclient.h>
-#include <wx/button.h>
 #include <wx/propgrid/propgrid.h>
 
 
@@ -96,7 +90,8 @@ public:
 	CParameters_Control(wxWindow *pParent, bool bDialog = false);
 	virtual ~CParameters_Control(void);
 
-	void						On_Size				(wxSizeEvent &event);
+	void						On_Size				(wxSizeEvent         &event);
+	void						On_Key				(wxKeyEvent          &event);
 	void						On_PG_Selected		(wxPropertyGridEvent &event);
 	void						On_PG_Changed		(wxPropertyGridEvent &event);
 
@@ -118,12 +113,12 @@ public:
 private:
 
 	bool						m_bModified;
+	
+	int							m_bFocus;
 
 	class CSG_Parameters		*m_pParameters, *m_pOriginal;
 
 	class wxPropertyGrid		*m_pPG;
-
-	class wxPropertyGridManager	*m_pPGM;
 
 
 	wxString					_Get_Identifier		(class CSG_Parameter *pParameter);

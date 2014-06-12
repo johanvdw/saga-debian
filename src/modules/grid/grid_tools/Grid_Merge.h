@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: Grid_Merge.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: Grid_Merge.h 1954 2014-01-22 14:20:41Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -97,6 +97,8 @@ private:
 
 	double						m_dBlend;
 
+	CSG_Vector					m_Match;
+
 	CSG_Grid					*m_pMosaic, m_Weights, m_Weight;
 
 	CSG_Parameter_Grid_List		*m_pGrids;
@@ -113,6 +115,8 @@ private:
 
 	bool						Set_Weight				(CSG_Grid *pGrid);
 	double						Get_Weight				(int x, int y);
+
+	void						Get_Match				(CSG_Grid *pGrid);
 
 };
 

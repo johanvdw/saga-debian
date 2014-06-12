@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: active_legend.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: active_legend.cpp 2042 2014-03-05 16:11:03Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ void CACTIVE_Legend::On_Copy(wxCommandEvent &event)
 	
 	((CWKSP_Layer *)m_pItem)->Get_Legend()->Draw(dc, m_Zoom, 1.0, p, &s);
 
-	BMP.Create(s.GetWidth() + p.x, s.GetHeight(), + p.y);
+	BMP.Create(s.GetWidth() + p.x, s.GetHeight() + p.y);
 	dc.SelectObject(BMP);
 	dc.SetBackground(*wxWHITE_BRUSH);
 	dc.Clear();

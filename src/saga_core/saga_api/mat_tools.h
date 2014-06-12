@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_tools.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: mat_tools.h 2117 2014-05-09 09:05:41Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -129,10 +129,15 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-SAGA_API_DLL_EXPORT double		SG_Get_Square		(double x);
+SAGA_API_DLL_EXPORT double		SG_Get_Square			(double Value);
+
+SAGA_API_DLL_EXPORT double		SG_Get_Rounded			(double Value, int Decimals = 0);
 
 //---------------------------------------------------------
-SAGA_API_DLL_EXPORT int			SG_Get_Digit_Count	(int Number);
+SAGA_API_DLL_EXPORT int			SG_Get_Digit_Count		(int Number);
+
+//---------------------------------------------------------
+SAGA_API_DLL_EXPORT	CSG_String	SG_Get_Double_asString	(double Number, int Width = -1, int Precision = -1, bool bScientific = false);
 
 
 ///////////////////////////////////////////////////////////
@@ -214,13 +219,15 @@ public:
 	bool						Add_Row				(double Value = 0.0);
 	bool						Del_Row				(void);
 
-	int							Get_N				(void)	const	{	return( m_n );		}
-	operator const double *							(void)	const	{	return( m_z );		}
-	double *					Get_Data			(void)	const	{	return( m_z );		}
-	double						operator ()			(int x)	const	{	return( m_z[x] );	}
-	double &					operator []			(int x)			{	return( m_z[x] );	}
+	int							Get_N				(void)	const	{	return( (int)Get_Size() );					}
+	size_t						Get_Size			(void)	const	{	return( m_Array.Get_Size() );				}
+	double *					Get_Data			(void)	const	{	return( (double *)m_Array.Get_Array() );	}
+	double						Get_Data			(int x)	const	{	return( Get_Data()[x] );	}
+	double						operator ()			(int x)	const	{	return( Get_Data()[x] );	}
+	double &					operator []			(int x)			{	return( Get_Data()[x] );	}
+	operator const double *							(void)	const	{	return( Get_Data() );		}
 
-	CSG_String					asString			(void);
+	CSG_String					asString			(int Width = -1, int Precision = -1, bool bScientific = false)	const;
 
 	bool						is_Equal			(const CSG_Vector &Vector)	const;
 
@@ -258,15 +265,18 @@ public:
 	double						Get_Angle			(const CSG_Vector &Vector)	const;
 	CSG_Vector					Get_Unity			(void)						const;
 
+	typedef double const *		const_iterator;
+
+	const_iterator				begin				(void)	const	{	return( Get_Data()              );	}
+	const_iterator				end					(void)	const	{	return( Get_Data() + Get_Size() );	}
+	const_iterator				cbegin				(void)	const	{	return( Get_Data()              );	}
+	const_iterator				cend				(void)	const	{	return( Get_Data() + Get_Size() );	}
+
 
 private:
 
-	int							m_n;
+	CSG_Array					m_Array;
 
-	double						*m_z;
-
-
-	void						_On_Construction	(void);
 
 };
 
@@ -329,7 +339,7 @@ public:
 	double						operator ()			(int y, int x)	const	{	return( m_z[y][x] );	}
 	double *					operator []			(int y)			const	{	return( m_z[y] );		}
 
-	CSG_String					asString			(void);
+	CSG_String					asString			(int Width = -1, int Precision = -1, bool bScientific = false)	const;
 
 	bool						is_Square			(void)	const	{	return( m_nx > 0 && m_nx == m_ny );	}
 	bool						is_Equal			(const CSG_Matrix &Matrix)	const;
@@ -519,17 +529,17 @@ public:
 	CSG_Simple_Statistics(void);
 	CSG_Simple_Statistics(bool bHoldValues);
 	CSG_Simple_Statistics(const CSG_Simple_Statistics &Statistics);
-	CSG_Simple_Statistics(double Mean, double StdDev, int Count = 1000);
+	CSG_Simple_Statistics(double Mean, double StdDev, sLong Count = 1000);
 
 	bool						Create				(bool bHoldValues = false);
 	bool						Create				(const CSG_Simple_Statistics &Statistics);
-	bool						Create				(double Mean, double StdDev, int Count = 1000);
+	bool						Create				(double Mean, double StdDev, sLong Count = 1000);
 
 	void						Invalidate			(void);
 
 	bool						is_Evaluated		(void)	const	{	return( m_bEvaluated );	}
 
-	int							Get_Count			(void)	const	{	return( m_nValues );	}
+	sLong						Get_Count			(void)	const	{	return( m_nValues );	}
 	double						Get_Weights			(void)	const	{	return( m_Weights );	}
 
 	double						Get_Minimum			(void)		{	if( !m_bEvaluated )	_Evaluate(); return( m_Minimum	);	}
@@ -544,7 +554,7 @@ public:
 
 	void						Add_Value			(double Value, double Weight = 1.0);
 
-	double						Get_Value			(int i)	const	{	return( i >= 0 && i < (int)m_Values.Get_Size() ? ((double *)m_Values.Get_Array())[i] : m_Mean );	}
+	double						Get_Value			(sLong i)	const	{	return( i >= 0 && i < (sLong)m_Values.Get_Size() ? ((double *)m_Values.Get_Array())[i] : m_Mean );	}
 
 	CSG_Simple_Statistics &		operator  =			(const CSG_Simple_Statistics &Statistics)	{	Create(Statistics);	return( *this );	}
 	CSG_Simple_Statistics &		operator +=			(const CSG_Simple_Statistics &Statistics)	{	Add(Statistics);	return( *this );	}
@@ -555,7 +565,7 @@ protected:
 
 	bool						m_bEvaluated;
 
-	int							m_nValues;
+	sLong						m_nValues;
 
 	double						m_Weights, m_Sum, m_Sum2, m_Minimum, m_Maximum, m_Range, m_Mean, m_Variance, m_StdDev;
 

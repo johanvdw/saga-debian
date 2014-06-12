@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_grid.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_grid.cpp 2064 2014-03-21 13:20:57Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -84,8 +84,6 @@
 #include "wksp_grid_manager.h"
 #include "wksp_grid.h"
 
-#include "view_scatterplot.h"
-
 
 ///////////////////////////////////////////////////////////
 //														 //
@@ -148,7 +146,7 @@ wxString CWKSP_Grid::Get_Description(void)
 	DESC_ADD_STR (_TL("No Data Value")		, Get_Grid()->Get_NoData_Value() < Get_Grid()->Get_NoData_hiValue() ? CSG_String::Format(SG_T("%f - %f"), Get_Grid()->Get_NoData_Value(), Get_Grid()->Get_NoData_hiValue()).c_str() : SG_Get_String(Get_Grid()->Get_NoData_Value(), -2).c_str());
 	DESC_ADD_FLT (_TL("Arithmetic Mean")	, Get_Grid()->Get_ArithMean(true));
 	DESC_ADD_FLT (_TL("Standard Deviation")	, Get_Grid()->Get_StdDev(true));
-	DESC_ADD_STR (_TL("Memory Size")		, Get_nBytes_asString(Get_Grid()->Get_NCells() * Get_Grid()->Get_nValueBytes(), 2).c_str());
+	DESC_ADD_STR (_TL("Memory Size")		, Get_nBytes_asString(Get_Grid()->Get_Memory_Size(), 2).c_str());
 
 	if( Get_Grid()->is_Compressed() )
 	{
@@ -175,27 +173,25 @@ wxMenu * CWKSP_Grid::Get_Menu(void)
 {
 	wxMenu	*pMenu	= new wxMenu(m_pObject->Get_Name());
 
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_WKSP_ITEM_CLOSE);
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_GRIDS_SAVE);
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_GRIDS_SAVEAS);
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_GRIDS_SAVEAS_IMAGE);
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_GRIDS_SHOW);
-
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_CLOSE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_GRIDS_SHOW);
 	pMenu->AppendSeparator();
-
-	CMD_Menu_Add_Item(pMenu		, true , ID_CMD_GRIDS_HISTOGRAM);
-
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_GRIDS_SCATTERPLOT);
-	CMD_Menu_Add_Item(pMenu		, false, ID_CMD_WKSP_ITEM_SETTINGS_COPY);
-
-	//-----------------------------------------------------
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_GRIDS_SAVE);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_GRIDS_SAVEAS);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_GRIDS_SAVEAS_IMAGE);
+	pMenu->AppendSeparator();
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_DATA_PROJECTION);
+	pMenu->AppendSeparator();
+	CMD_Menu_Add_Item(pMenu, true , ID_CMD_GRIDS_HISTOGRAM);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_GRIDS_SCATTERPLOT);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_WKSP_ITEM_SETTINGS_COPY);
 
 	//-----------------------------------------------------
 	wxMenu	*pSubMenu	= new wxMenu(_TL("Classification"));
 
-	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_GRIDS_SET_LUT);
-	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_GRIDS_FIT_MINMAX);
-	CMD_Menu_Add_Item(pSubMenu	, false, ID_CMD_GRIDS_FIT_STDDEV);
+	CMD_Menu_Add_Item(pSubMenu, false, ID_CMD_GRIDS_SET_LUT);
+	CMD_Menu_Add_Item(pSubMenu, false, ID_CMD_GRIDS_FIT_MINMAX);
+	CMD_Menu_Add_Item(pSubMenu, false, ID_CMD_GRIDS_FIT_STDDEV);
 
 	pMenu->Append(ID_CMD_WKSP_FIRST, _TL("Classification"), pSubMenu);
 
@@ -226,7 +222,7 @@ bool CWKSP_Grid::On_Command(int Cmd_ID)
 		break;
 
 	case ID_CMD_GRIDS_SCATTERPLOT:
-		Add_ScatterPlot(Get_Grid());
+		Add_ScatterPlot();
 		break;
 
 	case ID_CMD_GRIDS_FIT_MINMAX:
@@ -238,7 +234,7 @@ bool CWKSP_Grid::On_Command(int Cmd_ID)
 
 	case ID_CMD_GRIDS_FIT_STDDEV:
 		{
-			double	d	= g_pData->Get_Parameter("FIT_STDDEV")->asDouble();
+			double	d	= g_pData->Get_Parameter("GRID_COLORS_FIT_STDDEV")->asDouble();
 
 			Set_Color_Range(
 				Get_Grid()->Get_ArithMean(true) - d * Get_Grid()->Get_StdDev(true),
@@ -654,7 +650,7 @@ void CWKSP_Grid::_LUT_Create(void)
 		{
 			double		Value;
 
-			for(long iCell=0, jCell; iCell<Get_Grid()->Get_NCells() && PROGRESSBAR_Set_Position(iCell, Get_Grid()->Get_NCells()); iCell++)
+			for(sLong iCell=0, jCell; iCell<Get_Grid()->Get_NCells() && PROGRESSBAR_Set_Position(iCell, Get_Grid()->Get_NCells()); iCell++)
 			{
 				if( Get_Grid()->Get_Sorted(iCell, jCell, false) && (pLUT->Get_Record_Count() == 0 || Value != Get_Grid()->asDouble(jCell)) )
 				{
@@ -714,7 +710,7 @@ void CWKSP_Grid::_LUT_Create(void)
 				pColors->Set_Count(Get_Grid()->Get_NCells());
 			}
 
-			long	jCell, nCells;
+			sLong	jCell, nCells;
 			double	Minimum, Maximum, iCell, Count;
 
 			Maximum	= Get_Grid()->Get_ZMin();
@@ -723,7 +719,7 @@ void CWKSP_Grid::_LUT_Create(void)
 
 			for(iCell=0.0; iCell<Get_Grid()->Get_NCells(); iCell++)
 			{
-				if( Get_Grid()->Get_Sorted((long)iCell, jCell, false) )
+				if( Get_Grid()->Get_Sorted(iCell, jCell, false) )
 				{
 					break;
 				}
@@ -733,7 +729,7 @@ void CWKSP_Grid::_LUT_Create(void)
 
 			for(int iClass=0; iClass<pColors->Get_Count(); iClass++, iCell+=Count)
 			{
-				Get_Grid()->Get_Sorted((long)iCell, jCell, false);
+				Get_Grid()->Get_Sorted(iCell, jCell, false);
 
 				Minimum	= Maximum;
 				Maximum	= iCell < Get_Grid()->Get_NCells() ? Get_Grid()->asDouble(jCell) : Get_Grid()->Get_ZMax() + 1.0;
@@ -828,7 +824,7 @@ double CWKSP_Grid::Get_Value_Range(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-wxMenu * CWKSP_Grid::On_Edit_Get_Menu(void)
+wxMenu * CWKSP_Grid::Edit_Get_Menu(void)
 {
 	if( m_Edit_Attributes.Get_Count() < 1 )
 	{
@@ -844,7 +840,23 @@ wxMenu * CWKSP_Grid::On_Edit_Get_Menu(void)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Grid::On_Edit_On_Key_Down(int KeyCode)
+TSG_Rect CWKSP_Grid::Edit_Get_Extent(void)
+{
+	if( m_Edit_Attributes.Get_Count() > 0 )
+	{
+		return( CSG_Rect(
+			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_xGrid_to_World(m_xSel),
+			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_yGrid_to_World(m_ySel),
+			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_xGrid_to_World(m_xSel + m_Edit_Attributes.Get_Field_Count()),
+			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_yGrid_to_World(m_ySel + m_Edit_Attributes.Get_Count()))
+		);
+	}
+
+	return( Get_Grid()->Get_Extent().m_rect );
+}
+
+//---------------------------------------------------------
+bool CWKSP_Grid::Edit_On_Key_Down(int KeyCode)
 {
 	switch( KeyCode )
 	{
@@ -857,7 +869,7 @@ bool CWKSP_Grid::On_Edit_On_Key_Down(int KeyCode)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Grid::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
+bool CWKSP_Grid::Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int Key)
 {
 	if( Key & MODULE_INTERACTIVE_KEY_LEFT )
 	{
@@ -877,7 +889,7 @@ bool CWKSP_Grid::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int 
 
 		if( nx > 0 && ny > 0 )
 		{
-			int	x, y, Maximum = g_pData->Get_Parameter("SELECT_MAX")->asInt();
+			int	x, y, Maximum = g_pData->Get_Parameter("GRID_SELECT_MAX")->asInt();
 
 			if( nx > Maximum )
 			{
@@ -925,7 +937,7 @@ bool CWKSP_Grid::On_Edit_On_Mouse_Up(CSG_Point Point, double ClientToWorld, int 
 }
 
 //---------------------------------------------------------
-bool CWKSP_Grid::On_Edit_Set_Attributes(void)
+bool CWKSP_Grid::Edit_Set_Attributes(void)
 {
 	if( m_Edit_Attributes.Get_Count() > 0 )
 	{
@@ -952,22 +964,6 @@ bool CWKSP_Grid::On_Edit_Set_Attributes(void)
 	}
 
 	return( false );
-}
-
-//---------------------------------------------------------
-TSG_Rect CWKSP_Grid::On_Edit_Get_Extent(void)
-{
-	if( m_Edit_Attributes.Get_Count() > 0 )
-	{
-		return( CSG_Rect(
-			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_xGrid_to_World(m_xSel),
-			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_yGrid_to_World(m_ySel),
-			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_xGrid_to_World(m_xSel + m_Edit_Attributes.Get_Field_Count()),
-			-Get_Grid()->Get_Cellsize() / 2.0 + Get_Grid()->Get_System().Get_yGrid_to_World(m_ySel + m_Edit_Attributes.Get_Count()))
-		);
-	}
-
-	return( Get_Grid()->Get_Extent().m_rect );
 }
 
 
@@ -1031,7 +1027,7 @@ bool CWKSP_Grid::Fit_Color_Range(void)
 {
 	double		zMin, zMax;
 
-	int		Method	= g_pData->Get_Parameter("GRID_DISPLAY_RANGEFIT")->asInt();
+	int		Method	= g_pData->Get_Parameter("GRID_COLORS_FIT")->asInt();
 
 	if( Method == 0 )
 	{
@@ -1040,7 +1036,7 @@ bool CWKSP_Grid::Fit_Color_Range(void)
 	}
 	else
 	{
-		double	d	= g_pData->Get_Parameter("FIT_STDDEV")->asDouble();
+		double	d	= g_pData->Get_Parameter("GRID_COLORS_FIT_STDDEV")->asDouble();
 
 		zMin	= Get_Grid()->Get_ArithMean(true) - Get_Grid()->Get_StdDev(true) * d;
 		zMax	= Get_Grid()->Get_ArithMean(true) + Get_Grid()->Get_StdDev(true) * d;

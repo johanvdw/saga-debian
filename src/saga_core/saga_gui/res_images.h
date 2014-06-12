@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: res_images.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: res_images.h 2039 2014-03-05 13:26:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -167,6 +167,7 @@ enum ID_IMAGES
 	ID_IMG_TB_MAP_MODE_SELECT,
 	ID_IMG_TB_MAP_MODE_ZOOM,
 	ID_IMG_TB_MAP_SCALEBAR,
+	ID_IMG_TB_MAP_NORTH_ARROW,
 	ID_IMG_TB_MAP_SYNCHRONIZE,
 	ID_IMG_TB_MAP_ZOOM_ACTIVE,
 	ID_IMG_TB_MAP_ZOOM_FULL,
@@ -197,6 +198,7 @@ enum ID_IMAGES
 	ID_IMG_WKSP_GRID_SYSTEM,
 	ID_IMG_WKSP_MAP,
 	ID_IMG_WKSP_MAP_MANAGER,
+	ID_IMG_WKSP_MAP_GRATICULE,
 	ID_IMG_WKSP_MODULE,
 	ID_IMG_WKSP_MODULE_LIBRARY,
 	ID_IMG_WKSP_MODULE_MANAGER,

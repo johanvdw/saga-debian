@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: view_map.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: view_map.cpp 2066 2014-03-24 08:55:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -69,6 +69,9 @@
 
 #include "helper.h"
 
+#include "active.h"
+
+#include "wksp_layer.h"
 #include "wksp_map.h"
 
 #include "view_ruler.h"
@@ -94,6 +97,8 @@ BEGIN_EVENT_TABLE(CVIEW_Map, CVIEW_Base)
 	EVT_MENU			(ID_CMD_MAP_3D_SHOW						, CVIEW_Map::On_Map_3D_Show)
 	EVT_MENU			(ID_CMD_MAP_LAYOUT_SHOW					, CVIEW_Map::On_Map_Layout_Show)
 	EVT_MENU			(ID_CMD_MAP_SCALEBAR					, CVIEW_Map::On_Map_ScaleBar)
+	EVT_MENU			(ID_CMD_MAP_NORTH_ARROW					, CVIEW_Map::On_Map_North_Arrow)
+	EVT_MENU			(ID_CMD_MAP_GRATICULE_ADD				, CVIEW_Map::On_Map_Graticule)
 	EVT_MENU			(ID_CMD_MAP_SAVE_IMAGE					, CVIEW_Map::On_Map_Save_Image)
 	EVT_MENU			(ID_CMD_MAP_SAVE_IMAGE_ON_CHANGE		, CVIEW_Map::On_Map_Save_Image_On_Change)
 	EVT_MENU			(ID_CMD_MAPS_SAVE_IMAGE_TO_MEMORY		, CVIEW_Map::On_Map_Save_Image_To_Memory)
@@ -123,7 +128,7 @@ END_EVENT_TABLE()
 
 //---------------------------------------------------------
 CVIEW_Map::CVIEW_Map(CWKSP_Map *pMap, int Frame_Width)
-	: CVIEW_Base(ID_VIEW_MAP, pMap->Get_Name(), ID_IMG_WND_MAP)
+	: CVIEW_Base(pMap, ID_VIEW_MAP, pMap->Get_Name(), ID_IMG_WND_MAP, false)
 {
 	SYS_Set_Color_BG_Window(this);
 
@@ -139,12 +144,8 @@ CVIEW_Map::CVIEW_Map(CWKSP_Map *pMap, int Frame_Width)
 	m_Ruler_Size	= 20;
 
 	Ruler_Set_Width(Frame_Width);
-}
 
-//---------------------------------------------------------
-CVIEW_Map::~CVIEW_Map(void)
-{
-	m_pMap->View_Closes(this);
+	Do_Show();
 }
 
 
@@ -164,6 +165,8 @@ wxMenu * CVIEW_Map::_Create_Menu(void)
 	CMD_Menu_Add_Item(pMenu, true , ID_CMD_MAP_3D_SHOW);
 	CMD_Menu_Add_Item(pMenu, true , ID_CMD_MAP_LAYOUT_SHOW);
 	CMD_Menu_Add_Item(pMenu, true , ID_CMD_MAP_SCALEBAR);
+	CMD_Menu_Add_Item(pMenu, true , ID_CMD_MAP_NORTH_ARROW);
+	CMD_Menu_Add_Item(pMenu, false, ID_CMD_MAP_GRATICULE_ADD);
 	pMenu->AppendSeparator();
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_MAP_SAVE_IMAGE);
 //	CMD_Menu_Add_Item(pMenu, true , ID_CMD_MAP_SAVE_IMAGE_ON_CHANGE);
@@ -207,11 +210,26 @@ wxToolBarBase * CVIEW_Map::_Create_ToolBar(void)
 	CMD_ToolBar_Add_Separator(pToolBar);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_MAP_3D_SHOW);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_MAP_LAYOUT_SHOW);
+	CMD_ToolBar_Add_Separator(pToolBar);
 	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_MAP_SCALEBAR);
+	CMD_ToolBar_Add_Item(pToolBar, true , ID_CMD_MAP_NORTH_ARROW);
 
 	CMD_ToolBar_Add(pToolBar, _TL("Map"));
 
 	return( pToolBar );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+void CVIEW_Map::Do_Update(void)
+{
+	m_pControl->Refresh_Map();
 }
 
 
@@ -380,9 +398,13 @@ void CVIEW_Map::On_Command_UI(wxUpdateUIEvent &event)
 		event.Check(m_pMap->is_ScaleBar());
 		break;
 
+	case ID_CMD_MAP_NORTH_ARROW:
+		event.Check(m_pMap->is_North_Arrow());
+		break;
+
 	case ID_CMD_MAP_SYNCHRONIZE:
 		event.Enable(m_pMap->Get_Manager()->Get_Count() > 1);
-		event.Check(m_pMap->is_Synchronising());
+		event.Check (m_pMap->is_Synchronising());
 		break;
 
 	case ID_CMD_MAP_SAVE_IMAGE_ON_CHANGE:
@@ -405,12 +427,27 @@ void CVIEW_Map::On_Command_UI(wxUpdateUIEvent &event)
 		event.Check(m_pControl->Get_Mode() == MAP_MODE_DISTANCE);
 		break;
 
+	case ID_CMD_MAP_ZOOM_ACTIVE:
+		event.Enable(g_pACTIVE->Get_Active_Layer() != NULL);
+		break;
+
+	case ID_CMD_MAP_ZOOM_SELECTION:
+		event.Enable(g_pACTIVE->Get_Active_Layer()
+			&& g_pACTIVE->Get_Active_Layer()->Get_Object()->asShapes()
+			&& g_pACTIVE->Get_Active_Layer()->Get_Object()->asShapes()->Get_Selection_Count() > 0
+		);
+		break;
+
 	case ID_CMD_MAP_ZOOM_BACK:
 		event.Enable(m_pMap->Set_Extent_Back(true));
 		break;
 
 	case ID_CMD_MAP_ZOOM_FORWARD:
 		event.Enable(m_pMap->Set_Extent_Forward(true));
+		break;
+
+	case ID_CMD_MAP_GRATICULE_ADD:
+		event.Enable(m_pMap->Get_Count() > 0 && m_pMap->Get_Projection().is_Okay());
 		break;
 	}
 }
@@ -514,6 +551,18 @@ void CVIEW_Map::On_Map_ScaleBar(wxCommandEvent &event)
 }
 
 //---------------------------------------------------------
+void CVIEW_Map::On_Map_North_Arrow(wxCommandEvent &event)
+{
+	m_pMap->Set_North_Arrow(!m_pMap->is_North_Arrow());
+}
+
+//---------------------------------------------------------
+void CVIEW_Map::On_Map_Graticule(wxCommandEvent &event)
+{
+	m_pMap->Add_Graticule();
+}
+
+//---------------------------------------------------------
 void CVIEW_Map::On_Map_Zoom_Synchronize(wxCommandEvent &event)
 {
 	m_pMap->Set_Synchronising(!m_pMap->is_Synchronising());
@@ -541,19 +590,6 @@ void CVIEW_Map::On_Map_Mode_Select(wxCommandEvent &event)
 void CVIEW_Map::On_Map_Mode_Distance(wxCommandEvent &event)
 {
 	m_pControl->Set_Mode(MAP_MODE_DISTANCE);
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-void CVIEW_Map::Refresh_Map(void)
-{
-	m_pControl->Refresh_Map();
 }
 
 

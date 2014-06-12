@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_module_manager.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_module_manager.cpp 2087 2014-04-04 09:08:54Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,6 +72,7 @@
 
 #include "helper.h"
 
+#include "wksp_module_control.h"
 #include "wksp_module_manager.h"
 #include "wksp_module_library.h"
 #include "wksp_module_menu.h"
@@ -102,16 +103,13 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 	m_pMenu_Modules	= new CWKSP_Menu_Modules;
 
 	//-----------------------------------------------------
-	m_Parameters.Create(this, _TL(""), _TL(""));
+	CSG_Parameter	*pNode;
 
-	m_Parameters.Add_Value(
-		NULL	, "BEEP"		, _TL("Beep when finished"),
-		_TL(""),
-		PARAMETER_TYPE_Bool	, true
-	);
+	//-----------------------------------------------------
+	pNode	= m_Parameters.Add_Node(NULL, "NODE_GENERAL", _TL("General"), _TL(""));
 
 	m_Parameters.Add_Choice(
-		NULL	, "START_LOGO"	, _TL("Show Logo at Start Up"),
+		pNode	, "START_LOGO"		, _TL("Show Logo at Start Up"),
 		_TL(""),
 		CSG_String::Format(SG_T("%s|%s|%s|%s|"),
 			_TL("do not show"),
@@ -121,24 +119,21 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 		), 1
 	);
 
-	m_Parameters.Add_Choice(
-		NULL	, "HELP_SOURCE"	, _TL("Module Description Source"),
-		_TL(""),
-		CSG_String::Format(SG_T("%s|%s|"),
-			_TL("built-in"),
-			_TL("online")
-		), 0
-	);
-
 	m_Parameters.Add_Value(
-		NULL	, "PROC_FREQ"	, _TL("Process Update Frequency [milliseconds]"),
+		pNode	, "PROCESS_UPDATE"	, _TL("Process Update Frequency [milliseconds]"),
 		_TL(""),
 		PARAMETER_TYPE_Int	, 0, 0, true
 	);
 
+	m_Parameters.Add_Value(
+		pNode	, "SAVE_CONFIG"		, _TL("Save Configuration"),
+		_TL("disabling might help to shut down faster, particularly if started from slow devices"),
+		PARAMETER_TYPE_Bool	, true
+	);
+
 #ifdef _OPENMP
 	m_Parameters.Add_Value(
-		NULL	, "MAX_NUM_THREADS_OMP"	, _TL("Number of CPU Cores [# physical processors]"),
+		pNode	, "OMP_THREADS_MAX"	, _TL("Number of CPU Cores [# physical processors]"),
 		_TW("Number of processors to use for parallelization. Should be set to the number "
 		    "of physical processors, and not to the total number of physical and logical processors "
 			"on systems supporting hyper-threading."),
@@ -146,9 +141,36 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 	);
 #endif
 
+	//-----------------------------------------------------
+	pNode	= m_Parameters.Add_Node(NULL, "NODE_MODULES", _TL("Tools"), _TL(""));
+
+	m_Parameters.Add_Value(
+		pNode	, "BEEP"			, _TL("Beep when finished"),
+		_TL(""),
+		PARAMETER_TYPE_Bool	, true
+	);
+
+	m_Parameters.Add_Choice(
+		pNode	, "HELP_SOURCE"		, _TL("Tool Description Source"),
+		_TL(""),
+		CSG_String::Format(SG_T("%s|%s|"),
+			_TL("built-in"),
+			_TL("online")
+		), 0
+	);
+
+	//-----------------------------------------------------
+	pNode	= m_Parameters.Add_Node(NULL, "NODE_FILES", _TL("Files"), _TL(""));
+
+	m_Parameters.Add_Value(
+		pNode	, "LNG_OLDSTYLE"	, _TL("Old Style Namings"),
+		_TL("Use old style namings (e.g. 'modules' instead of 'tools'). Ignored if translation file is used. You need to restart SAGA to apply changes."),
+		PARAMETER_TYPE_Bool, false
+	);
+
 	m_Parameters.Add_FilePath(
-		NULL	, "LNG_FILE_DIC", _TL("Language Translations"),
-		_TL("Dictionary for translations from built-in (English) to local language (editable text table)"),
+		pNode	, "LNG_FILE_DIC"	, _TL("Language Translations"),
+		_TL("Dictionary for translations from built-in (English) to local language (editable text table). You need to restart SAGA to apply changes."),
 		CSG_String::Format(SG_T("%s|*.lng|%s|*.txt|%s|*.*"),
 			_TL("Dictionary Files (*.lng)"),
 			_TL("Text Table (*.txt)"),
@@ -157,7 +179,7 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 	);
 
 	m_Parameters.Add_FilePath(
-		NULL	, "CRS_FILE_SRS", _TL("CRS Database"),
+		pNode	, "CRS_FILE_SRS"		, _TL("CRS Database"),
 		_TL("Database with Coordinate Reference System (CRS) definitions. You have to restart SAGA to make changes take affect!"),
 		CSG_String::Format(SG_T("%s|*.srs|%s|*.*"),
 			_TL("Spatial Reference System Files (*.srs)"),
@@ -166,7 +188,7 @@ CWKSP_Module_Manager::CWKSP_Module_Manager(void)
 	);
 
 	m_Parameters.Add_FilePath(
-		NULL	, "CRS_FILE_DIC", _TL("CRS Dictionary"),
+		pNode	, "CRS_FILE_DIC"		, _TL("CRS Dictionary"),
 		_TL("Dictionary for Proj.4/OGC WKT translations. You have to restart SAGA to make changes take affect!"),
 		CSG_String::Format(SG_T("%s|*.dic|%s|*.*"),
 			_TL("Dictionary Files (*.dic)"),
@@ -191,9 +213,25 @@ CWKSP_Module_Manager::~CWKSP_Module_Manager(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+#define CFG_LIBS	wxT("/LIBS")
+#define CFG_LIBF	wxT("LIB_%03d")
+
+//---------------------------------------------------------
 bool CWKSP_Module_Manager::Initialise(void)
 {
-	_Config_Read();
+	CONFIG_Read("/MODULES", &m_Parameters);
+
+#ifdef _OPENMP
+	SG_Set_Max_Num_Threads_Omp(m_Parameters("OMP_THREADS_MAX")->asInt());
+#endif
+
+	//-----------------------------------------------------
+	wxString	Library;
+
+	for(int i=0; CONFIG_Read(CFG_LIBS, wxString::Format(CFG_LIBF, i), Library); i++)
+	{
+		Open(Library);
+	}
 
 	if( Get_Count() == 0 )
 	{
@@ -201,9 +239,9 @@ bool CWKSP_Module_Manager::Initialise(void)
 	if( _Open_Directory(wxT(MODULE_LIBRARY_PATH)) == 0 )
 #endif
 		_Open_Directory(g_pSAGA->Get_App_Path(), true);
-
-		m_pMenu_Modules->Update();
 	}
+
+	m_pMenu_Modules->Update();
 
 	return( true );
 }
@@ -211,7 +249,25 @@ bool CWKSP_Module_Manager::Initialise(void)
 //---------------------------------------------------------
 bool CWKSP_Module_Manager::Finalise(void)
 {
-	_Config_Write();
+	CONFIG_Write("/MODULES", &m_Parameters);
+
+	CONFIG_Delete(CFG_LIBS);
+
+	for(int i=0; i<Get_Count(); i++)
+	{
+#ifdef _SAGA_MSW
+		wxFileName	fLib(Get_Library(i)->Get_File_Name());
+
+		if( fLib.GetPath().Find(g_pSAGA->Get_App_Path()) == 0 )
+		{
+			fLib.MakeRelativeTo(g_pSAGA->Get_App_Path());
+		}
+
+		CONFIG_Write(CFG_LIBS, wxString::Format(CFG_LIBF, i), fLib.GetFullPath());
+#else
+		CONFIG_Write(CFG_LIBS, wxString::Format(CFG_LIBF, i), Get_Library(i)->Get_File_Name());
+#endif
+	}
 
 	return( true );
 }
@@ -226,7 +282,7 @@ bool CWKSP_Module_Manager::Finalise(void)
 //---------------------------------------------------------
 wxString CWKSP_Module_Manager::Get_Name(void)
 {
-	return( _TL("Module Libraries") );
+	return( _TL("Tool Libraries") );
 }
 
 //---------------------------------------------------------
@@ -240,7 +296,7 @@ wxMenu * CWKSP_Module_Manager::Get_Menu(void)
 {
 	wxMenu	*pMenu;
 
-	pMenu	= new wxMenu(_TL("Module Libraries"));
+	pMenu	= new wxMenu(_TL("Tool Libraries"));
 
 	CMD_Menu_Add_Item(pMenu, false, ID_CMD_MODULES_OPEN);
 
@@ -275,13 +331,24 @@ bool CWKSP_Module_Manager::On_Command(int Cmd_ID)
 		Open();
 		break;
 
+	case ID_CMD_MODULES_SEARCH:
+		{
+			CWKSP_Base_Item	*pItem	= g_pModule_Ctrl->Search_Item(_TL("Run Tool"), WKSP_ITEM_Module);
+
+			if( pItem && pItem->GetId().IsOk() && pItem->Get_Type() == WKSP_ITEM_Module )
+			{
+				((CWKSP_Module *)pItem)->Execute(true);
+			}
+		}
+		break;
+
 	case ID_CMD_MODULES_SAVE_DOCS:
 		{
 			wxString	Path;
 
-			if( DLG_Directory(Path, _TL("Create Module Description Files")) )
+			if( DLG_Directory(Path, _TL("Create Tool Description Files")) )
 			{
-				MSG_General_Add(wxString::Format(SG_T("%s..."), _TL("Create Module Description Files")), true, true);
+				MSG_General_Add(wxString::Format(SG_T("%s..."), _TL("Create Tool Description Files")), true, true);
 
 				SG_Get_Module_Library_Manager().Get_Summary(&Path);
 
@@ -303,6 +370,8 @@ bool CWKSP_Module_Manager::On_Command_UI(wxUpdateUIEvent &event)
 		return( CWKSP_Base_Manager::On_Command_UI(event) );
 
 	case ID_CMD_WKSP_ITEM_CLOSE:
+	case ID_CMD_MODULES_SEARCH:
+	case ID_CMD_MODULES_SAVE_DOCS:
 		event.Enable(Get_Count() > 0 && g_pModule == NULL);
 		break;
 	}
@@ -354,110 +423,26 @@ void CWKSP_Module_Manager::On_Execute_UI(wxUpdateUIEvent &event)
 //---------------------------------------------------------
 void CWKSP_Module_Manager::Parameters_Changed(void)
 {
-	g_pSAGA->Process_Set_Frequency(m_Parameters("PROC_FREQ")->asInt());
+	CWKSP_Base_Item::Parameters_Changed();
+
+	g_pSAGA->Process_Set_Frequency(m_Parameters("PROCESS_UPDATE")->asInt());
+
+	if( m_Parameters("SAVE_CONFIG")->asBool() == false )
+	{
+		CONFIG_Write("/MODULES", &m_Parameters);
+	}
+
+	CONFIG_Do_Save(m_Parameters("SAVE_CONFIG")->asBool());
 
 #ifdef _OPENMP
-	SG_Set_Max_Num_Threads_Omp(m_Parameters("MAX_NUM_THREADS_OMP")->asInt());
+	SG_Set_Max_Num_Threads_Omp(m_Parameters("OMP_THREADS_MAX")->asInt());
 #endif
-
-	CWKSP_Base_Item::Parameters_Changed();
 }
 
 //---------------------------------------------------------
 bool CWKSP_Module_Manager::Do_Beep(void)
 {
 	return( m_Parameters("BEEP")->asBool() );
-}
-
-
-///////////////////////////////////////////////////////////
-//														 //
-//														 //
-//														 //
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-#define CFG_LIBS	wxT("/LIBS")
-#define CFG_LIBF	wxT("LIB_%03d")
-
-//---------------------------------------------------------
-void CWKSP_Module_Manager::_Config_Read(void)
-{
-	bool		bValue;
-	long		lValue;
-	wxString	sValue;
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("BEEP")		, bValue) )
-	{
-		m_Parameters("BEEP")		->Set_Value(bValue);
-	}
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("START_LOGO")	, lValue) )
-	{
-		m_Parameters("START_LOGO")	->Set_Value((int)lValue);
-	}
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("HELP_SOURCE")	, lValue) )
-	{
-		m_Parameters("HELP_SOURCE")	->Set_Value((int)lValue);
-	}
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("PROC_FREQ")	, lValue) )
-	{
-		m_Parameters("PROC_FREQ")	->Set_Value((int)lValue);
-	}
-
-#ifdef _OPENMP
-	if( CONFIG_Read(wxT("/MODULES"), wxT("MAX_NUM_THREADS_OMP"), lValue) )
-	{
-		m_Parameters("MAX_NUM_THREADS_OMP")->Set_Value((int)lValue);
-		SG_Set_Max_Num_Threads_Omp((int)lValue);
-	}
-#endif
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("LNG_FILE_DIC"), sValue) )
-	{
-		m_Parameters("LNG_FILE_DIC")->Set_Value(CSG_String(&sValue));
-	}
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_SRS"), sValue) )
-	{
-		m_Parameters("CRS_FILE_SRS")->Set_Value(CSG_String(&sValue));
-	}
-
-	if( CONFIG_Read(wxT("/MODULES"), wxT("CRS_FILE_DIC"), sValue) )
-	{
-		m_Parameters("CRS_FILE_DIC")->Set_Value(CSG_String(&sValue));
-	}
-
-	for(int i=0; CONFIG_Read(CFG_LIBS, wxString::Format(CFG_LIBF, i), sValue); i++)
-	{
-		Open(sValue);
-	}
-
-	m_pMenu_Modules->Update();
-}
-
-//---------------------------------------------------------
-void CWKSP_Module_Manager::_Config_Write(void)
-{
-	CONFIG_Write(wxT("/MODULES"), wxT("BEEP")		 ,       m_Parameters("BEEP")        ->asBool());
-	CONFIG_Write(wxT("/MODULES"), wxT("START_LOGO")	 , (long)m_Parameters("START_LOGO")  ->asInt());
-	CONFIG_Write(wxT("/MODULES"), wxT("HELP_SOURCE") , (long)m_Parameters("HELP_SOURCE") ->asInt());
-	CONFIG_Write(wxT("/MODULES"), wxT("PROC_FREQ")	 , (long)m_Parameters("PROC_FREQ")   ->asInt());
-#ifdef _OPENMP
-	CONFIG_Write(wxT("/MODULES"), wxT("MAX_NUM_THREADS_OMP"), (long)m_Parameters("MAX_NUM_THREADS_OMP")->asInt());
-#endif
-	CONFIG_Write(wxT("/MODULES"), wxT("LNG_FILE_DIC"),       m_Parameters("LNG_FILE_DIC")->asString());
-	CONFIG_Write(wxT("/MODULES"), wxT("CRS_FILE_SRS"),       m_Parameters("CRS_FILE_SRS")->asString());
-	CONFIG_Write(wxT("/MODULES"), wxT("CRS_FILE_DIC"),       m_Parameters("CRS_FILE_DIC")->asString());
-
-	CONFIG_Delete(CFG_LIBS);
-
-	for(int i=0; i<Get_Count(); i++)
-	{
-		CONFIG_Write(CFG_LIBS, wxString::Format(CFG_LIBF, i), Get_Library(i)->Get_File_Name());
-	}
 }
 
 

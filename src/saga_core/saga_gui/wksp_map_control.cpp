@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map_control.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_map_control.cpp 2068 2014-03-25 16:04:16Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ enum
 {
 	IMG_MAP_MANAGER		= 1,
 	IMG_MAP,
-
+	IMG_MAP_GRATICULE,
 	IMG_SHAPES_POINT,
 	IMG_SHAPES_POINTS,
 	IMG_SHAPES_LINE,
@@ -143,7 +143,7 @@ CWKSP_Map_Control::CWKSP_Map_Control(wxWindow *pParent)
 	//-----------------------------------------------------
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_MAP_MANAGER);
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_MAP);
-
+	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_MAP_GRATICULE);
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_SHAPES_POINT);
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_SHAPES_POINTS);
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_SHAPES_LINE);
@@ -176,8 +176,8 @@ int CWKSP_Map_Control::OnCompareItems(const wxTreeItemId &item1, const wxTreeIte
 {
 	CWKSP_Base_Item	*p1, *p2;
 
-	if(	(p1 = (CWKSP_Base_Item *)GetItemData(item1)) != NULL && p1->Get_Type() == WKSP_ITEM_Map_Layer
-	&&	(p2 = (CWKSP_Base_Item *)GetItemData(item2)) != NULL && p2->Get_Type() == WKSP_ITEM_Map_Layer )
+	if(	(p1 = (CWKSP_Base_Item *)GetItemData(item1)) != NULL && (p1->Get_Type() == WKSP_ITEM_Map_Layer || p1->Get_Type() == WKSP_ITEM_Map_Graticule)
+	&&	(p2 = (CWKSP_Base_Item *)GetItemData(item2)) != NULL && (p2->Get_Type() == WKSP_ITEM_Map_Layer || p2->Get_Type() == WKSP_ITEM_Map_Graticule) )
 	{
 		return( p1->Get_Index() - p2->Get_Index() );
 	}
@@ -195,28 +195,33 @@ int CWKSP_Map_Control::OnCompareItems(const wxTreeItemId &item1, const wxTreeIte
 //---------------------------------------------------------
 inline int CWKSP_Map_Control::_Get_Image_ID(CWKSP_Base_Item *pItem)
 {
-	if( pItem && pItem->Get_Type() == WKSP_ITEM_Map_Layer )
+	if( pItem )
 	{
-		pItem	= ((CWKSP_Map_Layer *)pItem)->Get_Layer();
-
-		switch( pItem->Get_Type() )
+		if( pItem->Get_Type() == WKSP_ITEM_Map_Graticule )
 		{
-		default:
-			break;
+			return( IMG_MAP_GRATICULE );
+		}
 
-		case WKSP_ITEM_Shapes:
-			switch( ((CWKSP_Shapes *)pItem)->Get_Shapes()->Get_Type() )
+		if( pItem->Get_Type() == WKSP_ITEM_Map_Layer )
+		{
+			pItem	= ((CWKSP_Map_Layer *)pItem)->Get_Layer();
+
+			switch( pItem->Get_Type() )
 			{
-			default:
-			case SHAPE_TYPE_Point:		return( IMG_SHAPES_POINT );
-			case SHAPE_TYPE_Points:		return( IMG_SHAPES_POINTS );
-			case SHAPE_TYPE_Line:		return( IMG_SHAPES_LINE );
-			case SHAPE_TYPE_Polygon:	return( IMG_SHAPES_POLYGON );
+			default:						break;
+			case WKSP_ITEM_Grid:			return( IMG_GRID );
+			case WKSP_ITEM_TIN:				return( IMG_TIN );
+			case WKSP_ITEM_PointCloud:		return( IMG_POINTCLOUD );
+			case WKSP_ITEM_Shapes:
+				switch( ((CWKSP_Shapes *)pItem)->Get_Shapes()->Get_Type() )
+				{
+				case SHAPE_TYPE_Point:		return( IMG_SHAPES_POINT );
+				case SHAPE_TYPE_Points:		return( IMG_SHAPES_POINTS );
+				case SHAPE_TYPE_Line:		return( IMG_SHAPES_LINE );
+				case SHAPE_TYPE_Polygon:	return( IMG_SHAPES_POLYGON );
+				default:	break;
+				}
 			}
-
-		case WKSP_ITEM_TIN:				return( IMG_TIN );
-		case WKSP_ITEM_PointCloud:		return( IMG_POINTCLOUD );
-		case WKSP_ITEM_Grid:			return( IMG_GRID );
 		}
 	}
 
@@ -247,22 +252,25 @@ void CWKSP_Map_Control::Add_Item(CWKSP_Base_Manager *pManager, CWKSP_Base_Item *
 }
 
 //---------------------------------------------------------
-bool CWKSP_Map_Control::Del_Item(CWKSP_Map *pMap, CWKSP_Layer *pLayer)
+bool CWKSP_Map_Control::Del_Item(CWKSP_Map *pMap, CWKSP_Base_Item *pItem)
 {
-	CWKSP_Map_Layer	*pItem;
-
-	if( pMap && (pItem = pMap->Find_Layer(pLayer)) != NULL )
+	if( pMap && pItem )
 	{
+		pItem	= pItem->Get_Type() == WKSP_ITEM_Map_Layer
+				? pMap->Find_Layer(((CWKSP_Map_Layer *)pItem)->Get_Layer())
+				: pMap->Find_Layer( (CWKSP_Layer     *)pItem);
+
 		bool	bRefresh	= pMap->Get_Count() > 1;
 
-		_Del_Item(pItem, true);
-
-		if( bRefresh )
+		if( pItem && _Del_Item(pItem, true) )
 		{
-			pMap->View_Refresh(false);
-		}
+			if( bRefresh )
+			{
+				pMap->View_Refresh(false);
+			}
 
-		return( true );
+			return( true );
+		}
 	}
 
 	return( false );
@@ -280,7 +288,7 @@ void CWKSP_Map_Control::On_Drag_Begin(wxTreeEvent &event)
 {
 	CWKSP_Base_Item	*pItem	= (CWKSP_Base_Item *)GetItemData(event.GetItem());
 
-	if( pItem && pItem->Get_Type() == WKSP_ITEM_Map_Layer )
+	if( pItem && (pItem->Get_Type() == WKSP_ITEM_Map_Layer || pItem->Get_Type() == WKSP_ITEM_Map_Graticule) )
 	{
 		m_draggedItem	= event.GetItem();
 
@@ -291,53 +299,57 @@ void CWKSP_Map_Control::On_Drag_Begin(wxTreeEvent &event)
 //---------------------------------------------------------
 void CWKSP_Map_Control::On_Drag_End(wxTreeEvent &event)
 {
-	if( event.GetItem().IsOk() )
+	if( event.GetItem().IsOk()
+	&& (  ((CWKSP_Base_Item *)GetItemData(m_draggedItem))->Get_Type() == WKSP_ITEM_Map_Layer
+	   || ((CWKSP_Base_Item *)GetItemData(m_draggedItem))->Get_Type() == WKSP_ITEM_Map_Graticule ) )
 	{
 		CWKSP_Map		*pDst_Map, *pSrc_Map;
 		CWKSP_Base_Item	*pSrc, *pDst, *pCpy;
 
-		if( ((CWKSP_Base_Item *)GetItemData(m_draggedItem))->Get_Type() == WKSP_ITEM_Map_Layer )
+		pDst		= (CWKSP_Base_Item *)GetItemData(event.GetItem());
+		pSrc		= (CWKSP_Base_Item *)GetItemData(m_draggedItem);
+		pSrc_Map	= (CWKSP_Map *)pSrc->Get_Manager();
+
+		switch( pDst->Get_Type() )
 		{
-			pDst		= (CWKSP_Base_Item *)GetItemData(event.GetItem());
-			pSrc		= (CWKSP_Base_Item *)GetItemData(m_draggedItem);
-			pSrc_Map	= (CWKSP_Map *)pSrc->Get_Manager();
+		default:
+			pDst_Map	= NULL;
+			break;
 
-			switch( pDst->Get_Type() )
+		case WKSP_ITEM_Map:
+			pDst_Map	= (CWKSP_Map *)pDst;
+			pDst		= NULL;
+			break;
+
+		case WKSP_ITEM_Map_Layer:
+		case WKSP_ITEM_Map_Graticule:
+			pDst_Map	= (CWKSP_Map *)pDst->Get_Manager();
+			break;
+		}
+
+		if( pDst_Map )
+		{
+			Freeze();
+
+			if( pDst_Map == pSrc_Map )
 			{
-			default:
-				pDst_Map	= NULL;
-				break;
+				pDst_Map->Move_To(pSrc, pDst);
 
-			case WKSP_ITEM_Map:
-				pDst_Map	= (CWKSP_Map *)pDst;
-				pDst		= NULL;
-				break;
+				pDst_Map->View_Refresh(false);
+			}
+			else if( (pCpy = pDst_Map->Add_Copy(pSrc)) != NULL )
+			{
+				pDst_Map->Move_To(pCpy, pDst);
 
-			case WKSP_ITEM_Map_Layer:
-				pDst_Map	= (CWKSP_Map *)pDst->Get_Manager();
-				break;
+				if( pCpy && !wxGetKeyState(WXK_CONTROL) )
+				{
+					Del_Item(pSrc_Map, pSrc);
+				}
+
+				pDst_Map->View_Refresh(false);
 			}
 
-			if( pDst_Map )
-			{
-				if( pDst_Map == pSrc_Map )
-				{
-					pDst_Map->Move_To(pSrc, pDst);
-
-					pDst_Map->View_Refresh(false);
-				}
-				else if( (pCpy = pDst_Map->Add_Layer(((CWKSP_Map_Layer *)pSrc)->Get_Layer())) != NULL )
-				{
-					pDst_Map->Move_To(pCpy, pDst);
-
-					if( pCpy && !wxGetKeyState(WXK_CONTROL) )
-					{
-						Del_Item(pSrc_Map, ((CWKSP_Map_Layer *)pSrc)->Get_Layer());
-					}
-
-					pDst_Map->View_Refresh(false);
-				}
-			}
+			Thaw();
 		}
 	}
 

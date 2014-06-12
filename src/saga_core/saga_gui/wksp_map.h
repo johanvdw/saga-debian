@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_map.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_map.h 2066 2014-03-24 08:55:13Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -142,22 +142,25 @@ public:
 	bool						Set_Extent_Back			(bool bCheck_Only = false);
 	bool						Set_Extent_Forward		(bool bCheck_Only = false);
 
-	void						Set_Synchronising		(bool bOn);
-	bool						is_Synchronising		(void)	{	return( m_bSynchronise );	}
+	bool						is_North_Arrow			(void);
+	void						Set_North_Arrow			(bool bOn);
 
+	bool						is_ScaleBar				(void);
 	void						Set_ScaleBar			(bool bOn);
-	bool						is_ScaleBar				(void)	{	return( m_bScaleBar );	}
+
+	bool						is_Synchronising		(void);
+	void						Set_Synchronising		(bool bOn);
 
 	bool						is_Image_Save_Mode		(void)	{	return( m_Img_bSave );		}
 
-	class CWKSP_Map_Layer *		Add_Layer				(class CWKSP_Layer *pLayer);
-	int							Get_Layer				(class CWKSP_Layer *pLayer);
-	class CWKSP_Map_Layer *		Get_Layer				(int i)		{	return( (class CWKSP_Map_Layer *)Get_Item(i) );	}
 	bool						Update					(class CWKSP_Layer *pLayer, bool bMapOnly);
+	int							Get_Layer				(class CWKSP_Layer *pLayer);
 	class CWKSP_Map_Layer *		Find_Layer				(class CWKSP_Layer *pLayer);
+	class CWKSP_Map_Layer *		Add_Layer				(class CWKSP_Layer *pLayer);
+	class CWKSP_Map_Graticule *	Add_Graticule			(CSG_MetaData *pEntry = NULL);
+	class CWKSP_Base_Item *		Add_Copy				(CWKSP_Base_Item *pItem);
 
-	void						On_Delete				(class CWKSP_Map_Layer *pLayer);
-
+    bool                        View_Opened             (class wxMDIChildFrame *pView);
 	void						View_Closes				(class wxMDIChildFrame *pView);
 	void						View_Refresh			(bool bMapOnly);
 	class CVIEW_Map *			View_Get				(void)		{	return( m_pView );		}
@@ -185,6 +188,8 @@ public:
 	void						Draw_Frame				(wxDC &dc, wxRect rMap, int Width);
 	void						Draw_Frame				(wxDC &dc, const CSG_Rect &rWorld, wxRect rMap, int Width);
 	bool						Draw_Legend				(wxDC &dc, double Zoom_Map, double Zoom, wxPoint Position, wxSize *pSize = NULL);
+	bool						Draw_North_Arrow		(wxDC &dc, const CSG_Rect &rWorld, const wxRect &rClient);
+	bool						Draw_ScaleBar			(wxDC &dc, const CSG_Rect &rWorld, const wxRect &rClient);
 
 	const wxBitmap &			Get_Thumbnail			(int dx, int dy);
 
@@ -194,6 +199,9 @@ public:
 	int							Get_Print_Resolution	(void);
 	int							Get_Print_Frame			(void);
 	int							Get_Print_Legend		(void);
+
+	void						Set_Projection			(void);
+	CSG_Projection &			Get_Projection			(void)	{	return( m_Projection );	}
 
 
 protected:
@@ -205,7 +213,7 @@ protected:
 
 private:
 
-	bool						m_bScaleBar, m_bSynchronise, m_Img_bSave;
+	bool						m_Img_bSave;
 
 	int							m_Img_Type, m_Img_Count;
 
@@ -214,6 +222,8 @@ private:
 	wxBitmap					m_Thumbnail;
 
 	CSG_Parameters				m_Img_Parms;
+
+	CSG_Projection				m_Projection;
 
 	CWKSP_Map_Extents			m_Extents;
 

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dlg_list_shapes.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: dlg_list_shapes.h 1964 2014-02-04 16:25:58Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -88,7 +88,6 @@ class CDLG_List_Shapes : public CDLG_List_Base
 
 public:
 	CDLG_List_Shapes(CSG_Parameter_Shapes_List *pList, wxString Caption);
-	virtual ~CDLG_List_Shapes(void);
 
 
 protected:
@@ -96,9 +95,7 @@ protected:
 	int							m_Shape_Type;
 
 
-	virtual void				_Set_Objects(void);
-
-	void						_Set_Shapes(class CWKSP_Base_Manager *pType);
+	void						_Set_Data		(void);
 
 
 //---------------------------------------------------------

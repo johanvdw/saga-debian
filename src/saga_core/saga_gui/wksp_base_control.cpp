@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_control.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_base_control.cpp 2020 2014-02-26 11:21:04Z oconrad $
  *********************************************************/
 	
 ///////////////////////////////////////////////////////////
@@ -150,6 +150,7 @@ CWKSP_Base_Control::CWKSP_Base_Control(wxWindow *pParent, wxWindowID id)
 	: wxTreeCtrl(pParent, id, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS)
 {
 	m_pManager	= NULL;
+	m_bUpdating	= false;
 
 	AssignImageList(new wxImageList(IMG_SIZE_TREECTRL, IMG_SIZE_TREECTRL, true, 0));
 	IMG_ADD_TO_TREECTRL(ID_IMG_WKSP_NOITEMS);
@@ -157,8 +158,7 @@ CWKSP_Base_Control::CWKSP_Base_Control(wxWindow *pParent, wxWindowID id)
 
 //---------------------------------------------------------
 CWKSP_Base_Control::~CWKSP_Base_Control(void)
-{
-}
+{}
 
 
 ///////////////////////////////////////////////////////////
@@ -194,76 +194,53 @@ bool CWKSP_Base_Control::_Set_Manager(CWKSP_Base_Manager *pManager)
 //---------------------------------------------------------
 void CWKSP_Base_Control::On_Command(wxCommandEvent &event)
 {
-	//-----------------------------------------------------
-	if( event.GetId() == ID_CMD_WKSP_ITEM_CLOSE )
+	switch( event.GetId() )
 	{
+	case ID_CMD_WKSP_ITEM_CLOSE:
 		_Del_Active(false);
+		break;
 
-		return;
-	}
-
-	//-----------------------------------------------------
-	if( event.GetId() == ID_CMD_WKSP_ITEM_SHOW )
-	{
+	case ID_CMD_WKSP_ITEM_SHOW:
 		_Show_Active();
+		break;
 
-		return;
-	}
-
-	//-----------------------------------------------------
-	if( event.GetId() == ID_CMD_WKSP_ITEM_SETTINGS_LOAD && Get_Selection_Count() > 1 )
-	{
+	case ID_CMD_WKSP_ITEM_SETTINGS_LOAD:
 		_Load_Settings();
+		break;
 
-		return;
-	}
-
-	//-----------------------------------------------------
-	if( event.GetId() == ID_CMD_WKSP_ITEM_SETTINGS_COPY && Get_Selection_Count() > 0 )
-	{
+	case ID_CMD_WKSP_ITEM_SETTINGS_COPY:
 		_Copy_Settings();
+		break;
 
-		return;
-	}
-
-	//-----------------------------------------------------
-	if( event.GetId() == ID_CMD_WKSP_ITEM_SEARCH )
-	{
+	case ID_CMD_WKSP_ITEM_SEARCH:
 		_Search_Item();
-
-		return;
-	}
+		break;
 
 	//-----------------------------------------------------
-	if( m_pManager->On_Command(event.GetId()) )
-	{
-		return;
-	}
+	default:
+		if( !m_pManager->On_Command(event.GetId()) )
+		{
+			CWKSP_Base_Item	*pItem	= Get_Item_Selected();
 
-	//-----------------------------------------------------
-	CWKSP_Base_Item	*pItem	= Get_Item_Selected();
-
-	if( pItem )
-	{
-		pItem->On_Command(event.GetId());
+			if( pItem )
+			{
+				pItem->On_Command(event.GetId());
+			}
+		}
 	}
 }
 
 //---------------------------------------------------------
 void CWKSP_Base_Control::On_Command_UI(wxUpdateUIEvent &event)
 {
-	//-----------------------------------------------------
-	if( m_pManager->On_Command_UI(event) )
+	if( !m_pManager->On_Command_UI(event) )
 	{
-		return;
-	}
+		CWKSP_Base_Item	*pItem	= Get_Item_Selected();
 
-	//-----------------------------------------------------
-	CWKSP_Base_Item	*pItem	= Get_Item_Selected();
-
-	if( pItem )
-	{
-		pItem->On_Command_UI(event);
+		if( pItem )
+		{
+			pItem->On_Command_UI(event);
+		}
 	}
 }
 
@@ -445,6 +422,23 @@ bool CWKSP_Base_Control::_Del_Item_Confirm(CWKSP_Base_Item *pItem)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
+int CWKSP_Base_Control::Get_Selection_Count(void)
+{
+	if( GetWindowStyle() & wxTR_MULTIPLE )
+	{
+		wxArrayTreeItemIds	IDs;
+
+		return( GetSelections(IDs) );
+	}
+	else
+	{
+		wxTreeItemId	ID	= GetSelection();
+
+		return( ID.IsOk() ? 1 : 0 );
+	}
+}
+
+//---------------------------------------------------------
 CWKSP_Base_Item * CWKSP_Base_Control::Get_Item_Selected(void)
 {
 	wxTreeItemId	ID;
@@ -471,40 +465,41 @@ bool CWKSP_Base_Control::Set_Item_Selected(CWKSP_Base_Item *pItem, bool bKeepMul
 {
 	if( pItem && pItem->Get_Control() == this && pItem->GetId().IsOk() )
 	{
-		g_pACTIVE->Freeze();
-
-		bool	bSelect	= bKeepMultipleSelection ? !IsSelected(pItem->GetId()) : true;
-
-		if( !bKeepMultipleSelection )
+		if( GetWindowStyle() & wxTR_MULTIPLE )
 		{
-			UnselectAll();
+			if( bKeepMultipleSelection )
+			{
+				ToggleItemSelection(pItem->GetId());
+			}
+			else
+			{
+				m_bUpdating	= true;
+				SelectItem(pItem->GetId());
+				m_bUpdating	= false;
+
+				wxArrayTreeItemIds	IDs;
+				
+				if( GetSelections(IDs) > 1 )
+				{
+					for(size_t i=0; i<IDs.Count(); i++)
+					{
+						if( IDs[i] != pItem->GetId() )
+						{
+							UnselectItem(IDs[i]);
+						}
+					}
+				}
+			}
 		}
-
-		SelectItem(pItem->GetId(), bSelect);
-
-		g_pACTIVE->Thaw();
+		else
+		{
+			SelectItem(pItem->GetId());
+		}
 
 		return( true );
 	}
 
 	return( false );
-}
-
-//---------------------------------------------------------
-int CWKSP_Base_Control::Get_Selection_Count(void)
-{
-	if( GetWindowStyle() & wxTR_MULTIPLE )
-	{
-		wxArrayTreeItemIds	IDs;
-
-		return( GetSelections(IDs) );
-	}
-	else
-	{
-		wxTreeItemId	ID	= GetSelection();
-
-		return( ID.IsOk() ? 1 : 0 );
-	}
 }
 
 
@@ -555,19 +550,6 @@ wxMenu * CWKSP_Base_Control::Get_Context_Menu(void)
 //														 //
 //														 //
 ///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-bool CWKSP_Base_Control::_Set_Active(void)
-{
-	if( g_pACTIVE )
-	{
-		g_pACTIVE->Set_Active(Get_Item_Selected());
-
-		return( true );
-	}
-
-	return( false );
-}
 
 //---------------------------------------------------------
 bool CWKSP_Base_Control::_Del_Active(bool bSilent)
@@ -858,28 +840,31 @@ bool CWKSP_Base_Control::_Search_Compare(wxString A, wxString B, bool bCase)
 }
 
 //---------------------------------------------------------
-bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase)
+bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pItem, const wxString &String, bool bName, bool bDesc, bool bCase, TWKSP_Item Type)
 {
 	if( pItem == NULL )
 	{
 		return( false );
 	}
 
-	if(	(bName && _Search_Compare(String, pItem->Get_Name       (), bCase))
-	||	(bDesc && _Search_Compare(String, pItem->Get_Description(), bCase)) )
+	if(	Type == WKSP_ITEM_Undefined || Type == pItem->Get_Type() )
 	{
-		CSG_Table_Record	*pRecord	= pList->Add_Record();
+		if( (bName && _Search_Compare(String, pItem->Get_Name       (), bCase))
+		||  (bDesc && _Search_Compare(String, pItem->Get_Description(), bCase)) )
+		{
+			CSG_Table_Record	*pRecord	= pList->Add_Record();
 
-		pRecord->Set_Value(0, pItem->Get_Name().wx_str());
-		pRecord->Set_Value(1, pItem->Get_Type_Name(pItem->Get_Type()).wx_str());
-		pRecord->Set_Value(2, (long)pItem);
+			pRecord->Set_Value(0, pItem->Get_Name().wx_str());
+			pRecord->Set_Value(1, pItem->Get_Type_Name(pItem->Get_Type()).wx_str());
+			pRecord->Set_Value(2, (long)pItem);
+		}
 	}
 
 	if( pItem->is_Manager() )
 	{
 		for(int i=0; i<((CWKSP_Base_Manager *)pItem)->Get_Count(); i++)
 		{
-			_Search_Get_List(pList, ((CWKSP_Base_Manager *)pItem)->Get_Item(i), String, bName, bDesc, bCase);
+			_Search_Get_List(pList, ((CWKSP_Base_Manager *)pItem)->Get_Item(i), String, bName, bDesc, bCase, Type);
 		}
 	}
 
@@ -887,9 +872,9 @@ bool CWKSP_Base_Control::_Search_Get_List(CSG_Table *pList, CWKSP_Base_Item *pIt
 }
 
 //---------------------------------------------------------
-bool CWKSP_Base_Control::_Search_Item(void)
+CWKSP_Base_Item * CWKSP_Base_Control::Search_Item(const wxString &Caption, TWKSP_Item Type)
 {
-	static CSG_Parameters	Search(NULL, _TL("Search for..."), _TL(""));
+	static CSG_Parameters	Search(NULL, Caption, _TL(""));
 
 	if( Search.Get_Count() == 0 )
 	{
@@ -901,7 +886,7 @@ bool CWKSP_Base_Control::_Search_Item(void)
 
 	if( !DLG_Parameters(&Search) )
 	{
-		return( false );
+		return( NULL );
 	}
 
 	//-----------------------------------------------------
@@ -911,42 +896,61 @@ bool CWKSP_Base_Control::_Search_Item(void)
 	List.Add_Field(_TL("TYPE")	, SG_DATATYPE_String);
 	List.Add_Field(_TL("ADDR")	, SG_DATATYPE_Long);
 
-	_Search_Get_List(&List, m_pManager, Search("STRING")->asString(), Search("NAME")->asBool(), Search("DESC")->asBool(), Search("CASE")->asBool());
+	_Search_Get_List(&List, m_pManager, Search("STRING")->asString(), Search("NAME")->asBool(), Search("DESC")->asBool(), Search("CASE")->asBool(), Type);
 
 	if( List.Get_Count() <= 0 )
 	{
 		wxMessageBox(_TL("Search text not found"), _TL("Search for..."), wxOK|wxICON_EXCLAMATION);
 
-		return( false );
+		return( NULL );
 	}
 
 	//-----------------------------------------------------
+	List.Set_Index(1, TABLE_INDEX_Ascending, 0, TABLE_INDEX_Ascending);
+
 	wxArrayString	Items;
 
 	for(int i=0; i<List.Get_Count(); i++)
 	{
-		Items.Add(wxString::Format(wxT("[%s] %s"), List[i].asString(1), List[i].asString(0)));
+		if( Type == WKSP_ITEM_Undefined )
+		{
+			Items.Add(wxString::Format(wxT("[%s] %s"), List[i].asString(1), List[i].asString(0)));
+		}
+		else
+		{
+			Items.Add(List[i].asString(0));
+		}
 	}
 
 	wxSingleChoiceDialog	dlg(MDI_Get_Top_Window(),
-		_TL("Locate..."),
-		wxString::Format(wxT("%s: %s"), _TL("Search Text"), Search("STRING")->asString()),
-		Items
+		wxString::Format(wxT("%s: '%s'"), _TL("Search Result"), Search("STRING")->asString()),
+		Caption, Items
 	);
 
 	if( dlg.ShowModal() != wxID_OK )
 	{
-		return( false );
+		return( NULL );
 	}
 
 	//-----------------------------------------------------
-	CWKSP_Base_Item	*pItem	= (CWKSP_Base_Item *)List.Get_Record(dlg.GetSelection())->asInt(2);
+	return( (CWKSP_Base_Item *)List[dlg.GetSelection()].asInt(2) );
+}
 
-	EnsureVisible	(pItem->GetId());
-	SelectItem		(pItem->GetId());
-	ScrollTo		(pItem->GetId());
+//---------------------------------------------------------
+bool CWKSP_Base_Control::_Search_Item(void)
+{
+	CWKSP_Base_Item	*pItem	= Search_Item(_TL("Locate..."));
 
-	return( true );
+	if( pItem && pItem->GetId().IsOk() )
+	{
+		EnsureVisible	(pItem->GetId());
+		SelectItem		(pItem->GetId());
+		ScrollTo		(pItem->GetId());
+
+		return( true );
+	}
+
+	return( false );
 }
 
 
@@ -959,7 +963,7 @@ bool CWKSP_Base_Control::_Search_Item(void)
 //---------------------------------------------------------
 void CWKSP_Base_Control::On_Item_LClick(wxMouseEvent &event)
 {
-	_Set_Active();
+	g_pACTIVE->Set_Active(Get_Item_Selected());
 
 	event.Skip();
 }
@@ -982,7 +986,7 @@ void CWKSP_Base_Control::On_Item_RClick(wxTreeEvent &event)
 	{
 	//	SelectItem(event.GetItem());
 
-		_Set_Active();
+		g_pACTIVE->Set_Active(Get_Item_Selected());
 	}
 
 	wxMenu	*pMenu	= Get_Context_Menu();
@@ -1024,7 +1028,10 @@ void CWKSP_Base_Control::On_Item_KeyDown(wxTreeEvent &event)
 //---------------------------------------------------------
 void CWKSP_Base_Control::On_Item_SelChanged(wxTreeEvent &event)
 {
-	_Set_Active();
+	if( g_pACTIVE && (!m_bUpdating || Get_Item_Selected()) )
+	{
+		g_pACTIVE->Set_Active(Get_Item_Selected());
+	}
 
 	event.Skip();
 }

@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: module_library.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: module_library.cpp 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ void CCMD_Module::Destroy(void)
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-bool CCMD_Module::Execute(int argc, char *argv[])
+bool CCMD_Module::Execute(CSG_String sLibName, int argc, char *argv[])
 {
 	int		i;
 
@@ -148,7 +148,9 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 
 	if( argc <= 1 )
 	{
-		SG_PRINTF(m_CMD.GetUsageString());
+		wxString sUsage = m_CMD.GetUsageString();
+		sUsage = wxString::Format(SG_T("Usage: saga_cmd %s %d %s"), sLibName.c_str(), m_pModule->Get_ID(), sUsage.AfterFirst(' ').AfterFirst(' '));
+		SG_PRINTF(sUsage);
 
 		return( false );
 	}
@@ -183,7 +185,9 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 	{
 		CMD_Print("");
 
-		SG_PRINTF(m_CMD.GetUsageString());
+		wxString sUsage = m_CMD.GetUsageString();
+		sUsage = wxString::Format(SG_T("Usage: saga_cmd %s %d %s"), sLibName.c_str(), m_pModule->Get_ID(), sUsage.AfterFirst(' ').AfterFirst(' '));
+		SG_PRINTF(sUsage);
 	}
 
 	//-----------------------------------------------------
@@ -212,7 +216,7 @@ bool CCMD_Module::Execute(int argc, char *argv[])
 	}
 	else
 	{
-		CMD_Print_Error(_TL("executing module"), m_pModule->Get_Name());
+		CMD_Print_Error(_TL("executing tool"), m_pModule->Get_Name());
 	}
 
 	return( bResult );

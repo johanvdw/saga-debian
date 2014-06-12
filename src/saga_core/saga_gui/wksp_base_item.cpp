@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_item.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_base_item.cpp 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -85,9 +85,9 @@ wxString CWKSP_Base_Item::Get_Type_Name(TWKSP_Item Type)
 {
 	switch( Type )
 	{
-	case WKSP_ITEM_Module_Manager:		return( _TL("Module Manager") );
-	case WKSP_ITEM_Module_Library:		return( _TL("Module Library") );
-	case WKSP_ITEM_Module:				return( _TL("Module") );
+	case WKSP_ITEM_Module_Manager:		return( _TL("Tool Manager") );
+	case WKSP_ITEM_Module_Library:		return( _TL("Tool Library") );
+	case WKSP_ITEM_Module:				return( _TL("Tool") );
 
 	case WKSP_ITEM_Data_Manager:		return( _TL("Data Manager") );
 
@@ -205,6 +205,7 @@ CWKSP_Base_Control * CWKSP_Base_Item::Get_Control(void)
 	case WKSP_ITEM_Map_Manager:
 	case WKSP_ITEM_Map:
 	case WKSP_ITEM_Map_Layer:
+	case WKSP_ITEM_Map_Graticule:
 		return( g_pMap_Ctrl );
 	}
 }

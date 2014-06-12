@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: wksp_base_item.h 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: wksp_base_item.h 1994 2014-02-14 10:55:29Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -72,9 +72,10 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-#include <wx/event.h>
 #include <wx/menu.h>
 #include <wx/treectrl.h>
+
+#include <saga_api/saga_api.h>
 
 
 ///////////////////////////////////////////////////////////
@@ -112,6 +113,7 @@ typedef enum
 	WKSP_ITEM_Map_Manager,
 	WKSP_ITEM_Map,
 	WKSP_ITEM_Map_Layer,
+	WKSP_ITEM_Map_Graticule,
 
 	WKSP_ITEM_Undefined
 }

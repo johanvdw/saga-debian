@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: dc_helper.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: dc_helper.cpp 2039 2014-03-05 13:26:00Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -337,128 +337,175 @@ void			Draw_Text			(wxDC &dc, int Align, int x, int y, double Angle, const wxStr
 #define TEXTSPACE	6
 
 //---------------------------------------------------------
-void		Draw_Scale(wxDC &dc, wxRect r, double zMin, double zMax, bool bHorizontal, bool bAscendent, bool bTickAtTop, bool bLineConnector)
+void		Draw_Scale(wxDC &dc, const wxRect &r, double zMin, double zMax, int Orientation, int Tick, int Style, const wxString &Unit)
 {
-	int			xOff, yOff, Width, Height, Height_Tick, Decimals, zDC, yDC, Style, x, y, n;
-	double		z, dz, zToDC;
-	wxString	s;
-	wxFont		Font, oldFont;
+	//-----------------------------------------------------
+	int	Width	= Orientation != SCALE_VERTICAL ? r.GetWidth() : r.GetHeight();
+	int	Height	= Orientation != SCALE_VERTICAL ? r.GetHeight() : r.GetWidth();
+
+	if( zMin >= zMax || Width < 5 || Height < 5 )
+	{
+		return;
+	}
 
 	//-----------------------------------------------------
-	Style	= bTickAtTop ? 1 : 2;
-
-	Width	= bHorizontal ? r.GetWidth() : r.GetHeight();
-	Height	= bHorizontal ? r.GetHeight() : r.GetWidth();
-
-	if( zMin < zMax && Width > 0 && Height > 0 )
+	if( Style & SCALE_STYLE_GLOOMING )
 	{
-		xOff		= r.GetLeft();
-		yOff		= r.GetTop();
+		Style	^= SCALE_STYLE_GLOOMING;
 
-		oldFont		= dc.GetFont();
-		yDC			= (int)((Style == 0 ? 0.60 : 0.45) * (double)Height);
-		Font.Create(yDC, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		dc.SetFont(Font);
+		wxRect	rTmp;
 
-		Height_Tick	= (int)((Style == 0 ? 1.00 : 0.30) * (double)Height);
+		dc.SetPen     (wxPen(*wxWHITE));
+		dc.SetTextForeground(*wxWHITE);
 
-		//-------------------------------------------------
-		zToDC		= (double)Width / (zMax - zMin);
+		rTmp	= r; rTmp.Offset( 0,  1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset( 1,  1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset( 1,  0); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset( 1, -1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset( 0, -1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset(-1, -1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset(-1,  0); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
+		rTmp	= r; rTmp.Offset(-1,  1); Draw_Scale(dc, rTmp, zMin, zMax, Orientation, Tick, Style, Unit);
 
-		dz			= pow(10.0, floor(log10(zMax - zMin)) - 1.0);
-		Decimals	= dz >= 1.0 ? 0 : (int)floor(-log10(dz));
-
-		s.Printf(wxT("%.*f"), Decimals, zMax);
-		dc.GetTextExtent(s, &zDC, &yDC);
-		while( zToDC * dz < zDC + TEXTSPACE )
-		{
-			dz	*= 2;
-		}
-
-		//-------------------------------------------------
-		z			= dz * floor(zMin / dz);
-
-		if( Style != 0 && z < zMin )
-		{
-			z	+= dz;
-		}
-
-		if( z == z + dz )
-		{
-			return;
-		}
-
-		//-------------------------------------------------
-		for(; z<=zMax; z+=dz)
-		{
-			s.Printf(wxT("%.*f"), Decimals, z);
-
-			zDC	= bAscendent ? (int)(zToDC * (z - zMin)) : Width - 1 - (int)(zToDC * (z - zMin));
-
-			if( bHorizontal )
-			{
-				x	= xOff + zDC;
-				y	= yOff;
-				n	= yOff + Height;
-
-				switch( Style )
-				{
-				case 0:	// ...
-					dc.DrawLine(x, y, x, y + Height_Tick);
-					Draw_Text(dc, TEXTALIGN_CENTERLEFT  , x + 2, y + Height / 2, s);
-					break;
-
-				case 1:	// tick at top...
-					dc.DrawLine(x, y, x, y + Height_Tick);
-					Draw_Text(dc, TEXTALIGN_TOPCENTER   , x, y + Height_Tick, s);
-					break;
-
-				case 2: // tick at bottom...
-					dc.DrawLine(x, n, x, n - Height_Tick);
-					Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, x, n - Height_Tick, s);
-					break;
-				}
-			}
-			else
-			{
-				x	= xOff;
-				y	= yOff + zDC;
-				n	= xOff + Height;
-
-				switch( Style )
-				{
-				case 0: // ...
-					dc.DrawLine(x, y, x + Height_Tick, y);
-					Draw_Text(dc, TEXTALIGN_CENTERLEFT  , x + Height / 2, y - 2, 90.0, s);
-					break;
-
-				case 1:	// tick at top...
-					dc.DrawLine(x, y, x + Height_Tick, y);
-					Draw_Text(dc, TEXTALIGN_TOPCENTER   , x + Height_Tick, y, 90.0, s);
-					break;
-
-				case 2: // tick at bottom...
-					dc.DrawLine(n, y, n - Height_Tick, y);
-					Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, n - Height_Tick, y, 90.0, s);
-					break;
-				}
-			}
-		}
-
-		if( bLineConnector )
-		{
-			if( bHorizontal )
-			{
-				dc.DrawLine(xOff, yOff, xOff + zDC, yOff);
-			}
-			else
-			{
-			}
-		}
-
-		//-------------------------------------------------
-		dc.SetFont(oldFont);
+		dc.SetPen     (wxPen(*wxBLACK));
+		dc.SetTextForeground(*wxBLACK);
 	}
+
+	//-----------------------------------------------------
+	wxPen	oldPen  (dc.GetPen  ());
+	wxBrush	oldBrush(dc.GetBrush());
+	wxFont	oldFont (dc.GetFont ());
+
+	dc.SetFont(wxFont(
+		(int)((Tick == SCALE_TICK_NONE ? 0.60 : 0.45) * (double)Height),
+		wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL
+	));
+
+	//-----------------------------------------------------
+	double	zToDC		= (double)Width / (zMax - zMin);
+	double	dz			= pow(10.0, floor(log10(zMax - zMin)) - 1.0);
+	int		Decimals	= dz >= 1.0 ? 0 : (int)floor(-log10(dz));
+
+	int		h	= dc.GetTextExtent(wxString::Format("%.*f", Decimals, zMax)).GetWidth();
+
+	while( zToDC * dz < h + TEXTSPACE )	{	dz	*= 2;	}
+
+	//-----------------------------------------------------
+	int		Align, x[2], y[2];	h	= 0;
+
+	switch( Tick )
+	{
+	default               :	Align = TEXTALIGN_TOPLEFT     ;	break;
+	case SCALE_TICK_TOP   :	Align = TEXTALIGN_TOPCENTER   ;	break;
+	case SCALE_TICK_BOTTOM:	Align = TEXTALIGN_BOTTOMCENTER;	break;
+	}
+
+	if( Orientation != SCALE_VERTICAL )
+	{
+		x[0]	= -1;	x[1]	= (int)((Tick == SCALE_TICK_NONE ? 1.00 : 0.30) * (double)Height);
+		y[0]	= r.GetTop () + (Tick != SCALE_TICK_BOTTOM ? 0    : Height);
+		y[1]	= r.GetTop () + (Tick != SCALE_TICK_BOTTOM ? x[1] : Height - x[1]);
+	}
+	else // if( Orientation == SCALE_VERTICAL )
+	{
+		y[0]	= -1;	y[1]	= (int)((Tick == SCALE_TICK_NONE ? 1.00 : 0.30) * (double)Height);
+		x[0]	= r.GetLeft() + (Tick != SCALE_TICK_BOTTOM ? 0    : Height);
+		x[1]	= r.GetLeft() + (Tick != SCALE_TICK_BOTTOM ? y[1] : Height - y[1]);
+	}
+
+	//-----------------------------------------------------
+	for(double z=dz*floor(zMin/dz); z<=zMax; z+=dz)
+	{
+		if( Tick == SCALE_TICK_NONE || z >= zMin )
+		{
+			int	zDC	= Style & SCALE_STYLE_DESCENDENT
+				? Width - 1 - (int)(zToDC * (z - zMin))
+				:             (int)(zToDC * (z - zMin));
+
+			if( Orientation != SCALE_VERTICAL )
+			{
+				int	xLast	= x[0];	x[0] = x[1] = r.GetLeft() + zDC;
+
+				if( Style & SCALE_STYLE_BLACKWHITE && xLast >= 0 )
+				{
+					dc.SetBrush(h++ % 2 ? *wxWHITE : *wxBLACK);
+
+					dc.DrawRectangle(xLast, y[0], x[1] - xLast, y[1] - y[0]);
+				}
+			}
+			else // if( Orientation == SCALE_VERTICAL )
+			{
+				int	yLast	= y[0]; y[0] = y[1] = r.GetTop () + zDC;
+
+				if( Style & SCALE_STYLE_BLACKWHITE && yLast >= 0 )
+				{
+					dc.SetBrush(h++ % 2 ? *wxWHITE : *wxBLACK);
+
+					dc.DrawRectangle(x[0], yLast, x[1] - x[0], y[1] - yLast);
+				}
+			}
+
+			if( !(Style & SCALE_STYLE_BLACKWHITE) )
+			{
+				dc.DrawLine(x[0], y[0], x[1], y[1]);
+			}
+
+			Draw_Text(dc, Align, x[1], y[1], Orientation != SCALE_VERTICAL ? 0 : 90,
+				wxString::Format("%.*f", Decimals, z)
+			);
+		}
+	}
+
+	//-----------------------------------------------------
+	if( Orientation != SCALE_VERTICAL )
+	{
+		if( Style & SCALE_STYLE_LINECONN )
+		{
+			dc.DrawLine(r.GetLeft(), y[0], x[1], y[0]);
+		}
+
+		if( !Unit.IsEmpty() )
+		{
+			if( Style & SCALE_STYLE_UNIT_BELOW )
+			{
+				Draw_Text(dc, TEXTALIGN_TOPCENTER   , r.GetLeft() + r.GetWidth() / 2, r.GetBottom(), Unit);
+			}
+			else // if( Style & SCALE_STYLE_UNIT_ABOVE )
+			{
+				Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, r.GetLeft() + r.GetWidth() / 2, r.GetTop   (), Unit);
+			}
+		}
+	}
+	else
+	{
+		if( Style & SCALE_STYLE_LINECONN )
+		{
+			dc.DrawLine(x[0], r.GetTop(), x[0], y[1]);
+		}
+
+		if( !Unit.IsEmpty() )
+		{
+			if( Style & SCALE_STYLE_UNIT_BELOW )
+			{
+				Draw_Text(dc, TEXTALIGN_TOPCENTER   , r.GetRight(), r.GetTop() + r.GetHeight() / 2, 90.0, Unit);
+			}
+			else // if( Style & SCALE_STYLE_UNIT_ABOVE )
+			{
+				Draw_Text(dc, TEXTALIGN_BOTTOMCENTER, r.GetLeft (), r.GetTop() + r.GetHeight() / 2, 90.0, Unit);
+			}
+		}
+	}
+
+	//-----------------------------------------------------
+	dc.SetPen  (oldPen  );
+	dc.SetBrush(oldBrush);
+	dc.SetFont (oldFont );
+}
+
+//---------------------------------------------------------
+void		Draw_Scale(wxDC &dc, const wxRect &r, double zMin, double zMax, bool bHorizontal, bool bAscendent, bool bTickAtTop)
+{
+	Draw_Scale(dc, r, zMin, zMax, bHorizontal ? SCALE_HORIZONTAL : SCALE_VERTICAL, bTickAtTop ? SCALE_TICK_TOP : SCALE_TICK_BOTTOM, bAscendent ? SCALE_STYLE_DEFAULT : SCALE_STYLE_DESCENDENT);
 }
 
 

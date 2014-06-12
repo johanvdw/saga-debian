@@ -1,5 +1,5 @@
 /**********************************************************
- * Version $Id: mat_tools.cpp 1921 2014-01-09 10:24:11Z oconrad $
+ * Version $Id: mat_tools.cpp 2117 2014-05-09 09:05:41Z oconrad $
  *********************************************************/
 
 ///////////////////////////////////////////////////////////
@@ -76,9 +76,29 @@
 ///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
-double			SG_Get_Square(double x)
+double			SG_Get_Square(double Value)
 {
-	return( x * x );
+	return( Value * Value );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+double			SG_Get_Rounded(double Value, int Decimals)
+{
+	if( Decimals <= 0 )
+	{
+		return( (int)(0.5 + Value) );
+	}
+
+	double	d	= pow(10.0, Decimals);
+
+	return( ((int)(0.5 + d * Value)) / d );
 }
 
 
@@ -94,6 +114,34 @@ int				SG_Get_Digit_Count(int Number)
 	Number	= abs(Number);
 
 	return( Number < 10 ? 1 : 1 + (int)log10((double)Number) );
+}
+
+
+///////////////////////////////////////////////////////////
+//														 //
+//														 //
+//														 //
+///////////////////////////////////////////////////////////
+
+//---------------------------------------------------------
+CSG_String		SG_Get_Double_asString(double Number, int Width, int Precision, bool bScientific)
+{
+	if( bScientific )
+	{
+		if( Width > 0 && Precision >= 0 )	return( CSG_String::Format(SG_T("%*.*e"), Width, Precision, Number) );
+		if( Width > 0                   )	return( CSG_String::Format(SG_T("%*e"  ), Width           , Number) );
+		if(              Precision >= 0 )	return( CSG_String::Format(SG_T("%.*e" ),        Precision, Number) );
+
+		return( CSG_String::Format(SG_T("%e"), Number) );
+	}
+	else
+	{
+		if( Width > 0 && Precision >= 0 )	return( CSG_String::Format(SG_T("%*.*f"), Width, Precision, Number) );
+		if( Width > 0                   )	return( CSG_String::Format(SG_T("%*f"  ), Width           , Number) );
+		if(              Precision >= 0 )	return( CSG_String::Format(SG_T("%.*f" ),        Precision, Number) );
+
+		return( CSG_String::Format(SG_T("%f"), Number) );
+	}
 }
 
 
@@ -189,7 +237,7 @@ CSG_Simple_Statistics::CSG_Simple_Statistics(const CSG_Simple_Statistics &Statis
 	Create(Statistics);
 }
 
-CSG_Simple_Statistics::CSG_Simple_Statistics(double Mean, double StdDev, int Count)
+CSG_Simple_Statistics::CSG_Simple_Statistics(double Mean, double StdDev, sLong Count)
 {
 	Create(Mean, StdDev, Count);
 }
@@ -225,7 +273,7 @@ bool CSG_Simple_Statistics::Create(const CSG_Simple_Statistics &Statistics)
 	return( true );
 }
 
-bool CSG_Simple_Statistics::Create(double Mean, double StdDev, int Count)
+bool CSG_Simple_Statistics::Create(double Mean, double StdDev, sLong Count)
 {
 	m_bEvaluated	= true;
 
@@ -233,7 +281,7 @@ bool CSG_Simple_Statistics::Create(double Mean, double StdDev, int Count)
 	m_StdDev		= StdDev;
 	m_Variance		= StdDev*StdDev;
 	m_nValues		= Count;
-	m_Weights		= Count;
+	m_Weights		= (double)Count;
 
 	m_Sum			= m_Weights *  m_Mean;
 	m_Sum2			= m_Weights * (m_Mean*m_Mean + m_Variance);
@@ -285,7 +333,7 @@ void CSG_Simple_Statistics::Add(const CSG_Simple_Statistics &Statistics)
 	//--------------------------------------------------------
 	if( m_Values.Get_Size() == m_nValues && Statistics.m_Values.Get_Size() == Statistics.m_nValues && m_Values.Set_Array(m_nValues + Statistics.m_nValues) )
 	{
-		for(int i=0, j=m_nValues; i<Statistics.m_nValues; i++, j++)
+		for(sLong i=0, j=m_nValues; i<Statistics.m_nValues; i++, j++)
 		{
 			((double *)m_Values.Get_Array())[j]	= Statistics.Get_Value(i);
 		}
@@ -434,7 +482,7 @@ bool CSG_Class_Statistics::Get_Majority(double &Value)
 
 bool CSG_Class_Statistics::Get_Majority(double &Value, int &Count)
 {
-	return( Get_Class(Get_Majority(), Value, Count) );
+	return( Get_Class(Get_Majority(), Value, Count) && Count > 0 );
 }
 
 //---------------------------------------------------------
@@ -1152,7 +1200,7 @@ void CSG_Classifier_Supervised::_Get_Parallel_Epiped(const CSG_Vector &Features,
 		for(int iFeature=0; bMember && iFeature<Get_Feature_Count(); iFeature++)
 		{
 			double	d	= Features(iFeature);
-			
+
 			if(	d < m_Statistics[iClass][iFeature].Get_Minimum()
 			||	d > m_Statistics[iClass][iFeature].Get_Maximum() )
 			{
@@ -1246,7 +1294,7 @@ void CSG_Classifier_Supervised::_Get_Maximum_Likelihood(const CSG_Vector &Featur
 			d	+= SG_Get_Square((Features(iFeature) - m_Statistics[iClass][iFeature].Get_Mean()) / m_Statistics[iClass][iFeature].Get_StdDev());
 		}
 
-		dSum	+= (d	= m_ML_s[iClass] * exp(-0.5 * d));	
+		dSum	+= (d	= m_ML_s[iClass] * exp(-0.5 * d));
 		*/
 
 		if( Quality < d )
@@ -1342,14 +1390,14 @@ double CSG_Test_Distribution::Get_T_Tail(double T, int df, TSG_Test_Distribution
 	{
 		return( -1.0 );
 	}
-	
+
 	return( _Change_Tail_Type(Get_T_P(T, df), TESTDIST_TYPE_TwoTail, Type, T < 0.0) );
 }
 
 //---------------------------------------------------------
 double CSG_Test_Distribution::Get_T_Inverse(double p, int df, TSG_Test_Distribution_Type Type)
 {	// Keith Dear & Robert Brennan.
-	// Returns an accurate t to tol sig. fig.'s given p & df.  
+	// Returns an accurate t to tol sig. fig.'s given p & df.
 
 	if( p <= 0.0 || p >= 1.0 || df < 1 )
 	{
@@ -1408,7 +1456,7 @@ double CSG_Test_Distribution::Get_Norm_P(double z)
 	double	p;
 
 	z	= fabs(z);
-	
+
 	p	= (((((a1 * z + a2) * z + a3) * z + a4) * z + a5) * z + a6) * z + 1.0;
 
 	return( pow(p, -16) );
@@ -1515,10 +1563,10 @@ double CSG_Test_Distribution::Get_T_Inv(double p, int df)
 		{
 			y	= 0.5 * y*y + y;
 		}
-	}            
+	}
 	else
 	{
-		y	= ((1.0 / (((df + 6.0) / (df * y) - 0.089 * d - 0.822) * (df + 2.0) * 3.0) 
+		y	= ((1.0 / (((df + 6.0) / (df * y) - 0.089 * d - 0.822) * (df + 2.0) * 3.0)
 			+ 0.5 / (df + 4.0)) * y - 1.0) * (df + 1.0) / (df + 2.0) + 1.0 / y;
 	}
 
@@ -1588,12 +1636,12 @@ double CSG_Test_Distribution::Get_F_Inverse(double alpha, int dfn, int dfd, TSG_
 	{
 		lo	= 0.5;
 		hi	= lo;
-		
+
 		for(i=0; i<ITERMAX; i++)
 		{
 			hi	*= 2.0;
 			p	= Get_F_Tail(hi, dfn, dfd);
-	
+
 			if( p > alpha )
 			{
 				lo	= hi;
