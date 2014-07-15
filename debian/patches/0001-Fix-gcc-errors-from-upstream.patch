@@ -1,10 +1,7 @@
-From: Johan Van de Wauw <johan.vandewauw@gmail.com>
-Date: Fri, 13 Jun 2014 01:04:37 +0200
-Subject: Fix gcc errors - from upstream
-
-errfunc.c: fix bug, refers to bug #191 Missing format strings
-2014-05-29 12:13:13
-by reklov_w
+From: Volker Wichmann <wichmann@laserdata.at>
+Subject: errfunc.c: fix bug, refers to bug #191 Missing format strings
+Bug:http://sourceforge.net/p/saga-gis/bugs/191/
+Origin: upstream, http://sourceforge.net/p/saga-gis/code-0/2133/
 ---
  src/modules/grid/grid_filter/geodesic_morph_rec/errfunc.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
