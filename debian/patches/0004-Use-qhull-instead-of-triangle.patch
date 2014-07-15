@@ -1,11 +1,11 @@
 From: Johan Van de Wauw <johan.vandewauw@gmail.com>
-Date: Fri, 15 Nov 2013 00:06:46 -0500
+Date: Tue, 15 Jul 2014 04:30:10 -0400
 Subject: Use qhull instead of triangle
 
 ---
- src/modules/grid/grid_gridding/Makefile.am   |  3 +--
- src/modules/grid/grid_gridding/nn/delaunay.c |  2 +-
- 3 files changed, 4 insertions(+), 14 deletions(-)
+ src/modules/grid/grid_gridding/Makefile.am   | 3 +--
+ src/modules/grid/grid_gridding/nn/delaunay.c | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/src/modules/grid/grid_gridding/Makefile.am b/src/modules/grid/grid_gridding/Makefile.am
 index 75c79c9..bc55004 100644
@@ -28,7 +28,6 @@ index 75c79c9..bc55004 100644
  Interpolation.h\
  Interpolation_AngularDistance.h\
  Interpolation_InverseDistance.h\
-
 diff --git a/src/modules/grid/grid_gridding/nn/delaunay.c b/src/modules/grid/grid_gridding/nn/delaunay.c
 index dc98875..e2952fa 100644
 --- a/src/modules/grid/grid_gridding/nn/delaunay.c

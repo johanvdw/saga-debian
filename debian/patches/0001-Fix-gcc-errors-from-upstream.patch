@@ -2,7 +2,6 @@ From: Johan Van de Wauw <johan.vandewauw@gmail.com>
 Date: Fri, 13 Jun 2014 01:04:37 +0200
 Subject: Fix gcc errors - from upstream
 
->From upstream:
 errfunc.c: fix bug, refers to bug #191 Missing format strings
 2014-05-29 12:13:13
 by reklov_w

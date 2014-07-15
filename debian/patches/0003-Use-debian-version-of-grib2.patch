@@ -1,16 +1,15 @@
 From: Johan Van de Wauw <johan.vandewauw@gmail.com>
-Date: Thu, 14 Nov 2013 21:00:49 -0500
+Date: Tue, 15 Jul 2014 04:28:04 -0400
 Subject: Use debian version of grib2
 
 ---
- src/modules_io/grid/io_grid_grib2/Makefile.am    | 50 +-----------------------
- src/modules_io/grid/io_grid_grib2/grib2_import.h |  2 +-
- 2 files changed, 2 insertions(+), 50 deletions(-)
+ src/modules/io/io_grid_grib2/Makefile.am | 50 +-------------------------------
+ 1 file changed, 1 insertion(+), 49 deletions(-)
 
-diff --git a/src/modules_io/grid/io_grid_grib2/Makefile.am b/src/modules_io/grid/io_grid_grib2/Makefile.am
+diff --git a/src/modules/io/io_grid_grib2/Makefile.am b/src/modules/io/io_grid_grib2/Makefile.am
 index 2d6ff24..7e006ae 100644
---- a/src/modules_io/grid/io_grid_grib2/Makefile.am
-+++ b/src/modules_io/grid/io_grid_grib2/Makefile.am
+--- a/src/modules/io/io_grid_grib2/Makefile.am
++++ b/src/modules/io/io_grid_grib2/Makefile.am
 @@ -11,57 +11,9 @@ DEF_SAGA           = -D_SAGA_LINUX -D_TYPEDEF_BYTE -D_TYPEDEF_WORD -DUSE_JPEG200
  CXX_INCS           = -I$(top_srcdir)/src/saga_core $(LOCAL_INCS)
  AM_CXXFLAGS        = -fPIC $(CXX_INCS) $(DEF_SAGA) $(UC_DEFS) $(DBGFLAGS) $(GOMPFLAGS)
@@ -70,16 +69,3 @@ index 2d6ff24..7e006ae 100644
  grib2_import.cpp\
  MLB_Interface.cpp\
  grib2_import.h\
-diff --git a/src/modules_io/grid/io_grid_grib2/grib2_import.h b/src/modules_io/grid/io_grid_grib2/grib2_import.h
-index 6381b89..5ab426b 100644
---- a/src/modules_io/grid/io_grid_grib2/grib2_import.h
-+++ b/src/modules_io/grid/io_grid_grib2/grib2_import.h
-@@ -11,7 +11,7 @@
- 
- #include "MLB_Interface.h"
- extern "C" {
--#include "g2clib-1.0.4/grib2.h"
-+#include <grib2.h>
- }
- 
- 
