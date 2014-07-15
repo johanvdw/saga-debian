@@ -1,4 +1,4 @@
-saga (2.1.2+dfsg-1) UNRELEASED; urgency=medium
+saga (2.1.2+dfsg-1) unstable; urgency=medium
 
   * Import new upstream (closes: #717624)
   * Fix patches - remove autoreconf results - rename configure.in
