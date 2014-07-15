@@ -1,4 +1,4 @@
-saga (2.1.1+dfsg-1) UNRELEASED; urgency=medium
+saga (2.1.2+dfsg-1) UNRELEASED; urgency=medium
 
   * Import new upstream (closes: #717624)
   * Fix patches - remove autoreconf results - rename configure.in
@@ -7,7 +7,7 @@ saga (2.1.1+dfsg-1) UNRELEASED; urgency=medium
   * Delete missing icons from menu fil
   * Bump standards version - no changes needed
 
- -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Thu, 09 Jan 2014 10:53:49 -0500
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Tue, 15 Jul 2014 04:38:14 -0400
 
 saga (2.1.0+dfsg-1) unstable; urgency=low
 
