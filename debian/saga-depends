@@ -8,11 +8,11 @@
 
 if [ $# -ne 0 ]; then
     cat >>debian/${PKG}.substvars <<EOF
-saga:Depends=libsaga-2.1.1
+saga:Depends=libsaga-2.1.2
 EOF
 else
     cat >>debian/substvars <<EOF
-saga:Depends=libsaga-2.1.1
+saga:Depends=libsaga-2.1.2
 EOF
 
 fi
