@@ -1,12 +1,20 @@
 #!/usr/bin/make -f
 
 CFLAGS+=$(CPPFLAGS)
+DEB_BUILD_ARCH_CPU := $(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU 2>/dev/null)
+ifeq ($(DEB_BUILD_ARCH_CPU), arm)
+    DISABLE_GUI := '--disable-gui'
+else ifeq ($(DEB_BUILD_ARCH_CPU), armhf)
+    DISABLE_GUI := '--disable-gui'
+else
+    DISABLE_GUI := ''
+endif
 
 %:
 	dh $@ --with python2 --with autoreconf
 
 override_dh_auto_configure:
-	dh_auto_configure -- --prefix=/usr --enable-python $(shell dpkg-buildflags --export=configure)
+	dh_auto_configure -- $(DISABLE_GUI) --prefix=/usr --enable-python $(shell dpkg-buildflags --export=configure)
 
 VERSION := $(shell grep '^AC_INIT' configure.ac | \
 	sed 's/AC_INIT(saga, \([0-9|\.]*\)\,.*)/\1/g')
