@@ -3,11 +3,13 @@
 CFLAGS+=$(CPPFLAGS)
 DEB_BUILD_ARCH_CPU := $(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU 2>/dev/null)
 ifeq ($(DEB_BUILD_ARCH_CPU), arm)
-    DISABLE_GUI := '--disable-gui'
+    DISABLE_GUI := --disable-gui
 else ifeq ($(DEB_BUILD_ARCH_CPU), armhf)
-    DISABLE_GUI := '--disable-gui'
+    DISABLE_GUI := --disable-gui
+else ifeq ($(DEB_BUILD_ARCH_CPU), armel)
+    DISABLE_GUI := --disable-gui
 else
-    DISABLE_GUI := ''
+    DISABLE_GUI := 
 endif
 
 %:
