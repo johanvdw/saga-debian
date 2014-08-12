@@ -1,3 +1,11 @@
+saga (2.1.2+dfsg-2) UNRELEASED; urgency=medium
+
+  * Remove unneeded configure option
+  * Fix wrong version number in saga-depends
+  * Temporarily disable building saga gui on arm (closes: #755361)
+
+ -- Johan Van de Wauw <johan.vandewauw@gmail.com>  Tue, 12 Aug 2014 18:48:40 +0200
+
 saga (2.1.2+dfsg-1) unstable; urgency=medium
 
   * Import new upstream (closes: #717624)
