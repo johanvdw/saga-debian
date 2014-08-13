@@ -1,0 +1,12 @@
+The original source was downloaded from http://www.saga-gis.org 
+The main upstream author is: Olaf Conrad <oconrad@saga-gis.org>
+
+On two places files were removed to adhere to the DFSG:
+- the files triangle.c and triangle.h were removed from libgrid_gridding
+  because they are incompatible with the DFSG. The functionality
+  could be retained by linking to libqhull
+  src/modules/grid/grid_gridding/nn/triangle.[c/h]
+- the module fire simulation: src/modules_simulation/fire/*
+  it relies on a non DFSG library: libfire  (www.fire.org)
+
+These steps can be reproduced by running debian/rules get-orig-source

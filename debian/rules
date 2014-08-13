@@ -37,10 +37,12 @@ override_dh_makeshlibs:
 	dh_makeshlibs -Xpython-saga
 
 get-orig-source:
-	wget $(UPSTREAM_URL)
-	gunzip *.tar.gz
-	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.c
-	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.h
-	tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/simulation/sim_fire_spreading
-	gzip -9n saga_$(UPSTREAM_VERSION).tar
-	mv saga_$(UPSTREAM_VERSION).tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
+	uscan --verbose --force-download --repack --compression xz
+	#sources up to version 2.1.2 were created using these commands:
+	#wget $(UPSTREAM_URL)
+	#gunzip *.tar.gz
+	#tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.c
+	#tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/grid/grid_gridding/nn/triangle.h
+	#tar --delete -f saga_$(UPSTREAM_VERSION).tar saga-$(UPSTREAM_VERSION)/src/modules/simulation/sim_fire_spreading
+	#gzip -9n saga_$(UPSTREAM_VERSION).tar
+	#mv saga_$(UPSTREAM_VERSION).tar.gz ../saga_$(UPSTREAM_VERSION)+dfsg.orig.tar.gz 
